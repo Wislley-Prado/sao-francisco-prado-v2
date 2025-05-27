@@ -2,6 +2,7 @@
 import React from 'react';
 import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
+import RanchosSection from '@/components/RanchosSection';
 import PackagesSection from '@/components/PackagesSection';
 import LunarCalendar from '@/components/LunarCalendar';
 import DamInfo from '@/components/DamInfo';
@@ -12,6 +13,7 @@ const Index = () => {
     <div className="min-h-screen">
       <Header />
       <HeroSection />
+      <RanchosSection />
       <PackagesSection />
       <LunarCalendar />
       <DamInfo />
