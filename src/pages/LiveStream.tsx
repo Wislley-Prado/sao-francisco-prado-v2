@@ -13,7 +13,7 @@ import { Link } from 'react-router-dom';
 const LiveStream = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-rio-blue/5 to-water-green/5">
-      {/* Header */}
+      {/* Header Compacto */}
       <div className="bg-rio-blue text-white p-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-4">
@@ -32,15 +32,17 @@ const LiveStream = () => {
         </div>
       </div>
 
-      {/* Main Content */}
+      {/* Primeira Dobra - Player Principal */}
       <div className="max-w-7xl mx-auto p-4">
-        {/* Video Player - Full Width on Mobile */}
+        {/* Video Player - Destaque Principal */}
         <div className="mb-6">
           <Card className="overflow-hidden">
             <CardContent className="p-0">
+              {/* Player ocupa toda a área disponível */}
               <div className="aspect-video">
                 <StreamPlayer />
               </div>
+              {/* Controles integrados */}
               <div className="p-4">
                 <StreamControls />
               </div>
@@ -48,7 +50,7 @@ const LiveStream = () => {
           </Card>
         </div>
 
-        {/* Mobile-Optimized Information Tabs */}
+        {/* Layout Mobile - Tabs para Informações */}
         <div className="lg:hidden">
           <Tabs defaultValue="conditions" className="w-full">
             <TabsList className="grid w-full grid-cols-3">
@@ -127,7 +129,7 @@ const LiveStream = () => {
           </Tabs>
         </div>
 
-        {/* Desktop Layout */}
+        {/* Layout Desktop - Lado a Lado */}
         <div className="hidden lg:grid lg:grid-cols-3 lg:gap-6">
           <div className="lg:col-span-1">
             <StreamInfo />
