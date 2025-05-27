@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, CarouselApi } from '@/components/ui/carousel';
 import BlogCard from './BlogCard';
-import { BookOpen, TrendingUp } from 'lucide-react';
+import { BookOpen, TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react';
 
 // Dados mock dos posts mais recentes
 const recentPosts = [
@@ -55,6 +54,27 @@ const recentPosts = [
 ];
 
 const BlogSection = () => {
+  const [api, setApi] = React.useState<CarouselApi>();
+  const [current, setCurrent] = React.useState(0);
+  const [count, setCount] = React.useState(0);
+
+  React.useEffect(() => {
+    if (!api) {
+      return;
+    }
+
+    setCount(api.scrollSnapList().length);
+    setCurrent(api.selectedScrollSnap() + 1);
+
+    api.on("select", () => {
+      setCurrent(api.selectedScrollSnap() + 1);
+    });
+  }, [api]);
+
+  const scrollTo = (index: number) => {
+    api?.scrollTo(index);
+  };
+
   return (
     <section id="blog" className="py-16 bg-gradient-to-br from-slate-50 to-blue-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -71,11 +91,19 @@ const BlogSection = () => {
             <TrendingUp className="h-4 w-4" />
             <span className="font-medium">Posts mais recentes</span>
           </div>
+          
+          {/* Mobile hint */}
+          <div className="md:hidden mt-4 text-xs text-gray-500 flex items-center justify-center space-x-2">
+            <ChevronLeft className="h-3 w-3 animate-pulse" />
+            <span>Deslize para ver mais posts</span>
+            <ChevronRight className="h-3 w-3 animate-pulse" />
+          </div>
         </div>
 
         {/* Carousel de Posts */}
         <div className="relative">
           <Carousel
+            setApi={setApi}
             opts={{
               align: "start",
               loop: true,
@@ -84,14 +112,36 @@ const BlogSection = () => {
           >
             <CarouselContent className="-ml-2 md:-ml-4">
               {recentPosts.map((post) => (
-                <CarouselItem key={post.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
+                <CarouselItem key={post.id} className="pl-2 md:pl-4 basis-4/5 sm:basis-3/5 md:basis-1/2 lg:basis-1/3">
                   <BlogCard post={post} />
                 </CarouselItem>
               ))}
             </CarouselContent>
+            
+            {/* Desktop Navigation */}
             <CarouselPrevious className="hidden md:flex -left-12" />
             <CarouselNext className="hidden md:flex -right-12" />
+            
+            {/* Mobile Navigation Buttons */}
+            <CarouselPrevious className="md:hidden left-2 h-8 w-8 bg-white/80 hover:bg-white border shadow-lg" />
+            <CarouselNext className="md:hidden right-2 h-8 w-8 bg-white/80 hover:bg-white border shadow-lg" />
           </Carousel>
+
+          {/* Dots Indicators */}
+          <div className="flex justify-center mt-6 space-x-2">
+            {Array.from({ length: count }).map((_, index) => (
+              <button
+                key={index}
+                onClick={() => scrollTo(index)}
+                className={`w-2 h-2 rounded-full transition-all duration-200 ${
+                  index === current - 1 
+                    ? 'bg-rio-blue w-6' 
+                    : 'bg-gray-300 hover:bg-gray-400'
+                }`}
+                aria-label={`Ir para post ${index + 1}`}
+              />
+            ))}
+          </div>
         </div>
 
         {/* CTA para ver todos os posts */}
