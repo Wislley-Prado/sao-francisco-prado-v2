@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Menu, X, Phone, Calendar, Fish } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -10,7 +11,7 @@ const Header = () => {
     { name: 'Início', href: '#home' },
     { name: 'Ranchos', href: '#ranchos' },
     { name: 'Pacotes', href: '#pacotes' },
-    { name: 'Transmissão', href: '#live' },
+    { name: 'Transmissão', href: '/live' },
     { name: 'Represa', href: '#represa' },
     { name: 'Blog', href: '#blog' },
   ];
@@ -20,24 +21,34 @@ const Header = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
           {/* Logo */}
-          <div className="flex items-center space-x-2">
+          <Link to="/" className="flex items-center space-x-2">
             <Fish className="h-8 w-8 text-white" />
             <div className="text-white">
               <h1 className="text-2xl font-bold">PradoAqui</h1>
               <p className="text-xs text-blue-200">Rio São Francisco</p>
             </div>
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             {navItems.map((item) => (
-              <a
-                key={item.name}
-                href={item.href}
-                className="text-white hover:text-sand-beige transition-colors duration-200"
-              >
-                {item.name}
-              </a>
+              item.href.startsWith('/') ? (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className="text-white hover:text-sand-beige transition-colors duration-200"
+                >
+                  {item.name}
+                </Link>
+              ) : (
+                <a
+                  key={item.name}
+                  href={item.href}
+                  className="text-white hover:text-sand-beige transition-colors duration-200"
+                >
+                  {item.name}
+                </a>
+              )
             ))}
           </nav>
 
@@ -78,14 +89,25 @@ const Header = () => {
           <div className="md:hidden pb-4">
             <nav className="flex flex-col space-y-4">
               {navItems.map((item) => (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  className="text-white hover:text-sand-beige transition-colors duration-200 py-2"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {item.name}
-                </a>
+                item.href.startsWith('/') ? (
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    className="text-white hover:text-sand-beige transition-colors duration-200 py-2"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {item.name}
+                  </Link>
+                ) : (
+                  <a
+                    key={item.name}
+                    href={item.href}
+                    className="text-white hover:text-sand-beige transition-colors duration-200 py-2"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {item.name}
+                  </a>
+                )
               ))}
               <div className="flex flex-col space-y-2 pt-4">
                 <Button
