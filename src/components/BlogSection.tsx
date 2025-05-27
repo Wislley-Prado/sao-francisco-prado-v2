@@ -1,0 +1,109 @@
+
+import React from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import BlogCard from './BlogCard';
+import { BookOpen, TrendingUp } from 'lucide-react';
+
+// Dados mock dos posts mais recentes
+const recentPosts = [
+  {
+    id: '1',
+    title: 'Melhores Técnicas de Pesca no Rio São Francisco',
+    excerpt: 'Descubra as técnicas mais eficazes para pescar no Velho Chico, desde iscas naturais até equipamentos recomendados pelos pescadores experientes.',
+    author: 'João Pescador',
+    date: '15 Mai 2024',
+    image: '/placeholder.svg',
+    category: 'Técnicas'
+  },
+  {
+    id: '2',
+    title: 'Calendário Lunar da Pesca: Maio 2024',
+    excerpt: 'Confira as melhores fases da lua para pescar neste mês e maximize suas chances de uma pescaria de sucesso no Rio São Francisco.',
+    author: 'Maria Santos',
+    date: '12 Mai 2024',
+    image: '/placeholder.svg',
+    category: 'Lunar'
+  },
+  {
+    id: '3',
+    title: 'Represa de Três Marias: Condições Atuais',
+    excerpt: 'Relatório completo sobre o nível da represa, qualidade da água e previsões para os próximos dias de pesca.',
+    author: 'Pedro Análise',
+    date: '10 Mai 2024',
+    image: '/placeholder.svg',
+    category: 'Represa'
+  },
+  {
+    id: '4',
+    title: 'Espécies de Peixes: Dourado do São Francisco',
+    excerpt: 'Conheça tudo sobre o dourado, o rei dos peixes do São Francisco, seus hábitos, melhores iscas e locais para encontrá-lo.',
+    author: 'Ana Bióloga',
+    date: '8 Mai 2024',
+    image: '/placeholder.svg',
+    category: 'Espécies'
+  },
+  {
+    id: '5',
+    title: 'Regulamentação da Pesca em 2024',
+    excerpt: 'Fique por dentro das novas regras de pesca, períodos de defeso e licenças necessárias para pescar no Rio São Francisco.',
+    author: 'Roberto Legal',
+    date: '5 Mai 2024',
+    image: '/placeholder.svg',
+    category: 'Regulamentação'
+  }
+];
+
+const BlogSection = () => {
+  return (
+    <section id="blog" className="py-16 bg-gradient-to-br from-slate-50 to-blue-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header da Seção */}
+        <div className="text-center mb-12">
+          <div className="flex items-center justify-center space-x-2 mb-4">
+            <BookOpen className="h-8 w-8 text-rio-blue" />
+            <h2 className="text-3xl font-bold text-gray-900">Blog PradoAqui</h2>
+          </div>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Fique por dentro das últimas novidades, dicas de pesca e informações sobre o Rio São Francisco
+          </p>
+          <div className="flex items-center justify-center space-x-1 mt-4 text-sm text-rio-blue">
+            <TrendingUp className="h-4 w-4" />
+            <span className="font-medium">Posts mais recentes</span>
+          </div>
+        </div>
+
+        {/* Carousel de Posts */}
+        <div className="relative">
+          <Carousel
+            opts={{
+              align: "start",
+              loop: true,
+            }}
+            className="w-full"
+          >
+            <CarouselContent className="-ml-2 md:-ml-4">
+              {recentPosts.map((post) => (
+                <CarouselItem key={post.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
+                  <BlogCard post={post} />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="hidden md:flex -left-12" />
+            <CarouselNext className="hidden md:flex -right-12" />
+          </Carousel>
+        </div>
+
+        {/* CTA para ver todos os posts */}
+        <div className="text-center mt-12">
+          <button className="bg-rio-blue hover:bg-blue-600 text-white px-8 py-3 rounded-lg font-medium transition-colors duration-200 inline-flex items-center space-x-2">
+            <BookOpen className="h-5 w-5" />
+            <span>Ver Todos os Posts</span>
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default BlogSection;

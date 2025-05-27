@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Menu, X, Phone, Calendar, Fish } from 'lucide-react';
@@ -11,9 +10,9 @@ const Header = () => {
     { name: 'Início', href: '#home' },
     { name: 'Ranchos', href: '#ranchos' },
     { name: 'Pacotes', href: '#pacotes' },
+    { name: 'Blog', href: '#blog' },
     { name: 'Transmissão', href: '/live' },
     { name: 'Represa', href: '#represa' },
-    { name: 'Blog', href: '#blog' },
   ];
 
   return (
