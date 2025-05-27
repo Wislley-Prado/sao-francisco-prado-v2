@@ -1,7 +1,7 @@
 
 import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Play, Pause, Volume2, VolumeX, Maximize, Loader2 } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, Maximize, Loader2, Radio } from 'lucide-react';
 
 const StreamPlayer = () => {
   const [isPlaying, setIsPlaying] = useState(false);
