@@ -24,7 +24,7 @@ const ConditionsGrid: React.FC<ConditionsGridProps> = ({ conditions, defluencia 
               <span className="font-medium">{condition.label}</span>
               {/* Adicionar indicador especial para defluência */}
               {condition.label === "Defluência" && spillwayStatus?.isActive && (
-                <Waves className="h-4 w-4 text-blue-500" title="Vertedouro ativo" />
+                <Waves className="h-4 w-4 text-blue-500" />
               )}
             </div>
             <div className="flex items-center space-x-2">
