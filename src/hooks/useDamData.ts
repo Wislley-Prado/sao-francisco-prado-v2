@@ -3,8 +3,8 @@ import { useQuery } from '@tanstack/react-query';
 import { DamData } from '@/types/damData';
 
 const fetchDamData = async (): Promise<DamData> => {
-  console.log('Fetching dam data from webhook...');
-  const response = await fetch('https://n8n.prado.vendopro.com.br/webhook-test/represaonlinepradoaqui', {
+  console.log('Fetching dam data from production webhook...');
+  const response = await fetch('https://n8n.prado.vendopro.com.br/webhook/represaonlinepradoaqui', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
