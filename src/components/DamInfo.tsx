@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -12,6 +11,7 @@ import ConditionsGrid from './dam/ConditionsGrid';
 import HistoryTable from './dam/HistoryTable';
 import FishingImpactCard from './dam/FishingImpactCard';
 import CurrentStatsCard from './dam/CurrentStatsCard';
+import SpillwayStatus from './dam/SpillwayStatus';
 
 const DamInfo = () => {
   const { data: damData, isLoading, error, refetch } = useDamData();
@@ -110,7 +110,7 @@ const DamInfo = () => {
                   </div>
                 </div>
 
-                <ConditionsGrid conditions={conditions} />
+                <ConditionsGrid conditions={conditions} defluencia={defluencia} />
 
                 <HistoryTable historicoDias={damData?.historico_dias || []} />
               </CardContent>
@@ -119,6 +119,9 @@ const DamInfo = () => {
 
           {/* Side Info */}
           <div className="space-y-6">
+            {/* Novo componente para status do vertedouro */}
+            <SpillwayStatus defluencia={defluencia} />
+            
             <FishingImpactCard currentLevel={currentLevel} />
 
             <CurrentStatsCard 
