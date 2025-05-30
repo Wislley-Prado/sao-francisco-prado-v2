@@ -62,15 +62,15 @@ const extractNumber = (value: string | number): string => {
 
 // Função para converter os dados do webhook para o formato esperado
 const mapWebhookDataToDamData = (webhookData: WebhookResponse): DamData => {
-  console.log('Mapping webhook data:', webhookData);
+  console.log('🔄 [MAPPING] Iniciando mapeamento dos dados do webhook:', webhookData);
   
   // Verificar se é a estrutura nova ou antiga
   if (webhookData.reservatorio) {
-    // Estrutura antiga com reservatorio
+    console.log('📋 [MAPPING] Usando estrutura antiga (reservatorio)');
     const { reservatorio } = webhookData;
     const dateTimeParts = reservatorio.nivel_atual.data_hora.split(' - ');
     
-    return {
+    const mappedData = {
       nivel_atual: extractNumber(reservatorio.percentual_volume_util),
       volume_util_percentual: extractNumber(reservatorio.percentual_volume_util),
       afluencia: extractNumber(reservatorio.afluencia.valor),
@@ -79,7 +79,12 @@ const mapWebhookDataToDamData = (webhookData: WebhookResponse): DamData => {
       hora_atualizacao: dateTimeParts[1] || '',
       historico_dias: []
     };
+    
+    console.log('✅ [MAPPING] Dados mapeados (estrutura antiga):', mappedData);
+    return mappedData;
   } else {
+    console.log('📋 [MAPPING] Usando estrutura nova (direta)');
+    
     // Estrutura nova (direta) - verificar todos os possíveis campos
     const volumePercentual = webhookData.volume_util_percentual || 
                            webhookData.percentual_volume_util || 
@@ -95,13 +100,15 @@ const mapWebhookDataToDamData = (webhookData: WebhookResponse): DamData => {
                            webhookData.defluencia_m3s ||
                            webhookData.defluencia_metros_cubicos_por_segundo || 0;
     
-    console.log('Extracted values:', {
+    console.log('🔍 [MAPPING] Valores extraídos:', {
       volumePercentual,
       afluenciaValor,
-      defluenciaValor
+      defluenciaValor,
+      data_atualizacao: webhookData.data_atualizacao,
+      hora_atualizacao: webhookData.hora_atualizacao
     });
     
-    return {
+    const mappedData = {
       nivel_atual: extractNumber(volumePercentual),
       volume_util_percentual: extractNumber(volumePercentual),
       afluencia: extractNumber(afluenciaValor),
@@ -110,11 +117,15 @@ const mapWebhookDataToDamData = (webhookData: WebhookResponse): DamData => {
       hora_atualizacao: webhookData.hora_atualizacao || '',
       historico_dias: []
     };
+    
+    console.log('✅ [MAPPING] Dados mapeados (estrutura nova):', mappedData);
+    return mappedData;
   }
 };
 
 const fetchDamData = async (): Promise<DamData> => {
-  console.log('Fetching dam data from production webhook URL...');
+  const timestamp = new Date().toISOString();
+  console.log(`🚀 [FETCH] ${timestamp} - Iniciando busca de dados do webhook...`);
   
   try {
     const response = await fetch('https://n8n.prado.vendopro.com.br/webhook/v1.teste.represa.online', {
@@ -126,47 +137,50 @@ const fetchDamData = async (): Promise<DamData> => {
       cache: 'no-cache',
     });
     
-    console.log(`Response status: ${response.status}`);
+    console.log(`📡 [FETCH] Status da resposta: ${response.status}`);
     
     if (!response.ok) {
       throw new Error(`HTTP error: ${response.status} - ${response.statusText}`);
     }
     
     const responseData = await response.json();
-    console.log('Raw webhook response:', responseData);
+    console.log('📦 [FETCH] Dados brutos recebidos:', responseData);
     
     // Extrair os dados da estrutura correta
     let webhookData: WebhookResponse;
     
     if (Array.isArray(responseData) && responseData.length > 0) {
-      // Se for um array, pegar o primeiro item e extrair o content
+      console.log('🔄 [FETCH] Resposta é um array, extraindo primeiro item...');
       const firstItem = responseData[0];
       if (firstItem?.message?.content) {
         webhookData = firstItem.message.content;
+        console.log('📋 [FETCH] Dados extraídos de message.content:', webhookData);
       } else {
         webhookData = firstItem;
+        console.log('📋 [FETCH] Dados extraídos do primeiro item:', webhookData);
       }
     } else {
       webhookData = responseData;
+      console.log('📋 [FETCH] Dados extraídos diretamente:', webhookData);
     }
-      
-    console.log('Extracted webhook data:', webhookData);
     
     // Converter para o formato esperado
     const damData = mapWebhookDataToDamData(webhookData);
-    console.log('Mapped dam data:', damData);
-    console.log('✅ Dados carregados com sucesso!');
+    console.log('✅ [FETCH] Dados finais processados:', damData);
+    console.log(`🎉 [FETCH] ${timestamp} - Busca concluída com sucesso!`);
     
     return damData;
     
   } catch (error) {
-    console.error('Erro ao buscar dados:', error);
+    console.error('❌ [FETCH] Erro ao buscar dados:', error);
     throw error;
   }
 };
 
 export const useDamData = () => {
-  return useQuery({
+  console.log('🔧 [HOOK] Inicializando hook useDamData');
+  
+  const query = useQuery({
     queryKey: ['damData'],
     queryFn: fetchDamData,
     refetchInterval: 6 * 60 * 60 * 1000, // Refetch a cada 6 horas
@@ -174,5 +188,26 @@ export const useDamData = () => {
     retry: 1,
     retryDelay: 5000,
     throwOnError: false, // Não lançar erro, usar dados mock em caso de falha
+    onSuccess: (data) => {
+      console.log('🎊 [HOOK] onSuccess - Dados carregados com sucesso:', data);
+    },
+    onError: (error) => {
+      console.error('💥 [HOOK] onError - Erro no hook:', error);
+    },
+    onSettled: (data, error) => {
+      console.log('🏁 [HOOK] onSettled - Query finalizada', { data, error });
+    }
   });
+
+  console.log('📊 [HOOK] Estado atual do query:', {
+    isLoading: query.isLoading,
+    isFetching: query.isFetching,
+    isError: query.isError,
+    isSuccess: query.isSuccess,
+    data: query.data,
+    error: query.error,
+    dataUpdatedAt: new Date(query.dataUpdatedAt).toISOString()
+  });
+
+  return query;
 };

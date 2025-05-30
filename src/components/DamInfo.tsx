@@ -1,4 +1,5 @@
-import React from 'react';
+
+import React, { useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
@@ -14,17 +15,57 @@ import CurrentStatsCard from './dam/CurrentStatsCard';
 import SpillwayStatus from './dam/SpillwayStatus';
 
 const DamInfo = () => {
-  const { data: damData, isLoading, error, refetch } = useDamData();
+  const { data: damData, isLoading, error, refetch, dataUpdatedAt } = useDamData();
+  const renderCount = useRef(0);
+  const lastDataRef = useRef(damData);
 
-  console.log('Current dam data:', damData);
-  console.log('Loading state:', isLoading);
-  console.log('Error state:', error);
+  // Incrementar contador de renders para debug
+  renderCount.current += 1;
+
+  useEffect(() => {
+    console.log(`🎨 [UI] Render #${renderCount.current} - DamInfo componente renderizado`);
+    console.log('🎨 [UI] Estado atual:', {
+      damData,
+      isLoading,
+      error: error?.message,
+      dataUpdatedAt: dataUpdatedAt ? new Date(dataUpdatedAt).toISOString() : 'N/A'
+    });
+  });
+
+  // Detectar mudanças nos dados
+  useEffect(() => {
+    if (lastDataRef.current !== damData) {
+      console.log('🔄 [UI] DADOS MUDARAM!');
+      console.log('🔄 [UI] Dados anteriores:', lastDataRef.current);
+      console.log('🔄 [UI] Novos dados:', damData);
+      lastDataRef.current = damData;
+    }
+  }, [damData]);
+
+  // Log quando o componente monta/desmonta
+  useEffect(() => {
+    console.log('🏗️ [UI] DamInfo componente montado');
+    return () => {
+      console.log('🏗️ [UI] DamInfo componente desmontado');
+    };
+  }, []);
+
+  console.log('🎯 [UI] Dados atuais no render:', damData);
+  console.log('🎯 [UI] Loading state:', isLoading);
+  console.log('🎯 [UI] Error state:', error);
 
   // Valores padrão enquanto carrega ou em caso de erro
   const currentLevel = damData?.nivel_atual ? parseFloat(damData.nivel_atual) : 86;
   const volumePercentual = damData?.volume_util_percentual ? parseFloat(damData.volume_util_percentual) : 86;
   const afluencia = damData?.afluencia || '--';
   const defluencia = damData?.defluencia || '--';
+
+  console.log('📊 [UI] Valores calculados:', {
+    currentLevel,
+    volumePercentual,
+    afluencia,
+    defluencia
+  });
 
   const levelStatus = getStatusFromLevel(currentLevel);
 
@@ -59,14 +100,30 @@ const DamInfo = () => {
     }
   ];
 
+  const handleRefetch = () => {
+    console.log('🔄 [UI] Botão de refresh clicado - forçando refetch');
+    refetch();
+  };
+
   return (
     <section id="represa" className="py-20 bg-gradient-to-br from-blue-50 to-green-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Debug Info */}
+        <div className="mb-4 p-4 bg-gray-100 rounded-lg text-xs">
+          <div className="font-bold mb-2">🐛 DEBUG INFO (Render #{renderCount.current})</div>
+          <div>Estado: {isLoading ? 'Carregando' : error ? 'Erro' : 'Sucesso'}</div>
+          <div>Dados: {damData ? 'Presentes' : 'Ausentes'}</div>
+          <div>Última atualização: {dataUpdatedAt ? new Date(dataUpdatedAt).toLocaleString() : 'N/A'}</div>
+          <div>Nível atual: {currentLevel}%</div>
+          <div>Afluência: {afluencia}</div>
+          <div>Defluência: {defluencia}</div>
+        </div>
+
         <DamHeader 
           damData={damData}
           isLoading={isLoading}
           error={error}
-          refetch={refetch}
+          refetch={handleRefetch}
         />
 
         <div className="grid lg:grid-cols-3 gap-8">
@@ -80,7 +137,7 @@ const DamInfo = () => {
                     Status Atual da Represa
                   </div>
                   <button 
-                    onClick={() => refetch()} 
+                    onClick={handleRefetch} 
                     className="p-2 hover:bg-blue-600 rounded-full transition-colors"
                     disabled={isLoading}
                   >
