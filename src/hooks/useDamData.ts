@@ -60,8 +60,8 @@ const mapWebhookDataToDamData = (webhookData: WebhookResponse): DamData => {
 };
 
 const fetchDamData = async (): Promise<DamData> => {
-  console.log('Fetching dam data from new webhook URL...');
-  const response = await fetch('https://n8n.prado.vendopro.com.br/webhook-test/v1.teste.represa.online', {
+  console.log('Fetching dam data from production webhook URL...');
+  const response = await fetch('https://n8n.prado.vendopro.com.br/webhook/v1.teste.represa.online', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
