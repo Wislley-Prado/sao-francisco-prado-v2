@@ -10,9 +10,7 @@ import { Condition } from '@/types/damData';
 import DamHeader from './dam/DamHeader';
 import ConditionsGrid from './dam/ConditionsGrid';
 import HistoryTable from './dam/HistoryTable';
-import FishingImpactCard from './dam/FishingImpactCard';
-import CurrentStatsCard from './dam/CurrentStatsCard';
-import SpillwayStatus from './dam/SpillwayStatus';
+import DamDashboard from './dam/DamDashboard';
 
 const DamInfo = () => {
   const { data: damData, isLoading, error, refetch, dataUpdatedAt } = useDamData();
@@ -115,6 +113,16 @@ const DamInfo = () => {
           refetch={handleRefetch}
         />
 
+        {/* Dashboard Interativo */}
+        <DamDashboard
+          damData={damData}
+          isLoading={isLoading}
+          error={error}
+          dataUpdatedAt={dataUpdatedAt}
+          renderCount={renderCount.current}
+          onRefresh={handleRefetch}
+        />
+
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Info Card */}
           <div className="lg:col-span-2">
@@ -163,19 +171,9 @@ const DamInfo = () => {
             </Card>
           </div>
 
-          {/* Side Info */}
+          {/* Side Info - Removido os cartões antigos */}
           <div className="space-y-6">
-            <SpillwayStatus defluencia={defluencia} />
-            
-            <FishingImpactCard currentLevel={currentLevel} />
-
-            <CurrentStatsCard 
-              damData={damData}
-              currentLevel={currentLevel}
-              volumePercentual={volumePercentual}
-              afluencia={afluencia}
-              defluencia={defluencia}
-            />
+            {/* Espaço reservado para futuros componentes se necessário */}
           </div>
         </div>
       </div>
