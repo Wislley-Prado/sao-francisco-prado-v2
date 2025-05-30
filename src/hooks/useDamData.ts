@@ -2,9 +2,66 @@
 import { useQuery } from '@tanstack/react-query';
 import { DamData } from '@/types/damData';
 
+// Interface para os dados que vêm do novo webhook
+interface WebhookResponse {
+  reservatorio: {
+    nome: string;
+    nivel_atual: {
+      data_hora: string;
+      valor: string;
+    };
+    nivel_maximo: string;
+    nivel_minimo: string;
+    percentual_volume_util: string;
+  };
+  hidreletrica: {
+    nome: string;
+    afluencia: {
+      data_hora: string;
+      valor: string;
+    };
+    defluencia: {
+      data_hora: string;
+      valor: string;
+    };
+  };
+}
+
+// Função para extrair apenas o número de uma string (remove unidades)
+const extractNumber = (value: string): string => {
+  const match = value.match(/[\d.,]+/);
+  return match ? match[0].replace(',', '.') : '0';
+};
+
+// Função para separar data e hora
+const separateDateAndTime = (dateTimeString: string) => {
+  const parts = dateTimeString.split(' - ');
+  return {
+    date: parts[0] || '',
+    time: parts[1] || ''
+  };
+};
+
+// Função para converter os dados do webhook para o formato esperado
+const mapWebhookDataToDamData = (webhookData: WebhookResponse): DamData => {
+  const { date: dataAtualizacao, time: horaAtualizacao } = separateDateAndTime(
+    webhookData.reservatorio.nivel_atual.data_hora
+  );
+
+  return {
+    nivel_atual: extractNumber(webhookData.reservatorio.percentual_volume_util),
+    volume_util_percentual: extractNumber(webhookData.reservatorio.percentual_volume_util),
+    afluencia: extractNumber(webhookData.hidreletrica.afluencia.valor),
+    defluencia: extractNumber(webhookData.hidreletrica.defluencia.valor),
+    data_atualizacao: dataAtualizacao,
+    hora_atualizacao: horaAtualizacao,
+    historico_dias: [] // Por enquanto vazio, pode ser implementado depois
+  };
+};
+
 const fetchDamData = async (): Promise<DamData> => {
-  console.log('Fetching dam data from new webhook...');
-  const response = await fetch('https://n8n.prado.vendopro.com.br/webhook/teste.represa', {
+  console.log('Fetching dam data from new webhook URL...');
+  const response = await fetch('https://n8n.prado.vendopro.com.br/webhook-test/v1.teste.represa.online', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -19,13 +76,15 @@ const fetchDamData = async (): Promise<DamData> => {
   const responseData = await response.json();
   console.log('Raw webhook response:', responseData);
   
-  // Extrair e fazer parse do campo 'output' que contém o JSON como string
-  if (!responseData.output) {
-    throw new Error('Campo output não encontrado na resposta');
-  }
+  // Os dados agora vêm direto, sem o campo 'output'
+  const webhookData = responseData[0]?.message?.role === 'assistant' ? 
+    responseData[0].message.content : responseData;
+    
+  console.log('Extracted webhook data:', webhookData);
   
-  const damData = JSON.parse(responseData.output);
-  console.log('Parsed dam data:', damData);
+  // Converter para o formato esperado
+  const damData = mapWebhookDataToDamData(webhookData);
+  console.log('Mapped dam data:', damData);
   
   return damData;
 };
