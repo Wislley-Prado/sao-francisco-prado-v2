@@ -8,6 +8,8 @@ interface WebhookResponse {
   hora_atualizacao?: string;
   nivel_atual?: number;
   nivel_atual_metros?: number;
+  nivel_maximo_metros?: number;
+  nivel_minimo_metros?: number;
   volume_util?: number;
   volume_util_percentual?: number;
   percentual_volume_util?: number;
@@ -15,14 +17,20 @@ interface WebhookResponse {
     valor: number;
     data?: string;
     hora?: string;
+    timestamp?: string;
+    unidade?: string;
   };
   defluencia?: {
     valor: number;
     data?: string;
     hora?: string;
+    timestamp?: string;
+    unidade?: string;
   };
   afluencia_m3s?: number;
   defluencia_m3s?: number;
+  afluencia_metros_cubicos_por_segundo?: number;
+  defluencia_metros_cubicos_por_segundo?: number;
   // Estrutura anterior (para compatibilidade)
   reservatorio?: {
     nome: string;
@@ -72,16 +80,26 @@ const mapWebhookDataToDamData = (webhookData: WebhookResponse): DamData => {
       historico_dias: []
     };
   } else {
-    // Estrutura nova (direta)
+    // Estrutura nova (direta) - verificar todos os possíveis campos
     const volumePercentual = webhookData.volume_util_percentual || 
                            webhookData.percentual_volume_util || 
                            webhookData.volume_util || 0;
     
+    // Buscar afluencia em todas as possíveis estruturas
     const afluenciaValor = webhookData.afluencia?.valor || 
-                          webhookData.afluencia_m3s || 0;
+                          webhookData.afluencia_m3s || 
+                          webhookData.afluencia_metros_cubicos_por_segundo || 0;
     
+    // Buscar defluencia em todas as possíveis estruturas  
     const defluenciaValor = webhookData.defluencia?.valor || 
-                           webhookData.defluencia_m3s || 0;
+                           webhookData.defluencia_m3s ||
+                           webhookData.defluencia_metros_cubicos_por_segundo || 0;
+    
+    console.log('Extracted values:', {
+      volumePercentual,
+      afluenciaValor,
+      defluenciaValor
+    });
     
     return {
       nivel_atual: extractNumber(volumePercentual),
