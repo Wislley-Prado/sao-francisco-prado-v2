@@ -13,7 +13,6 @@ import HistoryTable from './dam/HistoryTable';
 import FishingImpactCard from './dam/FishingImpactCard';
 import CurrentStatsCard from './dam/CurrentStatsCard';
 import SpillwayStatus from './dam/SpillwayStatus';
-import DamDashboard from './dam/DamDashboard';
 
 const DamInfo = () => {
   const { data: damData, isLoading, error, refetch, dataUpdatedAt } = useDamData();
@@ -109,16 +108,6 @@ const DamInfo = () => {
   return (
     <section id="represa" className="py-20 bg-gradient-to-br from-blue-50 to-green-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Novo Dashboard Interativo */}
-        <DamDashboard
-          damData={damData}
-          isLoading={isLoading}
-          error={error}
-          dataUpdatedAt={dataUpdatedAt}
-          renderCount={renderCount.current}
-          onRefresh={handleRefetch}
-        />
-
         <DamHeader 
           damData={damData}
           isLoading={isLoading}
@@ -176,7 +165,6 @@ const DamInfo = () => {
 
           {/* Side Info */}
           <div className="space-y-6">
-            {/* Novo componente para status do vertedouro */}
             <SpillwayStatus defluencia={defluencia} />
             
             <FishingImpactCard currentLevel={currentLevel} />
