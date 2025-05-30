@@ -13,6 +13,7 @@ import HistoryTable from './dam/HistoryTable';
 import FishingImpactCard from './dam/FishingImpactCard';
 import CurrentStatsCard from './dam/CurrentStatsCard';
 import SpillwayStatus from './dam/SpillwayStatus';
+import DamDashboard from './dam/DamDashboard';
 
 const DamInfo = () => {
   const { data: damData, isLoading, error, refetch, dataUpdatedAt } = useDamData();
@@ -108,16 +109,15 @@ const DamInfo = () => {
   return (
     <section id="represa" className="py-20 bg-gradient-to-br from-blue-50 to-green-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Debug Info */}
-        <div className="mb-4 p-4 bg-gray-100 rounded-lg text-xs">
-          <div className="font-bold mb-2">🐛 DEBUG INFO (Render #{renderCount.current})</div>
-          <div>Estado: {isLoading ? 'Carregando' : error ? 'Erro' : 'Sucesso'}</div>
-          <div>Dados: {damData ? 'Presentes' : 'Ausentes'}</div>
-          <div>Última atualização: {dataUpdatedAt ? new Date(dataUpdatedAt).toLocaleString() : 'N/A'}</div>
-          <div>Nível atual: {currentLevel}%</div>
-          <div>Afluência: {afluencia}</div>
-          <div>Defluência: {defluencia}</div>
-        </div>
+        {/* Novo Dashboard Interativo */}
+        <DamDashboard
+          damData={damData}
+          isLoading={isLoading}
+          error={error}
+          dataUpdatedAt={dataUpdatedAt}
+          renderCount={renderCount.current}
+          onRefresh={handleRefetch}
+        />
 
         <DamHeader 
           damData={damData}
