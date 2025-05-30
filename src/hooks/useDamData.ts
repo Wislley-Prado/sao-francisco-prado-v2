@@ -1,5 +1,6 @@
 
 import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { DamData } from '@/types/damData';
 
 // Interface para os dados que vêm do novo webhook (estrutura atualizada)
@@ -188,16 +189,28 @@ export const useDamData = () => {
     retry: 1,
     retryDelay: 5000,
     throwOnError: false, // Não lançar erro, usar dados mock em caso de falha
-    onSuccess: (data) => {
-      console.log('🎊 [HOOK] onSuccess - Dados carregados com sucesso:', data);
-    },
-    onError: (error) => {
-      console.error('💥 [HOOK] onError - Erro no hook:', error);
-    },
-    onSettled: (data, error) => {
-      console.log('🏁 [HOOK] onSettled - Query finalizada', { data, error });
-    }
   });
+
+  // Use useEffect for success/error logging instead of deprecated callbacks
+  useEffect(() => {
+    if (query.isSuccess && query.data) {
+      console.log('🎊 [HOOK] Query Success - Dados carregados com sucesso:', query.data);
+    }
+  }, [query.isSuccess, query.data]);
+
+  useEffect(() => {
+    if (query.isError && query.error) {
+      console.error('💥 [HOOK] Query Error - Erro no hook:', query.error);
+    }
+  }, [query.isError, query.error]);
+
+  useEffect(() => {
+    console.log('🏁 [HOOK] Query Status Changed - Query finalizada', { 
+      data: query.data, 
+      error: query.error,
+      status: query.status 
+    });
+  }, [query.status, query.data, query.error]);
 
   console.log('📊 [HOOK] Estado atual do query:', {
     isLoading: query.isLoading,
