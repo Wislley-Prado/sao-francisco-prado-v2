@@ -14,6 +14,8 @@ export interface DamData {
   volume_util_percentual: string;
   afluencia: string;
   defluencia: string;
+  data_atualizacao: string;
+  hora_atualizacao: string;
   historico_dias: DamHistoryDay[];
 }
 
