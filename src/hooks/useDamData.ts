@@ -2,9 +2,29 @@
 import { useQuery } from '@tanstack/react-query';
 import { DamData } from '@/types/damData';
 
-// Interface para os dados que vêm do novo webhook
+// Interface para os dados que vêm do novo webhook (estrutura atualizada)
 interface WebhookResponse {
-  reservatorio: {
+  data_atualizacao?: string;
+  hora_atualizacao?: string;
+  nivel_atual?: number;
+  nivel_atual_metros?: number;
+  volume_util?: number;
+  volume_util_percentual?: number;
+  percentual_volume_util?: number;
+  afluencia?: {
+    valor: number;
+    data?: string;
+    hora?: string;
+  };
+  defluencia?: {
+    valor: number;
+    data?: string;
+    hora?: string;
+  };
+  afluencia_m3s?: number;
+  defluencia_m3s?: number;
+  // Estrutura anterior (para compatibilidade)
+  reservatorio?: {
     nome: string;
     nivel_atual: {
       data_hora: string;
@@ -25,39 +45,54 @@ interface WebhookResponse {
 }
 
 // Função para extrair apenas o número de uma string (remove unidades)
-const extractNumber = (value: string): string => {
+const extractNumber = (value: string | number): string => {
+  if (typeof value === 'number') return value.toString();
   if (!value) return '0';
-  const match = value.match(/[\d.,]+/);
+  const match = value.toString().match(/[\d.,]+/);
   return match ? match[0].replace(',', '.') : '0';
-};
-
-// Função para separar data e hora
-const separateDateAndTime = (dateTimeString: string) => {
-  if (!dateTimeString) return { date: '', time: '' };
-  const parts = dateTimeString.split(' - ');
-  return {
-    date: parts[0] || '',
-    time: parts[1] || ''
-  };
 };
 
 // Função para converter os dados do webhook para o formato esperado
 const mapWebhookDataToDamData = (webhookData: WebhookResponse): DamData => {
   console.log('Mapping webhook data:', webhookData);
   
-  const { date: dataAtualizacao, time: horaAtualizacao } = separateDateAndTime(
-    webhookData?.reservatorio?.nivel_atual?.data_hora || ''
-  );
-
-  return {
-    nivel_atual: extractNumber(webhookData?.reservatorio?.percentual_volume_util || '0'),
-    volume_util_percentual: extractNumber(webhookData?.reservatorio?.percentual_volume_util || '0'),
-    afluencia: extractNumber(webhookData?.reservatorio?.afluencia?.valor || '0'),
-    defluencia: extractNumber(webhookData?.reservatorio?.defluencia?.valor || '0'),
-    data_atualizacao: dataAtualizacao,
-    hora_atualizacao: horaAtualizacao,
-    historico_dias: [] // Por enquanto vazio, pode ser implementado depois
-  };
+  // Verificar se é a estrutura nova ou antiga
+  if (webhookData.reservatorio) {
+    // Estrutura antiga com reservatorio
+    const { reservatorio } = webhookData;
+    const dateTimeParts = reservatorio.nivel_atual.data_hora.split(' - ');
+    
+    return {
+      nivel_atual: extractNumber(reservatorio.percentual_volume_util),
+      volume_util_percentual: extractNumber(reservatorio.percentual_volume_util),
+      afluencia: extractNumber(reservatorio.afluencia.valor),
+      defluencia: extractNumber(reservatorio.defluencia.valor),
+      data_atualizacao: dateTimeParts[0] || '',
+      hora_atualizacao: dateTimeParts[1] || '',
+      historico_dias: []
+    };
+  } else {
+    // Estrutura nova (direta)
+    const volumePercentual = webhookData.volume_util_percentual || 
+                           webhookData.percentual_volume_util || 
+                           webhookData.volume_util || 0;
+    
+    const afluenciaValor = webhookData.afluencia?.valor || 
+                          webhookData.afluencia_m3s || 0;
+    
+    const defluenciaValor = webhookData.defluencia?.valor || 
+                           webhookData.defluencia_m3s || 0;
+    
+    return {
+      nivel_atual: extractNumber(volumePercentual),
+      volume_util_percentual: extractNumber(volumePercentual),
+      afluencia: extractNumber(afluenciaValor),
+      defluencia: extractNumber(defluenciaValor),
+      data_atualizacao: webhookData.data_atualizacao || '',
+      hora_atualizacao: webhookData.hora_atualizacao || '',
+      historico_dias: []
+    };
+  }
 };
 
 const fetchDamData = async (): Promise<DamData> => {
@@ -98,12 +133,6 @@ const fetchDamData = async (): Promise<DamData> => {
     }
       
     console.log('Extracted webhook data:', webhookData);
-    
-    // Verificar se temos os dados necessários (agora tudo está dentro de reservatorio)
-    if (!webhookData?.reservatorio) {
-      console.error('Dados incompletos recebidos - reservatorio não encontrado:', webhookData);
-      throw new Error('Estrutura de dados inválida: reservatorio não encontrado');
-    }
     
     // Converter para o formato esperado
     const damData = mapWebhookDataToDamData(webhookData);
