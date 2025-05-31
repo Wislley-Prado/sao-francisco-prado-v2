@@ -1,15 +1,35 @@
 
 import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Play, Pause, Volume2, VolumeX, Maximize, Loader2, Radio } from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
+import { 
+  Play, 
+  Pause, 
+  Volume2, 
+  VolumeX, 
+  Maximize, 
+  Minimize,
+  Loader2, 
+  Radio,
+  Settings,
+  RotateCcw,
+  Share2,
+  Camera,
+  Maximize2
+} from 'lucide-react';
 
 const StreamPlayer = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [volume, setVolume] = useState([80]);
+  const [quality, setQuality] = useState('720p');
+  const [showControls, setShowControls] = useState(true);
+  
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const controlsTimeoutRef = useRef<NodeJS.Timeout>();
 
   const togglePlay = () => {
     if (videoRef.current) {
@@ -29,6 +49,13 @@ const StreamPlayer = () => {
     }
   };
 
+  const handleVolumeChange = (value: number[]) => {
+    setVolume(value);
+    if (videoRef.current) {
+      videoRef.current.volume = value[0] / 100;
+    }
+  };
+
   const toggleFullscreen = () => {
     if (containerRef.current) {
       if (!isFullscreen) {
@@ -40,6 +67,36 @@ const StreamPlayer = () => {
     }
   };
 
+  const handleReload = () => {
+    setIsLoading(true);
+    setTimeout(() => setIsLoading(false), 2000);
+  };
+
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: 'Transmissão ao Vivo - Rio São Francisco',
+        text: 'Veja as condições do rio em tempo real!',
+        url: window.location.href,
+      });
+    }
+  };
+
+  const handleCapture = () => {
+    console.log('Captura de tela solicitada');
+    // Implementar lógica de captura
+  };
+
+  const handleMouseMove = () => {
+    setShowControls(true);
+    if (controlsTimeoutRef.current) {
+      clearTimeout(controlsTimeoutRef.current);
+    }
+    controlsTimeoutRef.current = setTimeout(() => {
+      setShowControls(false);
+    }, 3000);
+  };
+
   const handleLoadStart = () => {
     setIsLoading(true);
   };
@@ -48,11 +105,18 @@ const StreamPlayer = () => {
     setIsLoading(false);
   };
 
+  const qualityOptions = ['480p', '720p', '1080p'];
+
   return (
-    <div ref={containerRef} className="relative bg-black aspect-video group">
+    <div 
+      ref={containerRef} 
+      className="relative bg-black aspect-video group cursor-pointer"
+      onMouseMove={handleMouseMove}
+      onMouseLeave={() => setShowControls(false)}
+    >
       {/* Loading State */}
       {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black">
+        <div className="absolute inset-0 flex items-center justify-center bg-black z-10">
           <div className="text-center text-white">
             <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
             <p className="text-sm">Carregando transmissão...</p>
@@ -60,7 +124,7 @@ const StreamPlayer = () => {
         </div>
       )}
 
-      {/* Video Element - Using placeholder for demo */}
+      {/* Video Element */}
       <video
         ref={videoRef}
         className="w-full h-full object-cover"
@@ -68,8 +132,8 @@ const StreamPlayer = () => {
         onLoadStart={handleLoadStart}
         onCanPlay={handleCanPlay}
         muted={isMuted}
+        onClick={togglePlay}
       >
-        {/* Placeholder for actual stream URL */}
         <source src="#" type="video/mp4" />
         <div className="absolute inset-0 bg-gradient-to-br from-rio-blue to-water-green flex items-center justify-center">
           <div className="text-center text-white p-8">
@@ -81,7 +145,7 @@ const StreamPlayer = () => {
       </video>
 
       {/* Live Badge */}
-      <div className="absolute top-4 left-4">
+      <div className="absolute top-4 left-4 z-20">
         <div className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center">
           <div className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></div>
           AO VIVO
@@ -89,46 +153,150 @@ const StreamPlayer = () => {
       </div>
 
       {/* Quality Badge */}
-      <div className="absolute top-4 right-4">
+      <div className="absolute top-4 right-4 z-20">
         <div className="bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs">
-          HD 720p
+          HD {quality}
         </div>
       </div>
 
-      {/* Controls Overlay */}
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+      {/* Viewer Count */}
+      <div className="absolute top-16 right-4 z-20">
+        <div className="bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs flex items-center">
+          <Radio className="h-3 w-3 mr-1" />
+          127 assistindo
+        </div>
+      </div>
+
+      {/* Main Controls Overlay */}
+      <div className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 transition-opacity duration-300 z-20 ${showControls ? 'opacity-100' : 'opacity-0'}`}>
+        {/* Progress Bar (Simulada para Live) */}
+        <div className="mb-4">
+          <div className="w-full h-1 bg-white/30 rounded">
+            <div className="w-full h-1 bg-red-500 rounded animate-pulse"></div>
+          </div>
+        </div>
+
+        {/* Controls Row */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
+          {/* Left Controls */}
+          <div className="flex items-center space-x-3">
             <Button
               size="sm"
               variant="ghost"
               onClick={togglePlay}
-              className="text-white hover:bg-white/20"
+              className="text-white hover:bg-white/20 p-2"
             >
-              {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+              {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
             </Button>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={toggleMute}
-              className="text-white hover:bg-white/20"
-            >
-              {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
-            </Button>
+
+            <div className="flex items-center space-x-2">
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={toggleMute}
+                className="text-white hover:bg-white/20 p-2"
+              >
+                {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+              </Button>
+              
+              <div className="w-20">
+                <Slider
+                  value={volume}
+                  onValueChange={handleVolumeChange}
+                  max={100}
+                  step={1}
+                  className="cursor-pointer"
+                />
+              </div>
+            </div>
+
+            <div className="text-white text-sm">
+              LIVE
+            </div>
           </div>
 
+          {/* Center Controls */}
           <div className="flex items-center space-x-2">
             <Button
               size="sm"
               variant="ghost"
-              onClick={toggleFullscreen}
-              className="text-white hover:bg-white/20"
+              onClick={handleCapture}
+              className="text-white hover:bg-white/20 p-2"
+              title="Capturar Imagem"
             >
-              <Maximize className="h-4 w-4" />
+              <Camera className="h-4 w-4" />
+            </Button>
+
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={handleShare}
+              className="text-white hover:bg-white/20 p-2"
+              title="Compartilhar"
+            >
+              <Share2 className="h-4 w-4" />
+            </Button>
+
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={handleReload}
+              className="text-white hover:bg-white/20 p-2"
+              title="Recarregar Stream"
+            >
+              <RotateCcw className="h-4 w-4" />
+            </Button>
+          </div>
+
+          {/* Right Controls */}
+          <div className="flex items-center space-x-2">
+            <select 
+              value={quality}
+              onChange={(e) => setQuality(e.target.value)}
+              className="text-sm border-0 bg-white/20 text-white rounded px-2 py-1 backdrop-blur-sm"
+            >
+              {qualityOptions.map(option => (
+                <option key={option} value={option} className="text-black">
+                  {option}
+                </option>
+              ))}
+            </select>
+
+            <Button
+              size="sm"
+              variant="ghost"
+              className="text-white hover:bg-white/20 p-2"
+              title="Configurações"
+            >
+              <Settings className="h-4 w-4" />
+            </Button>
+
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={toggleFullscreen}
+              className="text-white hover:bg-white/20 p-2"
+              title="Tela Cheia"
+            >
+              {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
             </Button>
           </div>
         </div>
       </div>
+
+      {/* Click to Play Overlay */}
+      {!isPlaying && !isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center z-10">
+          <Button
+            size="lg"
+            onClick={togglePlay}
+            className="bg-white/20 hover:bg-white/30 text-white border-2 border-white/50 backdrop-blur-sm"
+          >
+            <Play className="h-8 w-8 mr-2" />
+            Reproduzir
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
