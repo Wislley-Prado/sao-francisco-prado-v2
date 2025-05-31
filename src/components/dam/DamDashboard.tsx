@@ -13,7 +13,9 @@ import {
   Wifi,
   WifiOff,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  trending-down,
+  trending-up
 } from 'lucide-react';
 import { DamData } from '@/types/damData';
 import { getStatusFromLevel } from '@/utils/damStatus';
@@ -36,23 +38,41 @@ const DamDashboard: React.FC<DamDashboardProps> = ({
   renderCount,
   onRefresh
 }) => {
-  const currentLevel = damData?.nivel_atual ? parseFloat(damData.nivel_atual) : 86;
-  const volumePercentual = damData?.volume_util_percentual ? parseFloat(damData.volume_util_percentual) : 86;
+  const currentLevel = damData?.volume_util_percentual ? parseFloat(damData.volume_util_percentual) : 0;
   const afluencia = damData?.afluencia || '--';
   const defluencia = damData?.defluencia || '--';
+  const tendencia = damData?.tendencia_represa || 'estável';
   
   const levelStatus = getStatusFromLevel(currentLevel);
   
-  // Dados mockados para o gráfico de tendência
-  const trendData = [
-    { time: '00:00', nivel: currentLevel - 2 },
-    { time: '04:00', nivel: currentLevel - 1.5 },
-    { time: '08:00', nivel: currentLevel - 1 },
-    { time: '12:00', nivel: currentLevel - 0.5 },
-    { time: '16:00', nivel: currentLevel },
-    { time: '20:00', nivel: currentLevel + 0.2 },
-    { time: '24:00', nivel: currentLevel }
-  ];
+  // Usar dados reais do histórico para o gráfico
+  const trendData = damData?.historico_dias?.slice(-7).reverse().map(dia => ({
+    time: new Date(dia.dia).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
+    nivel: parseFloat(dia.vol_util_final) || 0,
+    afluencia: parseFloat(dia.vazao_afl) || 0,
+    defluencia: parseFloat(dia.vazao_def) || 0
+  })) || [];
+
+  // Determinar ícone da tendência
+  const getTendenciaIcon = () => {
+    const tendenciaLower = tendencia.toLowerCase();
+    if (tendenciaLower.includes('subindo') || tendenciaLower.includes('enchendo')) {
+      return <trending-up className="h-4 w-4 text-green-500" />;
+    } else if (tendenciaLower.includes('descendo') || tendenciaLower.includes('baixando')) {
+      return <trending-down className="h-4 w-4 text-red-500" />;
+    }
+    return <Activity className="h-4 w-4 text-blue-500" />;
+  };
+
+  const getTendenciaColor = () => {
+    const tendenciaLower = tendencia.toLowerCase();
+    if (tendenciaLower.includes('subindo') || tendenciaLower.includes('enchendo')) {
+      return 'text-green-600 bg-green-50 border-green-200';
+    } else if (tendenciaLower.includes('descendo') || tendenciaLower.includes('baixando')) {
+      return 'text-red-600 bg-red-50 border-red-200';
+    }
+    return 'text-blue-600 bg-blue-50 border-blue-200';
+  };
 
   return (
     <div className="mb-12">
@@ -103,7 +123,7 @@ const DamDashboard: React.FC<DamDashboardProps> = ({
       {/* Grid Principal */}
       <div className="grid lg:grid-cols-4 gap-6 bg-white rounded-b-xl shadow-lg p-6">
         
-        {/* Card de Nível Principal */}
+        {/* Card de Nível Principal com Gráfico */}
         <div className="lg:col-span-2">
           <Card className="h-full border-0 shadow-md">
             <CardHeader className="pb-3">
@@ -131,40 +151,46 @@ const DamDashboard: React.FC<DamDashboardProps> = ({
                   </div>
                 </div>
                 
-                {/* Gráfico de Tendência */}
-                <div className="mt-6">
-                  <h5 className="text-sm font-medium text-gray-700 mb-3">Tendência (24h)</h5>
-                  <ResponsiveContainer width="100%" height={120}>
-                    <LineChart data={trendData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                      <XAxis 
-                        dataKey="time" 
-                        fontSize={10}
-                        stroke="#6b7280"
-                      />
-                      <YAxis 
-                        fontSize={10}
-                        stroke="#6b7280"
-                        domain={['dataMin - 1', 'dataMax + 1']}
-                      />
-                      <Tooltip 
-                        contentStyle={{ 
-                          backgroundColor: '#1f2937', 
-                          border: 'none', 
-                          borderRadius: '8px',
-                          color: 'white'
-                        }}
-                      />
-                      <Line 
-                        type="monotone" 
-                        dataKey="nivel" 
-                        stroke="#3b82f6" 
-                        strokeWidth={2}
-                        dot={{ fill: '#3b82f6', strokeWidth: 2, r: 3 }}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
+                {/* Gráfico de Tendência com dados reais */}
+                {trendData.length > 0 && (
+                  <div className="mt-6">
+                    <h5 className="text-sm font-medium text-gray-700 mb-3">Tendência (7 dias)</h5>
+                    <ResponsiveContainer width="100%" height={120}>
+                      <LineChart data={trendData}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                        <XAxis 
+                          dataKey="time" 
+                          fontSize={10}
+                          stroke="#6b7280"
+                        />
+                        <YAxis 
+                          fontSize={10}
+                          stroke="#6b7280"
+                          domain={['dataMin - 1', 'dataMax + 1']}
+                        />
+                        <Tooltip 
+                          contentStyle={{ 
+                            backgroundColor: '#1f2937', 
+                            border: 'none', 
+                            borderRadius: '8px',
+                            color: 'white'
+                          }}
+                          formatter={(value, name) => [
+                            `${value}${name === 'nivel' ? '%' : ' m³/s'}`,
+                            name === 'nivel' ? 'Nível' : name === 'afluencia' ? 'Afluência' : 'Defluência'
+                          ]}
+                        />
+                        <Line 
+                          type="monotone" 
+                          dataKey="nivel" 
+                          stroke="#3b82f6" 
+                          strokeWidth={2}
+                          dot={{ fill: '#3b82f6', strokeWidth: 2, r: 3 }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -172,21 +198,19 @@ const DamDashboard: React.FC<DamDashboardProps> = ({
 
         {/* Cards de Métricas */}
         <div className="space-y-4">
-          {/* Volume Útil */}
+          {/* Tendência da Represa */}
           <Card className="border-0 shadow-md">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <TrendingUp className="h-4 w-4 text-green-500" />
-                  <span className="text-sm font-medium text-gray-700">Volume Útil</span>
+                  {getTendenciaIcon()}
+                  <span className="text-sm font-medium text-gray-700">Tendência</span>
                 </div>
-                <Badge variant="outline" className="text-green-600 border-green-600">
-                  Estável
-                </Badge>
               </div>
               <div className="mt-2">
-                <div className="text-2xl font-bold text-gray-900">{volumePercentual.toFixed(1)}%</div>
-                <Progress value={volumePercentual} className="h-2 mt-2" />
+                <Badge className={`${getTendenciaColor()} border px-2 py-1 text-sm capitalize`}>
+                  {tendencia}
+                </Badge>
               </div>
             </CardContent>
           </Card>

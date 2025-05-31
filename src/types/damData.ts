@@ -1,6 +1,7 @@
 
 export interface DamHistoryDay {
   dia: string;
+  data_original?: string;
   vazao_afl: string;
   cota_inicial: string;
   vol_util_inicial: string;
@@ -17,6 +18,9 @@ export interface DamData {
   data_atualizacao: string;
   hora_atualizacao: string;
   historico_dias: DamHistoryDay[];
+  // Novos campos da API de produção
+  tendencia_represa?: string;
+  timestamp_atualizacao?: string;
 }
 
 export interface StatusInfo {
