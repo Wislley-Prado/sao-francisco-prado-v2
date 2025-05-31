@@ -52,25 +52,25 @@ const DamInfo = () => {
   console.log('🎯 [UI] Loading state:', isLoading);
   console.log('🎯 [UI] Error state:', error);
 
-  // Valores padrão enquanto carrega ou em caso de erro
-  const currentLevel = damData?.nivel_atual ? parseFloat(damData.nivel_atual) : 86;
-  const volumePercentual = damData?.volume_util_percentual ? parseFloat(damData.volume_util_percentual) : 86;
+  // Valores calculados corretamente
+  const nivelAtualMetros = damData?.nivel_atual ? parseFloat(damData.nivel_atual) : 569.8;
+  const volumePercentual = damData?.volume_util_percentual ? parseFloat(damData.volume_util_percentual) : 82;
   const afluencia = damData?.afluencia || '--';
   const defluencia = damData?.defluencia || '--';
 
   console.log('📊 [UI] Valores calculados:', {
-    currentLevel,
+    nivelAtualMetros,
     volumePercentual,
     afluencia,
     defluencia
   });
 
-  const levelStatus = getStatusFromLevel(currentLevel);
+  const levelStatus = getStatusFromLevel(volumePercentual);
 
   const conditions: Condition[] = [
     {
       label: "Nível da Represa",
-      value: `${currentLevel.toFixed(1)}%`,
+      value: `${nivelAtualMetros.toFixed(1)}m`,
       status: levelStatus.status,
       icon: <Droplets className="h-5 w-5" />,
       trend: "stable"
@@ -146,20 +146,20 @@ const DamInfo = () => {
                 </p>
               </CardHeader>
               <CardContent className="p-6">
-                {/* Main Level Display */}
+                {/* Main Level Display - CORRIGIDO */}
                 <div className="mb-8">
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-2xl font-bold text-gray-900">
-                      Nível: {currentLevel.toFixed(1)}%
+                      Nível: {nivelAtualMetros.toFixed(1)}m
                     </h3>
                     <Badge className={`${levelStatus.color} text-white`}>
                       {levelStatus.text}
                     </Badge>
                   </div>
-                  <Progress value={currentLevel} className="h-4 mb-2" />
+                  <Progress value={volumePercentual} className="h-4 mb-2" />
                   <div className="flex justify-between text-sm text-gray-600">
                     <span>Mínimo (40%)</span>
-                    <span>Atual: {currentLevel.toFixed(1)}%</span>
+                    <span>Atual: {volumePercentual.toFixed(1)}%</span>
                     <span>Máximo (100%)</span>
                   </div>
                 </div>
