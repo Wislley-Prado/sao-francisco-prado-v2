@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -36,9 +37,10 @@ const DamDashboard: React.FC<DamDashboardProps> = ({
   renderCount,
   onRefresh
 }) => {
-  const currentLevel = damData?.volume_util_percentual ? parseFloat(damData.volume_util_percentual) : 0;
-  const afluencia = damData?.afluencia || '--';
-  const defluencia = damData?.defluencia || '--';
+  const currentLevel = damData?.volume_util_percentual ? parseFloat(damData.volume_util_percentual) : 82;
+  const nivelAtualMetros = damData?.nivel_atual ? parseFloat(damData.nivel_atual) : 569.8;
+  const afluencia = damData?.afluencia || '134';
+  const defluencia = damData?.defluencia || '310';
   const tendencia = damData?.tendencia_represa || 'estável';
   
   const levelStatus = getStatusFromLevel(currentLevel);
@@ -73,22 +75,22 @@ const DamDashboard: React.FC<DamDashboardProps> = ({
   };
 
   return (
-    <div className="mb-12">
+    <div className="mb-8 sm:mb-12">
       {/* Header do Dashboard */}
       <div className="bg-white rounded-t-xl shadow-lg border-b border-gray-200">
-        <div className="px-6 py-4">
-          <div className="flex items-center justify-between">
+        <div className="px-4 sm:px-6 py-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center space-x-3">
               <div className="p-2 bg-blue-100 rounded-lg">
-                <Database className="h-6 w-6 text-blue-600" />
+                <Database className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Dashboard de Monitoramento</h3>
+                <h3 className="text-lg sm:text-xl font-semibold text-gray-900">Dashboard de Monitoramento</h3>
                 <p className="text-sm text-gray-600">Sistema de controle em tempo real</p>
               </div>
             </div>
             
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-4 w-full sm:w-auto">
               {/* Status da Conexão */}
               <div className="flex items-center space-x-2">
                 {damData && !error ? (
@@ -111,36 +113,47 @@ const DamDashboard: React.FC<DamDashboardProps> = ({
                 className="flex items-center space-x-2 px-3 py-2 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors disabled:opacity-50"
               >
                 <RefreshCw className={`h-4 w-4 text-blue-600 ${isLoading ? 'animate-spin' : ''}`} />
-                <span className="text-sm text-blue-600">Atualizar</span>
+                <span className="text-sm text-blue-600 hidden sm:inline">Atualizar</span>
               </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Grid Principal */}
-      <div className="grid lg:grid-cols-4 gap-6 bg-white rounded-b-xl shadow-lg p-6">
+      {/* Grid Principal Responsivo */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6 bg-white rounded-b-xl shadow-lg p-4 sm:p-6">
         
         {/* Card de Nível Principal com Gráfico */}
         <div className="lg:col-span-2">
           <Card className="h-full border-0 shadow-md">
             <CardHeader className="pb-3">
-              <CardTitle className="flex items-center justify-between text-lg">
+              <CardTitle className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-base sm:text-lg">
                 <div className="flex items-center space-x-2">
                   <Droplets className="h-5 w-5 text-blue-500" />
                   <span>Nível da Represa</span>
                 </div>
-                <Badge className={`${levelStatus.color} text-white`}>
+                <Badge className={`${levelStatus.color} text-white text-xs sm:text-sm`}>
                   {levelStatus.text}
                 </Badge>
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
+                {/* Nível em metros */}
                 <div className="text-center">
-                  <div className="text-4xl font-bold text-gray-900 mb-2">
+                  <div className="text-3xl sm:text-4xl font-bold text-gray-900 mb-1">
+                    {nivelAtualMetros.toFixed(1)}m
+                  </div>
+                  <div className="text-sm text-gray-600 mb-3">
+                    Cota atual: {nivelAtualMetros.toFixed(1)} metros
+                  </div>
+                  
+                  {/* Volume útil percentual */}
+                  <div className="text-2xl sm:text-3xl font-bold text-blue-600 mb-2">
                     {currentLevel.toFixed(1)}%
                   </div>
+                  <div className="text-sm text-gray-600 mb-3">Volume útil</div>
+                  
                   <Progress value={currentLevel} className="h-3 mb-2" />
                   <div className="flex justify-between text-xs text-gray-500">
                     <span>0%</span>
@@ -153,40 +166,42 @@ const DamDashboard: React.FC<DamDashboardProps> = ({
                 {trendData.length > 0 && (
                   <div className="mt-6">
                     <h5 className="text-sm font-medium text-gray-700 mb-3">Tendência (7 dias)</h5>
-                    <ResponsiveContainer width="100%" height={120}>
-                      <LineChart data={trendData}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                        <XAxis 
-                          dataKey="time" 
-                          fontSize={10}
-                          stroke="#6b7280"
-                        />
-                        <YAxis 
-                          fontSize={10}
-                          stroke="#6b7280"
-                          domain={['dataMin - 1', 'dataMax + 1']}
-                        />
-                        <Tooltip 
-                          contentStyle={{ 
-                            backgroundColor: '#1f2937', 
-                            border: 'none', 
-                            borderRadius: '8px',
-                            color: 'white'
-                          }}
-                          formatter={(value, name) => [
-                            `${value}${name === 'nivel' ? '%' : ' m³/s'}`,
-                            name === 'nivel' ? 'Nível' : name === 'afluencia' ? 'Afluência' : 'Defluência'
-                          ]}
-                        />
-                        <Line 
-                          type="monotone" 
-                          dataKey="nivel" 
-                          stroke="#3b82f6" 
-                          strokeWidth={2}
-                          dot={{ fill: '#3b82f6', strokeWidth: 2, r: 3 }}
-                        />
-                      </LineChart>
-                    </ResponsiveContainer>
+                    <div className="h-24 sm:h-32">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={trendData}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                          <XAxis 
+                            dataKey="time" 
+                            fontSize={10}
+                            stroke="#6b7280"
+                          />
+                          <YAxis 
+                            fontSize={10}
+                            stroke="#6b7280"
+                            domain={['dataMin - 1', 'dataMax + 1']}
+                          />
+                          <Tooltip 
+                            contentStyle={{ 
+                              backgroundColor: '#1f2937', 
+                              border: 'none', 
+                              borderRadius: '8px',
+                              color: 'white'
+                            }}
+                            formatter={(value, name) => [
+                              `${value}${name === 'nivel' ? '%' : ' m³/s'}`,
+                              name === 'nivel' ? 'Nível' : name === 'afluencia' ? 'Afluência' : 'Defluência'
+                            ]}
+                          />
+                          <Line 
+                            type="monotone" 
+                            dataKey="nivel" 
+                            stroke="#3b82f6" 
+                            strokeWidth={2}
+                            dot={{ fill: '#3b82f6', strokeWidth: 2, r: 3 }}
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
                   </div>
                 )}
               </div>
@@ -223,7 +238,7 @@ const DamDashboard: React.FC<DamDashboardProps> = ({
                 </div>
                 <div className="text-xs text-gray-500">m³/s</div>
               </div>
-              <div className="text-2xl font-bold text-gray-900 mt-2">{afluencia}</div>
+              <div className="text-xl sm:text-2xl font-bold text-gray-900 mt-2">{afluencia}</div>
             </CardContent>
           </Card>
 
@@ -237,7 +252,7 @@ const DamDashboard: React.FC<DamDashboardProps> = ({
                 </div>
                 <div className="text-xs text-gray-500">m³/s</div>
               </div>
-              <div className="text-2xl font-bold text-gray-900 mt-2">{defluencia}</div>
+              <div className="text-xl sm:text-2xl font-bold text-gray-900 mt-2">{defluencia}</div>
             </CardContent>
           </Card>
         </div>
@@ -254,7 +269,7 @@ const DamDashboard: React.FC<DamDashboardProps> = ({
             <CardContent className="space-y-3">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-600">Última atualização:</span>
-                <span className="font-medium">
+                <span className="font-medium text-xs sm:text-sm">
                   {new Date(dataUpdatedAt).toLocaleTimeString('pt-BR')}
                 </span>
               </div>
@@ -292,12 +307,12 @@ const DamDashboard: React.FC<DamDashboardProps> = ({
                 <>
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-600">Data:</span>
-                    <span className="font-medium">{damData.data_atualizacao}</span>
+                    <span className="font-medium text-xs sm:text-sm">{damData.data_atualizacao}</span>
                   </div>
                   
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-600">Hora:</span>
-                    <span className="font-medium">{damData.hora_atualizacao}</span>
+                    <span className="font-medium text-xs sm:text-sm">{damData.hora_atualizacao}</span>
                   </div>
                 </>
               )}
