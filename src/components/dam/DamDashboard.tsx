@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -14,8 +13,7 @@ import {
   WifiOff,
   CheckCircle,
   AlertCircle,
-  trending-down,
-  trending-up
+  TrendingDown
 } from 'lucide-react';
 import { DamData } from '@/types/damData';
 import { getStatusFromLevel } from '@/utils/damStatus';
@@ -57,9 +55,9 @@ const DamDashboard: React.FC<DamDashboardProps> = ({
   const getTendenciaIcon = () => {
     const tendenciaLower = tendencia.toLowerCase();
     if (tendenciaLower.includes('subindo') || tendenciaLower.includes('enchendo')) {
-      return <trending-up className="h-4 w-4 text-green-500" />;
+      return <TrendingUp className="h-4 w-4 text-green-500" />;
     } else if (tendenciaLower.includes('descendo') || tendenciaLower.includes('baixando')) {
-      return <trending-down className="h-4 w-4 text-red-500" />;
+      return <TrendingDown className="h-4 w-4 text-red-500" />;
     }
     return <Activity className="h-4 w-4 text-blue-500" />;
   };
