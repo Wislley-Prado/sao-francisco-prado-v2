@@ -25,7 +25,7 @@ const DamInfo = () => {
     console.log('🎨 [UI] Estado atual:', {
       damData,
       isLoading,
-      error: error?.message,
+      error: error instanceof Error ? error.message : 'Unknown error',
       dataUpdatedAt: dataUpdatedAt ? new Date(dataUpdatedAt).toISOString() : 'N/A'
     });
   });
@@ -103,13 +103,16 @@ const DamInfo = () => {
     refetch();
   };
 
+  // Create proper Error objects for components that expect them
+  const errorForComponents = error instanceof Error ? error : new Error('Unknown error occurred');
+
   return (
     <section id="represa" className="py-20 bg-gradient-to-br from-blue-50 to-green-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <DamHeader 
           damData={damData}
           isLoading={isLoading}
-          error={error}
+          error={error ? errorForComponents : undefined}
           refetch={handleRefetch}
         />
 
@@ -117,7 +120,7 @@ const DamInfo = () => {
         <DamDashboard
           damData={damData}
           isLoading={isLoading}
-          error={error}
+          error={error ? errorForComponents : undefined}
           dataUpdatedAt={dataUpdatedAt}
           renderCount={renderCount.current}
           onRefresh={handleRefetch}
