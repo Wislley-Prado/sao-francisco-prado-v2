@@ -1,6 +1,5 @@
 
 import { useQuery } from '@tanstack/react-query';
-import { useEffect } from 'react';
 import { DamData } from '@/types/damData';
 
 // Interface para os dados que vêm da nova API de produção
@@ -131,36 +130,22 @@ const fetchDamData = async (): Promise<DamData> => {
 export const useDamData = () => {
   console.log('🔧 [HOOK] Inicializando hook useDamData para produção');
   
-  const query = useQuery({
-    queryKey: ['damData', 'production'],
-    queryFn: fetchDamData,
-    refetchInterval: 5 * 60 * 1000, // Refetch a cada 5 minutos
-    staleTime: 2 * 60 * 1000, // Dados ficam fresh por 2 minutos
-    retry: 2,
-    retryDelay: 3000,
-    throwOnError: false,
-  });
-
-  // Use useEffect for success/error logging instead of deprecated callbacks
-  useEffect(() => {
-    if (query.isSuccess && query.data) {
-      console.log('🎊 [HOOK] Query Success - Dados da produção carregados:', query.data);
+  const query = useQuery(
+    ['damData', 'production'],
+    fetchDamData,
+    {
+      refetchInterval: 5 * 60 * 1000, // Refetch a cada 5 minutos
+      staleTime: 2 * 60 * 1000, // Dados ficam fresh por 2 minutos
+      retry: 2,
+      retryDelay: 3000,
+      onSuccess: (data) => {
+        console.log('🎊 [HOOK] Query Success - Dados da produção carregados:', data);
+      },
+      onError: (error) => {
+        console.error('💥 [HOOK] Query Error - Erro no hook da produção:', error);
+      },
     }
-  }, [query.isSuccess, query.data]);
-
-  useEffect(() => {
-    if (query.isError && query.error) {
-      console.error('💥 [HOOK] Query Error - Erro no hook da produção:', query.error);
-    }
-  }, [query.isError, query.error]);
-
-  useEffect(() => {
-    console.log('🏁 [HOOK] Query Status Changed - Status da produção:', { 
-      data: query.data, 
-      error: query.error,
-      status: query.status 
-    });
-  }, [query.status, query.data, query.error]);
+  );
 
   console.log('📊 [HOOK] Estado atual do query da produção:', {
     isLoading: query.isLoading,
