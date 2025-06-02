@@ -109,9 +109,9 @@ const WeatherDashboard = () => {
   const current = weatherData.current;
   const fishingCondition = getFishingCondition(weatherData);
 
-  // Data atual formatada para exibição
-  const today = new Date();
-  const currentDate = today.toLocaleDateString('pt-BR', {
+  // Data atual formatada para exibição - ATUALIZADA DINAMICAMENTE
+  const now = new Date();
+  const currentDate = now.toLocaleDateString('pt-BR', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
@@ -164,7 +164,7 @@ const WeatherDashboard = () => {
                   <CardTitle className="text-lg sm:text-xl truncate">Três Marias, MG</CardTitle>
                   <p className="text-xs sm:text-sm text-gray-600 capitalize truncate">{current.weather_description}</p>
                   <p className="text-xs text-blue-600 font-medium">
-                    HOJE - {today.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit' })}
+                    HOJE - {now.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit' })}
                   </p>
                 </div>
               </div>
@@ -287,8 +287,9 @@ const WeatherDashboard = () => {
                 <div className="space-y-3 sm:space-y-4">
                   {weatherData.daily.map((day, index) => {
                     const dayDate = new Date(day.dt * 1000);
-                    const isToday = index === 0;
-                    const isTomorrow = index === 1;
+                    const todayDate = new Date();
+                    const isToday = dayDate.toDateString() === todayDate.toDateString();
+                    const isTomorrow = new Date(todayDate.getTime() + 24 * 60 * 60 * 1000).toDateString() === dayDate.toDateString();
                     
                     let dayLabel;
                     if (isToday) {
@@ -396,7 +397,8 @@ const WeatherDashboard = () => {
                 <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2 sm:gap-4">
                   {weatherData.hourly.slice(0, 8).map((hour, index) => {
                     const hourDate = new Date(hour.dt * 1000);
-                    const isToday = hourDate.toDateString() === today.toDateString();
+                    const todayDate = new Date();
+                    const isToday = hourDate.toDateString() === todayDate.toDateString();
                     const dayLabel = isToday ? 'Hoje' : hourDate.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit' });
                     
                     return (
