@@ -14,13 +14,11 @@ const StreamInfo = () => {
     minute: '2-digit' 
   });
 
-  // Usar dados reais se disponíveis, senão usar dados padrão
   const temperature = weatherData?.current.temperature || 23;
   const windSpeed = weatherData?.current.wind_speed || 5;
   const humidity = weatherData?.current.humidity || 78;
   const visibility = weatherData?.current.visibility || 10;
 
-  // Determinar visibilidade em texto
   const getVisibilityText = (visibility: number) => {
     if (visibility >= 10) return 'Excelente';
     if (visibility >= 5) return 'Boa';
@@ -40,8 +38,8 @@ const StreamInfo = () => {
       {/* Weather Conditions */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center">
-            <Thermometer className="h-5 w-5 text-rio-blue mr-2" />
+          <CardTitle className="text-base sm:text-lg flex items-center">
+            <Thermometer className="h-4 w-4 sm:h-5 sm:w-5 text-rio-blue mr-2" />
             Condições Meteorológicas
             {weatherData && (
               <Badge className="ml-2 bg-green-100 text-green-800 text-xs">REAL</Badge>
@@ -50,29 +48,31 @@ const StreamInfo = () => {
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-600">Temperatura</span>
-            <span className="font-medium">{temperature}°C</span>
+            <span className="text-xs sm:text-sm text-gray-600">Temperatura</span>
+            <span className="font-medium text-sm sm:text-base">{temperature}°C</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-600 flex items-center">
-              <Wind className="h-4 w-4 mr-1" />
+            <span className="text-xs sm:text-sm text-gray-600 flex items-center">
+              <Wind className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
               Vento
             </span>
-            <span className="font-medium">{windSpeed} km/h {weatherData?.current.wind_direction ? `${Math.round(weatherData.current.wind_direction)}°` : 'NE'}</span>
+            <span className="font-medium text-sm sm:text-base">
+              {windSpeed} km/h {weatherData?.current.wind_direction ? `${Math.round(weatherData.current.wind_direction)}°` : 'NE'}
+            </span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-600 flex items-center">
-              <Droplets className="h-4 w-4 mr-1" />
+            <span className="text-xs sm:text-sm text-gray-600 flex items-center">
+              <Droplets className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
               Umidade
             </span>
-            <span className="font-medium">{humidity}%</span>
+            <span className="font-medium text-sm sm:text-base">{humidity}%</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-600 flex items-center">
-              <Eye className="h-4 w-4 mr-1" />
+            <span className="text-xs sm:text-sm text-gray-600 flex items-center">
+              <Eye className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
               Visibilidade
             </span>
-            <Badge className={getVisibilityColor(visibility)}>
+            <Badge className={`${getVisibilityColor(visibility)} text-xs`}>
               {getVisibilityText(visibility)}
             </Badge>
           </div>
@@ -82,36 +82,36 @@ const StreamInfo = () => {
       {/* Fishing Conditions */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center">
-            <TrendingUp className="h-5 w-5 text-water-green mr-2" />
+          <CardTitle className="text-base sm:text-lg flex items-center">
+            <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-water-green mr-2" />
             Condições de Pesca
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-600">Atividade dos Peixes</span>
+            <span className="text-xs sm:text-sm text-gray-600">Atividade dos Peixes</span>
             <Badge className={
-              temperature >= 22 && temperature <= 26 ? "bg-green-100 text-green-800" :
-              temperature >= 18 && temperature <= 30 ? "bg-yellow-100 text-yellow-800" :
-              "bg-red-100 text-red-800"
+              temperature >= 22 && temperature <= 26 ? "bg-green-100 text-green-800 text-xs" :
+              temperature >= 18 && temperature <= 30 ? "bg-yellow-100 text-yellow-800 text-xs" :
+              "bg-red-100 text-red-800 text-xs"
             }>
               {temperature >= 22 && temperature <= 26 ? 'Alta' :
                temperature >= 18 && temperature <= 30 ? 'Moderada' : 'Baixa'}
             </Badge>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-600">Nível da Água</span>
-            <span className="font-medium">85% Normal</span>
+            <span className="text-xs sm:text-sm text-gray-600">Nível da Água</span>
+            <span className="font-medium text-sm sm:text-base">85% Normal</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-600">Corrente</span>
-            <span className="font-medium">
+            <span className="text-xs sm:text-sm text-gray-600">Corrente</span>
+            <span className="font-medium text-sm sm:text-base">
               {windSpeed <= 10 ? 'Fraca' : windSpeed <= 20 ? 'Moderada' : 'Forte'}
             </span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-600">Melhor Horário</span>
-            <span className="font-medium text-sunset-orange">
+            <span className="text-xs sm:text-sm text-gray-600">Melhor Horário</span>
+            <span className="font-medium text-sunset-orange text-sm sm:text-base">
               {weatherData ? 
                 `${new Date(weatherData.current.sunrise * 1000).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}-${new Date(weatherData.current.sunrise * 1000 + 2 * 3600000).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}` :
                 '05:00-07:00'
@@ -124,37 +124,37 @@ const StreamInfo = () => {
       {/* Live Stats */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg flex items-center">
-            <Clock className="h-5 w-5 text-sunset-orange mr-2" />
+          <CardTitle className="text-base sm:text-lg flex items-center">
+            <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-sunset-orange mr-2" />
             Estatísticas Ao Vivo
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-600">Última Atualização</span>
-            <span className="font-medium">{currentTime}</span>
+            <span className="text-xs sm:text-sm text-gray-600">Última Atualização</span>
+            <span className="font-medium text-sm sm:text-base">{currentTime}</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-600">Espectadores</span>
-            <span className="font-medium text-rio-blue">127 online</span>
+            <span className="text-xs sm:text-sm text-gray-600">Espectadores</span>
+            <span className="font-medium text-rio-blue text-sm sm:text-base">127 online</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-600">Qualidade do Stream</span>
-            <Badge className="bg-blue-100 text-blue-800">HD 720p</Badge>
+            <span className="text-xs sm:text-sm text-gray-600">Qualidade do Stream</span>
+            <Badge className="bg-blue-100 text-blue-800 text-xs">HD 720p</Badge>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-600">Status da Conexão</span>
+            <span className="text-xs sm:text-sm text-gray-600">Status da Conexão</span>
             <div className="flex items-center">
               <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-              <span className="text-sm font-medium text-green-600">Estável</span>
+              <span className="text-xs sm:text-sm font-medium text-green-600">Estável</span>
             </div>
           </div>
           {weatherData && (
             <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600">Dados Meteorológicos</span>
+              <span className="text-xs sm:text-sm text-gray-600">Dados Meteorológicos</span>
               <div className="flex items-center">
                 <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                <span className="text-sm font-medium text-green-600">Conectado</span>
+                <span className="text-xs sm:text-sm font-medium text-green-600">Conectado</span>
               </div>
             </div>
           )}

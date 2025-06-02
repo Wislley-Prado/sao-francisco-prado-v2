@@ -40,22 +40,22 @@ const WeatherDashboard = () => {
 
   const getWeatherIcon = (iconCode: string) => {
     const iconMap: { [key: string]: React.ReactNode } = {
-      '01d': <Sun className="h-6 w-6 text-yellow-500" />,
-      '01n': <Sun className="h-6 w-6 text-gray-400" />,
-      '02d': <Cloud className="h-6 w-6 text-gray-500" />,
-      '02n': <Cloud className="h-6 w-6 text-gray-600" />,
-      '03d': <Cloud className="h-6 w-6 text-gray-500" />,
-      '03n': <Cloud className="h-6 w-6 text-gray-600" />,
-      '04d': <Cloud className="h-6 w-6 text-gray-600" />,
-      '04n': <Cloud className="h-6 w-6 text-gray-700" />,
-      '09d': <CloudRain className="h-6 w-6 text-blue-500" />,
-      '09n': <CloudRain className="h-6 w-6 text-blue-600" />,
-      '10d': <CloudRain className="h-6 w-6 text-blue-500" />,
-      '10n': <CloudRain className="h-6 w-6 text-blue-600" />,
-      '11d': <CloudRain className="h-6 w-6 text-purple-500" />,
-      '11n': <CloudRain className="h-6 w-6 text-purple-600" />,
+      '01d': <Sun className="h-5 w-5 sm:h-6 sm:w-6 text-yellow-500" />,
+      '01n': <Sun className="h-5 w-5 sm:h-6 sm:w-6 text-gray-400" />,
+      '02d': <Cloud className="h-5 w-5 sm:h-6 sm:w-6 text-gray-500" />,
+      '02n': <Cloud className="h-5 w-5 sm:h-6 sm:w-6 text-gray-600" />,
+      '03d': <Cloud className="h-5 w-5 sm:h-6 sm:w-6 text-gray-500" />,
+      '03n': <Cloud className="h-5 w-5 sm:h-6 sm:w-6 text-gray-600" />,
+      '04d': <Cloud className="h-5 w-5 sm:h-6 sm:w-6 text-gray-600" />,
+      '04n': <Cloud className="h-5 w-5 sm:h-6 sm:w-6 text-gray-700" />,
+      '09d': <CloudRain className="h-5 w-5 sm:h-6 sm:w-6 text-blue-500" />,
+      '09n': <CloudRain className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />,
+      '10d': <CloudRain className="h-5 w-5 sm:h-6 sm:w-6 text-blue-500" />,
+      '10n': <CloudRain className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />,
+      '11d': <CloudRain className="h-5 w-5 sm:h-6 sm:w-6 text-purple-500" />,
+      '11n': <CloudRain className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />,
     };
-    return iconMap[iconCode] || <Sun className="h-6 w-6 text-yellow-500" />;
+    return iconMap[iconCode] || <Sun className="h-5 w-5 sm:h-6 sm:w-6 text-yellow-500" />;
   };
 
   const getFishingCondition = (weather: any) => {
@@ -66,24 +66,19 @@ const WeatherDashboard = () => {
     const clouds = weather.current.clouds;
     const pressure = weather.current.pressure;
     
-    // Lógica para condições de pesca
     let score = 0;
     
-    // Temperatura ideal: 20-28°C
     if (temp >= 20 && temp <= 28) score += 3;
     else if (temp >= 18 && temp <= 30) score += 2;
     else score += 1;
     
-    // Vento: até 15km/h é bom
     if (wind <= 10) score += 3;
     else if (wind <= 15) score += 2;
     else if (wind <= 25) score += 1;
     
-    // Nebulosidade: 20-60% é ideal
     if (clouds >= 20 && clouds <= 60) score += 2;
     else if (clouds <= 80) score += 1;
     
-    // Pressão: estável é melhor
     if (pressure >= 1013 && pressure <= 1020) score += 2;
     else if (pressure >= 1008 && pressure <= 1025) score += 1;
     
@@ -95,67 +90,79 @@ const WeatherDashboard = () => {
 
   if (showSettings || !apiKey) {
     return (
-      <Card className="max-w-md mx-auto">
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <Settings className="h-5 w-5 mr-2" />
-            Configurar API OpenWeatherMap
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <label className="text-sm font-medium">API Key</label>
-            <Input
-              type="password"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              placeholder="Sua chave da API OpenWeatherMap"
-            />
-          </div>
-          <Button onClick={handleSaveApiKey} className="w-full">
-            Salvar e Carregar Dados
-          </Button>
-          <p className="text-xs text-gray-600">
-            Seus dados meteorológicos serão atualizados automaticamente a cada 10 minutos.
-          </p>
-        </CardContent>
-      </Card>
+      <section className="py-8 sm:py-16 bg-gradient-to-br from-blue-50 to-green-50">
+        <div className="max-w-md mx-auto px-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center text-lg">
+                <Settings className="h-5 w-5 mr-2" />
+                Configurar API OpenWeatherMap
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <label className="text-sm font-medium">API Key</label>
+                <Input
+                  type="password"
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                  placeholder="Sua chave da API OpenWeatherMap"
+                  className="mt-1"
+                />
+              </div>
+              <Button onClick={handleSaveApiKey} className="w-full">
+                Salvar e Carregar Dados
+              </Button>
+              <p className="text-xs text-gray-600">
+                Seus dados meteorológicos serão atualizados automaticamente a cada 10 minutos.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
     );
   }
 
   if (isLoading) {
     return (
-      <Card>
-        <CardContent className="flex items-center justify-center py-12">
-          <RefreshCw className="h-8 w-8 animate-spin text-blue-500" />
-          <span className="ml-2">Carregando dados meteorológicos...</span>
-        </CardContent>
-      </Card>
+      <section className="py-8 sm:py-16 bg-gradient-to-br from-blue-50 to-green-50">
+        <div className="max-w-7xl mx-auto px-4">
+          <Card>
+            <CardContent className="flex items-center justify-center py-12">
+              <RefreshCw className="h-8 w-8 animate-spin text-blue-500" />
+              <span className="ml-2 text-sm sm:text-base">Carregando dados meteorológicos...</span>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
     );
   }
 
   if (error || !weatherData) {
     return (
-      <Card>
-        <CardContent className="text-center py-12">
-          <p className="text-red-600 mb-4">Erro ao carregar dados meteorológicos</p>
-          <div className="space-x-2">
-            <Button variant="outline" onClick={() => refetch()}>
-              Tentar Novamente
-            </Button>
-            <Button variant="outline" onClick={() => setShowSettings(true)}>
-              Configurar API
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      <section className="py-8 sm:py-16 bg-gradient-to-br from-blue-50 to-green-50">
+        <div className="max-w-7xl mx-auto px-4">
+          <Card>
+            <CardContent className="text-center py-12">
+              <p className="text-red-600 mb-4 text-sm sm:text-base">Erro ao carregar dados meteorológicos</p>
+              <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                <Button variant="outline" onClick={() => refetch()}>
+                  Tentar Novamente
+                </Button>
+                <Button variant="outline" onClick={() => setShowSettings(true)}>
+                  Configurar API
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
     );
   }
 
   const current = weatherData.current;
   const fishingCondition = getFishingCondition(weatherData);
 
-  // Preparar dados para gráficos
   const hourlyChartData = weatherData.hourly.map(hour => ({
     time: new Date(hour.dt * 1000).toLocaleTimeString('pt-BR', { hour: '2-digit' }),
     temperatura: hour.temperature,
@@ -164,29 +171,29 @@ const WeatherDashboard = () => {
   }));
 
   return (
-    <section className="py-16 bg-gradient-to-br from-blue-50 to-green-50">
+    <section className="py-8 sm:py-16 bg-gradient-to-br from-blue-50 to-green-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+        <div className="text-center mb-8 sm:mb-12">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">
             Condições Meteorológicas
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto px-4">
             Dados em tempo real para Três Marias/MG. 
             Planeje sua pescaria com informações precisas e atualizadas.
           </p>
         </div>
 
         {/* Condições Atuais */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
           {/* Temperatura Principal */}
           <Card className="lg:col-span-2">
-            <CardHeader className="flex flex-row items-center justify-between">
+            <CardHeader className="flex flex-row items-start sm:items-center justify-between space-y-0 pb-4">
               <div className="flex items-center space-x-2">
                 {getWeatherIcon(current.weather_icon)}
-                <div>
-                  <CardTitle className="text-xl">Três Marias, MG</CardTitle>
-                  <p className="text-sm text-gray-600 capitalize">{current.weather_description}</p>
+                <div className="min-w-0">
+                  <CardTitle className="text-lg sm:text-xl truncate">Três Marias, MG</CardTitle>
+                  <p className="text-xs sm:text-sm text-gray-600 capitalize truncate">{current.weather_description}</p>
                 </div>
               </div>
               <Button variant="outline" size="sm" onClick={() => refetch()}>
@@ -194,26 +201,30 @@ const WeatherDashboard = () => {
               </Button>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-0">
                 <div>
-                  <div className="text-5xl font-bold text-gray-900">{current.temperature}°C</div>
+                  <div className="text-4xl sm:text-5xl font-bold text-gray-900">{current.temperature}°C</div>
                   <div className="text-sm text-gray-600">Sensação: {current.feels_like}°C</div>
                   <div className="text-xs text-gray-500 mt-2">
                     Atualizado: {new Date(current.dt * 1000).toLocaleTimeString('pt-BR')}
                   </div>
                 </div>
-                <div className="text-right">
-                  <Badge className={`${fishingCondition.color} text-white mb-2`}>
+                <div className="text-left sm:text-right">
+                  <Badge className={`${fishingCondition.color} text-white mb-2 text-xs sm:text-sm`}>
                     Pesca: {fishingCondition.text}
                   </Badge>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-sm text-gray-600 space-y-1">
                     <div className="flex items-center">
                       <Sunrise className="h-4 w-4 mr-1" />
-                      {new Date(current.sunrise * 1000).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                      <span className="text-xs sm:text-sm">
+                        {new Date(current.sunrise * 1000).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                      </span>
                     </div>
                     <div className="flex items-center">
                       <Sunset className="h-4 w-4 mr-1" />
-                      {new Date(current.sunset * 1000).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                      <span className="text-xs sm:text-sm">
+                        {new Date(current.sunset * 1000).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -222,46 +233,46 @@ const WeatherDashboard = () => {
           </Card>
 
           {/* Métricas Rápidas */}
-          <div className="lg:col-span-2 grid grid-cols-2 gap-4">
+          <div className="lg:col-span-2 grid grid-cols-2 gap-3 sm:gap-4">
             <Card>
-              <CardContent className="p-4">
+              <CardContent className="p-3 sm:p-4">
                 <div className="flex items-center space-x-2 mb-2">
                   <Wind className="h-4 w-4 text-blue-500" />
-                  <span className="text-sm font-medium">Vento</span>
+                  <span className="text-xs sm:text-sm font-medium">Vento</span>
                 </div>
-                <div className="text-2xl font-bold">{current.wind_speed} km/h</div>
+                <div className="text-xl sm:text-2xl font-bold">{current.wind_speed} km/h</div>
                 <div className="text-xs text-gray-600">{current.wind_direction}°</div>
               </CardContent>
             </Card>
 
             <Card>
-              <CardContent className="p-4">
+              <CardContent className="p-3 sm:p-4">
                 <div className="flex items-center space-x-2 mb-2">
                   <Droplets className="h-4 w-4 text-blue-500" />
-                  <span className="text-sm font-medium">Umidade</span>
+                  <span className="text-xs sm:text-sm font-medium">Umidade</span>
                 </div>
-                <div className="text-2xl font-bold">{current.humidity}%</div>
+                <div className="text-xl sm:text-2xl font-bold">{current.humidity}%</div>
               </CardContent>
             </Card>
 
             <Card>
-              <CardContent className="p-4">
+              <CardContent className="p-3 sm:p-4">
                 <div className="flex items-center space-x-2 mb-2">
                   <Gauge className="h-4 w-4 text-blue-500" />
-                  <span className="text-sm font-medium">Pressão</span>
+                  <span className="text-xs sm:text-sm font-medium">Pressão</span>
                 </div>
-                <div className="text-2xl font-bold">{current.pressure}</div>
+                <div className="text-xl sm:text-2xl font-bold">{current.pressure}</div>
                 <div className="text-xs text-gray-600">hPa</div>
               </CardContent>
             </Card>
 
             <Card>
-              <CardContent className="p-4">
+              <CardContent className="p-3 sm:p-4">
                 <div className="flex items-center space-x-2 mb-2">
                   <Eye className="h-4 w-4 text-blue-500" />
-                  <span className="text-sm font-medium">Visibilidade</span>
+                  <span className="text-xs sm:text-sm font-medium">Visibilidade</span>
                 </div>
-                <div className="text-2xl font-bold">{current.visibility}</div>
+                <div className="text-xl sm:text-2xl font-bold">{current.visibility}</div>
                 <div className="text-xs text-gray-600">km</div>
               </CardContent>
             </Card>
@@ -269,19 +280,22 @@ const WeatherDashboard = () => {
         </div>
 
         {/* Tabs para diferentes visualizações */}
-        <Tabs defaultValue="timeline" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="timeline" className="flex items-center">
-              <Clock className="h-4 w-4 mr-2" />
-              Linha do Tempo
+        <Tabs defaultValue="timeline" className="space-y-4 sm:space-y-6">
+          <TabsList className="grid w-full grid-cols-3 h-auto">
+            <TabsTrigger value="timeline" className="flex flex-col sm:flex-row items-center p-2 sm:p-3 text-xs sm:text-sm">
+              <Clock className="h-4 w-4 mb-1 sm:mb-0 sm:mr-2" />
+              <span className="hidden sm:inline">Linha do Tempo</span>
+              <span className="sm:hidden">Timeline</span>
             </TabsTrigger>
-            <TabsTrigger value="forecast" className="flex items-center">
-              <Calendar className="h-4 w-4 mr-2" />
-              Previsão 7 Dias
+            <TabsTrigger value="forecast" className="flex flex-col sm:flex-row items-center p-2 sm:p-3 text-xs sm:text-sm">
+              <Calendar className="h-4 w-4 mb-1 sm:mb-0 sm:mr-2" />
+              <span className="hidden sm:inline">Previsão 7 Dias</span>
+              <span className="sm:hidden">7 Dias</span>
             </TabsTrigger>
-            <TabsTrigger value="fishing" className="flex items-center">
-              <TrendingUp className="h-4 w-4 mr-2" />
-              Para Pesca
+            <TabsTrigger value="fishing" className="flex flex-col sm:flex-row items-center p-2 sm:p-3 text-xs sm:text-sm">
+              <TrendingUp className="h-4 w-4 mb-1 sm:mb-0 sm:mr-2" />
+              <span className="hidden sm:inline">Para Pesca</span>
+              <span className="sm:hidden">Pesca</span>
             </TabsTrigger>
           </TabsList>
 
@@ -289,16 +303,20 @@ const WeatherDashboard = () => {
           <TabsContent value="timeline">
             <Card>
               <CardHeader>
-                <CardTitle>Previsão Horária - Próximas 24h</CardTitle>
+                <CardTitle className="text-lg sm:text-xl">Previsão Horária - Próximas 24h</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-80 mb-6">
+                <div className="h-64 sm:h-80 mb-4 sm:mb-6">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={hourlyChartData}>
+                    <LineChart data={hourlyChartData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="time" />
-                      <YAxis yAxisId="temp" orientation="left" />
-                      <YAxis yAxisId="wind" orientation="right" />
+                      <XAxis 
+                        dataKey="time" 
+                        tick={{ fontSize: 12 }}
+                        interval="preserveStartEnd"
+                      />
+                      <YAxis yAxisId="temp" orientation="left" tick={{ fontSize: 12 }} />
+                      <YAxis yAxisId="wind" orientation="right" tick={{ fontSize: 12 }} />
                       <Tooltip 
                         formatter={(value, name) => [
                           `${value}${name === 'temperatura' ? '°C' : name === 'vento' ? ' km/h' : '%'}`,
@@ -311,18 +329,18 @@ const WeatherDashboard = () => {
                   </ResponsiveContainer>
                 </div>
 
-                {/* Cards horários */}
-                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
+                {/* Cards horários - Responsivo */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2 sm:gap-4">
                   {weatherData.hourly.slice(0, 8).map((hour, index) => (
                     <Card key={index} className="text-center">
-                      <CardContent className="p-3">
+                      <CardContent className="p-2 sm:p-3">
                         <div className="text-xs text-gray-600 mb-1">
                           {new Date(hour.dt * 1000).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                         </div>
                         <div className="flex justify-center mb-2">
                           {getWeatherIcon(hour.weather_icon)}
                         </div>
-                        <div className="font-bold">{hour.temperature}°</div>
+                        <div className="font-bold text-sm sm:text-base">{hour.temperature}°</div>
                         <div className="text-xs text-gray-600">{hour.pop}% 💧</div>
                         <div className="text-xs text-gray-600">{hour.wind_speed} km/h</div>
                       </CardContent>
@@ -337,20 +355,20 @@ const WeatherDashboard = () => {
           <TabsContent value="forecast">
             <Card>
               <CardHeader>
-                <CardTitle>Previsão para os Próximos Dias</CardTitle>
+                <CardTitle className="text-lg sm:text-xl">Previsão para os Próximos Dias</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   {weatherData.daily.map((day, index) => (
-                    <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex items-center space-x-4">
-                        <div className="text-sm font-medium w-20">
+                    <div key={index} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 border rounded-lg space-y-2 sm:space-y-0">
+                      <div className="flex items-center space-x-3 sm:space-x-4 w-full sm:w-auto">
+                        <div className="text-sm font-medium w-16 sm:w-20">
                           {index === 0 ? 'Hoje' : new Date(day.dt * 1000).toLocaleDateString('pt-BR', { weekday: 'short' })}
                         </div>
                         {getWeatherIcon(day.weather_icon)}
-                        <div className="text-sm capitalize">{day.weather_description}</div>
+                        <div className="text-sm capitalize flex-1 sm:flex-none">{day.weather_description}</div>
                       </div>
-                      <div className="flex items-center space-x-6 text-sm">
+                      <div className="flex items-center justify-between sm:justify-end space-x-4 sm:space-x-6 text-sm w-full sm:w-auto">
                         <div className="text-center">
                           <div className="text-xs text-gray-600">Chuva</div>
                           <div>{day.pop}%</div>
@@ -373,41 +391,41 @@ const WeatherDashboard = () => {
 
           {/* Condições para pesca */}
           <TabsContent value="fishing">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Condições Atuais para Pesca</CardTitle>
+                  <CardTitle className="text-lg sm:text-xl">Condições Atuais para Pesca</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex justify-between items-center p-3 bg-blue-50 rounded">
-                    <span>Condição Geral</span>
-                    <Badge className={`${fishingCondition.color} text-white`}>
+                    <span className="text-sm sm:text-base">Condição Geral</span>
+                    <Badge className={`${fishingCondition.color} text-white text-xs sm:text-sm`}>
                       {fishingCondition.text}
                     </Badge>
                   </div>
                   
                   <div className="space-y-3">
-                    <div className="flex justify-between">
-                      <span className="text-sm">Temperatura da Água (est.)</span>
-                      <span className="font-medium">{Math.max(current.temperature - 3, 18)}°C</span>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs sm:text-sm">Temperatura da Água (est.)</span>
+                      <span className="font-medium text-sm sm:text-base">{Math.max(current.temperature - 3, 18)}°C</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm">Atividade dos Peixes</span>
-                      <span className="font-medium">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs sm:text-sm">Atividade dos Peixes</span>
+                      <span className="font-medium text-sm sm:text-base">
                         {current.temperature >= 22 && current.temperature <= 26 ? 'Alta' : 
                          current.temperature >= 18 && current.temperature <= 30 ? 'Moderada' : 'Baixa'}
                       </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm">Melhor Período</span>
-                      <span className="font-medium">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs sm:text-sm">Melhor Período</span>
+                      <span className="font-medium text-sm sm:text-base">
                         {new Date(current.sunrise * 1000).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} - 
                         {new Date(current.sunrise * 1000 + 2 * 3600000).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm">Condições do Vento</span>
-                      <span className="font-medium">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs sm:text-sm">Condições do Vento</span>
+                      <span className="font-medium text-sm sm:text-base">
                         {current.wind_speed <= 10 ? 'Excelente' : 
                          current.wind_speed <= 20 ? 'Boa' : 'Desafiadora'}
                       </span>
@@ -418,10 +436,10 @@ const WeatherDashboard = () => {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Dicas para Hoje</CardTitle>
+                  <CardTitle className="text-lg sm:text-xl">Dicas para Hoje</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-3 text-sm">
+                  <div className="space-y-3 text-xs sm:text-sm">
                     {current.wind_speed <= 15 && (
                       <div className="flex items-start space-x-2">
                         <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
@@ -467,8 +485,8 @@ const WeatherDashboard = () => {
         </Tabs>
 
         {/* Configurações */}
-        <div className="text-center mt-8">
-          <Button variant="outline" onClick={() => setShowSettings(true)}>
+        <div className="text-center mt-6 sm:mt-8">
+          <Button variant="outline" onClick={() => setShowSettings(true)} className="text-sm sm:text-base">
             <Settings className="h-4 w-4 mr-2" />
             Configurar API
           </Button>
