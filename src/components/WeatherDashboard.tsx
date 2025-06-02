@@ -1,7 +1,6 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Cloud, 
@@ -13,7 +12,6 @@ import {
   Gauge,
   Sunrise,
   Sunset,
-  RefreshCw,
   TrendingUp,
   Calendar,
   Clock
@@ -22,7 +20,7 @@ import { useWeatherData } from '@/hooks/useWeatherData';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const WeatherDashboard = () => {
-  const { data: weatherData, isLoading, error, refetch } = useWeatherData();
+  const { data: weatherData, isLoading, error } = useWeatherData();
 
   const getWeatherIcon = (iconCode: string) => {
     const iconMap: { [key: string]: React.ReactNode } = {
@@ -80,7 +78,7 @@ const WeatherDashboard = () => {
         <div className="max-w-7xl mx-auto px-4">
           <Card>
             <CardContent className="flex items-center justify-center py-12">
-              <RefreshCw className="h-8 w-8 animate-spin text-blue-500" />
+              <Sun className="h-8 w-8 animate-spin text-yellow-500" />
               <span className="ml-2 text-sm sm:text-base">Carregando dados meteorológicos...</span>
             </CardContent>
           </Card>
@@ -96,9 +94,6 @@ const WeatherDashboard = () => {
           <Card>
             <CardContent className="text-center py-12">
               <p className="text-red-600 mb-4 text-sm sm:text-base">Erro ao carregar dados meteorológicos</p>
-              <Button variant="outline" onClick={() => refetch()}>
-                Tentar Novamente
-              </Button>
             </CardContent>
           </Card>
         </div>
@@ -109,17 +104,17 @@ const WeatherDashboard = () => {
   const current = weatherData.current;
   const fishingCondition = getFishingCondition(weatherData);
 
-  // Usar a data dos dados atuais da API para sincronizar tudo
-  const currentDataDate = new Date(current.dt * 1000);
-  const currentDate = currentDataDate.toLocaleDateString('pt-BR', {
+  // Usar a data atual do sistema para sincronizar
+  const now = new Date();
+  const currentDate = now.toLocaleDateString('pt-BR', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
     day: 'numeric'
   });
 
-  const hourlyChartData = weatherData.hourly.map(hour => {
-    const hourDate = new Date(hour.dt * 1000);
+  const hourlyChartData = weatherData.hourly.map((hour, index) => {
+    const hourDate = new Date(now.getTime() + (index * 3600000));
     return {
       time: hourDate.toLocaleTimeString('pt-BR', { hour: '2-digit' }),
       fullTime: hourDate.toLocaleString('pt-BR', { 
@@ -138,7 +133,7 @@ const WeatherDashboard = () => {
   return (
     <section className="py-8 sm:py-16 bg-gradient-to-br from-blue-50 to-green-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header com Data dos Dados da API */}
+        {/* Header com Data Atual */}
         <div className="text-center mb-8 sm:mb-12">
           <div className="inline-flex items-center space-x-2 bg-white px-6 py-3 rounded-full shadow-md mb-4">
             <Calendar className="h-5 w-5 text-blue-600" />
@@ -149,7 +144,7 @@ const WeatherDashboard = () => {
           </h2>
           <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto px-4">
             Dados em tempo real para Três Marias/MG. 
-            Planeje sua pescaria com informações precisas e atualizadas por 7 dias.
+            Planeje sua pescaria com informações precisas e atualizadas.
           </p>
         </div>
 
@@ -164,13 +159,10 @@ const WeatherDashboard = () => {
                   <CardTitle className="text-lg sm:text-xl truncate">Três Marias, MG</CardTitle>
                   <p className="text-xs sm:text-sm text-gray-600 capitalize truncate">{current.weather_description}</p>
                   <p className="text-xs text-blue-600 font-medium">
-                    HOJE - {currentDataDate.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit' })}
+                    HOJE - {now.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit' })}
                   </p>
                 </div>
               </div>
-              <Button variant="outline" size="sm" onClick={() => refetch()}>
-                <RefreshCw className="h-4 w-4" />
-              </Button>
             </CardHeader>
             <CardContent>
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-0">
@@ -178,7 +170,7 @@ const WeatherDashboard = () => {
                   <div className="text-4xl sm:text-5xl font-bold text-gray-900">{current.temperature}°C</div>
                   <div className="text-sm text-gray-600">Sensação: {current.feels_like}°C</div>
                   <div className="text-xs text-gray-500 mt-2">
-                    Atualizado: {currentDataDate.toLocaleTimeString('pt-BR')}
+                    Atualizado: {now.toLocaleTimeString('pt-BR')}
                   </div>
                 </div>
                 <div className="text-left sm:text-right">
@@ -187,13 +179,13 @@ const WeatherDashboard = () => {
                   </Badge>
                   <div className="text-sm text-gray-600 space-y-1">
                     <div className="flex items-center">
-                      <Sunrise className="h-4 w-4 mr-1" />
+                      <Sunrise className="h-4 w-4 mr-1 text-amber-500" />
                       <span className="text-xs sm:text-sm">
                         {new Date(current.sunrise * 1000).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
                     <div className="flex items-center">
-                      <Sunset className="h-4 w-4 mr-1" />
+                      <Sunset className="h-4 w-4 mr-1 text-orange-500" />
                       <span className="text-xs sm:text-sm">
                         {new Date(current.sunset * 1000).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                       </span>
@@ -204,7 +196,7 @@ const WeatherDashboard = () => {
             </CardContent>
           </Card>
 
-          {/* Métricas Rápidas - Keep existing code */}
+          {/* Métricas Rápidas */}
           <div className="lg:col-span-2 grid grid-cols-2 gap-3 sm:gap-4">
             <Card>
               <CardContent className="p-3 sm:p-4">
@@ -271,7 +263,7 @@ const WeatherDashboard = () => {
             </TabsTrigger>
           </TabsList>
 
-          {/* Previsão 7 dias - Com datas corretas da API */}
+          {/* Previsão 7 dias */}
           <TabsContent value="forecast">
             <Card>
               <CardHeader>
@@ -362,7 +354,7 @@ const WeatherDashboard = () => {
             </Card>
           </TabsContent>
 
-          {/* Timeline - Com horários e datas baseados na API */}
+          {/* Timeline */}
           <TabsContent value="timeline">
             <Card>
               <CardHeader>
@@ -436,7 +428,7 @@ const WeatherDashboard = () => {
             </Card>
           </TabsContent>
 
-          {/* Condições para pesca - Keep existing code for this tab */}
+          {/* Condições para pesca */}
           <TabsContent value="fishing">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               <Card>
