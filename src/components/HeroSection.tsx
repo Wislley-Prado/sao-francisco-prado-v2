@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -6,8 +5,7 @@ import { Play, Calendar, MapPin, Waves } from 'lucide-react';
 import { useWeatherData } from '@/hooks/useWeatherData';
 
 const HeroSection = () => {
-  const apiKey = localStorage.getItem('openweather_api_key');
-  const { data: weatherData } = useWeatherData(apiKey);
+  const { data: weatherData } = useWeatherData();
 
   const temperature = weatherData?.current.temperature || 24;
   const damLevel = 86;

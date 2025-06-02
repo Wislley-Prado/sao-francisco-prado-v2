@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -6,8 +5,7 @@ import { Thermometer, Wind, Eye, Droplets, Clock, TrendingUp } from 'lucide-reac
 import { useWeatherData } from '@/hooks/useWeatherData';
 
 const StreamInfo = () => {
-  const apiKey = localStorage.getItem('openweather_api_key');
-  const { data: weatherData } = useWeatherData(apiKey);
+  const { data: weatherData } = useWeatherData();
   
   const currentTime = new Date().toLocaleTimeString('pt-BR', { 
     hour: '2-digit', 

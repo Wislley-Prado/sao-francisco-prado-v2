@@ -1,9 +1,11 @@
-
 import { useQuery } from '@tanstack/react-query';
 
 // Coordenadas de Três Marias, MG
 const TRES_MARIAS_LAT = -18.2028;
 const TRES_MARIAS_LON = -45.2447;
+
+// Chave da API integrada
+const API_KEY = '6459a62448b61386ccc581f2cc307a2c';
 
 // Interface para dados meteorológicos atuais
 export interface CurrentWeather {
@@ -66,19 +68,19 @@ export interface WeatherData {
 }
 
 // Função para buscar dados meteorológicos
-const fetchWeatherData = async (apiKey: string): Promise<WeatherData> => {
+const fetchWeatherData = async (): Promise<WeatherData> => {
   console.log('🌤️ [WEATHER] Buscando dados meteorológicos...');
   
   try {
     // Buscar dados atuais e previsão em uma chamada (One Call API)
     const response = await fetch(
-      `https://api.openweathermap.org/data/3.0/onecall?lat=${TRES_MARIAS_LAT}&lon=${TRES_MARIAS_LON}&appid=${apiKey}&units=metric&lang=pt_br&exclude=minutely,alerts`
+      `https://api.openweathermap.org/data/3.0/onecall?lat=${TRES_MARIAS_LAT}&lon=${TRES_MARIAS_LON}&appid=${API_KEY}&units=metric&lang=pt_br&exclude=minutely,alerts`
     );
 
     if (!response.ok) {
       // Fallback para API gratuita se One Call falhar
       console.log('🔄 [WEATHER] One Call API falhou, usando APIs separadas...');
-      return await fetchWeatherDataFallback(apiKey);
+      return await fetchWeatherDataFallback();
     }
 
     const data = await response.json();
@@ -140,21 +142,21 @@ const fetchWeatherData = async (apiKey: string): Promise<WeatherData> => {
     
   } catch (error) {
     console.error('❌ [WEATHER] Erro ao buscar dados meteorológicos:', error);
-    return await fetchWeatherDataFallback(apiKey);
+    return await fetchWeatherDataFallback();
   }
 };
 
 // Função fallback usando APIs gratuitas separadas
-const fetchWeatherDataFallback = async (apiKey: string): Promise<WeatherData> => {
+const fetchWeatherDataFallback = async (): Promise<WeatherData> => {
   try {
     // Dados atuais
     const currentResponse = await fetch(
-      `https://api.openweathermap.org/data/2.5/weather?lat=${TRES_MARIAS_LAT}&lon=${TRES_MARIAS_LON}&appid=${apiKey}&units=metric&lang=pt_br`
+      `https://api.openweathermap.org/data/2.5/weather?lat=${TRES_MARIAS_LAT}&lon=${TRES_MARIAS_LON}&appid=${API_KEY}&units=metric&lang=pt_br`
     );
     
     // Previsão de 5 dias
     const forecastResponse = await fetch(
-      `https://api.openweathermap.org/data/2.5/forecast?lat=${TRES_MARIAS_LAT}&lon=${TRES_MARIAS_LON}&appid=${apiKey}&units=metric&lang=pt_br`
+      `https://api.openweathermap.org/data/2.5/forecast?lat=${TRES_MARIAS_LAT}&lon=${TRES_MARIAS_LON}&appid=${API_KEY}&units=metric&lang=pt_br`
     );
 
     if (!currentResponse.ok || !forecastResponse.ok) {
@@ -253,11 +255,10 @@ const fetchWeatherDataFallback = async (apiKey: string): Promise<WeatherData> =>
   }
 };
 
-export const useWeatherData = (apiKey: string | null) => {
+export const useWeatherData = () => {
   return useQuery({
-    queryKey: ['weather', 'tres-marias', apiKey],
-    queryFn: () => fetchWeatherData(apiKey!),
-    enabled: !!apiKey,
+    queryKey: ['weather', 'tres-marias'],
+    queryFn: fetchWeatherData,
     refetchInterval: 10 * 60 * 1000, // Atualizar a cada 10 minutos
     staleTime: 5 * 60 * 1000, // Dados ficam fresh por 5 minutos
     retry: 2,

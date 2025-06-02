@@ -1,9 +1,7 @@
-
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Cloud, 
@@ -16,27 +14,15 @@ import {
   Sunrise,
   Sunset,
   RefreshCw,
-  Settings,
   TrendingUp,
   Calendar,
   Clock
 } from 'lucide-react';
 import { useWeatherData } from '@/hooks/useWeatherData';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const WeatherDashboard = () => {
-  const [apiKey, setApiKey] = useState(localStorage.getItem('openweather_api_key') || '');
-  const [showSettings, setShowSettings] = useState(!apiKey);
-  
-  const { data: weatherData, isLoading, error, refetch } = useWeatherData(apiKey);
-
-  const handleSaveApiKey = () => {
-    if (apiKey.trim()) {
-      localStorage.setItem('openweather_api_key', apiKey.trim());
-      setShowSettings(false);
-      refetch();
-    }
-  };
+  const { data: weatherData, isLoading, error, refetch } = useWeatherData();
 
   const getWeatherIcon = (iconCode: string) => {
     const iconMap: { [key: string]: React.ReactNode } = {
@@ -88,41 +74,6 @@ const WeatherDashboard = () => {
     return { status: 'poor', text: 'Ruim', color: 'bg-red-500' };
   };
 
-  if (showSettings || !apiKey) {
-    return (
-      <section className="py-8 sm:py-16 bg-gradient-to-br from-blue-50 to-green-50">
-        <div className="max-w-md mx-auto px-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center text-lg">
-                <Settings className="h-5 w-5 mr-2" />
-                Configurar API OpenWeatherMap
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <label className="text-sm font-medium">API Key</label>
-                <Input
-                  type="password"
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                  placeholder="Sua chave da API OpenWeatherMap"
-                  className="mt-1"
-                />
-              </div>
-              <Button onClick={handleSaveApiKey} className="w-full">
-                Salvar e Carregar Dados
-              </Button>
-              <p className="text-xs text-gray-600">
-                Seus dados meteorológicos serão atualizados automaticamente a cada 10 minutos.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-    );
-  }
-
   if (isLoading) {
     return (
       <section className="py-8 sm:py-16 bg-gradient-to-br from-blue-50 to-green-50">
@@ -145,14 +96,9 @@ const WeatherDashboard = () => {
           <Card>
             <CardContent className="text-center py-12">
               <p className="text-red-600 mb-4 text-sm sm:text-base">Erro ao carregar dados meteorológicos</p>
-              <div className="flex flex-col sm:flex-row gap-2 justify-center">
-                <Button variant="outline" onClick={() => refetch()}>
-                  Tentar Novamente
-                </Button>
-                <Button variant="outline" onClick={() => setShowSettings(true)}>
-                  Configurar API
-                </Button>
-              </div>
+              <Button variant="outline" onClick={() => refetch()}>
+                Tentar Novamente
+              </Button>
             </CardContent>
           </Card>
         </div>
