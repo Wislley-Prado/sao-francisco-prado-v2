@@ -110,28 +110,39 @@ const WeatherDashboard = () => {
   const fishingCondition = getFishingCondition(weatherData);
 
   // Data atual formatada para exibição
-  const currentDate = new Date().toLocaleDateString('pt-BR', {
+  const today = new Date();
+  const currentDate = today.toLocaleDateString('pt-BR', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
     day: 'numeric'
   });
 
-  const hourlyChartData = weatherData.hourly.map(hour => ({
-    time: new Date(hour.dt * 1000).toLocaleTimeString('pt-BR', { hour: '2-digit' }),
-    temperatura: hour.temperature,
-    vento: hour.wind_speed,
-    chuva: hour.pop
-  }));
+  const hourlyChartData = weatherData.hourly.map(hour => {
+    const hourDate = new Date(hour.dt * 1000);
+    return {
+      time: hourDate.toLocaleTimeString('pt-BR', { hour: '2-digit' }),
+      fullTime: hourDate.toLocaleString('pt-BR', { 
+        weekday: 'short', 
+        day: '2-digit', 
+        month: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      }),
+      temperatura: hour.temperature,
+      vento: hour.wind_speed,
+      chuva: hour.pop
+    };
+  });
 
   return (
     <section className="py-8 sm:py-16 bg-gradient-to-br from-blue-50 to-green-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header com Data */}
+        {/* Header com Data Atual */}
         <div className="text-center mb-8 sm:mb-12">
-          <div className="inline-flex items-center space-x-2 bg-white px-4 py-2 rounded-full shadow-md mb-4">
-            <Calendar className="h-4 w-4 text-blue-600" />
-            <span className="text-sm font-medium text-gray-700 capitalize">{currentDate}</span>
+          <div className="inline-flex items-center space-x-2 bg-white px-6 py-3 rounded-full shadow-md mb-4">
+            <Calendar className="h-5 w-5 text-blue-600" />
+            <span className="text-lg font-semibold text-gray-800 capitalize">{currentDate}</span>
           </div>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">
             Condições Meteorológicas
@@ -152,6 +163,9 @@ const WeatherDashboard = () => {
                 <div className="min-w-0">
                   <CardTitle className="text-lg sm:text-xl truncate">Três Marias, MG</CardTitle>
                   <p className="text-xs sm:text-sm text-gray-600 capitalize truncate">{current.weather_description}</p>
+                  <p className="text-xs text-blue-600 font-medium">
+                    HOJE - {today.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit' })}
+                  </p>
                 </div>
               </div>
               <Button variant="outline" size="sm" onClick={() => refetch()}>
@@ -190,7 +204,7 @@ const WeatherDashboard = () => {
             </CardContent>
           </Card>
 
-          {/* Métricas Rápidas */}
+          {/* Métricas Rápidas - Keep existing code */}
           <div className="lg:col-span-2 grid grid-cols-2 gap-3 sm:gap-4">
             <Card>
               <CardContent className="p-3 sm:p-4">
@@ -257,7 +271,7 @@ const WeatherDashboard = () => {
             </TabsTrigger>
           </TabsList>
 
-          {/* Previsão 7 dias - Primeira aba */}
+          {/* Previsão 7 dias - Com datas bem claras */}
           <TabsContent value="forecast">
             <Card>
               <CardHeader>
@@ -271,61 +285,84 @@ const WeatherDashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3 sm:space-y-4">
-                  {weatherData.daily.map((day, index) => (
-                    <div key={index} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 border rounded-lg space-y-2 sm:space-y-0 hover:bg-gray-50 transition-colors">
-                      <div className="flex items-center space-x-3 sm:space-x-4 w-full sm:w-auto">
-                        <div className="text-sm font-medium w-20 sm:w-24">
-                          {index === 0 ? 'Hoje' : new Date(day.dt * 1000).toLocaleDateString('pt-BR', { 
-                            weekday: 'short',
-                            day: '2-digit',
-                            month: '2-digit'
-                          })}
+                  {weatherData.daily.map((day, index) => {
+                    const dayDate = new Date(day.dt * 1000);
+                    const isToday = index === 0;
+                    const isTomorrow = index === 1;
+                    
+                    let dayLabel;
+                    if (isToday) {
+                      dayLabel = 'HOJE';
+                    } else if (isTomorrow) {
+                      dayLabel = 'AMANHÃ';
+                    } else {
+                      dayLabel = dayDate.toLocaleDateString('pt-BR', { weekday: 'long' }).toUpperCase();
+                    }
+                    
+                    const fullDate = dayDate.toLocaleDateString('pt-BR', { 
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric'
+                    });
+
+                    return (
+                      <div key={index} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 border rounded-lg space-y-3 sm:space-y-0 hover:bg-gray-50 transition-colors">
+                        <div className="flex items-center space-x-4 w-full sm:w-auto">
+                          <div className="text-center min-w-[100px]">
+                            <div className={`text-sm font-bold ${isToday ? 'text-blue-600' : isTomorrow ? 'text-green-600' : 'text-gray-800'}`}>
+                              {dayLabel}
+                            </div>
+                            <div className="text-xs text-gray-500">{fullDate}</div>
+                          </div>
+                          {getWeatherIcon(day.weather_icon)}
+                          <div className="text-sm capitalize flex-1 sm:flex-none">{day.weather_description}</div>
                         </div>
-                        {getWeatherIcon(day.weather_icon)}
-                        <div className="text-sm capitalize flex-1 sm:flex-none">{day.weather_description}</div>
+                        <div className="flex items-center justify-between sm:justify-end space-x-4 sm:space-x-6 text-sm w-full sm:w-auto">
+                          <div className="text-center">
+                            <div className="text-xs text-gray-600">Chuva</div>
+                            <div className="font-medium">{day.pop}%</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-xs text-gray-600">Vento</div>
+                            <div className="font-medium">{day.wind_speed} km/h</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-xs text-gray-600">Min/Max</div>
+                            <div className="font-bold text-blue-600">{day.temp_min}°/{day.temp_max}°</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-xs text-gray-600">Pesca</div>
+                            <Badge className={`text-xs ${
+                              day.temp_min >= 18 && day.temp_max <= 30 && day.wind_speed <= 15 && day.pop <= 30
+                                ? 'bg-green-500' 
+                                : day.wind_speed <= 20 && day.pop <= 50
+                                ? 'bg-yellow-500'
+                                : 'bg-red-500'
+                            } text-white`}>
+                              {day.temp_min >= 18 && day.temp_max <= 30 && day.wind_speed <= 15 && day.pop <= 30
+                                ? 'Ótima' 
+                                : day.wind_speed <= 20 && day.pop <= 50
+                                ? 'Boa'
+                                : 'Regular'}
+                            </Badge>
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex items-center justify-between sm:justify-end space-x-4 sm:space-x-6 text-sm w-full sm:w-auto">
-                        <div className="text-center">
-                          <div className="text-xs text-gray-600">Chuva</div>
-                          <div className="font-medium">{day.pop}%</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-xs text-gray-600">Vento</div>
-                          <div className="font-medium">{day.wind_speed} km/h</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-xs text-gray-600">Min/Max</div>
-                          <div className="font-bold text-blue-600">{day.temp_min}°/{day.temp_max}°</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-xs text-gray-600">Pesca</div>
-                          <Badge className={`text-xs ${
-                            day.temp_min >= 18 && day.temp_max <= 30 && day.wind_speed <= 15 && day.pop <= 30
-                              ? 'bg-green-500' 
-                              : day.wind_speed <= 20 && day.pop <= 50
-                              ? 'bg-yellow-500'
-                              : 'bg-red-500'
-                          } text-white`}>
-                            {day.temp_min >= 18 && day.temp_max <= 30 && day.wind_speed <= 15 && day.pop <= 30
-                              ? 'Ótima' 
-                              : day.wind_speed <= 20 && day.pop <= 50
-                              ? 'Boa'
-                              : 'Regular'}
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
 
-          {/* Timeline - Próximas 24 horas */}
+          {/* Timeline - Com horários e datas claros */}
           <TabsContent value="timeline">
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg sm:text-xl">Previsão Horária - Próximas 24h</CardTitle>
+                <p className="text-sm text-gray-600">
+                  Horários detalhados com data e hora para planejamento preciso
+                </p>
               </CardHeader>
               <CardContent>
                 <div className="h-64 sm:h-80 mb-4 sm:mb-6">
@@ -344,6 +381,10 @@ const WeatherDashboard = () => {
                           `${value}${name === 'temperatura' ? '°C' : name === 'vento' ? ' km/h' : '%'}`,
                           name === 'temperatura' ? 'Temperatura' : name === 'vento' ? 'Vento' : 'Chuva'
                         ]}
+                        labelFormatter={(label, payload) => {
+                          const data = payload?.[0]?.payload;
+                          return data?.fullTime || label;
+                        }}
                       />
                       <Line yAxisId="temp" type="monotone" dataKey="temperatura" stroke="#3b82f6" strokeWidth={3} />
                       <Line yAxisId="wind" type="monotone" dataKey="vento" stroke="#10b981" strokeWidth={2} />
@@ -351,29 +392,38 @@ const WeatherDashboard = () => {
                   </ResponsiveContainer>
                 </div>
 
-                {/* Cards horários - Responsivo */}
+                {/* Cards horários com data/hora completa */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2 sm:gap-4">
-                  {weatherData.hourly.slice(0, 8).map((hour, index) => (
-                    <Card key={index} className="text-center">
-                      <CardContent className="p-2 sm:p-3">
-                        <div className="text-xs text-gray-600 mb-1">
-                          {new Date(hour.dt * 1000).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                        </div>
-                        <div className="flex justify-center mb-2">
-                          {getWeatherIcon(hour.weather_icon)}
-                        </div>
-                        <div className="font-bold text-sm sm:text-base">{hour.temperature}°</div>
-                        <div className="text-xs text-gray-600">{hour.pop}% 💧</div>
-                        <div className="text-xs text-gray-600">{hour.wind_speed} km/h</div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                  {weatherData.hourly.slice(0, 8).map((hour, index) => {
+                    const hourDate = new Date(hour.dt * 1000);
+                    const isToday = hourDate.toDateString() === today.toDateString();
+                    const dayLabel = isToday ? 'Hoje' : hourDate.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit' });
+                    
+                    return (
+                      <Card key={index} className="text-center">
+                        <CardContent className="p-2 sm:p-3">
+                          <div className="text-xs text-blue-600 font-medium mb-1">
+                            {dayLabel}
+                          </div>
+                          <div className="text-xs text-gray-600 mb-2">
+                            {hourDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                          </div>
+                          <div className="flex justify-center mb-2">
+                            {getWeatherIcon(hour.weather_icon)}
+                          </div>
+                          <div className="font-bold text-sm sm:text-base">{hour.temperature}°</div>
+                          <div className="text-xs text-gray-600">{hour.pop}% 💧</div>
+                          <div className="text-xs text-gray-600">{hour.wind_speed} km/h</div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
 
-          {/* Condições para pesca */}
+          {/* Condições para pesca - Keep existing code for this tab */}
           <TabsContent value="fishing">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               <Card>
