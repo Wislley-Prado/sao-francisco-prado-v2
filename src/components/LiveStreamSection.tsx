@@ -1,14 +1,10 @@
 
 import React from 'react';
-import StreamPlayer from './StreamPlayer';
-import StreamInfo from './StreamInfo';
-import StreamControls from './StreamControls';
-import ChatBox from './ChatBox';
-import StreamStats from './StreamStats';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Waves, Radio, MessageCircle, BarChart3 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Waves, Radio, Play, ExternalLink, Camera, Users, Clock } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const LiveStreamSection = () => {
   return (
@@ -31,117 +27,116 @@ const LiveStreamSection = () => {
           </p>
         </div>
 
-        {/* Main Content */}
-        <div className="grid lg:grid-cols-4 gap-8">
-          {/* Video Player - Takes more space */}
-          <div className="lg:col-span-3">
-            <Card className="overflow-hidden">
-              <CardContent className="p-0">
-                <StreamPlayer />
-                <div className="p-4">
-                  <StreamControls />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Side Panel */}
-          <div className="lg:col-span-1">
-            {/* Mobile Tabs */}
-            <div className="lg:hidden">
-              <Tabs defaultValue="conditions" className="w-full">
-                <TabsList className="grid w-full grid-cols-4">
-                  <TabsTrigger value="conditions" className="text-xs">
-                    <Waves className="h-4 w-4" />
-                  </TabsTrigger>
-                  <TabsTrigger value="chat" className="text-xs">
-                    <MessageCircle className="h-4 w-4" />
-                  </TabsTrigger>
-                  <TabsTrigger value="stats" className="text-xs">
-                    <BarChart3 className="h-4 w-4" />
-                  </TabsTrigger>
-                  <TabsTrigger value="info" className="text-xs">
-                    Info
-                  </TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="conditions" className="mt-4">
-                  <Card>
-                    <CardContent className="p-4">
-                      <h3 className="text-lg font-semibold mb-4 flex items-center">
-                        <Waves className="h-5 w-5 text-rio-blue mr-2" />
-                        Condições Atuais
-                      </h3>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="text-center p-3 bg-blue-50 rounded-lg">
-                          <div className="text-xl font-bold text-rio-blue">23°C</div>
-                          <div className="text-sm text-gray-600">Temperatura</div>
-                        </div>
-                        <div className="text-center p-3 bg-green-50 rounded-lg">
-                          <div className="text-xl font-bold text-water-green">Boa</div>
-                          <div className="text-sm text-gray-600">Visibilidade</div>
-                        </div>
-                        <div className="text-center p-3 bg-orange-50 rounded-lg">
-                          <div className="text-xl font-bold text-sunset-orange">5 km/h</div>
-                          <div className="text-sm text-gray-600">Vento</div>
-                        </div>
-                        <div className="text-center p-3 bg-blue-50 rounded-lg">
-                          <div className="text-xl font-bold text-rio-blue">85%</div>
-                          <div className="text-sm text-gray-600">Nível</div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-                
-                <TabsContent value="chat" className="mt-4">
-                  <ChatBox />
-                </TabsContent>
-                
-                <TabsContent value="stats" className="mt-4">
-                  <StreamStats />
-                </TabsContent>
-                
-                <TabsContent value="info" className="mt-4">
-                  <StreamInfo />
-                </TabsContent>
-              </Tabs>
-            </div>
-
-            {/* Desktop Layout */}
-            <div className="hidden lg:block space-y-6">
-              <StreamStats />
-              <ChatBox />
-              
-              {/* Quick Conditions */}
-              <Card>
-                <CardContent className="p-6">
-                  <h3 className="text-lg font-semibold mb-4 flex items-center">
-                    <Waves className="h-5 w-5 text-rio-blue mr-2" />
-                    Condições Atuais
-                  </h3>
-                  <div className="grid grid-cols-1 gap-3">
-                    <div className="flex justify-between items-center p-2 bg-blue-50 rounded">
-                      <span className="text-sm">Temperatura</span>
-                      <span className="font-bold text-rio-blue">23°C</span>
-                    </div>
-                    <div className="flex justify-between items-center p-2 bg-green-50 rounded">
-                      <span className="text-sm">Visibilidade</span>
-                      <span className="font-bold text-water-green">Boa</span>
-                    </div>
-                    <div className="flex justify-between items-center p-2 bg-orange-50 rounded">
-                      <span className="text-sm">Vento</span>
-                      <span className="font-bold text-sunset-orange">5 km/h</span>
-                    </div>
-                    <div className="flex justify-between items-center p-2 bg-blue-50 rounded">
-                      <span className="text-sm">Nível</span>
-                      <span className="font-bold text-rio-blue">85%</span>
+        {/* Preview Card */}
+        <div className="max-w-4xl mx-auto">
+          <Card className="overflow-hidden">
+            <CardContent className="p-0">
+              {/* Preview Image/Placeholder */}
+              <div className="relative bg-gradient-to-br from-rio-blue to-water-green aspect-video flex items-center justify-center">
+                <div className="text-center text-white">
+                  <Camera className="h-16 w-16 mx-auto mb-4 opacity-80" />
+                  <h3 className="text-2xl font-bold mb-2">Rio São Francisco - Ao Vivo</h3>
+                  <p className="text-lg opacity-90 mb-6">Transmissão em tempo real das condições do rio</p>
+                  
+                  {/* Live Badge */}
+                  <div className="absolute top-4 left-4">
+                    <div className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center">
+                      <div className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></div>
+                      AO VIVO
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
+
+                  {/* Quality Badge */}
+                  <div className="absolute top-4 right-4">
+                    <div className="bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs">
+                      HD 720p
+                    </div>
+                  </div>
+
+                  {/* Play Button Overlay */}
+                  <Link to="/live">
+                    <Button size="lg" className="bg-white/20 hover:bg-white/30 text-white border-2 border-white/50 backdrop-blur-sm">
+                      <Play className="h-6 w-6 mr-2 fill-current" />
+                      Assistir Transmissão
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+
+              {/* Info Section */}
+              <div className="p-6">
+                <div className="grid md:grid-cols-3 gap-6">
+                  {/* Current Stats */}
+                  <div className="text-center">
+                    <div className="flex items-center justify-center mb-2">
+                      <Users className="h-5 w-5 text-rio-blue mr-2" />
+                      <span className="font-semibold">127 assistindo</span>
+                    </div>
+                    <p className="text-sm text-gray-600">Espectadores online</p>
+                  </div>
+
+                  <div className="text-center">
+                    <div className="flex items-center justify-center mb-2">
+                      <Clock className="h-5 w-5 text-water-green mr-2" />
+                      <span className="font-semibold">2h 34min</span>
+                    </div>
+                    <p className="text-sm text-gray-600">Tempo ao vivo</p>
+                  </div>
+
+                  <div className="text-center">
+                    <div className="flex items-center justify-center mb-2">
+                      <Waves className="h-5 w-5 text-sunset-orange mr-2" />
+                      <span className="font-semibold">Condições ideais</span>
+                    </div>
+                    <p className="text-sm text-gray-600">Para pesca</p>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-col sm:flex-row gap-4 mt-6">
+                  <Link to="/live" className="flex-1">
+                    <Button className="w-full bg-rio-blue hover:bg-rio-blue/80">
+                      <Play className="h-5 w-5 mr-2" />
+                      Assistir Agora
+                    </Button>
+                  </Link>
+                  
+                  <Link to="/live" className="flex-1">
+                    <Button variant="outline" className="w-full">
+                      <ExternalLink className="h-5 w-5 mr-2" />
+                      Página Completa
+                    </Button>
+                  </Link>
+                </div>
+
+                {/* Quick Conditions Preview */}
+                <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+                  <h4 className="font-semibold mb-3 flex items-center">
+                    <Waves className="h-4 w-4 text-rio-blue mr-2" />
+                    Condições Atuais
+                  </h4>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-rio-blue">23°C</div>
+                      <div className="text-xs text-gray-600">Temperatura</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-water-green">Boa</div>
+                      <div className="text-xs text-gray-600">Visibilidade</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-sunset-orange">5 km/h</div>
+                      <div className="text-xs text-gray-600">Vento</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-rio-blue">85%</div>
+                      <div className="text-xs text-gray-600">Nível</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </section>
