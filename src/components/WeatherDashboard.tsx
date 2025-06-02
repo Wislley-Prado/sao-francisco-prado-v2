@@ -109,9 +109,9 @@ const WeatherDashboard = () => {
   const current = weatherData.current;
   const fishingCondition = getFishingCondition(weatherData);
 
-  // Data atual formatada para exibição - ATUALIZADA DINAMICAMENTE
-  const now = new Date();
-  const currentDate = now.toLocaleDateString('pt-BR', {
+  // Usar a data dos dados atuais da API para sincronizar tudo
+  const currentDataDate = new Date(current.dt * 1000);
+  const currentDate = currentDataDate.toLocaleDateString('pt-BR', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
@@ -138,7 +138,7 @@ const WeatherDashboard = () => {
   return (
     <section className="py-8 sm:py-16 bg-gradient-to-br from-blue-50 to-green-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header com Data Atual */}
+        {/* Header com Data dos Dados da API */}
         <div className="text-center mb-8 sm:mb-12">
           <div className="inline-flex items-center space-x-2 bg-white px-6 py-3 rounded-full shadow-md mb-4">
             <Calendar className="h-5 w-5 text-blue-600" />
@@ -164,7 +164,7 @@ const WeatherDashboard = () => {
                   <CardTitle className="text-lg sm:text-xl truncate">Três Marias, MG</CardTitle>
                   <p className="text-xs sm:text-sm text-gray-600 capitalize truncate">{current.weather_description}</p>
                   <p className="text-xs text-blue-600 font-medium">
-                    HOJE - {now.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit' })}
+                    HOJE - {currentDataDate.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit' })}
                   </p>
                 </div>
               </div>
@@ -178,7 +178,7 @@ const WeatherDashboard = () => {
                   <div className="text-4xl sm:text-5xl font-bold text-gray-900">{current.temperature}°C</div>
                   <div className="text-sm text-gray-600">Sensação: {current.feels_like}°C</div>
                   <div className="text-xs text-gray-500 mt-2">
-                    Atualizado: {new Date(current.dt * 1000).toLocaleTimeString('pt-BR')}
+                    Atualizado: {currentDataDate.toLocaleTimeString('pt-BR')}
                   </div>
                 </div>
                 <div className="text-left sm:text-right">
@@ -271,7 +271,7 @@ const WeatherDashboard = () => {
             </TabsTrigger>
           </TabsList>
 
-          {/* Previsão 7 dias - Com datas bem claras */}
+          {/* Previsão 7 dias - Com datas corretas da API */}
           <TabsContent value="forecast">
             <Card>
               <CardHeader>
@@ -287,9 +287,15 @@ const WeatherDashboard = () => {
                 <div className="space-y-3 sm:space-y-4">
                   {weatherData.daily.map((day, index) => {
                     const dayDate = new Date(day.dt * 1000);
-                    const todayDate = new Date();
-                    const isToday = dayDate.toDateString() === todayDate.toDateString();
-                    const isTomorrow = new Date(todayDate.getTime() + 24 * 60 * 60 * 1000).toDateString() === dayDate.toDateString();
+                    const currentDataDateOnly = new Date(current.dt * 1000);
+                    currentDataDateOnly.setHours(0, 0, 0, 0);
+                    
+                    const dayDateOnly = new Date(dayDate);
+                    dayDateOnly.setHours(0, 0, 0, 0);
+                    
+                    const isToday = dayDateOnly.getTime() === currentDataDateOnly.getTime();
+                    const tomorrowDate = new Date(currentDataDateOnly.getTime() + 24 * 60 * 60 * 1000);
+                    const isTomorrow = dayDateOnly.getTime() === tomorrowDate.getTime();
                     
                     let dayLabel;
                     if (isToday) {
@@ -356,7 +362,7 @@ const WeatherDashboard = () => {
             </Card>
           </TabsContent>
 
-          {/* Timeline - Com horários e datas claros */}
+          {/* Timeline - Com horários e datas baseados na API */}
           <TabsContent value="timeline">
             <Card>
               <CardHeader>
@@ -393,12 +399,17 @@ const WeatherDashboard = () => {
                   </ResponsiveContainer>
                 </div>
 
-                {/* Cards horários com data/hora completa */}
+                {/* Cards horários com data/hora baseados na API */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2 sm:gap-4">
                   {weatherData.hourly.slice(0, 8).map((hour, index) => {
                     const hourDate = new Date(hour.dt * 1000);
-                    const todayDate = new Date();
-                    const isToday = hourDate.toDateString() === todayDate.toDateString();
+                    const currentDataDateOnly = new Date(current.dt * 1000);
+                    currentDataDateOnly.setHours(0, 0, 0, 0);
+                    
+                    const hourDateOnly = new Date(hourDate);
+                    hourDateOnly.setHours(0, 0, 0, 0);
+                    
+                    const isToday = hourDateOnly.getTime() === currentDataDateOnly.getTime();
                     const dayLabel = isToday ? 'Hoje' : hourDate.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit' });
                     
                     return (
