@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -429,14 +430,6 @@ const WeatherDashboard = () => {
             </div>
           </TabsContent>
         </Tabs>
-
-        {/* Configurações */}
-        <div className="text-center mt-6 sm:mt-8">
-          <Button variant="outline" onClick={() => setShowSettings(true)} className="text-sm sm:text-base">
-            <Settings className="h-4 w-4 mr-2" />
-            Configurar API
-          </Button>
-        </div>
       </div>
     </section>
   );
