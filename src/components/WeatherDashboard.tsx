@@ -99,6 +99,8 @@ const WeatherDashboard = () => {
   }
 
   if (error || !weatherData) {
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+    
     return (
       <section className="py-8 sm:py-16 bg-gradient-to-br from-blue-50 to-green-50">
         <div className="max-w-7xl mx-auto px-4">
@@ -111,7 +113,7 @@ const WeatherDashboard = () => {
             <Card>
               <CardContent className="text-center py-12 space-y-4">
                 <p className="text-red-600 mb-4 text-sm sm:text-base">
-                  {error?.message?.includes('inválida') 
+                  {errorMessage.includes('inválida') 
                     ? 'Chave da API inválida ou expirada' 
                     : 'Erro ao carregar dados meteorológicos'}
                 </p>
