@@ -61,18 +61,95 @@ export interface WeatherData {
   };
 }
 
-// Função para gerar dados simulados realistas
-const generateMockWeatherData = (): WeatherData => {
-  console.log('🌤️ [WEATHER] Gerando dados simulados para Três Marias/MG...');
+// Função para buscar dados reais da API OpenWeatherMap
+const fetchWeatherData = async (): Promise<WeatherData> => {
+  console.log('🌤️ [WEATHER] Buscando dados reais da API OpenWeatherMap...');
   
+  // Coordenadas de Três Marias/MG
+  const lat = -18.2028;
+  const lon = -45.2394;
+  const apiKey = 'SUA_API_KEY_AQUI'; // Você precisa colocar sua chave da API aqui
+  
+  try {
+    // Uma única chamada para o One Call API 3.0 que traz tudo
+    const response = await fetch(
+      `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric&lang=pt_br`
+    );
+    
+    if (!response.ok) {
+      throw new Error(`Erro na API: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log('✅ [WEATHER] Dados da API recebidos com sucesso');
+    
+    return {
+      current: {
+        temperature: Math.round(data.current.temp),
+        feels_like: Math.round(data.current.feels_like),
+        humidity: data.current.humidity,
+        pressure: data.current.pressure,
+        wind_speed: Math.round(data.current.wind_speed * 3.6), // m/s para km/h
+        wind_direction: data.current.wind_deg || 0,
+        visibility: Math.round((data.current.visibility || 10000) / 1000), // metros para km
+        uv_index: Math.round(data.current.uvi || 0),
+        clouds: data.current.clouds,
+        weather_main: data.current.weather[0].main,
+        weather_description: data.current.weather[0].description,
+        weather_icon: data.current.weather[0].icon,
+        sunrise: data.current.sunrise,
+        sunset: data.current.sunset,
+        dt: data.current.dt
+      },
+      hourly: data.hourly.slice(0, 24).map((hour: any) => ({
+        dt: hour.dt,
+        temperature: Math.round(hour.temp),
+        feels_like: Math.round(hour.feels_like),
+        humidity: hour.humidity,
+        wind_speed: Math.round(hour.wind_speed * 3.6),
+        wind_direction: hour.wind_deg || 0,
+        weather_main: hour.weather[0].main,
+        weather_description: hour.weather[0].description,
+        weather_icon: hour.weather[0].icon,
+        pop: Math.round(hour.pop * 100),
+        clouds: hour.clouds
+      })),
+      daily: data.daily.slice(0, 7).map((day: any) => ({
+        dt: day.dt,
+        temp_min: Math.round(day.temp.min),
+        temp_max: Math.round(day.temp.max),
+        humidity: day.humidity,
+        wind_speed: Math.round(day.wind_speed * 3.6),
+        weather_main: day.weather[0].main,
+        weather_description: day.weather[0].description,
+        weather_icon: day.weather[0].icon,
+        pop: Math.round(day.pop * 100),
+        sunrise: day.sunrise,
+        sunset: day.sunset
+      })),
+      location: {
+        name: 'Três Marias',
+        country: 'BR',
+        timezone: data.timezone
+      }
+    };
+  } catch (error) {
+    console.error('❌ [WEATHER] Erro ao buscar dados da API:', error);
+    
+    // Fallback para dados simulados se a API falhar
+    console.log('🔄 [WEATHER] Usando dados simulados como fallback...');
+    return generateFallbackData();
+  }
+};
+
+// Função de fallback com dados simulados
+const generateFallbackData = (): WeatherData => {
   const now = new Date();
   const currentTimestamp = Math.floor(now.getTime() / 1000);
   
-  // Temperatura base realista para Três Marias/MG
-  const baseTemp = 25 + Math.sin(now.getHours() / 24 * Math.PI * 2) * 8; // Varia entre 17-33°C
+  const baseTemp = 25 + Math.sin(now.getHours() / 24 * Math.PI * 2) * 8;
   const temperature = Math.round(baseTemp + (Math.random() - 0.5) * 4);
   
-  // Condições climáticas típicas da região
   const weatherConditions = [
     { main: 'Clear', description: 'céu limpo', icon: '01d' },
     { main: 'Clouds', description: 'parcialmente nublado', icon: '02d' },
@@ -84,11 +161,11 @@ const generateMockWeatherData = (): WeatherData => {
   const current: CurrentWeather = {
     temperature,
     feels_like: temperature + Math.round((Math.random() - 0.5) * 4),
-    humidity: 60 + Math.round(Math.random() * 30), // 60-90%
-    pressure: 1010 + Math.round(Math.random() * 20), // 1010-1030 hPa
-    wind_speed: Math.round(Math.random() * 20), // 0-20 km/h
+    humidity: 60 + Math.round(Math.random() * 30),
+    pressure: 1010 + Math.round(Math.random() * 20),
+    wind_speed: Math.round(Math.random() * 20),
     wind_direction: Math.round(Math.random() * 360),
-    visibility: 8 + Math.round(Math.random() * 7), // 8-15 km
+    visibility: 8 + Math.round(Math.random() * 7),
     uv_index: Math.max(0, Math.round(Math.random() * 12)),
     clouds: Math.round(Math.random() * 100),
     weather_main: currentWeather.main,
@@ -99,7 +176,6 @@ const generateMockWeatherData = (): WeatherData => {
     dt: currentTimestamp
   };
 
-  // Gerar previsão horária (próximas 24h)
   const hourly: HourlyForecast[] = [];
   for (let i = 1; i <= 24; i++) {
     const hourTimestamp = currentTimestamp + (i * 3600);
@@ -121,7 +197,6 @@ const generateMockWeatherData = (): WeatherData => {
     });
   }
 
-  // Gerar previsão diária (próximos 7 dias)
   const daily: DailyForecast[] = [];
   for (let i = 1; i <= 7; i++) {
     const dayTimestamp = currentTimestamp + (i * 24 * 3600);
@@ -143,8 +218,6 @@ const generateMockWeatherData = (): WeatherData => {
     });
   }
 
-  console.log('✅ [WEATHER] Dados simulados gerados com sucesso');
-
   return {
     current,
     hourly,
@@ -159,10 +232,13 @@ const generateMockWeatherData = (): WeatherData => {
 
 export const useWeatherData = () => {
   return useQuery({
-    queryKey: ['weather', 'tres-marias-mock'],
-    queryFn: generateMockWeatherData,
-    refetchInterval: 5 * 60 * 1000, // Atualizar a cada 5 minutos para simular mudanças
-    staleTime: 2 * 60 * 1000, // Dados ficam fresh por 2 minutos
-    retry: 1,
+    queryKey: ['weather', 'tres-marias'],
+    queryFn: fetchWeatherData,
+    refetchInterval: 30 * 60 * 1000, // Atualizar apenas a cada 30 minutos (48 chamadas/dia)
+    staleTime: 25 * 60 * 1000, // Dados ficam fresh por 25 minutos
+    retry: 1, // Apenas 1 tentativa para não desperdiçar chamadas
+    retryDelay: 30000, // 30 segundos entre tentativas
+    refetchOnWindowFocus: false, // Não atualizar quando a janela ganha foco
+    refetchOnMount: false, // Não atualizar sempre que o componente monta (use cache)
   });
 };
