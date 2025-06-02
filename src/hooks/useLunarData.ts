@@ -111,12 +111,12 @@ const calculateLunarPhases = (): LunarData => {
     {
       time: "22:00 - 00:30",
       activity: "Lua Alta",
-      quality: currentPhase === 'Cheia' ? 'good' : 'fair' as const
+      quality: currentPhase === 'Cheia' ? 'good' as const : 'fair' as const
     },
     {
       time: "03:00 - 05:00",
       activity: "Madrugada",
-      quality: currentPhase === 'Nova' || currentPhase === 'Minguante' ? 'good' : 'fair' as const
+      quality: currentPhase === 'Nova' || currentPhase === 'Minguante' ? 'good' as const : 'fair' as const
     }
   ];
   
