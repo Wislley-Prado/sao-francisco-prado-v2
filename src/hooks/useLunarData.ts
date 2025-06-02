@@ -91,26 +91,32 @@ const calculateLunarPhases = (): LunarData => {
   }
   
   // Melhores horários para pesca baseados na lua
+  const sunrise = new Date();
+  sunrise.setHours(6, 0, 0, 0);
+  
+  const sunset = new Date();
+  sunset.setHours(18, 30, 0, 0);
+  
   const bestFishingTimes = [
     {
       time: "05:30 - 07:00",
       activity: "Nascente do Sol",
-      quality: 'excellent' as 'excellent' | 'good' | 'fair'
+      quality: 'excellent' as const
     },
     {
       time: "17:30 - 19:00", 
       activity: "Pôr do Sol",
-      quality: 'excellent' as 'excellent' | 'good' | 'fair'
+      quality: 'excellent' as const
     },
     {
       time: "22:00 - 00:30",
       activity: "Lua Alta",
-      quality: (currentPhase === 'Cheia' ? 'good' : 'fair') as 'excellent' | 'good' | 'fair'
+      quality: currentPhase === 'Cheia' ? 'good' : 'fair' as const
     },
     {
       time: "03:00 - 05:00",
       activity: "Madrugada",
-      quality: (currentPhase === 'Nova' || currentPhase === 'Minguante' ? 'good' : 'fair') as 'excellent' | 'good' | 'fair'
+      quality: currentPhase === 'Nova' || currentPhase === 'Minguante' ? 'good' : 'fair' as const
     }
   ];
   
