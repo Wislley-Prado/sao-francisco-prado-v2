@@ -90,27 +90,27 @@ const calculateLunarPhases = (): LunarData => {
     });
   }
   
-  // Melhores horários para pesca baseados na lua - corrigindo os tipos
+  // Melhores horários para pesca baseados na lua
   const bestFishingTimes = [
     {
       time: "05:30 - 07:00",
       activity: "Nascente do Sol",
-      quality: 'excellent' as const
+      quality: 'excellent' as 'excellent' | 'good' | 'fair'
     },
     {
       time: "17:30 - 19:00", 
       activity: "Pôr do Sol",
-      quality: 'excellent' as const
+      quality: 'excellent' as 'excellent' | 'good' | 'fair'
     },
     {
       time: "22:00 - 00:30",
       activity: "Lua Alta",
-      quality: (currentPhase === 'Cheia' ? 'good' : 'fair') as const
+      quality: (currentPhase === 'Cheia' ? 'good' : 'fair') as 'excellent' | 'good' | 'fair'
     },
     {
       time: "03:00 - 05:00",
       activity: "Madrugada",
-      quality: (currentPhase === 'Nova' || currentPhase === 'Minguante' ? 'good' : 'fair') as const
+      quality: (currentPhase === 'Nova' || currentPhase === 'Minguante' ? 'good' : 'fair') as 'excellent' | 'good' | 'fair'
     }
   ];
   

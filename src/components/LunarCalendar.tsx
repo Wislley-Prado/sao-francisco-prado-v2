@@ -82,21 +82,21 @@ const LunarCalendar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-8 items-start">
           {/* Lunar Calendar */}
-          <Card className="shadow-2xl border-0 overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-700 text-white">
-              <CardTitle className="text-2xl flex items-center">
-                <Moon className="mr-3 h-6 w-6" />
+          <Card className="shadow-xl border-0 overflow-hidden bg-white">
+            <CardHeader className="bg-white border-b border-gray-100 pb-6">
+              <CardTitle className="text-xl font-bold text-gray-800 flex items-center">
+                <Moon className="mr-3 h-5 w-5 text-blue-600" />
                 Calendário Lunar - Dezembro 2024
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 bg-white">
               <div className="space-y-4">
                 {lunarData.phases.map((phase, index) => (
-                  <div key={index} className="flex items-center justify-between p-4 bg-gradient-to-r from-slate-50 to-blue-50 rounded-xl border border-slate-200 hover:shadow-md transition-all duration-200">
+                  <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-100 hover:shadow-sm transition-all duration-200">
                     <div className="flex items-center space-x-4">
                       {getMoonIcon(phase.phase, phase.illumination)}
                       <div>
-                        <h4 className="font-semibold text-gray-900 text-lg">Lua {phase.phase}</h4>
+                        <h4 className="font-semibold text-gray-900">Lua {phase.phase}</h4>
                         <p className="text-sm text-gray-600">{phase.date}</p>
                       </div>
                     </div>
@@ -110,9 +110,9 @@ const LunarCalendar = () => {
                 ))}
               </div>
 
-              <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
-                <h5 className="font-semibold text-indigo-700 mb-2 flex items-center">
-                  <Star className="mr-2 h-4 w-4 fill-indigo-400 text-indigo-400" />
+              <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
+                <h5 className="font-semibold text-blue-700 mb-2 flex items-center">
+                  <Star className="mr-2 h-4 w-4 fill-blue-400 text-blue-400" />
                   Dica dos Especialistas
                 </h5>
                 <p className="text-sm text-gray-700">
@@ -123,11 +123,11 @@ const LunarCalendar = () => {
             </CardContent>
           </Card>
 
-          {/* Best Fishing Times - Inspirado na imagem */}
-          <Card className="shadow-2xl border-0 overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-orange-500 via-red-500 to-pink-600 text-white">
-              <CardTitle className="text-2xl flex items-center">
-                <Sun className="mr-3 h-6 w-6" />
+          {/* Best Fishing Times */}
+          <Card className="shadow-xl border-0 overflow-hidden bg-white">
+            <CardHeader className="bg-white border-b border-gray-100 pb-6">
+              <CardTitle className="text-xl font-bold text-gray-800 flex items-center">
+                <Sun className="mr-3 h-5 w-5 text-orange-500" />
                 Melhores Horários - Hoje
               </CardTitle>
             </CardHeader>
@@ -135,9 +135,9 @@ const LunarCalendar = () => {
               <div className="space-y-3">
                 {lunarData.bestFishingTimes.map((time, index) => (
                   <div key={index} className="relative">
-                    <div className="flex items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl border-l-4 border-orange-400 hover:shadow-md transition-all duration-200">
+                    <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg border-l-4 border-orange-400 hover:shadow-sm transition-all duration-200">
                       <div className="flex-1">
-                        <h4 className="font-bold text-gray-900 text-lg">{time.time}</h4>
+                        <h4 className="font-bold text-gray-900">{time.time}</h4>
                         <p className="text-sm text-gray-600 font-medium">{time.activity}</p>
                       </div>
                       <div className="ml-4">
@@ -150,7 +150,7 @@ const LunarCalendar = () => {
 
               {/* Current Conditions */}
               <div className="mt-8 grid grid-cols-2 gap-4">
-                <div className="text-center p-6 bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl border border-slate-200">
+                <div className="text-center p-6 bg-gray-50 rounded-lg border border-gray-100">
                   <h5 className="font-bold text-gray-900 mb-2">Lua Atual</h5>
                   {getCurrentMoonIcon(lunarData.currentPhase.phase, lunarData.currentPhase.illumination)}
                   <p className="text-sm text-gray-600 font-medium">
@@ -160,7 +160,7 @@ const LunarCalendar = () => {
                     {lunarData.currentPhase.illumination}% iluminada
                   </p>
                 </div>
-                <div className="text-center p-6 bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl border border-slate-200">
+                <div className="text-center p-6 bg-gray-50 rounded-lg border border-gray-100">
                   <h5 className="font-bold text-gray-900 mb-2">Próxima Fase</h5>
                   {getMoonIcon(nextPhase.phase, nextPhase.illumination)}
                   <p className="text-sm text-gray-600 font-medium mt-3">{nextPhase.phase}</p>
@@ -168,8 +168,8 @@ const LunarCalendar = () => {
                 </div>
               </div>
 
-              <div className="mt-6 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
-                <h5 className="font-bold text-emerald-700 mb-2">
+              <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-100">
+                <h5 className="font-bold text-green-700 mb-2">
                   Condição Atual: {
                     lunarData.currentPhase.phase === 'Nova' || lunarData.currentPhase.phase === 'Minguante' 
                       ? 'Excelente' 
