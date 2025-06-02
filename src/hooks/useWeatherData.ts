@@ -61,7 +61,7 @@ export interface WeatherData {
   };
 }
 
-// Sua chave da API OpenWeatherMap
+// Sua chave da API OpenWeatherMap (configurada)
 const API_KEY = '6459a62448b61386ccc581f2cc307a2c';
 
 // Função para gerar dados estáveis baseados na data atual (fallback apenas)
@@ -158,23 +158,6 @@ const generateStableWeatherData = (): WeatherData => {
   };
 };
 
-// Função para obter a chave da API (agora usando a sua chave fixa)
-const getApiKey = (): string => {
-  // Verificar se tem chave salva no localStorage, senão usar a chave fixa
-  const savedKey = localStorage.getItem('openweather_api_key');
-  return savedKey || API_KEY;
-};
-
-// Função para salvar a chave da API no localStorage
-export const saveApiKey = (apiKey: string): void => {
-  localStorage.setItem('openweather_api_key', apiKey);
-};
-
-// Função para remover a chave da API do localStorage
-export const removeApiKey = (): void => {
-  localStorage.removeItem('openweather_api_key');
-};
-
 // Função para buscar dados reais da API OpenWeatherMap
 const fetchWeatherData = async (): Promise<WeatherData> => {
   console.log('🌤️ [WEATHER] Buscando dados REAIS da API OpenWeatherMap...');
@@ -182,14 +165,13 @@ const fetchWeatherData = async (): Promise<WeatherData> => {
   // Coordenadas de Três Marias/MG
   const lat = -18.2028;
   const lon = -45.2394;
-  const apiKey = getApiKey();
   
-  console.log(`🔑 [WEATHER] Usando chave da API: ${apiKey.substring(0, 8)}...`);
+  console.log(`🔑 [WEATHER] Usando chave da API configurada: ${API_KEY.substring(0, 8)}...`);
   
   try {
     // Buscar dados atuais da API OpenWeatherMap
     const currentResponse = await fetch(
-      `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric&lang=pt_br`
+      `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric&lang=pt_br`
     );
     
     if (!currentResponse.ok) {
@@ -205,7 +187,7 @@ const fetchWeatherData = async (): Promise<WeatherData> => {
     
     // Buscar previsão de 5 dias (dados horários)
     const forecastResponse = await fetch(
-      `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric&lang=pt_br`
+      `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric&lang=pt_br`
     );
     
     let forecastData = null;
@@ -315,12 +297,6 @@ const fetchWeatherData = async (): Promise<WeatherData> => {
     
   } catch (error) {
     console.error('❌ [WEATHER] Erro ao buscar dados da API:', error);
-    
-    // Se for erro de chave inválida, avisar mas continuar com fallback
-    if (error instanceof Error && error.message.includes('inválida')) {
-      console.warn('⚠️ [WEATHER] Chave inválida, usando dados simulados');
-    }
-    
     console.log('🔄 [WEATHER] Usando dados simulados como fallback...');
     return generateStableWeatherData();
   }
@@ -328,9 +304,9 @@ const fetchWeatherData = async (): Promise<WeatherData> => {
 
 export const useWeatherData = () => {
   return useQuery({
-    queryKey: ['weather', 'tres-marias', getApiKey()],
+    queryKey: ['weather', 'tres-marias'],
     queryFn: fetchWeatherData,
-    refetchInterval: 10 * 60 * 1000, // Atualizar a cada 10 minutos (mais frequente para dados reais)
+    refetchInterval: 10 * 60 * 1000, // Atualizar a cada 10 minutos
     staleTime: 5 * 60 * 1000, // Dados ficam fresh por 5 minutos
     retry: 2,
     retryDelay: 10000,

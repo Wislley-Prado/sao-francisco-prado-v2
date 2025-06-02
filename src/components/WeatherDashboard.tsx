@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
@@ -10,8 +10,7 @@ import {
   Calendar,
   Clock
 } from 'lucide-react';
-import { useWeatherData, saveApiKey } from '@/hooks/useWeatherData';
-import ApiKeyForm from './ApiKeyForm';
+import { useWeatherData } from '@/hooks/useWeatherData';
 import WeatherHeader from './weather/WeatherHeader';
 import CurrentWeatherCard from './weather/CurrentWeatherCard';
 import WeatherMetrics from './weather/WeatherMetrics';
@@ -20,16 +19,7 @@ import TimelineTab from './weather/TimelineTab';
 import FishingTab from './weather/FishingTab';
 
 const WeatherDashboard = () => {
-  const { data: weatherData, isLoading, error, refetch } = useWeatherData();
-  const [showApiForm, setShowApiForm] = useState(false);
-
-  const handleApiKeySubmit = (apiKey: string) => {
-    saveApiKey(apiKey);
-    setShowApiForm(false);
-    refetch();
-  };
-
-  const hasApiKey = localStorage.getItem('openweather_api_key');
+  const { data: weatherData, isLoading, error } = useWeatherData();
 
   const getWeatherIcon = (iconCode: string) => {
     const iconMap: { [key: string]: React.ReactNode } = {
@@ -97,33 +87,16 @@ const WeatherDashboard = () => {
   }
 
   if (error || !weatherData) {
-    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
-    
     return (
       <section className="py-8 sm:py-16 bg-gradient-to-br from-blue-50 to-green-50">
         <div className="max-w-7xl mx-auto px-4">
-          {showApiForm ? (
-            <ApiKeyForm 
-              onApiKeySubmit={handleApiKeySubmit}
-              currentApiKey={hasApiKey || undefined}
-            />
-          ) : (
-            <Card>
-              <CardContent className="text-center py-12 space-y-4">
-                <p className="text-red-600 mb-4 text-sm sm:text-base">
-                  {errorMessage.includes('inválida') 
-                    ? 'Chave da API inválida ou expirada' 
-                    : 'Erro ao carregar dados meteorológicos'}
-                </p>
-                <button
-                  onClick={() => setShowApiForm(true)}
-                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
-                >
-                  Configurar API
-                </button>
-              </CardContent>
-            </Card>
-          )}
+          <Card>
+            <CardContent className="text-center py-12 space-y-4">
+              <p className="text-red-600 mb-4 text-sm sm:text-base">
+                Erro ao carregar dados meteorológicos
+              </p>
+            </CardContent>
+          </Card>
         </div>
       </section>
     );
@@ -142,19 +115,7 @@ const WeatherDashboard = () => {
   return (
     <section className="py-8 sm:py-16 bg-gradient-to-br from-blue-50 to-green-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <WeatherHeader 
-          currentDate={currentDate}
-          onShowApiForm={() => setShowApiForm(true)}
-        />
-
-        {showApiForm && (
-          <div className="mb-6">
-            <ApiKeyForm 
-              onApiKeySubmit={handleApiKeySubmit}
-              currentApiKey={hasApiKey || undefined}
-            />
-          </div>
-        )}
+        <WeatherHeader currentDate={currentDate} />
 
         {/* Condições Atuais */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
