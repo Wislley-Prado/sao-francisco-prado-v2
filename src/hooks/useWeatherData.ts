@@ -1,3 +1,4 @@
+
 import { useQuery } from '@tanstack/react-query';
 
 // Interface para dados meteorológicos atuais
@@ -60,9 +61,12 @@ export interface WeatherData {
   };
 }
 
-// Função para gerar dados estáveis baseados na data atual
+// Sua chave da API OpenWeatherMap
+const API_KEY = '6459a62448b61386ccc581f2cc307a2c';
+
+// Função para gerar dados estáveis baseados na data atual (fallback apenas)
 const generateStableWeatherData = (): WeatherData => {
-  console.log('🌤️ [WEATHER] Gerando dados simulados estáveis para Três Marias/MG...');
+  console.log('🌤️ [WEATHER] Gerando dados simulados como fallback...');
   
   const now = new Date();
   const currentTimestamp = Math.floor(now.getTime() / 1000);
@@ -154,9 +158,11 @@ const generateStableWeatherData = (): WeatherData => {
   };
 };
 
-// Função para obter a chave da API do localStorage
-const getApiKey = (): string | null => {
-  return localStorage.getItem('openweather_api_key');
+// Função para obter a chave da API (agora usando a sua chave fixa)
+const getApiKey = (): string => {
+  // Verificar se tem chave salva no localStorage, senão usar a chave fixa
+  const savedKey = localStorage.getItem('openweather_api_key');
+  return savedKey || API_KEY;
 };
 
 // Função para salvar a chave da API no localStorage
@@ -171,21 +177,17 @@ export const removeApiKey = (): void => {
 
 // Função para buscar dados reais da API OpenWeatherMap
 const fetchWeatherData = async (): Promise<WeatherData> => {
-  console.log('🌤️ [WEATHER] Tentando buscar dados reais da API OpenWeatherMap...');
+  console.log('🌤️ [WEATHER] Buscando dados REAIS da API OpenWeatherMap...');
   
   // Coordenadas de Três Marias/MG
   const lat = -18.2028;
   const lon = -45.2394;
   const apiKey = getApiKey();
   
-  // Verificar se temos uma chave válida
-  if (!apiKey) {
-    console.log('⚠️ [WEATHER] Chave da API não configurada, usando dados simulados estáveis...');
-    return generateStableWeatherData();
-  }
+  console.log(`🔑 [WEATHER] Usando chave da API: ${apiKey.substring(0, 8)}...`);
   
   try {
-    // Tentar usar a API gratuita Current Weather primeiro
+    // Buscar dados atuais da API OpenWeatherMap
     const currentResponse = await fetch(
       `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric&lang=pt_br`
     );
@@ -199,14 +201,23 @@ const fetchWeatherData = async (): Promise<WeatherData> => {
     }
     
     const currentData = await currentResponse.json();
-    console.log('✅ [WEATHER] Dados da API Current Weather recebidos com sucesso');
+    console.log('✅ [WEATHER] Dados reais recebidos da API OpenWeatherMap:', currentData);
     
-    // Como não temos acesso à API One Call, vamos usar apenas os dados atuais
-    // e simular o resto de forma estável
-    const stableData = generateStableWeatherData();
+    // Buscar previsão de 5 dias (dados horários)
+    const forecastResponse = await fetch(
+      `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric&lang=pt_br`
+    );
     
-    // Sobrescrever apenas os dados atuais com dados reais
-    stableData.current = {
+    let forecastData = null;
+    if (forecastResponse.ok) {
+      forecastData = await forecastResponse.json();
+      console.log('✅ [WEATHER] Previsão de 5 dias recebida da API');
+    } else {
+      console.warn('⚠️ [WEATHER] Erro na previsão, usando dados simulados para forecast');
+    }
+    
+    // Processar dados atuais reais
+    const current: CurrentWeather = {
       temperature: Math.round(currentData.main.temp),
       feels_like: Math.round(currentData.main.feels_like),
       humidity: currentData.main.humidity,
@@ -224,18 +235,93 @@ const fetchWeatherData = async (): Promise<WeatherData> => {
       dt: currentData.dt
     };
     
-    return stableData;
+    // Processar previsão horária se disponível
+    let hourly: HourlyForecast[] = [];
+    if (forecastData && forecastData.list) {
+      hourly = forecastData.list.slice(0, 24).map((item: any) => ({
+        dt: item.dt,
+        temperature: Math.round(item.main.temp),
+        feels_like: Math.round(item.main.feels_like),
+        humidity: item.main.humidity,
+        wind_speed: Math.round((item.wind?.speed || 0) * 3.6),
+        wind_direction: item.wind?.deg || 0,
+        weather_main: item.weather[0].main,
+        weather_description: item.weather[0].description,
+        weather_icon: item.weather[0].icon,
+        pop: Math.round((item.pop || 0) * 100),
+        clouds: item.clouds?.all || 0
+      }));
+    } else {
+      // Fallback para dados simulados se não conseguir a previsão
+      const fallbackData = generateStableWeatherData();
+      hourly = fallbackData.hourly;
+    }
+    
+    // Processar previsão diária (agregar dados horários)
+    let daily: DailyForecast[] = [];
+    if (forecastData && forecastData.list) {
+      const dailyMap = new Map();
+      
+      forecastData.list.forEach((item: any) => {
+        const date = new Date(item.dt * 1000).toDateString();
+        if (!dailyMap.has(date)) {
+          dailyMap.set(date, {
+            dt: item.dt,
+            temps: [item.main.temp],
+            humidity: item.main.humidity,
+            wind_speed: (item.wind?.speed || 0) * 3.6,
+            weather_main: item.weather[0].main,
+            weather_description: item.weather[0].description,
+            weather_icon: item.weather[0].icon,
+            pop: (item.pop || 0) * 100,
+            sunrise: currentData.sys.sunrise,
+            sunset: currentData.sys.sunset
+          });
+        } else {
+          const existing = dailyMap.get(date);
+          existing.temps.push(item.main.temp);
+        }
+      });
+      
+      daily = Array.from(dailyMap.values()).slice(0, 7).map((day: any) => ({
+        dt: day.dt,
+        temp_min: Math.round(Math.min(...day.temps)),
+        temp_max: Math.round(Math.max(...day.temps)),
+        humidity: day.humidity,
+        wind_speed: Math.round(day.wind_speed),
+        weather_main: day.weather_main,
+        weather_description: day.weather_description,
+        weather_icon: day.weather_icon,
+        pop: Math.round(day.pop),
+        sunrise: day.sunrise,
+        sunset: day.sunset
+      }));
+    } else {
+      // Fallback para dados simulados se não conseguir a previsão
+      const fallbackData = generateStableWeatherData();
+      daily = fallbackData.daily;
+    }
+    
+    return {
+      current,
+      hourly,
+      daily,
+      location: {
+        name: 'Três Marias',
+        country: 'BR',
+        timezone: 'America/Sao_Paulo'
+      }
+    };
     
   } catch (error) {
     console.error('❌ [WEATHER] Erro ao buscar dados da API:', error);
     
-    // Se for erro de chave inválida, remover do localStorage
+    // Se for erro de chave inválida, avisar mas continuar com fallback
     if (error instanceof Error && error.message.includes('inválida')) {
-      removeApiKey();
-      throw error;
+      console.warn('⚠️ [WEATHER] Chave inválida, usando dados simulados');
     }
     
-    console.log('🔄 [WEATHER] Usando dados simulados estáveis como fallback...');
+    console.log('🔄 [WEATHER] Usando dados simulados como fallback...');
     return generateStableWeatherData();
   }
 };
@@ -244,11 +330,11 @@ export const useWeatherData = () => {
   return useQuery({
     queryKey: ['weather', 'tres-marias', getApiKey()],
     queryFn: fetchWeatherData,
-    refetchInterval: 30 * 60 * 1000, // Atualizar a cada 30 minutos
-    staleTime: 25 * 60 * 1000, // Dados ficam fresh por 25 minutos
-    retry: 1,
-    retryDelay: 30000,
-    refetchOnWindowFocus: false,
-    refetchOnMount: false, // Importante: não refetch no mount para manter dados estáveis
+    refetchInterval: 10 * 60 * 1000, // Atualizar a cada 10 minutos (mais frequente para dados reais)
+    staleTime: 5 * 60 * 1000, // Dados ficam fresh por 5 minutos
+    retry: 2,
+    retryDelay: 10000,
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
   });
 };
