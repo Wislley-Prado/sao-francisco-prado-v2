@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -14,13 +14,24 @@ import {
   Sunset,
   TrendingUp,
   Calendar,
-  Clock
+  Clock,
+  Settings
 } from 'lucide-react';
-import { useWeatherData } from '@/hooks/useWeatherData';
+import { useWeatherData, saveApiKey } from '@/hooks/useWeatherData';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import ApiKeyForm from './ApiKeyForm';
 
 const WeatherDashboard = () => {
-  const { data: weatherData, isLoading, error } = useWeatherData();
+  const { data: weatherData, isLoading, error, refetch } = useWeatherData();
+  const [showApiForm, setShowApiForm] = useState(false);
+
+  const handleApiKeySubmit = (apiKey: string) => {
+    saveApiKey(apiKey);
+    setShowApiForm(false);
+    refetch();
+  };
+
+  const hasApiKey = localStorage.getItem('openweather_api_key');
 
   const getWeatherIcon = (iconCode: string) => {
     const iconMap: { [key: string]: React.ReactNode } = {
@@ -91,11 +102,28 @@ const WeatherDashboard = () => {
     return (
       <section className="py-8 sm:py-16 bg-gradient-to-br from-blue-50 to-green-50">
         <div className="max-w-7xl mx-auto px-4">
-          <Card>
-            <CardContent className="text-center py-12">
-              <p className="text-red-600 mb-4 text-sm sm:text-base">Erro ao carregar dados meteorológicos</p>
-            </CardContent>
-          </Card>
+          {showApiForm ? (
+            <ApiKeyForm 
+              onApiKeySubmit={handleApiKeySubmit}
+              currentApiKey={hasApiKey || undefined}
+            />
+          ) : (
+            <Card>
+              <CardContent className="text-center py-12 space-y-4">
+                <p className="text-red-600 mb-4 text-sm sm:text-base">
+                  {error?.message?.includes('inválida') 
+                    ? 'Chave da API inválida ou expirada' 
+                    : 'Erro ao carregar dados meteorológicos'}
+                </p>
+                <button
+                  onClick={() => setShowApiForm(true)}
+                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+                >
+                  Configurar API
+                </button>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </section>
     );
@@ -133,12 +161,29 @@ const WeatherDashboard = () => {
   return (
     <section className="py-8 sm:py-16 bg-gradient-to-br from-blue-50 to-green-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header com Data Atual */}
+        {/* Header com Data Atual e Configurações */}
         <div className="text-center mb-8 sm:mb-12">
           <div className="inline-flex items-center space-x-2 bg-white px-6 py-3 rounded-full shadow-md mb-4">
             <Calendar className="h-5 w-5 text-blue-600" />
             <span className="text-lg font-semibold text-gray-800 capitalize">{currentDate}</span>
+            <button
+              onClick={() => setShowApiForm(true)}
+              className="ml-4 p-1 text-gray-500 hover:text-blue-600 transition-colors"
+              title="Configurar API"
+            >
+              <Settings className="h-4 w-4" />
+            </button>
           </div>
+          
+          {showApiForm && (
+            <div className="mb-6">
+              <ApiKeyForm 
+                onApiKeySubmit={handleApiKeySubmit}
+                currentApiKey={hasApiKey || undefined}
+              />
+            </div>
+          )}
+
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">
             Condições Meteorológicas
           </h2>

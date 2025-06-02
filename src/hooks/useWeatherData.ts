@@ -1,4 +1,3 @@
-
 import { useQuery } from '@tanstack/react-query';
 
 // Interface para dados meteorológicos atuais
@@ -155,6 +154,21 @@ const generateStableWeatherData = (): WeatherData => {
   };
 };
 
+// Função para obter a chave da API do localStorage
+const getApiKey = (): string | null => {
+  return localStorage.getItem('openweather_api_key');
+};
+
+// Função para salvar a chave da API no localStorage
+export const saveApiKey = (apiKey: string): void => {
+  localStorage.setItem('openweather_api_key', apiKey);
+};
+
+// Função para remover a chave da API do localStorage
+export const removeApiKey = (): void => {
+  localStorage.removeItem('openweather_api_key');
+};
+
 // Função para buscar dados reais da API OpenWeatherMap
 const fetchWeatherData = async (): Promise<WeatherData> => {
   console.log('🌤️ [WEATHER] Tentando buscar dados reais da API OpenWeatherMap...');
@@ -162,10 +176,10 @@ const fetchWeatherData = async (): Promise<WeatherData> => {
   // Coordenadas de Três Marias/MG
   const lat = -18.2028;
   const lon = -45.2394;
-  const apiKey = 'SUA_API_KEY_AQUI'; // Precisa de uma chave válida da API
+  const apiKey = getApiKey();
   
   // Verificar se temos uma chave válida
-  if (!apiKey || apiKey === 'SUA_API_KEY_AQUI') {
+  if (!apiKey) {
     console.log('⚠️ [WEATHER] Chave da API não configurada, usando dados simulados estáveis...');
     return generateStableWeatherData();
   }
@@ -177,6 +191,10 @@ const fetchWeatherData = async (): Promise<WeatherData> => {
     );
     
     if (!currentResponse.ok) {
+      if (currentResponse.status === 401) {
+        console.error('❌ [WEATHER] Chave da API inválida ou expirada');
+        throw new Error('Chave da API inválida');
+      }
       throw new Error(`Erro na API Current Weather: ${currentResponse.status}`);
     }
     
@@ -210,6 +228,13 @@ const fetchWeatherData = async (): Promise<WeatherData> => {
     
   } catch (error) {
     console.error('❌ [WEATHER] Erro ao buscar dados da API:', error);
+    
+    // Se for erro de chave inválida, remover do localStorage
+    if (error instanceof Error && error.message.includes('inválida')) {
+      removeApiKey();
+      throw error;
+    }
+    
     console.log('🔄 [WEATHER] Usando dados simulados estáveis como fallback...');
     return generateStableWeatherData();
   }
@@ -217,7 +242,7 @@ const fetchWeatherData = async (): Promise<WeatherData> => {
 
 export const useWeatherData = () => {
   return useQuery({
-    queryKey: ['weather', 'tres-marias'],
+    queryKey: ['weather', 'tres-marias', getApiKey()],
     queryFn: fetchWeatherData,
     refetchInterval: 30 * 60 * 1000, // Atualizar a cada 30 minutos
     staleTime: 25 * 60 * 1000, // Dados ficam fresh por 25 minutos
