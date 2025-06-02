@@ -1,5 +1,5 @@
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { 
@@ -15,90 +15,30 @@ import {
   RotateCcw,
   Share2,
   Camera,
-  Maximize2,
-  Video,
-  VideoOff
+  Maximize2
 } from 'lucide-react';
 
 const StreamPlayer = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [volume, setVolume] = useState([80]);
   const [quality, setQuality] = useState('720p');
   const [showControls, setShowControls] = useState(true);
-  const [isCameraOn, setIsCameraOn] = useState(false);
-  const [cameraError, setCameraError] = useState<string | null>(null);
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const controlsTimeoutRef = useRef<NodeJS.Timeout>();
-  const streamRef = useRef<MediaStream | null>(null);
-
-  // Função para iniciar a câmera
-  const startCamera = async () => {
-    try {
-      setIsLoading(true);
-      setCameraError(null);
-      
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-          facingMode: 'environment' // Câmera traseira no mobile
-        },
-        audio: true
-      });
-      
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        streamRef.current = stream;
-        setIsCameraOn(true);
-        setIsPlaying(true);
-      }
-    } catch (error) {
-      console.error('Erro ao acessar a câmera:', error);
-      setCameraError('Erro ao acessar a câmera. Verifique as permissões.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Função para parar a câmera
-  const stopCamera = () => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-      streamRef.current = null;
-    }
-    if (videoRef.current) {
-      videoRef.current.srcObject = null;
-    }
-    setIsCameraOn(false);
-    setIsPlaying(false);
-  };
-
-  // Limpar stream quando componente desmonta
-  useEffect(() => {
-    return () => {
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
-      }
-    };
-  }, []);
 
   const togglePlay = () => {
-    if (isCameraOn) {
-      if (videoRef.current) {
-        if (isPlaying) {
-          videoRef.current.pause();
-        } else {
-          videoRef.current.play();
-        }
-        setIsPlaying(!isPlaying);
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+      } else {
+        videoRef.current.play();
       }
-    } else {
-      startCamera();
+      setIsPlaying(!isPlaying);
     }
   };
 
@@ -127,6 +67,11 @@ const StreamPlayer = () => {
     }
   };
 
+  const handleReload = () => {
+    setIsLoading(true);
+    setTimeout(() => setIsLoading(false), 2000);
+  };
+
   const handleShare = () => {
     if (navigator.share) {
       navigator.share({
@@ -138,29 +83,8 @@ const StreamPlayer = () => {
   };
 
   const handleCapture = () => {
-    if (videoRef.current && isCameraOn) {
-      const canvas = document.createElement('canvas');
-      const context = canvas.getContext('2d');
-      
-      canvas.width = videoRef.current.videoWidth;
-      canvas.height = videoRef.current.videoHeight;
-      
-      if (context) {
-        context.drawImage(videoRef.current, 0, 0);
-        
-        // Converter para blob e fazer download
-        canvas.toBlob((blob) => {
-          if (blob) {
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `rio-sao-francisco-${new Date().toISOString()}.png`;
-            a.click();
-            URL.revokeObjectURL(url);
-          }
-        });
-      }
-    }
+    console.log('Captura de tela solicitada');
+    // Implementar lógica de captura
   };
 
   const handleMouseMove = () => {
@@ -171,6 +95,14 @@ const StreamPlayer = () => {
     controlsTimeoutRef.current = setTimeout(() => {
       setShowControls(false);
     }, 3000);
+  };
+
+  const handleLoadStart = () => {
+    setIsLoading(true);
+  };
+
+  const handleCanPlay = () => {
+    setIsLoading(false);
   };
 
   const qualityOptions = ['480p', '720p', '1080p'];
@@ -187,21 +119,7 @@ const StreamPlayer = () => {
         <div className="absolute inset-0 flex items-center justify-center bg-black z-10">
           <div className="text-center text-white">
             <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
-            <p className="text-sm">Iniciando câmera...</p>
-          </div>
-        </div>
-      )}
-
-      {/* Error State */}
-      {cameraError && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black z-10">
-          <div className="text-center text-white p-8">
-            <Video className="h-16 w-16 mx-auto mb-4 text-red-500" />
-            <h3 className="text-xl font-semibold mb-2">Erro na Câmera</h3>
-            <p className="text-sm opacity-90 mb-4">{cameraError}</p>
-            <Button onClick={startCamera} className="bg-rio-blue hover:bg-rio-blue/80">
-              Tentar Novamente
-            </Button>
+            <p className="text-sm">Carregando transmissão...</p>
           </div>
         </div>
       )}
@@ -210,146 +128,173 @@ const StreamPlayer = () => {
       <video
         ref={videoRef}
         className="w-full h-full object-cover"
-        autoPlay
-        playsInline
+        poster="https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+        onLoadStart={handleLoadStart}
+        onCanPlay={handleCanPlay}
         muted={isMuted}
         onClick={togglePlay}
-      />
-
-      {/* No Camera State */}
-      {!isCameraOn && !isLoading && !cameraError && (
+      >
+        <source src="#" type="video/mp4" />
         <div className="absolute inset-0 bg-gradient-to-br from-rio-blue to-water-green flex items-center justify-center">
           <div className="text-center text-white p-8">
-            <Camera className="h-16 w-16 mx-auto mb-4" />
+            <Radio className="h-16 w-16 mx-auto mb-4 animate-pulse" />
             <h3 className="text-xl font-semibold mb-2">Transmissão do Rio São Francisco</h3>
-            <p className="text-sm opacity-90 mb-4">Clique para iniciar a câmera</p>
-            <Button onClick={startCamera} className="bg-white/20 hover:bg-white/30 text-white border-2 border-white/50">
-              <Camera className="h-5 w-5 mr-2" />
-              Iniciar Câmera
+            <p className="text-sm opacity-90">Visualização em tempo real das condições do rio</p>
+          </div>
+        </div>
+      </video>
+
+      {/* Live Badge */}
+      <div className="absolute top-4 left-4 z-20">
+        <div className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center">
+          <div className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></div>
+          AO VIVO
+        </div>
+      </div>
+
+      {/* Quality Badge */}
+      <div className="absolute top-4 right-4 z-20">
+        <div className="bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs">
+          HD {quality}
+        </div>
+      </div>
+
+      {/* Viewer Count */}
+      <div className="absolute top-16 right-4 z-20">
+        <div className="bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs flex items-center">
+          <Radio className="h-3 w-3 mr-1" />
+          127 assistindo
+        </div>
+      </div>
+
+      {/* Main Controls Overlay */}
+      <div className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 transition-opacity duration-300 z-20 ${showControls ? 'opacity-100' : 'opacity-0'}`}>
+        {/* Progress Bar (Simulada para Live) */}
+        <div className="mb-4">
+          <div className="w-full h-1 bg-white/30 rounded">
+            <div className="w-full h-1 bg-red-500 rounded animate-pulse"></div>
+          </div>
+        </div>
+
+        {/* Controls Row */}
+        <div className="flex items-center justify-between">
+          {/* Left Controls */}
+          <div className="flex items-center space-x-3">
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={togglePlay}
+              className="text-white hover:bg-white/20 p-2"
+            >
+              {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
+            </Button>
+
+            <div className="flex items-center space-x-2">
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={toggleMute}
+                className="text-white hover:bg-white/20 p-2"
+              >
+                {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+              </Button>
+              
+              <div className="w-20">
+                <Slider
+                  value={volume}
+                  onValueChange={handleVolumeChange}
+                  max={100}
+                  step={1}
+                  className="cursor-pointer"
+                />
+              </div>
+            </div>
+
+            <div className="text-white text-sm">
+              LIVE
+            </div>
+          </div>
+
+          {/* Center Controls */}
+          <div className="flex items-center space-x-2">
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={handleCapture}
+              className="text-white hover:bg-white/20 p-2"
+              title="Capturar Imagem"
+            >
+              <Camera className="h-4 w-4" />
+            </Button>
+
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={handleShare}
+              className="text-white hover:bg-white/20 p-2"
+              title="Compartilhar"
+            >
+              <Share2 className="h-4 w-4" />
+            </Button>
+
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={handleReload}
+              className="text-white hover:bg-white/20 p-2"
+              title="Recarregar Stream"
+            >
+              <RotateCcw className="h-4 w-4" />
+            </Button>
+          </div>
+
+          {/* Right Controls */}
+          <div className="flex items-center space-x-2">
+            <select 
+              value={quality}
+              onChange={(e) => setQuality(e.target.value)}
+              className="text-sm border-0 bg-white/20 text-white rounded px-2 py-1 backdrop-blur-sm"
+            >
+              {qualityOptions.map(option => (
+                <option key={option} value={option} className="text-black">
+                  {option}
+                </option>
+              ))}
+            </select>
+
+            <Button
+              size="sm"
+              variant="ghost"
+              className="text-white hover:bg-white/20 p-2"
+              title="Configurações"
+            >
+              <Settings className="h-4 w-4" />
+            </Button>
+
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={toggleFullscreen}
+              className="text-white hover:bg-white/20 p-2"
+              title="Tela Cheia"
+            >
+              {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
             </Button>
           </div>
         </div>
-      )}
+      </div>
 
-      {/* Live Badge */}
-      {isCameraOn && (
-        <div className="absolute top-4 left-4 z-20">
-          <div className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center">
-            <div className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></div>
-            AO VIVO
-          </div>
-        </div>
-      )}
-
-      {/* Quality Badge */}
-      {isCameraOn && (
-        <div className="absolute top-4 right-4 z-20">
-          <div className="bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs">
-            HD {quality}
-          </div>
-        </div>
-      )}
-
-      {/* Main Controls Overlay */}
-      {isCameraOn && (
-        <div className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 transition-opacity duration-300 z-20 ${showControls ? 'opacity-100' : 'opacity-0'}`}>
-          {/* Controls Row */}
-          <div className="flex items-center justify-between">
-            {/* Left Controls */}
-            <div className="flex items-center space-x-3">
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={togglePlay}
-                className="text-white hover:bg-white/20 p-2"
-              >
-                {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
-              </Button>
-
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={stopCamera}
-                className="text-white hover:bg-white/20 p-2"
-                title="Parar Câmera"
-              >
-                <VideoOff className="h-5 w-5" />
-              </Button>
-
-              <div className="flex items-center space-x-2">
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={toggleMute}
-                  className="text-white hover:bg-white/20 p-2"
-                >
-                  {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
-                </Button>
-                
-                <div className="w-20">
-                  <Slider
-                    value={volume}
-                    onValueChange={handleVolumeChange}
-                    max={100}
-                    step={1}
-                    className="cursor-pointer"
-                  />
-                </div>
-              </div>
-
-              <div className="text-white text-sm">
-                LIVE
-              </div>
-            </div>
-
-            {/* Center Controls */}
-            <div className="flex items-center space-x-2">
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={handleCapture}
-                className="text-white hover:bg-white/20 p-2"
-                title="Capturar Imagem"
-              >
-                <Camera className="h-4 w-4" />
-              </Button>
-
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={handleShare}
-                className="text-white hover:bg-white/20 p-2"
-                title="Compartilhar"
-              >
-                <Share2 className="h-4 w-4" />
-              </Button>
-            </div>
-
-            {/* Right Controls */}
-            <div className="flex items-center space-x-2">
-              <select 
-                value={quality}
-                onChange={(e) => setQuality(e.target.value)}
-                className="text-sm border-0 bg-white/20 text-white rounded px-2 py-1 backdrop-blur-sm"
-              >
-                {qualityOptions.map(option => (
-                  <option key={option} value={option} className="text-black">
-                    {option}
-                  </option>
-                ))}
-              </select>
-
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={toggleFullscreen}
-                className="text-white hover:bg-white/20 p-2"
-                title="Tela Cheia"
-              >
-                {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-              </Button>
-            </div>
-          </div>
+      {/* Click to Play Overlay */}
+      {!isPlaying && !isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center z-10">
+          <Button
+            size="lg"
+            onClick={togglePlay}
+            className="bg-white/20 hover:bg-white/30 text-white border-2 border-white/50 backdrop-blur-sm"
+          >
+            <Play className="h-8 w-8 mr-2" />
+            Reproduzir
+          </Button>
         </div>
       )}
     </div>
