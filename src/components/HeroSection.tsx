@@ -3,13 +3,23 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Play, Calendar, MapPin, Waves } from 'lucide-react';
+import { useWeatherData } from '@/hooks/useWeatherData';
 
 const HeroSection = () => {
+  const apiKey = localStorage.getItem('openweather_api_key');
+  const { data: weatherData } = useWeatherData(apiKey);
+
+  // Usar dados reais se disponíveis, senão usar dados padrão
+  const temperature = weatherData?.current.temperature || 24;
+  const damLevel = 86; // Este virá da represa
+  const windSpeed = weatherData?.current.wind_speed || 12;
+  const conditions = weatherData?.current.weather_description || 'Excelente';
+
   return (
     <section id="home" className="relative min-h-screen bg-river-gradient flex items-center overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzR2LTRoLTJ2NGgtNHYyaDR2NGgydi00aDR2LTJoLTR6bTAtMzBWMGgtMnY0aC00djJoNHY0aDJWNmg0VjRoLTR6TTYgMzR2LTRINHY0SDB2Mmg0djRoMnYtNGg0di0ySDZ6TTYgNFYwSDR2NEgwdjJoNHY0aDJWNmg0VjRINnoiLz48L2c+PC9nPjwvc3ZnPg==')] animate-wave"></div>
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzR2LTRINHY0aC00djJoNHY0aDJWNmg0VjRoLTR6bTAtMzBWMGgtMnY0aC00djJoNHY0aDJWNmg0VjRoLTR6TTYgMzR2LTRINHY0SDB2Mmg0djRoMnYtNGg0di0ySDZ6TTYgNFYwSDR2NEgwdjJoNHY0aDJWNmg0VjRINnoiLz48L2c+PC9nPjwvc3ZnPg==')] animate-wave"></div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
@@ -93,23 +103,23 @@ const HeroSection = () => {
                     </div>
                   </div>
 
-                  {/* Live Info */}
+                  {/* Live Info - Agora com dados reais */}
                   <div className="grid grid-cols-2 gap-4 text-white text-sm">
                     <div>
                       <p className="opacity-80">Temperatura da Água</p>
-                      <p className="font-semibold">24°C</p>
+                      <p className="font-semibold">{temperature}°C</p>
                     </div>
                     <div>
                       <p className="opacity-80">Nível da Represa</p>
-                      <p className="font-semibold">86%</p>
+                      <p className="font-semibold">{damLevel}%</p>
                     </div>
                     <div>
                       <p className="opacity-80">Condições</p>
-                      <p className="font-semibold text-nature-400">Excelente</p>
+                      <p className="font-semibold text-nature-400 capitalize">{conditions}</p>
                     </div>
                     <div>
                       <p className="opacity-80">Vento</p>
-                      <p className="font-semibold">12 km/h</p>
+                      <p className="font-semibold">{windSpeed} km/h</p>
                     </div>
                   </div>
                 </div>
