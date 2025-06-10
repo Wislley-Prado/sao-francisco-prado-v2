@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -45,13 +45,41 @@ const DamDashboard: React.FC<DamDashboardProps> = ({
   
   const levelStatus = getStatusFromLevel(currentLevel);
   
-  // Usar dados reais do histórico para o gráfico
-  const trendData = damData?.historico_dias?.slice(-7).reverse().map(dia => ({
-    time: new Date(dia.dia).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
-    nivel: parseFloat(dia.vol_util_final) || 0,
-    afluencia: parseFloat(dia.vazao_afl) || 0,
-    defluencia: parseFloat(dia.vazao_def) || 0
-  })) || [];
+  // Usar useMemo para garantir que os dados do gráfico sejam recalculados quando damData mudar
+  const trendData = useMemo(() => {
+    console.log('📊 [CHART] Recalculando dados do gráfico com historico_dias:', damData?.historico_dias?.length || 0);
+    
+    if (!damData?.historico_dias || damData.historico_dias.length === 0) {
+      console.log('⚠️ [CHART] Sem dados de histórico, retornando array vazio');
+      return [];
+    }
+
+    const chartData = damData.historico_dias
+      .slice(-7) // Pegar os últimos 7 dias
+      .reverse() // Inverter para mostrar do mais antigo para o mais recente
+      .map((dia, index) => {
+        const dataFormatada = new Date(dia.dia).toLocaleDateString('pt-BR', { 
+          day: '2-digit', 
+          month: '2-digit' 
+        });
+        
+        const nivel = parseFloat(dia.vol_util_final) || 0;
+        const aflData = parseFloat(dia.vazao_afl) || 0;
+        const defData = parseFloat(dia.vazao_def) || 0;
+        
+        console.log(`📈 [CHART] Dia ${index + 1}: ${dataFormatada} - Nível: ${nivel}%, Afl: ${aflData}, Def: ${defData}`);
+        
+        return {
+          time: dataFormatada,
+          nivel: nivel,
+          afluencia: aflData,
+          defluencia: defData
+        };
+      });
+
+    console.log('✅ [CHART] Dados do gráfico processados:', chartData);
+    return chartData;
+  }, [damData?.historico_dias]); // Dependência específica do histórico
 
   // Determinar ícone da tendência
   const getTendenciaIcon = () => {
@@ -165,10 +193,12 @@ const DamDashboard: React.FC<DamDashboardProps> = ({
                 {/* Gráfico de Tendência com dados reais */}
                 {trendData.length > 0 && (
                   <div className="mt-6">
-                    <h5 className="text-sm font-medium text-gray-700 mb-3">Tendência (7 dias)</h5>
+                    <h5 className="text-sm font-medium text-gray-700 mb-3">
+                      Tendência (7 dias) - {trendData.length} registros
+                    </h5>
                     <div className="h-24 sm:h-32">
                       <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={trendData}>
+                        <LineChart data={trendData} key={`chart-${dataUpdatedAt}`}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                           <XAxis 
                             dataKey="time" 
@@ -202,6 +232,12 @@ const DamDashboard: React.FC<DamDashboardProps> = ({
                         </LineChart>
                       </ResponsiveContainer>
                     </div>
+                  </div>
+                )}
+
+                {trendData.length === 0 && (
+                  <div className="mt-6 text-center">
+                    <p className="text-sm text-gray-500">Aguardando dados históricos...</p>
                   </div>
                 )}
               </div>
@@ -300,6 +336,13 @@ const DamDashboard: React.FC<DamDashboardProps> = ({
                 <span className="text-gray-600">Carregando:</span>
                 <Badge variant={isLoading ? "default" : "outline"}>
                   {isLoading ? "Sim" : "Não"}
+                </Badge>
+              </div>
+
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-600">Dados históricos:</span>
+                <Badge variant="outline">
+                  {damData?.historico_dias?.length || 0} dias
                 </Badge>
               </div>
 
