@@ -1,4 +1,3 @@
-
 import React, { useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -175,9 +174,6 @@ const DamLevelCard: React.FC<DamLevelCardProps> = ({
                     />
                   </LineChart>
                 </ResponsiveContainer>
-              </div>
-              <div className="text-xs text-gray-500 mt-2">
-                Período: {trendData[0]?.dataCompleta} até {trendData[trendData.length - 1]?.dataCompleta} | Key={chartKey}
               </div>
             </div>
           )}
