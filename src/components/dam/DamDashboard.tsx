@@ -1,4 +1,5 @@
 
+
 import React, { useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -69,32 +70,39 @@ const DamDashboard: React.FC<DamDashboardProps> = ({
 
     console.log('📊 [CHART] Dados brutos do histórico:', damData.historico_dias);
 
-    const chartData = damData.historico_dias
-      .slice(-7) // Pegar os últimos 7 dias
-      .reverse() // Inverter para mostrar do mais antigo para o mais recente
-      .map((dia, index) => {
-        console.log(`📊 [CHART] Processando dia ${index + 1}:`, dia);
-        
-        const dataFormatada = new Date(dia.dia).toLocaleDateString('pt-BR', { 
-          day: '2-digit', 
-          month: '2-digit' 
-        });
-        
-        const nivel = parseFloat(dia.vol_util_final) || 0;
-        const aflData = parseFloat(dia.vazao_afl) || 0;
-        const defData = parseFloat(dia.vazao_def) || 0;
-        
-        console.log(`📈 [CHART] Dia ${index + 1}: ${dataFormatada} - Nível: ${nivel}%, Afl: ${aflData}, Def: ${defData}`);
-        
-        return {
-          time: dataFormatada,
-          nivel: nivel,
-          afluencia: aflData,
-          defluencia: defData
-        };
+    // Ordenar os dados por data (mais recente primeiro) e pegar os últimos 7 dias
+    const sortedData = [...damData.historico_dias]
+      .sort((a, b) => new Date(b.dia).getTime() - new Date(a.dia).getTime())
+      .slice(0, 7) // Pegar os 7 mais recentes
+      .reverse(); // Inverter para mostrar cronologicamente (mais antigo para mais recente)
+
+    console.log('📊 [CHART] Dados ordenados (últimos 7 dias):', sortedData);
+
+    const chartData = sortedData.map((dia, index) => {
+      console.log(`📊 [CHART] Processando dia ${index + 1}:`, dia);
+      
+      const dataFormatada = new Date(dia.dia).toLocaleDateString('pt-BR', { 
+        day: '2-digit', 
+        month: '2-digit' 
       });
+      
+      const nivel = parseFloat(dia.vol_util_final) || 0;
+      const aflData = parseFloat(dia.vazao_afl) || 0;
+      const defData = parseFloat(dia.vazao_def) || 0;
+      
+      console.log(`📈 [CHART] Dia ${index + 1}: ${dataFormatada} - Nível: ${nivel}%, Afl: ${aflData}, Def: ${defData}`);
+      
+      return {
+        time: dataFormatada,
+        nivel: nivel,
+        afluencia: aflData,
+        defluencia: defData,
+        dataCompleta: dia.dia
+      };
+    });
 
     console.log('✅ [CHART] Dados finais do gráfico processados:', chartData);
+    console.log('✅ [CHART] Período do gráfico: de', chartData[0]?.dataCompleta, 'até', chartData[chartData.length - 1]?.dataCompleta);
     console.log('✅ [CHART] === FIM DO RECÁLCULO ===');
     return chartData;
   }, [damData?.historico_dias, dataUpdatedAt, renderCount]);
@@ -104,6 +112,9 @@ const DamDashboard: React.FC<DamDashboardProps> = ({
     console.log('📊 [CHART] trendData MUDOU! Nova length:', trendData.length);
     console.log('📊 [CHART] Novos dados:', trendData);
     console.log('📊 [CHART] Timestamp da mudança:', new Date().toISOString());
+    if (trendData.length > 0) {
+      console.log('📊 [CHART] Período atualizado: de', trendData[0]?.dataCompleta, 'até', trendData[trendData.length - 1]?.dataCompleta);
+    }
   }, [trendData]);
 
   // Determinar ícone da tendência
@@ -223,7 +234,7 @@ const DamDashboard: React.FC<DamDashboardProps> = ({
                 {trendData.length > 0 && (
                   <div className="mt-6">
                     <h5 className="text-sm font-medium text-gray-700 mb-3">
-                      Tendência (7 dias) - {trendData.length} registros - Atualizado: {new Date(dataUpdatedAt).toLocaleTimeString('pt-BR')}
+                      Tendência Últimos 7 Dias - {trendData.length} registros - Atualizado: {new Date(dataUpdatedAt).toLocaleTimeString('pt-BR')}
                     </h5>
                     <div className="h-24 sm:h-32">
                       <ResponsiveContainer width="100%" height="100%">
@@ -265,7 +276,7 @@ const DamDashboard: React.FC<DamDashboardProps> = ({
                       </ResponsiveContainer>
                     </div>
                     <div className="text-xs text-gray-500 mt-2">
-                      Debug: Key={chartKey} | Dados atualizados em {new Date().toLocaleTimeString('pt-BR')} | Registros: {trendData.length}
+                      Período: {trendData[0]?.dataCompleta} até {trendData[trendData.length - 1]?.dataCompleta} | Key={chartKey}
                     </div>
                   </div>
                 )}
@@ -412,3 +423,4 @@ const DamDashboard: React.FC<DamDashboardProps> = ({
 };
 
 export default DamDashboard;
+
