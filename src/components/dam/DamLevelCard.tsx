@@ -39,15 +39,18 @@ const DamLevelCard: React.FC<DamLevelCardProps> = ({
 
     console.log('📊 [CHART] Dados brutos do histórico:', damData.historico_dias);
 
-    // Ordenar os dados por data (mais recente primeiro) e pegar os últimos 7 dias
+    // Ordenar os dados por data (mais antigo primeiro)
     const sortedData = [...damData.historico_dias]
-      .sort((a, b) => new Date(b.dia).getTime() - new Date(a.dia).getTime())
-      .slice(0, 7) // Pegar os 7 mais recentes
-      .reverse(); // Inverter para mostrar cronologicamente (mais antigo para mais recente)
+      .sort((a, b) => new Date(a.dia).getTime() - new Date(b.dia).getTime());
 
-    console.log('📊 [CHART] Dados ordenados (últimos 7 dias):', sortedData);
+    console.log('📊 [CHART] Dados ordenados cronologicamente:', sortedData);
 
-    const chartData = sortedData.map((dia, index) => {
+    // Pegar os últimos 7 dias do histórico ordenado
+    const last7Days = sortedData.slice(-7);
+
+    console.log('📊 [CHART] Últimos 7 dias selecionados:', last7Days);
+
+    const chartData = last7Days.map((dia, index) => {
       console.log(`📊 [CHART] Processando dia ${index + 1}:`, dia);
       
       const dataFormatada = new Date(dia.dia).toLocaleDateString('pt-BR', { 
