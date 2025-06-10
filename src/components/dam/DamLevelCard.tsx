@@ -1,3 +1,4 @@
+
 import React, { useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -44,7 +45,7 @@ const DamLevelCard: React.FC<DamLevelCardProps> = ({
 
     console.log('📊 [CHART] Dados ordenados cronologicamente:', sortedData);
 
-    // Pegar os últimos 7 dias do histórico ordenado
+    // Pegar exatamente os últimos 7 dias (incluindo o mais recente)
     const last7Days = sortedData.slice(-7);
 
     console.log('📊 [CHART] Últimos 7 dias selecionados:', last7Days);
