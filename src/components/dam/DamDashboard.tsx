@@ -1,3 +1,4 @@
+
 import React, { useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -59,6 +60,7 @@ const DamDashboard: React.FC<DamDashboardProps> = ({
     console.log('📊 [CHART] historico_dias existe?', !!damData?.historico_dias);
     console.log('📊 [CHART] historico_dias length:', damData?.historico_dias?.length || 0);
     console.log('📊 [CHART] dataUpdatedAt:', new Date(dataUpdatedAt).toISOString());
+    console.log('📊 [CHART] renderCount:', renderCount);
     
     if (!damData?.historico_dias || damData.historico_dias.length === 0) {
       console.log('⚠️ [CHART] Sem dados de histórico, retornando array vazio');
@@ -95,12 +97,13 @@ const DamDashboard: React.FC<DamDashboardProps> = ({
     console.log('✅ [CHART] Dados finais do gráfico processados:', chartData);
     console.log('✅ [CHART] === FIM DO RECÁLCULO ===');
     return chartData;
-  }, [damData?.historico_dias, dataUpdatedAt]); // Adicionando dataUpdatedAt como dependência
+  }, [damData?.historico_dias, dataUpdatedAt, renderCount]);
 
   // Log quando trendData mudar
   useEffect(() => {
     console.log('📊 [CHART] trendData MUDOU! Nova length:', trendData.length);
     console.log('📊 [CHART] Novos dados:', trendData);
+    console.log('📊 [CHART] Timestamp da mudança:', new Date().toISOString());
   }, [trendData]);
 
   // Determinar ícone da tendência
@@ -123,6 +126,10 @@ const DamDashboard: React.FC<DamDashboardProps> = ({
     }
     return 'text-blue-600 bg-blue-50 border-blue-200';
   };
+
+  // Criar uma chave única para forçar re-render do gráfico
+  const chartKey = `chart-${dataUpdatedAt}-${trendData.length}-${renderCount}`;
+  console.log('🔑 [CHART] Chart key gerada:', chartKey);
 
   return (
     <div className="mb-8 sm:mb-12">
@@ -222,7 +229,7 @@ const DamDashboard: React.FC<DamDashboardProps> = ({
                       <ResponsiveContainer width="100%" height="100%">
                         <LineChart 
                           data={trendData} 
-                          key={`chart-${dataUpdatedAt}-${trendData.length}-${JSON.stringify(trendData[0])}`}
+                          key={chartKey}
                         >
                           <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                           <XAxis 
@@ -258,7 +265,7 @@ const DamDashboard: React.FC<DamDashboardProps> = ({
                       </ResponsiveContainer>
                     </div>
                     <div className="text-xs text-gray-500 mt-2">
-                      Debug: Dados atualizados em {new Date().toLocaleTimeString('pt-BR')} | Registros: {trendData.length}
+                      Debug: Key={chartKey} | Dados atualizados em {new Date().toLocaleTimeString('pt-BR')} | Registros: {trendData.length}
                     </div>
                   </div>
                 )}
@@ -405,5 +412,3 @@ const DamDashboard: React.FC<DamDashboardProps> = ({
 };
 
 export default DamDashboard;
-
-}
