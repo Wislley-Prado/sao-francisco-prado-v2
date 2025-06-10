@@ -1,5 +1,4 @@
-
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -37,6 +36,14 @@ const DamDashboard: React.FC<DamDashboardProps> = ({
   renderCount,
   onRefresh
 }) => {
+  // Log sempre que o componente renderizar
+  useEffect(() => {
+    console.log('🎨 [DASHBOARD] Componente renderizou - Render #', renderCount);
+    console.log('🎨 [DASHBOARD] damData:', damData);
+    console.log('🎨 [DASHBOARD] dataUpdatedAt:', new Date(dataUpdatedAt).toISOString());
+    console.log('🎨 [DASHBOARD] historico_dias length:', damData?.historico_dias?.length || 0);
+  });
+
   const currentLevel = damData?.volume_util_percentual ? parseFloat(damData.volume_util_percentual) : 82;
   const nivelAtualMetros = damData?.nivel_atual ? parseFloat(damData.nivel_atual) : 569.8;
   const afluencia = damData?.afluencia || '134';
@@ -47,17 +54,25 @@ const DamDashboard: React.FC<DamDashboardProps> = ({
   
   // Usar useMemo para garantir que os dados do gráfico sejam recalculados quando damData mudar
   const trendData = useMemo(() => {
-    console.log('📊 [CHART] Recalculando dados do gráfico com historico_dias:', damData?.historico_dias?.length || 0);
+    console.log('📊 [CHART] === RECALCULANDO DADOS DO GRÁFICO ===');
+    console.log('📊 [CHART] damData existe?', !!damData);
+    console.log('📊 [CHART] historico_dias existe?', !!damData?.historico_dias);
+    console.log('📊 [CHART] historico_dias length:', damData?.historico_dias?.length || 0);
+    console.log('📊 [CHART] dataUpdatedAt:', new Date(dataUpdatedAt).toISOString());
     
     if (!damData?.historico_dias || damData.historico_dias.length === 0) {
       console.log('⚠️ [CHART] Sem dados de histórico, retornando array vazio');
       return [];
     }
 
+    console.log('📊 [CHART] Dados brutos do histórico:', damData.historico_dias);
+
     const chartData = damData.historico_dias
       .slice(-7) // Pegar os últimos 7 dias
       .reverse() // Inverter para mostrar do mais antigo para o mais recente
       .map((dia, index) => {
+        console.log(`📊 [CHART] Processando dia ${index + 1}:`, dia);
+        
         const dataFormatada = new Date(dia.dia).toLocaleDateString('pt-BR', { 
           day: '2-digit', 
           month: '2-digit' 
@@ -77,9 +92,16 @@ const DamDashboard: React.FC<DamDashboardProps> = ({
         };
       });
 
-    console.log('✅ [CHART] Dados do gráfico processados:', chartData);
+    console.log('✅ [CHART] Dados finais do gráfico processados:', chartData);
+    console.log('✅ [CHART] === FIM DO RECÁLCULO ===');
     return chartData;
-  }, [damData?.historico_dias]); // Dependência específica do histórico
+  }, [damData?.historico_dias, dataUpdatedAt]); // Adicionando dataUpdatedAt como dependência
+
+  // Log quando trendData mudar
+  useEffect(() => {
+    console.log('📊 [CHART] trendData MUDOU! Nova length:', trendData.length);
+    console.log('📊 [CHART] Novos dados:', trendData);
+  }, [trendData]);
 
   // Determinar ícone da tendência
   const getTendenciaIcon = () => {
@@ -194,11 +216,14 @@ const DamDashboard: React.FC<DamDashboardProps> = ({
                 {trendData.length > 0 && (
                   <div className="mt-6">
                     <h5 className="text-sm font-medium text-gray-700 mb-3">
-                      Tendência (7 dias) - {trendData.length} registros
+                      Tendência (7 dias) - {trendData.length} registros - Atualizado: {new Date(dataUpdatedAt).toLocaleTimeString('pt-BR')}
                     </h5>
                     <div className="h-24 sm:h-32">
                       <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={trendData} key={`chart-${dataUpdatedAt}`}>
+                        <LineChart 
+                          data={trendData} 
+                          key={`chart-${dataUpdatedAt}-${trendData.length}-${JSON.stringify(trendData[0])}`}
+                        >
                           <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                           <XAxis 
                             dataKey="time" 
@@ -232,12 +257,18 @@ const DamDashboard: React.FC<DamDashboardProps> = ({
                         </LineChart>
                       </ResponsiveContainer>
                     </div>
+                    <div className="text-xs text-gray-500 mt-2">
+                      Debug: Dados atualizados em {new Date().toLocaleTimeString('pt-BR')} | Registros: {trendData.length}
+                    </div>
                   </div>
                 )}
 
                 {trendData.length === 0 && (
                   <div className="mt-6 text-center">
                     <p className="text-sm text-gray-500">Aguardando dados históricos...</p>
+                    <div className="text-xs text-gray-400 mt-1">
+                      Debug: historico_dias length = {damData?.historico_dias?.length || 0}
+                    </div>
                   </div>
                 )}
               </div>
@@ -374,3 +405,5 @@ const DamDashboard: React.FC<DamDashboardProps> = ({
 };
 
 export default DamDashboard;
+
+}
