@@ -50,13 +50,14 @@ const PackageOffer = () => {
     },
     {
       icon: "🍳",
-      title: "Alimentação Completa",
-      description: "Cozinheira todos os dias",
+      title: "Cozinheira Inclusa",
+      description: "Serviço de cozinheira todos os dias",
       items: [
-        "Comida caseira, no capricho mineiro",
-        "Café da manhã, almoço e jantar",
-        "Cardápio regional típico",
-        "Panelada especial incluída"
+        "Cozinheira experiente à disposição",
+        "Você compra os ingredientes",
+        "Passa o cardápio para ela",
+        "Comida feita com muito carinho",
+        "Estilo caseiro, capricho mineiro"
       ]
     },
     {
