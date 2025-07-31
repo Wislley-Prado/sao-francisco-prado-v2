@@ -11,25 +11,25 @@ const PackageOffer = () => {
     {
       id: 1,
       people: 4,
-      totalPrice: 5588,
-      pricePerPerson: 1397,
-      installments: "10x R$ 139,70",
+      totalPrice: 7870,
+      pricePerPerson: 1967.50,
+      installments: "R$ 196,75",
       popular: false
     },
     {
       id: 2,
       people: 6,
-      totalPrice: 8382,
-      pricePerPerson: 1397,
-      installments: "10x R$ 139,70",
+      totalPrice: 9123,
+      pricePerPerson: 1520.50,
+      installments: "R$ 152,05",
       popular: true
     },
     {
       id: 3,
       people: 8,
-      totalPrice: 11176,
-      pricePerPerson: 1397,
-      installments: "10x R$ 139,70",
+      totalPrice: 10376,
+      pricePerPerson: 1297,
+      installments: "R$ 129,70",
       popular: false
     }
   ];
@@ -172,11 +172,14 @@ const PackageOffer = () => {
                   <CardTitle className="text-2xl text-rio-blue mb-2">
                     {option.people} Pescadores
                   </CardTitle>
-                  <div className="text-4xl font-bold text-gray-900 mb-2">
-                    R$ {option.totalPrice.toLocaleString('pt-BR')}
+                  <div className="text-6xl font-bold text-sunset-orange mb-2">
+                    {option.installments}
                   </div>
-                  <div className="text-lg text-gray-600">
-                    R$ {option.pricePerPerson.toLocaleString('pt-BR')} por pessoa
+                  <div className="text-lg font-semibold text-gray-900 mb-1">
+                    por mês, por pessoa
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    Total: R$ {option.totalPrice.toLocaleString('pt-BR')} | R$ {option.pricePerPerson.toLocaleString('pt-BR')} por pessoa
                   </div>
                 </CardHeader>
 
