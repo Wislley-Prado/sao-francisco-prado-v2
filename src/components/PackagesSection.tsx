@@ -19,7 +19,7 @@ const PackagesSection = () => {
         "Exclusividade total do rancho",
         "Vista pro lago, sossego absoluto"
       ],
-      image: "/src/assets/rancho-prado-pescador-feliz.jpg",
+      image: "src/assets/rancho-prado-pescador-feliz.jpg",
       popular: true
     },
     {

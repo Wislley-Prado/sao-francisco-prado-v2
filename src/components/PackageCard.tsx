@@ -40,7 +40,16 @@ const PackageCard = ({ pkg }: PackageCardProps) => {
       )}
 
       <CardHeader className="p-0">
-        <div className="h-48 bg-gradient-to-br from-rio-blue to-water-green relative">
+        <div className="h-48 relative overflow-hidden">
+          <img 
+            src={pkg.image} 
+            alt={pkg.title}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+              e.currentTarget.parentElement!.classList.add('bg-gradient-to-br', 'from-rio-blue', 'to-water-green');
+            }}
+          />
           <div className="absolute inset-0 bg-black bg-opacity-20"></div>
           <div className="absolute bottom-4 left-4 text-white">
             <div className="flex items-center space-x-1 mb-2">
