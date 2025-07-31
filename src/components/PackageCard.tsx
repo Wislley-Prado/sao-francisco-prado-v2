@@ -96,9 +96,10 @@ const PackageCard = ({ pkg }: PackageCardProps) => {
               ? 'bg-sunset-orange hover:bg-orange-600' 
               : 'bg-rio-blue hover:bg-blue-600'
           } text-white`}
+          onClick={() => window.location.href = '/pacote-vip'}
         >
           <Calendar className="mr-2 h-4 w-4" />
-          Reservar Agora
+          Ver Detalhes
         </Button>
       </CardContent>
     </Card>

@@ -7,9 +7,9 @@ const PackagesSection = () => {
   const packages = [
     {
       id: 1,
-      title: '🌟 PACOTE VIP EXCLUSIVO – "Pesca e prosa Boa"',
+      title: 'PACOTE VIP EXCLUSIVO – "Pesca e prosa Boa"',
       description: "📍 Rancho Prado – Aldeia - Para 6 pescadores com exclusividade total do rancho",
-      price: "R$ 180",
+      price: "10 X R$147,97",
       duration: "5 dias / 4 noites",
       people: "6 pescadores",
       rating: 4.8,
