@@ -79,7 +79,7 @@ const PackageOffer = () => {
       items: [
         "Faxina final inclusa",
         "Roupa de cama e banho",
-        "Seguro de vida e acidentes",
+        "Muita pescaria",
         "Assistência 24h"
       ]
     }
