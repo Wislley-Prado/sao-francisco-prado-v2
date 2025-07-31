@@ -45,7 +45,7 @@ const PackageOffer = () => {
         "Fogão a lenha, churrasqueira, freezer",
         "Área gourmet, Wi-Fi",
         "Acomodação confortável",
-        "Vista pro lago, sossego absoluto"
+        "Rancho muito confortável e econômico"
       ]
     },
     {
