@@ -40,6 +40,7 @@ const PackageOffer = () => {
       title: "Estrutura Premium",
       description: "Rancho inteiro reservado só pro grupo",
       items: [
+        "Exclusividade total do rancho",
         "Piscina privativa",
         "Fogão a lenha, churrasqueira, freezer",
         "Área gourmet, Wi-Fi",
@@ -49,12 +50,13 @@ const PackageOffer = () => {
     },
     {
       icon: "🍳",
-      title: "Alimentação",
+      title: "Alimentação Completa",
       description: "Cozinheira todos os dias",
       items: [
         "Comida caseira, no capricho mineiro",
         "Café da manhã, almoço e jantar",
-        "Cardápio regional típico"
+        "Cardápio regional típico",
+        "Panelada especial incluída"
       ]
     },
     {
@@ -63,6 +65,7 @@ const PackageOffer = () => {
       description: "Equipamentos e guias inclusos",
       items: [
         "3 barcos com motor",
+        "Guia de pesca especializado",
         "1 guia por barco (2 pescadores + guia)",
         "Gasolina incluída",
         "Pesca de quinta a sábado (7h30 às 17h30)",
@@ -76,7 +79,8 @@ const PackageOffer = () => {
       items: [
         "Faxina final inclusa",
         "Roupa de cama e banho",
-        "Seguro de vida e acidentes"
+        "Seguro de vida e acidentes",
+        "Assistência 24h"
       ]
     }
   ];
