@@ -7,20 +7,20 @@ const PackagesSection = () => {
   const packages = [
     {
       id: 1,
-      title: "Pacote Meio Dia",
-      description: "Perfeito para pescadores iniciantes ou quem tem pouco tempo",
+      title: '🌟 PACOTE VIP EXCLUSIVO – "Pesca e prosa Boa"',
+      description: "📍 Rancho Prado – Aldeia - Para 6 pescadores com exclusividade total do rancho",
       price: "R$ 180",
-      duration: "4 horas",
-      people: "1-3 pessoas",
+      duration: "5 dias / 4 noites",
+      people: "6 pescadores",
       rating: 4.8,
       features: [
-        "Guia especializado",
-        "Equipamentos inclusos",
-        "Isca natural",
-        "Seguro incluso"
+        "🗓️ De quarta a domingo",
+        "Rancho inteiro reservado só pro grupo",
+        "Exclusividade total do rancho",
+        "Vista pro lago, sossego absoluto"
       ],
-      image: "/api/placeholder/400/250",
-      popular: false
+      image: "/src/assets/rancho-prado-pescador-feliz.jpg",
+      popular: true
     },
     {
       id: 2,
