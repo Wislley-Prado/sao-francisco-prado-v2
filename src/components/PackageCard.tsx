@@ -16,19 +16,6 @@ interface Package {
   features: string[];
   image: string;
   popular: boolean;
-  vip?: boolean;
-  location?: string;
-  totalValue?: string;
-  pricePerPerson?: string;
-  paymentOptions?: {
-    installments?: string;
-    creditCard?: string;
-    pix?: string;
-  };
-  structure?: string[];
-  meals?: string[];
-  fishing?: string[];
-  cleaning?: string[];
 }
 
 interface PackageCardProps {
@@ -39,21 +26,12 @@ const PackageCard = ({ pkg }: PackageCardProps) => {
   return (
     <Card 
       className={`relative overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 ${
-        pkg.vip 
-          ? 'ring-2 ring-yellow-400 shadow-2xl bg-gradient-to-br from-yellow-50 to-amber-50' 
-          : pkg.popular 
+        pkg.popular 
           ? 'ring-2 ring-sunset-orange shadow-xl scale-105' 
           : 'hover:shadow-lg'
       }`}
     >
-      {pkg.vip && (
-        <div className="absolute top-4 right-4 z-10">
-          <Badge className="bg-gradient-to-r from-yellow-400 to-amber-500 text-black font-bold">
-            🌟 VIP EXCLUSIVO
-          </Badge>
-        </div>
-      )}
-      {pkg.popular && !pkg.vip && (
+      {pkg.popular && (
         <div className="absolute top-4 right-4 z-10">
           <Badge className="bg-sunset-orange text-white">
             Mais Popular
@@ -76,10 +54,6 @@ const PackageCard = ({ pkg }: PackageCardProps) => {
 
       <CardContent className="p-6">
         <p className="text-gray-600 mb-4">{pkg.description}</p>
-        
-        {pkg.location && (
-          <p className="text-sm text-gray-500 mb-4">📍 {pkg.location}</p>
-        )}
 
         {/* Package Info */}
         <div className="flex justify-between items-center mb-4">
@@ -96,18 +70,6 @@ const PackageCard = ({ pkg }: PackageCardProps) => {
           </div>
         </div>
 
-        {/* VIP Price Breakdown */}
-        {pkg.vip && pkg.totalValue && pkg.pricePerPerson && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-            <div className="text-lg font-bold text-yellow-800 mb-2">
-              💰 VALOR TOTAL: {pkg.totalValue}
-            </div>
-            <div className="text-md text-yellow-700">
-              🧍 {pkg.pricePerPerson} por pescador
-            </div>
-          </div>
-        )}
-
         {/* Features */}
         <div className="space-y-2 mb-6">
           {pkg.features.map((feature, index) => (
@@ -118,36 +80,16 @@ const PackageCard = ({ pkg }: PackageCardProps) => {
           ))}
         </div>
 
-        {/* VIP Payment Options */}
-        {pkg.vip && pkg.paymentOptions && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-            <h4 className="font-bold text-blue-800 mb-2">💳 PAGAMENTO FACILITADO:</h4>
-            <div className="space-y-2 text-sm text-blue-700">
-              {pkg.paymentOptions.installments && (
-                <div>✅ {pkg.paymentOptions.installments}</div>
-              )}
-              {pkg.paymentOptions.creditCard && (
-                <div>✅ {pkg.paymentOptions.creditCard}</div>
-              )}
-              {pkg.paymentOptions.pix && (
-                <div>✅ {pkg.paymentOptions.pix}</div>
-              )}
-            </div>
-          </div>
-        )}
-
         {/* CTA Button */}
         <Button 
           className={`w-full ${
-            pkg.vip 
-              ? 'bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-black font-bold' 
-              : pkg.popular 
-              ? 'bg-sunset-orange hover:bg-orange-600 text-white' 
-              : 'bg-rio-blue hover:bg-blue-600 text-white'
-          }`}
+            pkg.popular 
+              ? 'bg-sunset-orange hover:bg-orange-600' 
+              : 'bg-rio-blue hover:bg-blue-600'
+          } text-white`}
         >
           <Calendar className="mr-2 h-4 w-4" />
-          {pkg.vip ? 'Consultar Disponibilidade' : 'Reservar Agora'}
+          Reservar Agora
         </Button>
       </CardContent>
     </Card>

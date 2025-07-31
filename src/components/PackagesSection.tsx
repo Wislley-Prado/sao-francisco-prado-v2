@@ -59,39 +59,6 @@ const PackagesSection = () => {
       ],
       image: "/api/placeholder/400/250",
       popular: false
-    },
-    {
-      id: 4,
-      title: "🌟 PACOTE VIP EXCLUSIVO – Pesca, Prosa e Panelada Boa",
-      description: "Rancho inteiro reservado só pro grupo com exclusividade total",
-      price: "R$ 8.382",
-      duration: "5 dias / 4 noites",
-      people: "6 pescadores",
-      rating: 5.0,
-      features: [
-        "🏡 Rancho inteiro reservado só pro grupo",
-        "🏊 Piscina privativa",
-        "🔥 Fogão a lenha, churrasqueira, freezer, área gourmet, Wi-Fi",
-        "🛏️ Acomodação confortável, vista pro lago, sossego absoluto",
-        "🍳 Cozinheira todos os dias – comida caseira, no capricho mineiro",
-        "🎣 3 barcos com motor",
-        "👨‍🏫 1 guia por barco (2 pescadores + guia)",
-        "⛽ Gasolina incluída",
-        "🎣 Pesca de quinta a sábado (7h30 às 17h30)",
-        "🍽️ Almoço combinado com o guia (flexível)",
-        "🧼 Faxina final inclusa"
-      ],
-      image: "/api/placeholder/400/250",
-      popular: false,
-      vip: true,
-      location: "Rancho Prado – Aldeia",
-      totalValue: "R$ 8.382,00",
-      pricePerPerson: "R$ 1.397,00 por pescador",
-      paymentOptions: {
-        installments: "10x no boleto: R$ 139,70/mês por pessoa. Pagou 5 boletos (R$ 698,50), já pode marcar a pescaria!",
-        creditCard: "Cartão de crédito: Parcelado em até 12x – reserva confirmada na hora!",
-        pix: "À vista (PIX): Com 5% de desconto → R$ 7.962,90"
-      }
     }
   ];
 
@@ -110,7 +77,7 @@ const PackagesSection = () => {
         </div>
 
         {/* Packages Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {packages.map((pkg) => (
             <PackageCard key={pkg.id} pkg={pkg} />
           ))}
