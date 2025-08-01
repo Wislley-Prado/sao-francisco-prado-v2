@@ -5,6 +5,13 @@ import { Badge } from '@/components/ui/badge';
 import { Clock, Users, MapPin, Star, Calendar, CheckCircle, Phone, CreditCard, Banknote, Percent } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ranchoPradoImage from '@/assets/rancho-prado-pescador-feliz.jpg';
+import usina3MariasImage from '@/assets/gallery/usina-3-marias.jpg';
+import rancho21Image from '@/assets/gallery/rancho-21.jpg';
+import rancho9Image from '@/assets/gallery/rancho-9.png';
+import rancho7Image from '@/assets/gallery/rancho-7.png';
+import rancho28Image from '@/assets/gallery/rancho-28.png';
+import ranchoJulho9Image from '@/assets/gallery/rancho-julho-9.png';
+import capturaTelaImage from '@/assets/gallery/captura-tela.png';
 
 const PackageOption = memo(({ option }: { option: any }) => (
   <Card 
@@ -281,6 +288,90 @@ const PackageOffer = () => {
             {packageFeatures.map((feature, index) => (
               <FeatureCard key={index} feature={feature} index={index} />
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Photo Gallery Section */}
+      <section className="py-8 sm:py-12 lg:py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-center text-gray-900 mb-6 sm:mb-8 lg:mb-12">
+            Conheça Nosso Rancho
+          </h2>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+            {/* Main featured image */}
+            <div className="sm:col-span-2 lg:col-span-2 lg:row-span-2">
+              <div className="relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+                <img
+                  src={usina3MariasImage}
+                  alt="Usina de Três Marias e Represa"
+                  className="w-full h-48 sm:h-64 lg:h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  loading="lazy"
+                />
+                <div className="absolute top-2 sm:top-4 right-2 sm:right-4">
+                  <Badge className="bg-sunset-orange text-white text-xs sm:text-sm">
+                    🌊 Rio São Francisco
+                  </Badge>
+                </div>
+              </div>
+            </div>
+
+            {/* Gallery images */}
+            <div className="space-y-3 sm:space-y-4 lg:space-y-6">
+              <div className="relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+                <img
+                  src={rancho21Image}
+                  alt="Vista do Rancho"
+                  className="w-full h-32 sm:h-40 lg:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                  loading="lazy"
+                />
+              </div>
+              
+              <div className="relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+                <img
+                  src={rancho9Image}
+                  alt="Área de Lazer"
+                  className="w-full h-32 sm:h-40 lg:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+
+            {/* Bottom row */}
+            <div className="relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+              <img
+                src={rancho7Image}
+                alt="Instalações do Rancho"
+                className="w-full h-32 sm:h-40 lg:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                loading="lazy"
+              />
+            </div>
+
+            <div className="relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+              <img
+                src={rancho28Image}
+                alt="Área Externa"
+                className="w-full h-32 sm:h-40 lg:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                loading="lazy"
+              />
+            </div>
+
+            <div className="relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+              <img
+                src={ranchoJulho9Image}
+                alt="Vista Panorâmica"
+                className="w-full h-32 sm:h-40 lg:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                loading="lazy"
+              />
+            </div>
+          </div>
+
+          {/* Additional info */}
+          <div className="text-center mt-6 sm:mt-8">
+            <p className="text-sm sm:text-base text-gray-600">
+              📸 Todas as fotos são do nosso rancho real - sem surpresas na chegada!
+            </p>
           </div>
         </div>
       </section>
