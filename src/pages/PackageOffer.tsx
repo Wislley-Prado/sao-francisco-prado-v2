@@ -12,6 +12,9 @@ import rancho7Image from '@/assets/gallery/rancho-7.png';
 import rancho28Image from '@/assets/gallery/rancho-28.png';
 import ranchoJulho9Image from '@/assets/gallery/rancho-julho-9.png';
 import capturaTelaImage from '@/assets/gallery/captura-tela.png';
+import capturaTela1131Image from '@/assets/gallery/captura-tela-11-31-11.png';
+import rancho19Image from '@/assets/gallery/rancho-19.png';
+import rancho12Image from '@/assets/gallery/rancho-1-2.jpg';
 
 const PackageOption = memo(({ option }: { option: any }) => (
   <Card 
@@ -361,6 +364,34 @@ const PackageOffer = () => {
               <img
                 src={ranchoJulho9Image}
                 alt="Vista Panorâmica"
+                className="w-full h-32 sm:h-40 lg:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                loading="lazy"
+              />
+            </div>
+
+            {/* Additional client ranch photos */}
+            <div className="relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+              <img
+                src={capturaTela1131Image}
+                alt="Rancho de Cliente - Pescaria Real"
+                className="w-full h-32 sm:h-40 lg:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                loading="lazy"
+              />
+            </div>
+
+            <div className="relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+              <img
+                src={rancho19Image}
+                alt="Rancho de Cliente - Estrutura Real"
+                className="w-full h-32 sm:h-40 lg:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                loading="lazy"
+              />
+            </div>
+
+            <div className="relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+              <img
+                src={rancho12Image}
+                alt="Rancho de Cliente - Experiência Real"
                 className="w-full h-32 sm:h-40 lg:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                 loading="lazy"
               />
