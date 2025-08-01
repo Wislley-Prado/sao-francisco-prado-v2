@@ -454,6 +454,154 @@ const PackageOffer = () => {
         </div>
       </section>
 
+      {/* Social Proof Section */}
+      <section className="py-8 sm:py-12 lg:py-16 bg-gray-50">
+        <div className="max-w-6xl mx-auto px-3 sm:px-6 lg:px-8">
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-center text-gray-900 mb-8 sm:mb-12">
+            O que nossos clientes dizem
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            {/* Testimonial 1 */}
+            <div className="bg-white p-6 rounded-xl shadow-lg">
+              <div className="flex items-center mb-4">
+                <div className="flex text-yellow-500">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-4 w-4 fill-current" />
+                  ))}
+                </div>
+              </div>
+              <p className="text-gray-600 mb-4 italic">
+                "Melhor experiência de pesca da minha vida! O rancho é exatamente como nas fotos e a estrutura é impecável. Voltarei com certeza!"
+              </p>
+              <div className="text-sm font-semibold text-gray-900">
+                João Silva - São Paulo
+              </div>
+            </div>
+
+            {/* Testimonial 2 */}
+            <div className="bg-white p-6 rounded-xl shadow-lg">
+              <div className="flex items-center mb-4">
+                <div className="flex text-yellow-500">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-4 w-4 fill-current" />
+                  ))}
+                </div>
+              </div>
+              <p className="text-gray-600 mb-4 italic">
+                "Trouxe minha família toda e foi perfeito! As crianças adoraram e conseguimos pescar bastante. Atendimento nota 10!"
+              </p>
+              <div className="text-sm font-semibold text-gray-900">
+                Maria Santos - Belo Horizonte
+              </div>
+            </div>
+
+            {/* Testimonial 3 */}
+            <div className="bg-white p-6 rounded-xl shadow-lg">
+              <div className="flex items-center mb-4">
+                <div className="flex text-yellow-500">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-4 w-4 fill-current" />
+                  ))}
+                </div>
+              </div>
+              <p className="text-gray-600 mb-4 italic">
+                "Organização perfeita! Desde o primeiro contato até a pescaria, tudo foi muito bem planejado. Recomendo demais!"
+              </p>
+              <div className="text-sm font-semibold text-gray-900">
+                Carlos Oliveira - Rio de Janeiro
+              </div>
+            </div>
+          </div>
+
+          {/* Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div className="bg-white p-4 rounded-lg shadow">
+              <div className="text-2xl font-bold text-rio-blue">500+</div>
+              <div className="text-sm text-gray-600">Clientes Satisfeitos</div>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow">
+              <div className="text-2xl font-bold text-rio-blue">98%</div>
+              <div className="text-sm text-gray-600">Recomendação</div>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow">
+              <div className="text-2xl font-bold text-rio-blue">5+</div>
+              <div className="text-sm text-gray-600">Anos de Experiência</div>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow">
+              <div className="text-2xl font-bold text-rio-blue">15</div>
+              <div className="text-sm text-gray-600">Ranchos Disponíveis</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Location Info Section */}
+      <section className="py-8 sm:py-12 lg:py-16 bg-white">
+        <div className="max-w-6xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-center">
+            <div>
+              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-6">
+                Três Marias: O Paraíso da Pesca no Rio São Francisco
+              </h2>
+              <div className="space-y-4 text-gray-600">
+                <p className="text-sm sm:text-base">
+                  <span className="font-semibold text-rio-blue">Três Marias</span> é reconhecida nacionalmente como um dos melhores destinos de pesca do Brasil. 
+                  Localizada no coração de Minas Gerais, a cidade oferece acesso privilegiado ao majestoso <span className="font-semibold">Rio São Francisco</span>.
+                </p>
+                <p className="text-sm sm:text-base">
+                  O <span className="font-semibold text-water-green">Rio São Francisco</span>, conhecido como "Velho Chico", é famoso por sua rica biodiversidade aquática. 
+                  Suas águas abrigam espécies como tucunaré, dourado, surubim, pintado e muitas outras, proporcionando uma experiência de pesca única e inesquecível.
+                </p>
+                <div className="bg-gradient-to-r from-blue-50 to-green-50 p-4 rounded-lg border-l-4 border-rio-blue">
+                  <h3 className="font-semibold text-gray-900 mb-2">Por que Três Marias?</h3>
+                  <ul className="space-y-1 text-sm">
+                    <li>• 📍 Localização estratégica no Rio São Francisco</li>
+                    <li>• 🐟 Rica diversidade de peixes nativos</li>
+                    <li>• 🌊 Águas calmas e ideais para pesca</li>
+                    <li>• 🏞️ Paisagens naturais deslumbrantes</li>
+                    <li>• 🎣 Tradição pesqueira centenária</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div className="space-y-4">
+              <div className="bg-gradient-to-br from-rio-blue to-water-green text-white p-6 rounded-xl shadow-lg">
+                <h3 className="text-xl font-bold mb-4">🏆 Destaque Nacional</h3>
+                <p className="text-sm opacity-90 mb-4">
+                  Três Marias é considerada a "Capital da Pesca de Minas Gerais", atraindo pescadores de todo o Brasil em busca da experiência perfeita.
+                </p>
+                <div className="bg-white/20 p-3 rounded-lg">
+                  <div className="text-lg font-bold">💧 Rio São Francisco</div>
+                  <div className="text-sm opacity-90">2.863 km de extensão • Conhecido como "Velho Chico"</div>
+                </div>
+              </div>
+              <div className="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                <h3 className="text-lg font-bold text-gray-900 mb-3">🌟 Diferenciais da Região</h3>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div className="text-center p-2 bg-white rounded border">
+                    <div className="font-semibold text-rio-blue">Clima</div>
+                    <div className="text-gray-600">Tropical</div>
+                  </div>
+                  <div className="text-center p-2 bg-white rounded border">
+                    <div className="font-semibold text-rio-blue">Temporada</div>
+                    <div className="text-gray-600">Ano Todo</div>
+                  </div>
+                  <div className="text-center p-2 bg-white rounded border">
+                    <div className="font-semibold text-rio-blue">Peixes</div>
+                    <div className="text-gray-600">20+ Espécies</div>
+                  </div>
+                  <div className="text-center p-2 bg-white rounded border">
+                    <div className="font-semibold text-rio-blue">Acesso</div>
+                    <div className="text-gray-600">Fácil</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-8 sm:py-12 lg:py-16 bg-gradient-to-r from-rio-blue to-water-green text-white">
         <div className="max-w-4xl mx-auto text-center px-3 sm:px-6 lg:px-8">
