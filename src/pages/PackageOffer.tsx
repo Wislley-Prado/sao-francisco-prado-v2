@@ -15,6 +15,9 @@ import capturaTelaImage from '@/assets/gallery/captura-tela.png';
 import capturaTela1131Image from '@/assets/gallery/captura-tela-11-31-11.png';
 import rancho19Image from '@/assets/gallery/rancho-19.png';
 import rancho12Image from '@/assets/gallery/rancho-1-2.jpg';
+import ranchoAgosto2Image from '@/assets/gallery/rancho-agosto-2.jpg';
+import ranchoAgosto7Image from '@/assets/gallery/rancho-agosto-7.jpg';
+import ranchoAgosto5Image from '@/assets/gallery/rancho-agosto-5.jpg';
 
 const PackageOption = memo(({ option }: { option: any }) => (
   <Card 
@@ -299,7 +302,7 @@ const PackageOffer = () => {
       <section className="py-8 sm:py-12 lg:py-16 bg-white">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-center text-gray-900 mb-6 sm:mb-8 lg:mb-12">
-            Conheça Nosso Rancho
+            Galeria de Fotos - Experiências Reais
           </h2>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
@@ -392,6 +395,33 @@ const PackageOffer = () => {
               <img
                 src={rancho12Image}
                 alt="Rancho de Cliente - Experiência Real"
+                className="w-full h-32 sm:h-40 lg:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                loading="lazy"
+              />
+            </div>
+
+            <div className="relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+              <img
+                src={ranchoAgosto2Image}
+                alt="Rancho de Cliente - Agosto 2025"
+                className="w-full h-32 sm:h-40 lg:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                loading="lazy"
+              />
+            </div>
+
+            <div className="relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+              <img
+                src={ranchoAgosto7Image}
+                alt="Rancho de Cliente - Estrutura Completa"
+                className="w-full h-32 sm:h-40 lg:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                loading="lazy"
+              />
+            </div>
+
+            <div className="relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+              <img
+                src={ranchoAgosto5Image}
+                alt="Rancho de Cliente - Área de Lazer"
                 className="w-full h-32 sm:h-40 lg:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                 loading="lazy"
               />
