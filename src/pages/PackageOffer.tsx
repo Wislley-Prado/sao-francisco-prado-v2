@@ -136,9 +136,9 @@ const PackageOffer = () => {
     {
       id: 3,
       people: 8,
-      totalPrice: 10376,
-      pricePerPerson: 1297,
-      installments: "R$ 129,70",
+      totalPrice: 14300,
+      pricePerPerson: 1787.50,
+      installments: "R$ 178,75",
       popular: false
     }
   ];
