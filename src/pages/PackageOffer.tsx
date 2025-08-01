@@ -301,9 +301,13 @@ const PackageOffer = () => {
       {/* Photo Gallery Section */}
       <section className="py-8 sm:py-12 lg:py-16 bg-white">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-center text-gray-900 mb-6 sm:mb-8 lg:mb-12">
-            Galeria de Fotos - Experiências Reais
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-center text-gray-900 mb-4">
+            📸 Todas as fotos são dos nossos ranchos reais - sem surpresas na chegada!
           </h2>
+          <p className="text-center text-gray-600 mb-6 sm:mb-8 lg:mb-12 max-w-4xl mx-auto text-sm sm:text-base lg:text-lg">
+            Veja as estruturas reais que nossos clientes encontram. Cada rancho oferece conforto, segurança e a melhor experiência de pesca. 
+            <span className="font-semibold text-primary"> O que você vê é exatamente o que você terá!</span>
+          </p>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
             {/* Main featured image */}
@@ -428,11 +432,24 @@ const PackageOffer = () => {
             </div>
           </div>
 
-          {/* Additional info */}
-          <div className="text-center mt-6 sm:mt-8">
-            <p className="text-sm sm:text-base text-gray-600">
-              📸 Todas as fotos são do nosso rancho real - sem surpresas na chegada!
-            </p>
+          {/* Additional testimonial message */}
+          <div className="bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-xl p-4 sm:p-6 mt-6 sm:mt-8">
+            <div className="text-center">
+              <div className="flex justify-center items-center mb-3">
+                <Star className="h-5 w-5 text-yellow-500 mr-1" />
+                <Star className="h-5 w-5 text-yellow-500 mr-1" />
+                <Star className="h-5 w-5 text-yellow-500 mr-1" />
+                <Star className="h-5 w-5 text-yellow-500 mr-1" />
+                <Star className="h-5 w-5 text-yellow-500" />
+              </div>
+              <p className="text-sm sm:text-base lg:text-lg font-semibold text-gray-900 mb-2">
+                "Transparência Total - Zero Pegadinhas!"
+              </p>
+              <p className="text-xs sm:text-sm text-gray-600">
+                Essas são fotos reais dos nossos ranchos. Não usamos fotos fake ou de outros lugares. 
+                <span className="font-medium text-green-700"> Chegue e encontre exatamente o que viu aqui!</span>
+              </p>
+            </div>
           </div>
         </div>
       </section>
