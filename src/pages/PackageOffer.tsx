@@ -298,6 +298,56 @@ const PackageOffer = () => {
         </div>
       </section>
 
+      {/* Video Section - Pescaria de Dourado */}
+      <section className="py-8 sm:py-12 lg:py-16 bg-gradient-to-r from-rio-blue to-water-green text-white">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6">
+              🎣 Pescaria de Dourado na Cachoeira da Escadinha
+            </h2>
+            <p className="text-base sm:text-lg lg:text-xl opacity-90 max-w-4xl mx-auto">
+              Veja um exemplar incrível de Dourado capturado nas águas cristalinas do Rio São Francisco! 
+              Esta é a experiência que você terá nos nossos pontos estratégicos de pesca.
+            </p>
+          </div>
+          
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 sm:p-6 lg:p-8">
+              <div className="aspect-video rounded-lg overflow-hidden shadow-2xl">
+                <iframe
+                  src="https://www.youtube.com/embed/9yTHncRU9Uk"
+                  title="Pescaria de Dourado - Cachoeira da Escadinha - Rio São Francisco"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="w-full h-full"
+                ></iframe>
+              </div>
+              
+              <div className="mt-4 sm:mt-6 text-center">
+                <div className="flex flex-wrap justify-center gap-4 sm:gap-6 text-sm sm:text-base">
+                  <div className="flex items-center">
+                    <span className="text-sunset-orange font-semibold">🐟 Espécie:</span>
+                    <span className="ml-2">Dourado (Salminus brasiliensis)</span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-sunset-orange font-semibold">📍 Local:</span>
+                    <span className="ml-2">Cachoeira da Escadinha</span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-sunset-orange font-semibold">🌊 Rio:</span>
+                    <span className="ml-2">São Francisco</span>
+                  </div>
+                </div>
+                <p className="mt-3 sm:mt-4 text-xs sm:text-sm opacity-80">
+                  Esta é uma das muitas espécies que você pode capturar durante sua pescaria conosco!
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Photo Gallery Section */}
       <section className="py-8 sm:py-12 lg:py-16 bg-white">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
@@ -309,51 +359,48 @@ const PackageOffer = () => {
             <span className="font-semibold text-primary"> O que você vê é exatamente o que você terá!</span>
           </p>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
-            {/* Main featured image */}
-            <div className="sm:col-span-2 lg:col-span-2 lg:row-span-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
+            {/* Main featured image - spans 2 columns */}
+            <div className="col-span-2 row-span-2">
               <div className="relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
                 <img
                   src={usina3MariasImage}
                   alt="Usina de Três Marias e Represa"
-                  className="w-full h-48 sm:h-64 lg:h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-40 sm:h-52 lg:h-64 object-cover group-hover:scale-105 transition-transform duration-300"
                   loading="lazy"
                 />
-                <div className="absolute top-2 sm:top-4 right-2 sm:right-4">
-                  <Badge className="bg-sunset-orange text-white text-xs sm:text-sm">
+                <div className="absolute top-2 right-2">
+                  <Badge className="bg-sunset-orange text-white text-xs">
                     🌊 Rio São Francisco
                   </Badge>
                 </div>
               </div>
             </div>
 
-            {/* Gallery images */}
-            <div className="space-y-3 sm:space-y-4 lg:space-y-6">
-              <div className="relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
-                <img
-                  src={rancho21Image}
-                  alt="Vista do Rancho"
-                  className="w-full h-32 sm:h-40 lg:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                  loading="lazy"
-                />
-              </div>
-              
-              <div className="relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
-                <img
-                  src={rancho9Image}
-                  alt="Área de Lazer"
-                  className="w-full h-32 sm:h-40 lg:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                  loading="lazy"
-                />
-              </div>
+            {/* Gallery images - Single column items */}
+            <div className="relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+              <img
+                src={rancho21Image}
+                alt="Vista do Rancho"
+                className="w-full h-20 sm:h-24 lg:h-32 object-cover group-hover:scale-105 transition-transform duration-300"
+                loading="lazy"
+              />
             </div>
-
-            {/* Bottom row */}
+            
+            <div className="relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+              <img
+                src={rancho9Image}
+                alt="Área de Lazer"
+                className="w-full h-20 sm:h-24 lg:h-32 object-cover group-hover:scale-105 transition-transform duration-300"
+                loading="lazy"
+              />
+            </div>
+            
             <div className="relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
               <img
                 src={rancho7Image}
                 alt="Instalações do Rancho"
-                className="w-full h-32 sm:h-40 lg:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                className="w-full h-20 sm:h-24 lg:h-32 object-cover group-hover:scale-105 transition-transform duration-300"
                 loading="lazy"
               />
             </div>
@@ -362,7 +409,7 @@ const PackageOffer = () => {
               <img
                 src={rancho28Image}
                 alt="Área Externa"
-                className="w-full h-32 sm:h-40 lg:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                className="w-full h-20 sm:h-24 lg:h-32 object-cover group-hover:scale-105 transition-transform duration-300"
                 loading="lazy"
               />
             </div>
@@ -371,17 +418,16 @@ const PackageOffer = () => {
               <img
                 src={ranchoJulho9Image}
                 alt="Vista Panorâmica"
-                className="w-full h-32 sm:h-40 lg:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                className="w-full h-20 sm:h-24 lg:h-32 object-cover group-hover:scale-105 transition-transform duration-300"
                 loading="lazy"
               />
             </div>
 
-            {/* Additional client ranch photos */}
             <div className="relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
               <img
                 src={capturaTela1131Image}
                 alt="Rancho de Cliente - Pescaria Real"
-                className="w-full h-32 sm:h-40 lg:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                className="w-full h-20 sm:h-24 lg:h-32 object-cover group-hover:scale-105 transition-transform duration-300"
                 loading="lazy"
               />
             </div>
@@ -390,7 +436,7 @@ const PackageOffer = () => {
               <img
                 src={rancho19Image}
                 alt="Rancho de Cliente - Estrutura Real"
-                className="w-full h-32 sm:h-40 lg:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                className="w-full h-20 sm:h-24 lg:h-32 object-cover group-hover:scale-105 transition-transform duration-300"
                 loading="lazy"
               />
             </div>
@@ -399,7 +445,7 @@ const PackageOffer = () => {
               <img
                 src={rancho12Image}
                 alt="Rancho de Cliente - Experiência Real"
-                className="w-full h-32 sm:h-40 lg:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                className="w-full h-20 sm:h-24 lg:h-32 object-cover group-hover:scale-105 transition-transform duration-300"
                 loading="lazy"
               />
             </div>
@@ -408,7 +454,7 @@ const PackageOffer = () => {
               <img
                 src={ranchoAgosto2Image}
                 alt="Rancho de Cliente - Agosto 2025"
-                className="w-full h-32 sm:h-40 lg:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                className="w-full h-20 sm:h-24 lg:h-32 object-cover group-hover:scale-105 transition-transform duration-300"
                 loading="lazy"
               />
             </div>
@@ -417,7 +463,7 @@ const PackageOffer = () => {
               <img
                 src={ranchoAgosto7Image}
                 alt="Rancho de Cliente - Estrutura Completa"
-                className="w-full h-32 sm:h-40 lg:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                className="w-full h-20 sm:h-24 lg:h-32 object-cover group-hover:scale-105 transition-transform duration-300"
                 loading="lazy"
               />
             </div>
@@ -426,7 +472,7 @@ const PackageOffer = () => {
               <img
                 src={ranchoAgosto5Image}
                 alt="Rancho de Cliente - Área de Lazer"
-                className="w-full h-32 sm:h-40 lg:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                className="w-full h-20 sm:h-24 lg:h-32 object-cover group-hover:scale-105 transition-transform duration-300"
                 loading="lazy"
               />
             </div>
@@ -531,56 +577,6 @@ const PackageOffer = () => {
             <div className="bg-white p-4 rounded-lg shadow">
               <div className="text-2xl font-bold text-rio-blue">15</div>
               <div className="text-sm text-gray-600">Ranchos Disponíveis</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Video Section - Pescaria de Dourado */}
-      <section className="py-8 sm:py-12 lg:py-16 bg-gradient-to-r from-rio-blue to-water-green text-white">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-          <div className="text-center mb-8 sm:mb-12">
-            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6">
-              🎣 Pescaria de Dourado na Cachoeira da Escadinha
-            </h2>
-            <p className="text-base sm:text-lg lg:text-xl opacity-90 max-w-4xl mx-auto">
-              Veja um exemplar incrível de Dourado capturado nas águas cristalinas do Rio São Francisco! 
-              Esta é a experiência que você terá nos nossos pontos estratégicos de pesca.
-            </p>
-          </div>
-          
-          <div className="max-w-4xl mx-auto">
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 sm:p-6 lg:p-8">
-              <div className="aspect-video rounded-lg overflow-hidden shadow-2xl">
-                <iframe
-                  src="https://www.youtube.com/embed/9yTHncRU9Uk"
-                  title="Pescaria de Dourado - Cachoeira da Escadinha - Rio São Francisco"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="w-full h-full"
-                ></iframe>
-              </div>
-              
-              <div className="mt-4 sm:mt-6 text-center">
-                <div className="flex flex-wrap justify-center gap-4 sm:gap-6 text-sm sm:text-base">
-                  <div className="flex items-center">
-                    <span className="text-sunset-orange font-semibold">🐟 Espécie:</span>
-                    <span className="ml-2">Dourado (Salminus brasiliensis)</span>
-                  </div>
-                  <div className="flex items-center">
-                    <span className="text-sunset-orange font-semibold">📍 Local:</span>
-                    <span className="ml-2">Cachoeira da Escadinha</span>
-                  </div>
-                  <div className="flex items-center">
-                    <span className="text-sunset-orange font-semibold">🌊 Rio:</span>
-                    <span className="ml-2">São Francisco</span>
-                  </div>
-                </div>
-                <p className="mt-3 sm:mt-4 text-xs sm:text-sm opacity-80">
-                  Esta é uma das muitas espécies que você pode capturar durante sua pescaria conosco!
-                </p>
-              </div>
             </div>
           </div>
         </div>
