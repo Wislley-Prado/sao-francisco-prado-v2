@@ -2,7 +2,8 @@ import React, { memo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Clock, Users, MapPin, Star, Calendar, CheckCircle, Phone, CreditCard, Banknote, Percent } from 'lucide-react';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Clock, Users, MapPin, Star, Calendar, CheckCircle, Phone, CreditCard, Banknote, Percent, HelpCircle, Home, ChefHat, Fish, Sparkles, FileText, MessageCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ranchoPradoImage from '@/assets/rancho-prado-pescador-feliz.jpg';
 import usina3MariasImage from '@/assets/gallery/usina-3-marias.jpg';
@@ -667,6 +668,248 @@ const PackageOffer = () => {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-8 sm:py-12 lg:py-16 bg-gray-50">
+        <div className="max-w-4xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              <HelpCircle className="inline-block mr-3 h-8 w-8 text-rio-blue" />
+              Perguntas Frequentes
+            </h2>
+            <p className="text-sm sm:text-base text-gray-600 max-w-2xl mx-auto">
+              Tire suas dúvidas sobre nossos pacotes exclusivos no Rancho Prado Aldeia
+            </p>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="item-1" className="border-b border-gray-200">
+                <AccordionTrigger className="px-6 py-4 hover:bg-gray-50">
+                  <div className="flex items-center text-left">
+                    <Home className="h-5 w-5 text-rio-blue mr-3 flex-shrink-0" />
+                    <span className="font-semibold text-gray-900">O rancho é exclusivo para o grupo?</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-4">
+                  <div className="text-gray-600 leading-relaxed">
+                    <strong>Sim!</strong> Todos os pacotes garantem <strong>uso exclusivo do Rancho Prado – Aldeia</strong>. 
+                    Nada de dividir estrutura com outros hóspedes — piscina, fogão a lenha, área gourmet e toda a tranquilidade só pra turma.
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-2" className="border-b border-gray-200">
+                <AccordionTrigger className="px-6 py-4 hover:bg-gray-50">
+                  <div className="flex items-center text-left">
+                    <Users className="h-5 w-5 text-rio-blue mr-3 flex-shrink-0" />
+                    <span className="font-semibold text-gray-900">Quantas pessoas podem participar dos pacotes?</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-4">
+                  <div className="text-gray-600 leading-relaxed">
+                    Temos pacotes para grupos de <strong>4, 6 ou 8 pescadores</strong>, garantindo conforto na hospedagem, 
+                    organização na pescaria e economia justa por pessoa. <strong>O limite máximo é 8 pessoas.</strong>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-3" className="border-b border-gray-200">
+                <AccordionTrigger className="px-6 py-4 hover:bg-gray-50">
+                  <div className="flex items-center text-left">
+                    <Fish className="h-5 w-5 text-rio-blue mr-3 flex-shrink-0" />
+                    <span className="font-semibold text-gray-900">A pescaria é com guia? E a gasolina está inclusa?</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-4">
+                  <div className="text-gray-600 leading-relaxed">
+                    Sim! Todos os pacotes incluem <strong>guia profissional com barcos motorizados</strong>. 
+                    A gasolina está inclusa até <strong>20 litros por dia por barco</strong>. 
+                    Se passar disso, o excedente é pago diretamente pelo cliente.
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-4" className="border-b border-gray-200">
+                <AccordionTrigger className="px-6 py-4 hover:bg-gray-50">
+                  <div className="flex items-center text-left">
+                    <ChefHat className="h-5 w-5 text-rio-blue mr-3 flex-shrink-0" />
+                    <span className="font-semibold text-gray-900">A comida está inclusa?</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-4">
+                  <div className="text-gray-600 leading-relaxed">
+                    A <strong>cozinheira está inclusa todos os dias</strong>, preparando tudo com carinho mineiro!
+                    Mas a <strong>alimentação (ingredientes e bebidas) é por conta do cliente</strong>. 
+                    Você envia o cardápio antes da viagem, e a cozinheira já deixa tudo pronto na hora certa.
+                    <div className="mt-2 text-sm italic text-green-700">
+                      É só chegar da pescaria e a comida tá no ponto!
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-5" className="border-b border-gray-200">
+                <AccordionTrigger className="px-6 py-4 hover:bg-gray-50">
+                  <div className="flex items-center text-left">
+                    <CreditCard className="h-5 w-5 text-rio-blue mr-3 flex-shrink-0" />
+                    <span className="font-semibold text-gray-900">Como funciona o pagamento?</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-4">
+                  <div className="text-gray-600 leading-relaxed">
+                    <div className="space-y-2">
+                      <div>Você pode pagar em até <strong>10x no boleto por pessoa</strong>.</div>
+                      <div className="flex items-center">
+                        <Calendar className="h-4 w-4 text-green-600 mr-2" />
+                        <span>Assim que 50% do pacote for quitado, <strong>já pode marcar a data da pescaria</strong>.</span>
+                      </div>
+                      <div>Também aceitamos <strong>PIX, transferência ou cartão de crédito (até 12x)</strong>.</div>
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-6" className="border-b border-gray-200">
+                <AccordionTrigger className="px-6 py-4 hover:bg-gray-50">
+                  <div className="flex items-center text-left">
+                    <Sparkles className="h-5 w-5 text-rio-blue mr-3 flex-shrink-0" />
+                    <span className="font-semibold text-gray-900">A estrutura do rancho é completa?</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-4">
+                  <div className="text-gray-600 leading-relaxed">
+                    <div>Com certeza! Você terá à disposição:</div>
+                    <ul className="mt-2 space-y-1 text-sm">
+                      <li className="flex items-center">
+                        <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
+                        Piscina privativa
+                      </li>
+                      <li className="flex items-center">
+                        <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
+                        Churrasqueira, fogão a lenha, área gourmet
+                      </li>
+                      <li className="flex items-center">
+                        <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
+                        Wi-Fi e freezer
+                      </li>
+                    </ul>
+                    <div className="mt-2 font-medium text-rio-blue">
+                      Tudo isso com um ambiente super aconchegante, como você merece!
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-7" className="border-b border-gray-200">
+                <AccordionTrigger className="px-6 py-4 hover:bg-gray-50">
+                  <div className="flex items-center text-left">
+                    <Fish className="h-5 w-5 text-rio-blue mr-3 flex-shrink-0" />
+                    <span className="font-semibold text-gray-900">Posso levar minha tralha de pesca?</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-4">
+                  <div className="text-gray-600 leading-relaxed">
+                    Sim! A recomendação é que cada pescador traga sua tralha.
+                    <div className="mt-2 flex items-start">
+                      <Fish className="h-4 w-4 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                      <span>
+                        Caso queira alugar equipamento, entre em contato com nosso atendimento com antecedência — 
+                        <strong> os valores variam conforme o tipo de material</strong>.
+                      </span>
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-8" className="border-b border-gray-200">
+                <AccordionTrigger className="px-6 py-4 hover:bg-gray-50">
+                  <div className="flex items-center text-left">
+                    <FileText className="h-5 w-5 text-rio-blue mr-3 flex-shrink-0" />
+                    <span className="font-semibold text-gray-900">O que está incluído na pescaria?</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-4">
+                  <div className="text-gray-600 leading-relaxed">
+                    <ul className="space-y-2">
+                      <li className="flex items-center">
+                        <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
+                        5 dias e 4 noites de hospedagem no Rancho Prado – Aldeia
+                      </li>
+                      <li className="flex items-center">
+                        <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
+                        3 dias de pescaria (quinta, sexta e sábado)
+                      </li>
+                      <li className="flex items-center">
+                        <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
+                        De 2 a 4 barcos com motor, conforme o tamanho do grupo
+                      </li>
+                      <li className="flex items-center">
+                        <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
+                        Guia de pesca experiente (1 por barco, com até 2 pescadores)
+                      </li>
+                      <li className="flex items-center">
+                        <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
+                        Gasolina inclusa até 20L por barco por dia
+                      </li>
+                      <li className="flex items-center">
+                        <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
+                        Horário de almoço combinado diretamente com os guias, conforme a rotina de pescaria da turma
+                      </li>
+                    </ul>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-9">
+                <AccordionTrigger className="px-6 py-4 hover:bg-gray-50">
+                  <div className="flex items-center text-left">
+                    <Users className="h-5 w-5 text-rio-blue mr-3 flex-shrink-0" />
+                    <span className="font-semibold text-gray-900">Não tenho grupo formado. Posso comprar o pacote mesmo assim?</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-4">
+                  <div className="text-gray-600 leading-relaxed">
+                    <strong>Pode sim!</strong>
+                    <div className="mt-2">
+                      Você pode comprar <strong>uma cota individual</strong> (por exemplo, 1 vaga num pacote de 4, 6 ou 8 pessoas).
+                      Nós te encaixamos num grupo compatível e <strong>você curte tudo sem precisar juntar turma</strong>.
+                    </div>
+                    <div className="mt-2 italic text-green-700">
+                      Ideal pra quem quer pescar, descansar e fazer novas amizades!
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
+
+          {/* FAQ CTA */}
+          <div className="mt-8 sm:mt-12 text-center">
+            <div className="bg-gradient-to-r from-sunset-orange to-orange-600 text-white p-6 sm:p-8 rounded-xl shadow-lg">
+              <h3 className="text-xl sm:text-2xl font-bold mb-4">
+                Bora garantir o seu lugar?
+              </h3>
+              <p className="text-sm sm:text-base mb-6 opacity-90">
+                Fala com o Prado agora mesmo no WhatsApp e deixa que a gente cuida do resto.
+              </p>
+              <div className="flex items-center justify-center mb-4">
+                <Fish className="h-5 w-5 mr-2" />
+                <span className="text-sm sm:text-base font-medium">
+                  Rancho reservado, peixe esperando e só alegria no horizonte!
+                </span>
+              </div>
+              <Button 
+                size="lg" 
+                className="bg-white text-sunset-orange hover:bg-gray-100 font-semibold"
+              >
+                <MessageCircle className="mr-2 h-5 w-5" />
+                Falar com o Prado e Reservar
+              </Button>
             </div>
           </div>
         </div>
