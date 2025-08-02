@@ -18,6 +18,7 @@ import rancho12Image from '@/assets/gallery/rancho-1-2.jpg';
 import ranchoAgosto2Image from '@/assets/gallery/rancho-agosto-2.jpg';
 import ranchoAgosto7Image from '@/assets/gallery/rancho-agosto-7.jpg';
 import ranchoAgosto5Image from '@/assets/gallery/rancho-agosto-5.jpg';
+import capturaTelaJunhoImage from '@/assets/gallery/captura-tela-junho.png';
 
 const PackageOption = memo(({ option }: { option: any }) => (
   <Card 
@@ -444,6 +445,15 @@ const PackageOffer = () => {
               <img
                 src={ranchoAgosto5Image}
                 alt="Rancho de Cliente - Área de Lazer"
+                className="w-full h-20 sm:h-24 lg:h-32 object-cover group-hover:scale-105 transition-transform duration-300"
+                loading="lazy"
+              />
+            </div>
+
+            <div className="relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
+              <img
+                src={capturaTelaJunhoImage}
+                alt="Estrutura do Rancho - Junho 2025"
                 className="w-full h-20 sm:h-24 lg:h-32 object-cover group-hover:scale-105 transition-transform duration-300"
                 loading="lazy"
               />
