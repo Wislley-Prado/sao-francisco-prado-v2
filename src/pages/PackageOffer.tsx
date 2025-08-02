@@ -8,39 +8,24 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { Clock, Users, MapPin, Star, Calendar, CheckCircle, Phone, CreditCard, Banknote, Percent, HelpCircle, Home, ChefHat, Fish, Sparkles, FileText, MessageCircle, Expand, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ranchoPradoImage from '@/assets/rancho-prado-pescador-feliz.jpg';
-import usina3MariasImage from '@/assets/gallery/usina-3-marias.jpg';
-import rancho21Image from '@/assets/gallery/rancho-21.jpg';
-import rancho9Image from '@/assets/gallery/rancho-9.png';
-import rancho7Image from '@/assets/gallery/rancho-7.png';
-import rancho28Image from '@/assets/gallery/rancho-28.png';
-import ranchoJulho9Image from '@/assets/gallery/rancho-julho-9.png';
-import capturaTelaImage from '@/assets/gallery/captura-tela.png';
-import capturaTela1131Image from '@/assets/gallery/captura-tela-11-31-11.png';
-import rancho19Image from '@/assets/gallery/rancho-19.png';
-import rancho12Image from '@/assets/gallery/rancho-1-2.jpg';
-import ranchoAgosto2Image from '@/assets/gallery/rancho-agosto-2.jpg';
-import ranchoAgosto7Image from '@/assets/gallery/rancho-agosto-7.jpg';
-import ranchoAgosto5Image from '@/assets/gallery/rancho-agosto-5.jpg';
-import capturaTelaJunhoImage from '@/assets/gallery/captura-tela-junho.png';
+import ranchoPradoAldeia from '@/assets/gallery/rancho-prado-aldeia.jpg';
+import rancho2Image from '@/assets/gallery/rancho-2.jpg';
+import rioSaoFranciscoImage from '@/assets/gallery/rio-sao-francisco.jpg';
+import douradoGiganteVelhoChico from '@/assets/gallery/dourado-gigante-velho-chico.jpg';
+import clienteSatisfeitoDourado from '@/assets/gallery/cliente-satisfeito-dourado.jpg';
+import douradoGiganteSaoFrancisco from '@/assets/gallery/dourado-gigante-sao-francisco.jpg';
 
 const PhotoGallery = () => {
   const [selectedImageIndex, setSelectedImageIndex] = React.useState(0);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   
   const galleryImages = [
-    { src: usina3MariasImage, alt: "Usina de Três Marias e Represa", badge: "Rio São Francisco" },
-    { src: rancho21Image, alt: "Vista do Rancho" },
-    { src: rancho9Image, alt: "Área de Lazer" },
-    { src: rancho7Image, alt: "Instalações do Rancho" },
-    { src: rancho28Image, alt: "Área Externa" },
-    { src: ranchoJulho9Image, alt: "Vista Panorâmica" },
-    { src: capturaTela1131Image, alt: "Rancho de Cliente - Pescaria Real" },
-    { src: rancho19Image, alt: "Rancho de Cliente - Estrutura Real" },
-    { src: rancho12Image, alt: "Rancho de Cliente - Experiência Real" },
-    { src: ranchoAgosto2Image, alt: "Rancho de Cliente - Agosto 2025" },
-    { src: ranchoAgosto7Image, alt: "Rancho de Cliente - Estrutura Completa" },
-    { src: ranchoAgosto5Image, alt: "Rancho de Cliente - Área de Lazer" },
-    { src: capturaTelaJunhoImage, alt: "Estrutura do Rancho - Junho 2025" }
+    { src: ranchoPradoAldeia, alt: "Rancho Prado Aldeia - Vista Principal", badge: "Destaque" },
+    { src: rancho2Image, alt: "Vista do Rancho - Estrutura Completa" },
+    { src: rioSaoFranciscoImage, alt: "Rio São Francisco - Local de Pesca" },
+    { src: douradoGiganteVelhoChico, alt: "Dourado Gigante - Velho Chico" },
+    { src: clienteSatisfeitoDourado, alt: "Cliente Satisfeito - Captura de Dourado Gigante" },
+    { src: douradoGiganteSaoFrancisco, alt: "Dourado Gigante - São Francisco" }
   ];
 
   const openModal = (index: number) => {
