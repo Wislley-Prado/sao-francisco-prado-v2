@@ -3,7 +3,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Clock, Users, MapPin, Star, Calendar, CheckCircle, Phone, CreditCard, Banknote, Percent, HelpCircle, Home, ChefHat, Fish, Sparkles, FileText, MessageCircle } from 'lucide-react';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { Clock, Users, MapPin, Star, Calendar, CheckCircle, Phone, CreditCard, Banknote, Percent, HelpCircle, Home, ChefHat, Fish, Sparkles, FileText, MessageCircle, Expand, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ranchoPradoImage from '@/assets/rancho-prado-pescador-feliz.jpg';
 import usina3MariasImage from '@/assets/gallery/usina-3-marias.jpg';
@@ -20,6 +22,117 @@ import ranchoAgosto2Image from '@/assets/gallery/rancho-agosto-2.jpg';
 import ranchoAgosto7Image from '@/assets/gallery/rancho-agosto-7.jpg';
 import ranchoAgosto5Image from '@/assets/gallery/rancho-agosto-5.jpg';
 import capturaTelaJunhoImage from '@/assets/gallery/captura-tela-junho.png';
+
+const PhotoGallery = () => {
+  const [selectedImageIndex, setSelectedImageIndex] = React.useState(0);
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  
+  const galleryImages = [
+    { src: usina3MariasImage, alt: "Usina de Três Marias e Represa", badge: "Rio São Francisco" },
+    { src: rancho21Image, alt: "Vista do Rancho" },
+    { src: rancho9Image, alt: "Área de Lazer" },
+    { src: rancho7Image, alt: "Instalações do Rancho" },
+    { src: rancho28Image, alt: "Área Externa" },
+    { src: ranchoJulho9Image, alt: "Vista Panorâmica" },
+    { src: capturaTela1131Image, alt: "Rancho de Cliente - Pescaria Real" },
+    { src: rancho19Image, alt: "Rancho de Cliente - Estrutura Real" },
+    { src: rancho12Image, alt: "Rancho de Cliente - Experiência Real" },
+    { src: ranchoAgosto2Image, alt: "Rancho de Cliente - Agosto 2025" },
+    { src: ranchoAgosto7Image, alt: "Rancho de Cliente - Estrutura Completa" },
+    { src: ranchoAgosto5Image, alt: "Rancho de Cliente - Área de Lazer" },
+    { src: capturaTelaJunhoImage, alt: "Estrutura do Rancho - Junho 2025" }
+  ];
+
+  const openModal = (index: number) => {
+    setSelectedImageIndex(index);
+    setIsModalOpen(true);
+  };
+
+  return (
+    <>
+      {/* Grid Gallery */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
+        {/* Main featured image - spans 2 columns */}
+        <div 
+          className="col-span-2 row-span-2 relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer"
+          onClick={() => openModal(0)}
+        >
+          <img
+            src={galleryImages[0].src}
+            alt={galleryImages[0].alt}
+            className="w-full h-40 sm:h-52 lg:h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+            loading="lazy"
+          />
+          <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+            <div className="bg-white/20 backdrop-blur-sm rounded-full p-3">
+              <Expand className="h-6 w-6 text-white" />
+            </div>
+          </div>
+          {galleryImages[0].badge && (
+            <div className="absolute top-2 right-2">
+              <Badge className="bg-sunset-orange text-white text-xs">
+                {galleryImages[0].badge}
+              </Badge>
+            </div>
+          )}
+        </div>
+
+        {/* Gallery images - Single column items */}
+        {galleryImages.slice(1).map((image, index) => (
+          <div 
+            key={index + 1}
+            className="relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer"
+            onClick={() => openModal(index + 1)}
+          >
+            <img
+              src={image.src}
+              alt={image.alt}
+              className="w-full h-20 sm:h-24 lg:h-32 object-cover group-hover:scale-105 transition-transform duration-300"
+              loading="lazy"
+            />
+            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+              <div className="bg-white/20 backdrop-blur-sm rounded-full p-2">
+                <Expand className="h-4 w-4 text-white" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Lightbox Modal with Carousel */}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="max-w-[95vw] max-h-[95vh] w-full h-full p-0 bg-black/95 border-none">
+          <div className="relative w-full h-full flex items-center justify-center">
+            <Carousel 
+              className="w-full max-w-4xl mx-auto"
+              opts={{ startIndex: selectedImageIndex }}
+            >
+              <CarouselContent>
+                {galleryImages.map((image, index) => (
+                  <CarouselItem key={index}>
+                    <div className="flex items-center justify-center p-4">
+                      <img
+                        src={image.src}
+                        alt={image.alt}
+                        className="max-w-full max-h-[80vh] object-contain rounded-lg"
+                      />
+                    </div>
+                    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/50 backdrop-blur-sm text-white px-4 py-2 rounded-lg">
+                      <p className="text-sm font-medium">{image.alt}</p>
+                      <p className="text-xs opacity-75">{index + 1} de {galleryImages.length}</p>
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 border-white/30 text-white hover:bg-white/30" />
+              <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 border-white/30 text-white hover:bg-white/30" />
+            </Carousel>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+};
 
 const PackageOption = memo(({ option }: { option: any }) => (
   <Card 
@@ -339,133 +452,7 @@ const PackageOffer = () => {
             <span className="font-semibold text-primary"> O que você vê é exatamente o que você terá!</span>
           </p>
           
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
-            {/* Main featured image - spans 2 columns */}
-            <div className="col-span-2 row-span-2">
-              <div className="relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
-                <img
-                  src={usina3MariasImage}
-                  alt="Usina de Três Marias e Represa"
-                  className="w-full h-40 sm:h-52 lg:h-64 object-cover group-hover:scale-105 transition-transform duration-300"
-                  loading="lazy"
-                />
-                <div className="absolute top-2 right-2">
-                  <Badge className="bg-sunset-orange text-white text-xs">
-                    Rio São Francisco
-                  </Badge>
-                </div>
-              </div>
-            </div>
-
-            {/* Gallery images - Single column items */}
-            <div className="relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
-              <img
-                src={rancho21Image}
-                alt="Vista do Rancho"
-                className="w-full h-20 sm:h-24 lg:h-32 object-cover group-hover:scale-105 transition-transform duration-300"
-                loading="lazy"
-              />
-            </div>
-            
-            <div className="relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
-              <img
-                src={rancho9Image}
-                alt="Área de Lazer"
-                className="w-full h-20 sm:h-24 lg:h-32 object-cover group-hover:scale-105 transition-transform duration-300"
-                loading="lazy"
-              />
-            </div>
-            
-            <div className="relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
-              <img
-                src={rancho7Image}
-                alt="Instalações do Rancho"
-                className="w-full h-20 sm:h-24 lg:h-32 object-cover group-hover:scale-105 transition-transform duration-300"
-                loading="lazy"
-              />
-            </div>
-
-            <div className="relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
-              <img
-                src={rancho28Image}
-                alt="Área Externa"
-                className="w-full h-20 sm:h-24 lg:h-32 object-cover group-hover:scale-105 transition-transform duration-300"
-                loading="lazy"
-              />
-            </div>
-
-            <div className="relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
-              <img
-                src={ranchoJulho9Image}
-                alt="Vista Panorâmica"
-                className="w-full h-20 sm:h-24 lg:h-32 object-cover group-hover:scale-105 transition-transform duration-300"
-                loading="lazy"
-              />
-            </div>
-
-            <div className="relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
-              <img
-                src={capturaTela1131Image}
-                alt="Rancho de Cliente - Pescaria Real"
-                className="w-full h-20 sm:h-24 lg:h-32 object-cover group-hover:scale-105 transition-transform duration-300"
-                loading="lazy"
-              />
-            </div>
-
-            <div className="relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
-              <img
-                src={rancho19Image}
-                alt="Rancho de Cliente - Estrutura Real"
-                className="w-full h-20 sm:h-24 lg:h-32 object-cover group-hover:scale-105 transition-transform duration-300"
-                loading="lazy"
-              />
-            </div>
-
-            <div className="relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
-              <img
-                src={rancho12Image}
-                alt="Rancho de Cliente - Experiência Real"
-                className="w-full h-20 sm:h-24 lg:h-32 object-cover group-hover:scale-105 transition-transform duration-300"
-                loading="lazy"
-              />
-            </div>
-
-            <div className="relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
-              <img
-                src={ranchoAgosto2Image}
-                alt="Rancho de Cliente - Agosto 2025"
-                className="w-full h-20 sm:h-24 lg:h-32 object-cover group-hover:scale-105 transition-transform duration-300"
-                loading="lazy"
-              />
-            </div>
-
-            <div className="relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
-              <img
-                src={ranchoAgosto7Image}
-                alt="Rancho de Cliente - Estrutura Completa"
-                className="w-full h-20 sm:h-24 lg:h-32 object-cover group-hover:scale-105 transition-transform duration-300"
-                loading="lazy"
-              />
-            </div>
-
-            <div className="relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
-              <img
-                src={ranchoAgosto5Image}
-                alt="Rancho de Cliente - Área de Lazer"
-                className="w-full h-20 sm:h-24 lg:h-32 object-cover group-hover:scale-105 transition-transform duration-300"
-                loading="lazy"
-              />
-            </div>
-
-            <div className="relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
-              <img
-                src={capturaTelaJunhoImage}
-                alt="Estrutura do Rancho - Junho 2025"
-                className="w-full h-20 sm:h-24 lg:h-32 object-cover group-hover:scale-105 transition-transform duration-300"
-                loading="lazy"
-              />
-            </div>
-          </div>
+          <PhotoGallery />
 
           {/* Additional testimonial message */}
           <div className="bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-xl p-4 sm:p-6 mt-6 sm:mt-8">
