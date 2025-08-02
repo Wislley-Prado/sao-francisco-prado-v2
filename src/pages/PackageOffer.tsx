@@ -268,20 +268,6 @@ const PackageOffer = () => {
         </div>
       </section>
 
-      {/* Package Options */}
-      <section className="py-8 sm:py-12 lg:py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-center text-gray-900 mb-6 sm:mb-8 lg:mb-12">
-            Escolha o Tamanho do Seu Grupo
-          </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-8 sm:mb-12">
-            {packageOptions.map((option) => (
-              <PackageOption key={option.id} option={option} />
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* Features Section */}
       <section className="py-8 sm:py-12 lg:py-16 bg-sand-beige">
@@ -496,6 +482,21 @@ const PackageOffer = () => {
                 <span className="font-medium text-green-700"> Chegue e encontre exatamente o que viu aqui!</span>
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Package Options */}
+      <section className="py-8 sm:py-12 lg:py-16 bg-sand-beige">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-center text-gray-900 mb-6 sm:mb-8 lg:mb-12">
+            Escolha o Tamanho do Seu Grupo
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-8 sm:mb-12">
+            {packageOptions.map((option) => (
+              <PackageOption key={option.id} option={option} />
+            ))}
           </div>
         </div>
       </section>
