@@ -53,7 +53,10 @@ const PackageOption = memo(({ option }: { option: any }) => (
 
     <CardContent className="space-y-3 sm:space-y-4">
       <div className="border-t pt-3 sm:pt-4">
-        <h4 className="font-semibold text-gray-900 mb-2 sm:mb-3 text-sm sm:text-base">💳 Opções de Pagamento:</h4>
+        <h4 className="font-semibold text-gray-900 mb-2 sm:mb-3 text-sm sm:text-base">
+          <CreditCard className="inline-block mr-1 h-3 w-3 sm:h-4 sm:w-4" />
+          Opções de Pagamento:
+        </h4>
         
         {/* Boleto */}
         <div className="bg-green-50 border border-green-200 rounded-lg p-2 sm:p-3 mb-2 sm:mb-3">
@@ -65,7 +68,8 @@ const PackageOption = memo(({ option }: { option: any }) => (
             {option.installments} por pessoa
           </div>
           <div className="text-xs text-green-600 mt-1">
-            🔓 Pagou 5 boletos, já pode marcar!
+            <CheckCircle className="inline-block mr-1 h-3 w-3" />
+            Pagou 5 boletos, já pode marcar!
           </div>
         </div>
 
@@ -184,7 +188,7 @@ const PackageOffer = () => {
       ]
     },
     {
-      icon: "🎣",
+      icon: <MapPin className="h-8 w-8 sm:h-10 sm:w-10 text-rio-blue" />,
       title: "Pescaria Completa",
       description: "Equipamentos e guias inclusos",
       items: [
@@ -232,7 +236,8 @@ const PackageOffer = () => {
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="text-center mb-6 sm:mb-8 lg:mb-12">
             <Badge className="bg-sunset-orange text-white mb-3 sm:mb-4 text-sm sm:text-lg px-3 sm:px-4 py-1 sm:py-2">
-              🌟 OFERTA EXCLUSIVA
+              <Star className="inline-block mr-1 h-3 w-3 sm:h-4 sm:w-4" />
+              OFERTA EXCLUSIVA
             </Badge>
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-bold text-gray-900 mb-4 sm:mb-6 leading-tight">
               PACOTE VIP EXCLUSIVO
@@ -243,11 +248,11 @@ const PackageOffer = () => {
             <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-6 mb-6 sm:mb-8">
               <div className="flex items-center justify-center">
                 <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-water-green mr-2" />
-                <span className="text-sm sm:text-base text-gray-600">🗓️ De quarta a domingo – 5 dias / 4 noites</span>
+                <span className="text-sm sm:text-base text-gray-600">De quarta a domingo – 5 dias / 4 noites</span>
               </div>
               <div className="flex items-center justify-center">
                 <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-water-green mr-2" />
-                <span className="text-sm sm:text-base text-gray-600">📍 Rancho Prado – Aldeia</span>
+                <span className="text-sm sm:text-base text-gray-600">Rancho Prado – Aldeia</span>
               </div>
             </div>
           </div>
@@ -262,7 +267,8 @@ const PackageOffer = () => {
             />
             <div className="absolute top-2 sm:top-4 right-2 sm:right-4">
               <Badge className="bg-sunset-orange text-white text-xs sm:text-sm lg:text-lg px-2 sm:px-4 py-1 sm:py-2">
-                👥 Exclusividade Total
+                <Users className="inline-block mr-1 h-3 w-3 sm:h-4 sm:w-4" />
+                Exclusividade Total
               </Badge>
             </div>
           </div>
@@ -276,7 +282,7 @@ const PackageOffer = () => {
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="text-center mb-8 sm:mb-12">
             <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6">
-              🎣 Pescaria de Dourado na Cachoeira da Escadinha
+              Pescaria de Dourado na Cachoeira da Escadinha
             </h2>
             <p className="text-base sm:text-lg lg:text-xl opacity-90 max-w-4xl mx-auto">
               Veja um exemplar incrível de Dourado capturado nas águas cristalinas do Rio São Francisco! 
@@ -300,15 +306,15 @@ const PackageOffer = () => {
               <div className="mt-4 sm:mt-6 text-center">
                 <div className="flex flex-wrap justify-center gap-4 sm:gap-6 text-sm sm:text-base">
                   <div className="flex items-center">
-                    <span className="text-sunset-orange font-semibold">🐟 Espécie:</span>
+                    <span className="text-sunset-orange font-semibold">Espécie:</span>
                     <span className="ml-2">Dourado (Salminus brasiliensis)</span>
                   </div>
                   <div className="flex items-center">
-                    <span className="text-sunset-orange font-semibold">📍 Local:</span>
+                    <span className="text-sunset-orange font-semibold">Local:</span>
                     <span className="ml-2">Cachoeira da Escadinha</span>
                   </div>
                   <div className="flex items-center">
-                    <span className="text-sunset-orange font-semibold">🌊 Rio:</span>
+                    <span className="text-sunset-orange font-semibold">Rio:</span>
                     <span className="ml-2">São Francisco</span>
                   </div>
                 </div>
@@ -325,7 +331,7 @@ const PackageOffer = () => {
       <section className="py-8 sm:py-12 lg:py-16 bg-white">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-center text-gray-900 mb-4">
-            📸 Todas as fotos são dos nossos ranchos reais - sem surpresas na chegada!
+            Todas as fotos são dos nossos ranchos reais - sem surpresas na chegada!
           </h2>
           <p className="text-center text-gray-600 mb-6 sm:mb-8 lg:mb-12 max-w-4xl mx-auto text-sm sm:text-base lg:text-lg">
             Veja as estruturas reais que nossos clientes encontram. Cada rancho oferece conforto, segurança e a melhor experiência de pesca. 
@@ -344,7 +350,7 @@ const PackageOffer = () => {
                 />
                 <div className="absolute top-2 right-2">
                   <Badge className="bg-sunset-orange text-white text-xs">
-                    🌊 Rio São Francisco
+                    Rio São Francisco
                   </Badge>
                 </div>
               </div>
@@ -614,28 +620,34 @@ const PackageOffer = () => {
                 <div className="bg-gradient-to-r from-blue-50 to-green-50 p-4 rounded-lg border-l-4 border-rio-blue">
                   <h3 className="font-semibold text-gray-900 mb-2">Por que Três Marias?</h3>
                   <ul className="space-y-1 text-sm">
-                    <li>• 📍 Localização estratégica no Rio São Francisco</li>
-                    <li>• 🐟 Rica diversidade de peixes nativos</li>
-                    <li>• 🌊 Águas calmas e ideais para pesca</li>
-                    <li>• 🏞️ Paisagens naturais deslumbrantes</li>
-                    <li>• 🎣 Tradição pesqueira centenária</li>
+                    <li>• Localização estratégica no Rio São Francisco</li>
+                    <li>• Rica diversidade de peixes nativos</li>
+                    <li>• Águas calmas e ideais para pesca</li>
+                    <li>• Paisagens naturais deslumbrantes</li>
+                    <li>• Tradição pesqueira centenária</li>
                   </ul>
                 </div>
               </div>
             </div>
             <div className="space-y-4">
               <div className="bg-gradient-to-br from-rio-blue to-water-green text-white p-6 rounded-xl shadow-lg">
-                <h3 className="text-xl font-bold mb-4">🏆 Destaque Nacional</h3>
+                <h3 className="text-xl font-bold mb-4">
+                  <Star className="inline-block mr-2 h-5 w-5" />
+                  Destaque Nacional
+                </h3>
                 <p className="text-sm opacity-90 mb-4">
                   Três Marias é considerada a "Capital da Pesca de Minas Gerais", atraindo pescadores de todo o Brasil em busca da experiência perfeita.
                 </p>
                 <div className="bg-white/20 p-3 rounded-lg">
-                  <div className="text-lg font-bold">💧 Rio São Francisco</div>
+                  <div className="text-lg font-bold">Rio São Francisco</div>
                   <div className="text-sm opacity-90">2.863 km de extensão • Conhecido como "Velho Chico"</div>
                 </div>
               </div>
               <div className="bg-gray-50 p-6 rounded-xl border border-gray-200">
-                <h3 className="text-lg font-bold text-gray-900 mb-3">🌟 Diferenciais da Região</h3>
+                <h3 className="text-lg font-bold text-gray-900 mb-3">
+                  <Star className="inline-block mr-2 h-4 w-4" />
+                  Diferenciais da Região
+                </h3>
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div className="text-center p-2 bg-white rounded border">
                     <div className="font-semibold text-rio-blue">Clima</div>
@@ -682,7 +694,7 @@ const PackageOffer = () => {
           
           <div className="mt-8 text-center opacity-75">
             <p className="text-sm">
-              💬 Dúvidas? Entre em contato conosco pelo WhatsApp
+              Dúvidas? Entre em contato conosco pelo WhatsApp
             </p>
           </div>
         </div>
