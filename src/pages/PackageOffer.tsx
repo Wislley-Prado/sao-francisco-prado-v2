@@ -17,6 +17,8 @@ import douradoGiganteSaoFrancisco from '@/assets/gallery/dourado-gigante-sao-fra
 import paiFilhoDourado from '@/assets/gallery/pai-filho-dourado.jpg';
 import imagem7 from '@/assets/gallery/imagem-7.jpg';
 import clienteMulherDourado from '@/assets/gallery/cliente-mulher-dourado.jpg';
+import joaoSilvaDourado from '@/assets/testimonials/joao-silva-dourado.jpg';
+import carlosOliveira from '@/assets/testimonials/carlos-oliveira.jpg';
 
 const PhotoGallery = () => {
   const [selectedImageIndex, setSelectedImageIndex] = React.useState(0);
@@ -507,55 +509,82 @@ const PackageOffer = () => {
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            {/* Testimonial 1 */}
+            {/* Testimonial 1 - João Silva */}
             <div className="bg-white p-6 rounded-xl shadow-lg">
               <div className="flex items-center mb-4">
-                <div className="flex text-yellow-500">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-current" />
-                  ))}
+                <div className="w-16 h-16 rounded-full overflow-hidden mr-4 border-2 border-rio-blue/20">
+                  <img 
+                    src={joaoSilvaDourado} 
+                    alt="João Silva com dourado"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div>
+                  <div className="flex text-yellow-500 mb-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="h-4 w-4 fill-current" />
+                    ))}
+                  </div>
+                  <div className="text-sm font-semibold text-gray-900">
+                    João Silva - São Paulo
+                  </div>
                 </div>
               </div>
               <p className="text-gray-600 mb-4 italic">
-                "Melhor experiência de pesca da minha vida! O rancho é exatamente como nas fotos e a estrutura é impecável. Voltarei com certeza!"
+                "Peguei um dourado gigante na cachoeira do Escadinha! O guia fez toda a diferença, conhece cada cantinho do rio. Melhor pescaria da minha vida!"
               </p>
-              <div className="text-sm font-semibold text-gray-900">
-                João Silva - São Paulo
-              </div>
             </div>
 
-            {/* Testimonial 2 */}
+            {/* Testimonial 2 - Maria dos Santos */}
             <div className="bg-white p-6 rounded-xl shadow-lg">
               <div className="flex items-center mb-4">
-                <div className="flex text-yellow-500">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-current" />
-                  ))}
+                <div className="w-16 h-16 rounded-full overflow-hidden mr-4 border-2 border-rio-blue/20">
+                  <img 
+                    src={clienteMulherDourado} 
+                    alt="Maria dos Santos com dourado"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div>
+                  <div className="flex text-yellow-500 mb-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="h-4 w-4 fill-current" />
+                    ))}
+                  </div>
+                  <div className="text-sm font-semibold text-gray-900">
+                    Maria dos Santos - Belo Horizonte
+                  </div>
                 </div>
               </div>
               <p className="text-gray-600 mb-4 italic">
                 "Trouxe minha família toda e foi perfeito! As crianças adoraram e conseguimos pescar bastante. Atendimento nota 10!"
               </p>
-              <div className="text-sm font-semibold text-gray-900">
-                Maria Santos - Belo Horizonte
-              </div>
             </div>
 
-            {/* Testimonial 3 */}
+            {/* Testimonial 3 - Carlos Oliveira */}
             <div className="bg-white p-6 rounded-xl shadow-lg">
               <div className="flex items-center mb-4">
-                <div className="flex text-yellow-500">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-current" />
-                  ))}
+                <div className="w-16 h-16 rounded-full overflow-hidden mr-4 border-2 border-rio-blue/20">
+                  <img 
+                    src={carlosOliveira} 
+                    alt="Carlos Oliveira"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div>
+                  <div className="flex text-yellow-500 mb-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="h-4 w-4 fill-current" />
+                    ))}
+                  </div>
+                  <div className="text-sm font-semibold text-gray-900">
+                    Carlos Oliveira - Rio de Janeiro
+                  </div>
                 </div>
               </div>
               <p className="text-gray-600 mb-4 italic">
-                "Organização perfeita! Desde o primeiro contato até a pescaria, tudo foi muito bem planejado. Recomendo demais!"
+                "A cozinheira é sensacional e a organização é impecável! Tudo muito bem cuidado, lugar perfeito para relaxar e pescar. Voltarei com certeza!"
               </p>
-              <div className="text-sm font-semibold text-gray-900">
-                Carlos Oliveira - Rio de Janeiro
-              </div>
             </div>
           </div>
 
