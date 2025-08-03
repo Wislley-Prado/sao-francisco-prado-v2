@@ -86,7 +86,7 @@ const LunarCalendar = () => {
             <CardHeader className="bg-white border-b border-gray-100 pb-6">
               <CardTitle className="text-xl font-bold text-gray-800 flex items-center">
                 <Moon className="mr-3 h-5 w-5 text-blue-600" />
-                Calendário Lunar - Dezembro 2024
+                Calendário Lunar - {new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }).replace(/^\w/, (c) => c.toUpperCase())}
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 bg-white">
