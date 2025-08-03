@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
-import { Clock, Users, MapPin, Star, Calendar, CheckCircle, Phone, CreditCard, Banknote, Percent, HelpCircle, Home, ChefHat, Fish, Sparkles, FileText, MessageCircle, Expand, X } from 'lucide-react';
+import { Clock, Users, MapPin, Star, Calendar, CheckCircle, Phone, CreditCard, Banknote, Percent, HelpCircle, Home, ChefHat, Fish, Sparkles, FileText, MessageCircle, Expand, X, Utensils, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ranchoPradoImage from '@/assets/rancho-prado-pescador-feliz.jpg';
 import ranchoPradoAldeia from '@/assets/gallery/rancho-prado-aldeia.jpg';
@@ -270,7 +270,7 @@ const PackageOffer = () => {
 
   const packageFeatures = [
     {
-      icon: "🏡",
+      icon: <Home className="h-8 w-8 sm:h-10 sm:w-10 text-rio-blue" />,
       title: "Estrutura Premium",
       description: "Rancho inteiro reservado só pro grupo",
       items: [
@@ -283,7 +283,7 @@ const PackageOffer = () => {
       ]
     },
     {
-      icon: "🍳",
+      icon: <Utensils className="h-8 w-8 sm:h-10 sm:w-10 text-rio-blue" />,
       title: "Cozinheira Inclusa",
       description: "Serviço de cozinheira todos os dias",
       items: [
@@ -295,7 +295,7 @@ const PackageOffer = () => {
       ]
     },
     {
-      icon: <MapPin className="h-8 w-8 sm:h-10 sm:w-10 text-rio-blue" />,
+      icon: <Fish className="h-8 w-8 sm:h-10 sm:w-10 text-rio-blue" />,
       title: "Pescaria Completa",
       description: "Equipamentos e guias inclusos",
       items: [
@@ -308,7 +308,7 @@ const PackageOffer = () => {
       ]
     },
     {
-      icon: "🧼",
+      icon: <Shield className="h-8 w-8 sm:h-10 sm:w-10 text-rio-blue" />,
       title: "Serviços Inclusos",
       description: "Tudo cuidado para você",
       items: [
