@@ -4,7 +4,7 @@ import PackageCard from './PackageCard';
 import PackageFeatures from './PackageFeatures';
 import ranchoPradoPescadorFeliz from '@/assets/rancho-prado-pescador-feliz.jpg';
 import douradoGiganteSaoFrancisco from '@/assets/gallery/dourado-gigante-sao-francisco.jpg';
-import ranchoPradoAldeia from '@/assets/gallery/rancho-prado-aldeia.jpg';
+import pacoteDiamante from '@/assets/gallery/pacote-diamante.png';
 
 const PackagesSection = () => {
   const packages = [
@@ -27,40 +27,46 @@ const PackagesSection = () => {
     },
     {
       id: 2,
-      title: "Pacote Dia Inteiro",
-      description: "A experiência completa de pesca no Rio São Francisco",
-      price: "R$ 320",
-      duration: "8 horas",
-      people: "1-4 pessoas",
+      title: "PACOTE LUXO – 'Conforto Premium'",
+      description: "Experiência de luxo com hospedagem premium e serviços exclusivos",
+      price: "15 X R$199,90",
+      duration: "7 dias / 6 noites",
+      people: "4-8 pescadores",
       rating: 4.9,
       features: [
-        "Guia especializado",
-        "Equipamentos profissionais",
-        "Iscas variadas",
-        "Almoço incluso",
-        "Barco privativo",
-        "Seguro incluso"
+        "Hospedagem de luxo com suítes",
+        "Chef particular incluso",
+        "Equipamentos premium",
+        "Guia especializado 24h",
+        "Barco exclusivo de luxo",
+        "Transfer VIP incluso",
+        "Spa e relaxamento",
+        "Vista panorâmica do lago"
       ],
       image: douradoGiganteSaoFrancisco,
       popular: true
     },
     {
       id: 3,
-      title: "Pacote Fim de Semana",
-      description: "Dois dias de pesca e hospedagem em rancho exclusivo",
-      price: "R$ 850",
-      duration: "2 dias",
-      people: "1-6 pessoas",
+      title: "PACOTE DIAMANTE – 'Elite Experience'",
+      description: "O mais exclusivo pacote de pesca esportiva do Rio São Francisco",
+      price: "20 X R$299,97",
+      duration: "10 dias / 9 noites",
+      people: "6-12 pescadores",
       rating: 5.0,
       features: [
-        "Hospedagem em rancho",
-        "Todas as refeições",
-        "Guia 24h",
-        "Equipamentos premium",
-        "Barco exclusivo",
-        "Transfer incluso"
+        "Resort privativo exclusivo",
+        "Helicóptero para translado",
+        "Chef renomado e sommelier",
+        "Equipamentos de última geração",
+        "Guias especializados 24/7",
+        "Frota de barcos de luxo",
+        "Serviço de concierge",
+        "Experiências gastronômicas únicas",
+        "Spa completo e wellness",
+        "Fotógrafo profissional incluso"
       ],
-      image: ranchoPradoAldeia,
+      image: pacoteDiamante,
       popular: false
     }
   ];
