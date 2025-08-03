@@ -295,12 +295,14 @@ const calculateLunarPhasesLocal = (): LunarData => {
 
 export const useLunarData = () => {
   return useQuery<LunarData>({
-    queryKey: ['lunar', 'data', 'v3', Date.now()], // Força invalidação completa do cache
+    queryKey: ['lunar', 'data', 'v4'], // Cache fixo, sem Date.now()
     queryFn: fetchLunarDataFromAPI,
-    refetchInterval: 60 * 60 * 1000, // Atualizar a cada hora
-    staleTime: 30 * 60 * 1000, // Dados ficam fresh por 30 minutos
-    retry: 1,
+    refetchInterval: 2 * 60 * 60 * 1000, // Atualizar a cada 2 horas
+    staleTime: 60 * 60 * 1000, // Dados ficam fresh por 1 hora
+    retry: 1, // Apenas 1 tentativa para falhar rápido
+    retryDelay: 100, // Delay mínimo entre tentativas
     refetchOnWindowFocus: false,
-    refetchOnMount: true,
+    refetchOnMount: false, // Não refetch ao montar se há cache
+    networkMode: 'online', // Só tenta se estiver online
   });
 };
