@@ -14,6 +14,9 @@ import rioSaoFranciscoImage from '@/assets/gallery/rio-sao-francisco.jpg';
 import douradoGiganteVelhoChico from '@/assets/gallery/dourado-gigante-velho-chico.jpg';
 import clienteSatisfeitoDourado from '@/assets/gallery/cliente-satisfeito-dourado.jpg';
 import douradoGiganteSaoFrancisco from '@/assets/gallery/dourado-gigante-sao-francisco.jpg';
+import paiFilhoDourado from '@/assets/gallery/pai-filho-dourado.jpg';
+import imagem7 from '@/assets/gallery/imagem-7.jpg';
+import clienteMulherDourado from '@/assets/gallery/cliente-mulher-dourado.jpg';
 
 const PhotoGallery = () => {
   const [selectedImageIndex, setSelectedImageIndex] = React.useState(0);
@@ -21,6 +24,9 @@ const PhotoGallery = () => {
   
   const galleryImages = [
     { src: ranchoPradoAldeia, alt: "Rancho Prado Aldeia - Vista Principal", badge: "Destaque" },
+    { src: paiFilhoDourado, alt: "Pai e Filho - Momento Especial com Dourado" },
+    { src: clienteMulherDourado, alt: "Cliente Mulher - Sucesso na Pescaria de Dourado" },
+    { src: imagem7, alt: "Estrutura e Ambiente do Rancho" },
     { src: rancho2Image, alt: "Vista do Rancho - Estrutura Completa" },
     { src: rioSaoFranciscoImage, alt: "Rio São Francisco - Local de Pesca" },
     { src: douradoGiganteVelhoChico, alt: "Dourado Gigante - Velho Chico" },
@@ -35,18 +41,18 @@ const PhotoGallery = () => {
 
   return (
     <>
-      {/* Grid Gallery */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
-        {/* Main featured image - spans 2 columns */}
+      {/* Grid Gallery - Optimized for 9 images */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4 auto-rows-fr">
+        {/* Main featured image - spans 2 columns on desktop, full width on mobile */}
         <div 
-          className="col-span-2 row-span-2 relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer"
+          className="col-span-2 sm:col-span-2 lg:col-span-2 row-span-2 relative group overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer"
           onClick={() => openModal(0)}
         >
           <img
             src={galleryImages[0].src}
             alt={galleryImages[0].alt}
-            className="w-full h-40 sm:h-52 lg:h-64 object-cover group-hover:scale-105 transition-transform duration-300"
-            loading="lazy"
+            className="w-full h-48 sm:h-52 lg:h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+            loading="eager"
           />
           <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
             <div className="bg-white/20 backdrop-blur-sm rounded-full p-3">
@@ -62,7 +68,7 @@ const PhotoGallery = () => {
           )}
         </div>
 
-        {/* Gallery images - Single column items */}
+        {/* Gallery images - Regular grid items with improved mobile layout */}
         {galleryImages.slice(1).map((image, index) => (
           <div 
             key={index + 1}
@@ -72,7 +78,7 @@ const PhotoGallery = () => {
             <img
               src={image.src}
               alt={image.alt}
-              className="w-full h-20 sm:h-24 lg:h-32 object-cover group-hover:scale-105 transition-transform duration-300"
+              className="w-full h-24 sm:h-28 lg:h-32 object-cover group-hover:scale-105 transition-transform duration-300"
               loading="lazy"
             />
             <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
@@ -80,6 +86,8 @@ const PhotoGallery = () => {
                 <Expand className="h-4 w-4 text-white" />
               </div>
             </div>
+            {/* Add subtle gradient overlay for better text readability if needed */}
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/30 to-transparent h-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </div>
         ))}
       </div>
