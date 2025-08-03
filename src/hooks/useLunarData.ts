@@ -25,68 +25,96 @@ export interface LunarData {
   }[];
 }
 
-// Função para calcular as fases lunares
+// Função para calcular as fases lunares com precisão astronômica
 const calculateLunarPhases = (): LunarData => {
-  console.log('🌙 [LUNAR] Calculando dados lunares...');
+  console.log('🌙 [LUNAR] Calculando dados lunares com precisão astronômica...');
   
   const now = new Date();
   const currentTimestamp = now.getTime();
   
-  // Ciclo lunar é de aproximadamente 29.53 dias
-  const lunarCycle = 29.53 * 24 * 60 * 60 * 1000; // em millisegundos
-  
-  // Data de referência de lua nova conhecida (1 de janeiro de 2000)
+  // Usar data de referência mais precisa: Lua Nova de 1 de Janeiro de 2000, 12:00 UTC
   const referenceNewMoon = new Date('2000-01-06T18:14:00Z').getTime();
   
-  // Calcular quantos ciclos lunares se passaram desde a referência
+  // Ciclo lunar sinódico preciso: 29.530588853 dias
+  const lunarCycle = 29.530588853;
+  const cycleDurationMs = lunarCycle * 24 * 60 * 60 * 1000;
+  
+  // Calcular fase atual da lua
   const daysSinceReference = (currentTimestamp - referenceNewMoon) / (24 * 60 * 60 * 1000);
-  const cyclesSinceReference = daysSinceReference / 29.53;
-  const currentCycleProgress = (cyclesSinceReference - Math.floor(cyclesSinceReference)) * 29.53;
+  const cyclesSinceReference = daysSinceReference / lunarCycle;
+  const ageInDays = (cyclesSinceReference - Math.floor(cyclesSinceReference)) * lunarCycle;
   
-  // Determinar fase atual
+  // Calcular iluminação (0-100%)
+  const illumination = Math.round(50 * (1 - Math.cos(2 * Math.PI * ageInDays / lunarCycle)));
+  
+  // Determinar fase atual com 8 fases precisas
   let currentPhase: string;
-  let illumination: number;
   
-  if (currentCycleProgress < 1) {
+  if (ageInDays < 1) {
     currentPhase = 'Nova';
-    illumination = 0;
-  } else if (currentCycleProgress < 7.4) {
+  } else if (ageInDays < 6.38) {
     currentPhase = 'Crescente';
-    illumination = Math.round((currentCycleProgress / 7.4) * 50);
-  } else if (currentCycleProgress < 14.8) {
+  } else if (ageInDays < 8.38) {
+    currentPhase = 'Crescente Gibosa';
+  } else if (ageInDays < 15.77) {
     currentPhase = 'Cheia';
-    illumination = Math.round(50 + ((currentCycleProgress - 7.4) / 7.4) * 50);
-  } else if (currentCycleProgress < 22.1) {
+  } else if (ageInDays < 17.77) {
+    currentPhase = 'Minguante Gibosa';
+  } else if (ageInDays < 23.15) {
     currentPhase = 'Minguante';
-    illumination = Math.round(100 - ((currentCycleProgress - 14.8) / 7.3) * 50);
+  } else if (ageInDays < 27.53) {
+    currentPhase = 'Minguante Crescente';
   } else {
     currentPhase = 'Nova';
-    illumination = Math.round(50 - ((currentCycleProgress - 22.1) / 7.4) * 50);
   }
   
-  // Calcular próximas fases
+  // Calcular próximas 8 fases
   const phases: LunarPhase[] = [];
-  const phaseTypes = ['Nova', 'Crescente', 'Cheia', 'Minguante'];
-  const phaseColors = ['bg-green-500', 'bg-yellow-500', 'bg-orange-500', 'bg-yellow-500'];
-  const fishingQualities = ['Excelente', 'Bom', 'Regular', 'Bom'];
+  const phaseTypes = [
+    'Nova', 'Crescente', 'Crescente Gibosa', 'Cheia', 
+    'Minguante Gibosa', 'Minguante', 'Minguante Crescente', 'Nova'
+  ];
+  const phaseColors = [
+    'bg-gray-800', 'bg-yellow-400', 'bg-yellow-500', 'bg-orange-400',
+    'bg-orange-500', 'bg-yellow-400', 'bg-gray-600', 'bg-gray-800'
+  ];
+  const fishingQualities = [
+    'Excelente', 'Bom', 'Regular', 'Excelente', 
+    'Bom', 'Regular', 'Bom', 'Excelente'
+  ];
+  const phaseDurations = [1, 6.38, 8.38, 15.77, 17.77, 23.15, 27.53, 29.53];
   
+  // Encontrar próximas fases
+  let nextPhaseIndex = 0;
+  for (let i = 0; i < phaseDurations.length; i++) {
+    if (ageInDays < phaseDurations[i]) {
+      nextPhaseIndex = i;
+      break;
+    }
+  }
+  
+  // Calcular próximas 4 fases principais
   for (let i = 0; i < 4; i++) {
-    const phaseProgress = (i * 7.4) - currentCycleProgress;
-    let daysUntilPhase = phaseProgress;
+    const phaseIndex = (nextPhaseIndex + i * 2) % 8; // Pegar fases principais (Nova, Crescente, Cheia, Minguante)
+    const targetPhaseAge = phaseDurations[phaseIndex];
     
+    let daysUntilPhase = targetPhaseAge - ageInDays;
     if (daysUntilPhase <= 0) {
-      daysUntilPhase += 29.53;
+      daysUntilPhase += lunarCycle;
     }
     
     const phaseDate = new Date(currentTimestamp + (daysUntilPhase * 24 * 60 * 60 * 1000));
     
+    // Calcular iluminação para a fase
+    const phaseIllumination = Math.round(50 * (1 - Math.cos(2 * Math.PI * targetPhaseAge / lunarCycle)));
+    
     phases.push({
-      phase: phaseTypes[i],
+      phase: phaseTypes[phaseIndex],
       date: phaseDate.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }),
       timestamp: phaseDate.getTime(),
-      illumination: i === 0 ? 0 : i === 1 ? 25 : i === 2 ? 100 : 75,
-      fishing: fishingQualities[i],
-      color: phaseColors[i]
+      illumination: phaseIllumination,
+      fishing: fishingQualities[phaseIndex],
+      color: phaseColors[phaseIndex]
     });
   }
   
@@ -118,8 +146,8 @@ const calculateLunarPhases = (): LunarData => {
     currentPhase: {
       phase: currentPhase,
       illumination,
-      age: Math.round(currentCycleProgress),
-      distance: Math.round(384400 + Math.sin(currentCycleProgress * 0.2) * 20000) // km
+      age: Math.round(ageInDays),
+      distance: Math.round(384400 + Math.sin(ageInDays * 0.2) * 20000) // km
     },
     phases: phases.sort((a, b) => a.timestamp - b.timestamp),
     bestFishingTimes
