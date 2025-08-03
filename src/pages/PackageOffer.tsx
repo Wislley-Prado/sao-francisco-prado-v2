@@ -133,88 +133,86 @@ const PackageOption = memo(({ option }: { option: any }) => (
   <Card 
     className={`relative overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 ${
       option.popular 
-        ? 'ring-2 ring-sunset-orange shadow-xl scale-105' 
+        ? 'ring-2 ring-sunset-orange shadow-xl md:scale-105' 
         : 'hover:shadow-lg'
     }`}
   >
     {option.popular && (
-      <div className="absolute top-2 sm:top-4 right-2 sm:right-4 z-10">
-        <Badge className="bg-sunset-orange text-white text-xs sm:text-sm">
+      <div className="absolute top-3 right-3 z-10">
+        <Badge className="bg-sunset-orange text-white text-xs font-semibold px-2 py-1">
           Mais Popular
         </Badge>
       </div>
     )}
 
-    <CardHeader className="text-center">
-      <CardTitle className="text-lg sm:text-xl lg:text-2xl text-rio-blue mb-2">
+    <CardHeader className="text-center pb-4">
+      <CardTitle className="text-xl md:text-2xl text-rio-blue mb-3 font-bold">
         {option.people} Pescadores
       </CardTitle>
-      <div className="text-3xl sm:text-4xl lg:text-6xl font-bold text-sunset-orange mb-2">
+      <div className="text-4xl md:text-5xl lg:text-6xl font-bold text-sunset-orange mb-2">
         {option.installments}
       </div>
-      <div className="text-sm sm:text-base lg:text-lg font-semibold text-gray-900 mb-1">
+      <div className="text-base md:text-lg font-semibold text-gray-900 mb-2">
         por mês, por pessoa
       </div>
-      <div className="text-xs sm:text-sm text-gray-500">
+      <div className="text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
         Total: R$ {option.totalPrice.toLocaleString('pt-BR')} | R$ {option.pricePerPerson.toLocaleString('pt-BR')} por pessoa
       </div>
     </CardHeader>
 
-    <CardContent className="space-y-3 sm:space-y-4">
-      <div className="border-t pt-3 sm:pt-4">
-        <h4 className="font-semibold text-gray-900 mb-2 sm:mb-3 text-sm sm:text-base">
-          <CreditCard className="inline-block mr-1 h-3 w-3 sm:h-4 sm:w-4" />
+    <CardContent className="space-y-4 px-4 md:px-6">
+      <div className="border-t pt-4">
+        <h4 className="font-semibold text-gray-900 mb-4 text-base flex items-center">
+          <CreditCard className="inline-block mr-2 h-4 w-4" />
           Opções de Pagamento:
         </h4>
         
         {/* Boleto */}
-        <div className="bg-green-50 border border-green-200 rounded-lg p-2 sm:p-3 mb-2 sm:mb-3">
-          <div className="flex items-center mb-1 sm:mb-2">
-            <Banknote className="h-3 w-3 sm:h-4 sm:w-4 text-green-600 mr-2" />
-            <span className="font-medium text-green-800 text-xs sm:text-sm">10x no Boleto</span>
+        <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-3 shadow-sm">
+          <div className="flex items-center mb-2">
+            <Banknote className="h-4 w-4 text-green-600 mr-2" />
+            <span className="font-semibold text-green-800 text-sm">10x no Boleto</span>
           </div>
-          <div className="text-green-700 text-xs sm:text-sm">
+          <div className="text-green-700 text-sm font-medium mb-2">
             {option.installments} por pessoa
           </div>
-          <div className="text-xs text-green-600 mt-1">
+          <div className="text-xs text-green-600 flex items-center">
             <CheckCircle className="inline-block mr-1 h-3 w-3" />
             Pagou 5 boletos, já pode marcar!
           </div>
         </div>
 
         {/* Cartão */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 sm:p-3 mb-2 sm:mb-3">
-          <div className="flex items-center mb-1 sm:mb-2">
-            <CreditCard className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600 mr-2" />
-            <span className="font-medium text-blue-800 text-xs sm:text-sm">Cartão de Crédito</span>
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-3 shadow-sm">
+          <div className="flex items-center mb-2">
+            <CreditCard className="h-4 w-4 text-blue-600 mr-2" />
+            <span className="font-semibold text-blue-800 text-sm">Cartão de Crédito</span>
           </div>
-          <div className="text-blue-700 text-xs sm:text-sm">
+          <div className="text-blue-700 text-sm font-medium">
             Até 12x - reserva na hora!
           </div>
         </div>
 
         {/* PIX */}
-        <div className="bg-orange-50 border border-orange-200 rounded-lg p-2 sm:p-3">
-          <div className="flex items-center mb-1 sm:mb-2">
-            <Percent className="h-3 w-3 sm:h-4 sm:w-4 text-orange-600 mr-2" />
-            <span className="font-medium text-orange-800 text-xs sm:text-sm">À vista (PIX)</span>
+        <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 shadow-sm">
+          <div className="flex items-center mb-2">
+            <Percent className="h-4 w-4 text-orange-600 mr-2" />
+            <span className="font-semibold text-orange-800 text-sm">À vista (PIX)</span>
           </div>
-          <div className="text-orange-700 text-xs sm:text-sm">
-            5% desconto → R$ {(option.totalPrice * 0.95).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          <div className="text-orange-700 text-sm font-medium">
+            5% de desconto
           </div>
         </div>
       </div>
 
       <Button 
-        className={`w-full ${
-          option.popular 
-            ? 'bg-sunset-orange hover:bg-orange-600' 
-            : 'bg-rio-blue hover:bg-blue-600'
-        } text-white text-xs sm:text-sm`}
-        size="sm"
+        className="w-full bg-gradient-to-r from-rio-blue to-water-green hover:from-rio-blue/90 hover:to-water-green/90 text-white font-semibold py-3 md:py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-base"
+        asChild
       >
-        <Calendar className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-        Reservar {option.people} Pessoas
+        <Link to="https://wa.me/5537999805019?text=Olá! Gostaria de reservar o pacote para {option.people} pessoas. Pode me dar mais detalhes?">
+          <MessageCircle className="mr-2 h-4 w-4" />
+          Reservar Agora
+        </Link>
       </Button>
     </CardContent>
   </Card>
@@ -478,7 +476,7 @@ const PackageOffer = () => {
             Escolha o Tamanho do Seu Grupo
           </h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-8 sm:mb-12">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 mb-8 sm:mb-12 max-w-6xl mx-auto">
             {packageOptions.map((option) => (
               <PackageOption key={option.id} option={option} />
             ))}
