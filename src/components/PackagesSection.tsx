@@ -2,6 +2,9 @@
 import React from 'react';
 import PackageCard from './PackageCard';
 import PackageFeatures from './PackageFeatures';
+import ranchoPradoPescadorFeliz from '@/assets/rancho-prado-pescador-feliz.jpg';
+import douradoGiganteSaoFrancisco from '@/assets/gallery/dourado-gigante-sao-francisco.jpg';
+import ranchoPradoAldeia from '@/assets/gallery/rancho-prado-aldeia.jpg';
 
 const PackagesSection = () => {
   const packages = [
@@ -19,7 +22,7 @@ const PackagesSection = () => {
         "Exclusividade total do rancho",
         "Vista pro lago, sossego absoluto"
       ],
-      image: "/src/assets/rancho-prado-pescador-feliz.jpg",
+      image: ranchoPradoPescadorFeliz,
       popular: true
     },
     {
@@ -38,7 +41,7 @@ const PackagesSection = () => {
         "Barco privativo",
         "Seguro incluso"
       ],
-      image: "/src/assets/gallery/dourado-gigante-sao-francisco.jpg",
+      image: douradoGiganteSaoFrancisco,
       popular: true
     },
     {
@@ -57,7 +60,7 @@ const PackagesSection = () => {
         "Barco exclusivo",
         "Transfer incluso"
       ],
-      image: "/src/assets/gallery/rancho-prado-aldeia.jpg",
+      image: ranchoPradoAldeia,
       popular: false
     }
   ];
