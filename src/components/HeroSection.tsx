@@ -14,6 +14,17 @@ const HeroSection = () => {
     parseFloat(damData.volume_util_percentual).toFixed(1) : '86.0';
   const windSpeed = weatherData?.current.wind_speed || 12;
   const conditions = weatherData?.current.weather_description || 'Excelente';
+  
+  // Formatação dos horários de nascer e pôr do sol
+  const formatTime = (timestamp: number) => {
+    return new Date(timestamp * 1000).toLocaleTimeString('pt-BR', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+  
+  const sunrise = weatherData?.current.sunrise ? formatTime(weatherData.current.sunrise) : '06:00';
+  const sunset = weatherData?.current.sunset ? formatTime(weatherData.current.sunset) : '18:30';
 
   return (
     <section id="home" className="relative min-h-screen bg-river-gradient flex items-center overflow-hidden">
@@ -115,11 +126,19 @@ const HeroSection = () => {
                     </div>
                     <div>
                       <p className="opacity-80">Condições</p>
-                      <p className="font-semibold text-nature-400 capitalize">{conditions}</p>
+                      <p className="font-semibold text-sand-beige capitalize">{conditions}</p>
                     </div>
                     <div>
                       <p className="opacity-80">Vento</p>
                       <p className="font-semibold">{windSpeed} km/h</p>
+                    </div>
+                    <div>
+                      <p className="opacity-80">Nascer do Sol</p>
+                      <p className="font-semibold text-sunset-orange">{sunrise}</p>
+                    </div>
+                    <div>
+                      <p className="opacity-80">Pôr do Sol</p>
+                      <p className="font-semibold text-sunset-orange">{sunset}</p>
                     </div>
                   </div>
                 </div>
