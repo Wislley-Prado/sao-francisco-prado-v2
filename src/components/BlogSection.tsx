@@ -4,6 +4,12 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import BlogCard from './BlogCard';
 import { BookOpen, TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react';
 
+// Importar as imagens do blog
+import dicasDePesca from '@/assets/blog/dicas-de-pesca.jpg';
+import fasesLua from '@/assets/blog/fases-da-lua.jpg';
+import douradoGigante from '@/assets/blog/dourado-gigante.jpg';
+import regulamentacaoPesca from '@/assets/blog/regulamentacao-pesca.png';
+
 // Dados mock dos posts mais recentes
 const recentPosts = [
   {
@@ -12,43 +18,34 @@ const recentPosts = [
     excerpt: 'Descubra as técnicas mais eficazes para pescar no Velho Chico, desde iscas naturais até equipamentos recomendados pelos pescadores experientes.',
     author: 'João Pescador',
     date: '15 Mai 2024',
-    image: '/placeholder.svg',
+    image: dicasDePesca,
     category: 'Técnicas'
   },
   {
     id: '2',
-    title: 'Calendário Lunar da Pesca: Maio 2024',
+    title: 'Calendário Lunar da Pesca: Agosto 2024',
     excerpt: 'Confira as melhores fases da lua para pescar neste mês e maximize suas chances de uma pescaria de sucesso no Rio São Francisco.',
     author: 'Maria Santos',
-    date: '12 Mai 2024',
-    image: '/placeholder.svg',
+    date: '12 Ago 2024',
+    image: fasesLua,
     category: 'Lunar'
   },
   {
     id: '3',
-    title: 'Represa de Três Marias: Condições Atuais',
-    excerpt: 'Relatório completo sobre o nível da represa, qualidade da água e previsões para os próximos dias de pesca.',
-    author: 'Pedro Análise',
-    date: '10 Mai 2024',
-    image: '/placeholder.svg',
-    category: 'Represa'
-  },
-  {
-    id: '4',
     title: 'Espécies de Peixes: Dourado do São Francisco',
     excerpt: 'Conheça tudo sobre o dourado, o rei dos peixes do São Francisco, seus hábitos, melhores iscas e locais para encontrá-lo.',
     author: 'Ana Bióloga',
-    date: '8 Mai 2024',
-    image: '/placeholder.svg',
+    date: '8 Ago 2024',
+    image: douradoGigante,
     category: 'Espécies'
   },
   {
-    id: '5',
+    id: '4',
     title: 'Regulamentação da Pesca em 2024',
     excerpt: 'Fique por dentro das novas regras de pesca, períodos de defeso e licenças necessárias para pescar no Rio São Francisco.',
     author: 'Roberto Legal',
-    date: '5 Mai 2024',
-    image: '/placeholder.svg',
+    date: '5 Ago 2024',
+    image: regulamentacaoPesca,
     category: 'Regulamentação'
   }
 ];
