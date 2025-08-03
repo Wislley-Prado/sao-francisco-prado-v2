@@ -45,7 +45,9 @@ const PackageCard = ({ pkg }: PackageCardProps) => {
             src={pkg.image} 
             alt={pkg.title}
             className="w-full h-full object-cover"
+            loading="lazy"
             onError={(e) => {
+              console.log('Erro ao carregar imagem:', pkg.image);
               e.currentTarget.style.display = 'none';
               e.currentTarget.parentElement!.classList.add('bg-gradient-to-br', 'from-rio-blue', 'to-water-green');
             }}
