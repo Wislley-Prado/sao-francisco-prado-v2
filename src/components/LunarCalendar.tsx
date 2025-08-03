@@ -96,12 +96,44 @@ const LunarCalendar = () => {
     <section className="py-16 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-8 items-start">
+          {/* TODAY'S MOON - Destaque */}
+          <Card className="shadow-xl border-0 overflow-hidden bg-gradient-to-r from-blue-600 to-purple-600 text-white mb-6">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-xl font-bold flex items-center">
+                <Moon className="mr-3 h-6 w-6" />
+                Lua de Hoje - {new Date().toLocaleDateString('pt-BR', { 
+                  weekday: 'long',
+                  day: 'numeric', 
+                  month: 'long', 
+                  year: 'numeric' 
+                }).replace(/^\w/, (c) => c.toUpperCase())}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0 pb-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  {getCurrentMoonIcon(lunarData.currentPhase.phase, lunarData.currentPhase.illumination)}
+                  <div>
+                    <h3 className="text-2xl font-bold">Lua {lunarData.currentPhase.phase}</h3>
+                    <p className="text-blue-100">{lunarData.currentPhase.illumination}% iluminada</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <Badge className="bg-white text-blue-700 text-lg px-4 py-2">
+                    {lunarData.currentPhase.phase === 'Crescente Gibosa' ? 'Regular' : 'Boa'}
+                  </Badge>
+                  <p className="text-blue-100 text-sm mt-1">condição para pesca</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Lunar Calendar */}
           <Card className="shadow-xl border-0 overflow-hidden bg-white">
             <CardHeader className="bg-white border-b border-gray-100 pb-6">
               <CardTitle className="text-xl font-bold text-gray-800 flex items-center">
                 <Moon className="mr-3 h-5 w-5 text-blue-600" />
-                Calendário Lunar - {new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }).replace(/^\w/, (c) => c.toUpperCase())}
+                Próximas Fases Lunares
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 bg-white">
