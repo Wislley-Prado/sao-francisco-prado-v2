@@ -315,7 +315,8 @@ const PackageOffer = () => {
         "Faxina final inclusa",
         "Roupa de cama e banho",
         "Muita pescaria",
-        "Assistência 24h"
+        "Assistência 24h",
+        "🎉 BÔNUS: Churrasco de cortesia com os amigos da boa pesca!"
       ]
     }
   ];
@@ -495,6 +496,122 @@ const PackageOffer = () => {
             {packageFeatures.map((feature, index) => (
               <FeatureCard key={index} feature={feature} index={index} />
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Bonus Section */}
+      <section className="py-8 sm:py-12 lg:py-16 bg-gradient-to-br from-sunset-orange to-orange-600 text-white overflow-hidden relative">
+        {/* Background decorative elements */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl transform translate-x-32 -translate-y-32"></div>
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full blur-3xl transform -translate-x-24 translate-y-24"></div>
+        
+        <div className="max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-8 sm:mb-12">
+            <div className="inline-flex items-center justify-center mb-4">
+              <div className="bg-white/20 p-3 rounded-full">
+                <Sparkles className="h-8 w-8 text-white" />
+              </div>
+            </div>
+            <Badge className="bg-white/20 text-white border-white/30 mb-4 text-sm sm:text-base px-4 py-2">
+              BÔNUS EXCLUSIVO INCLUÍDO
+            </Badge>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6">
+              🔥 CHURRASCO DE CORTESIA 🔥
+            </h2>
+            <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-semibold mb-6 sm:mb-8 opacity-90">
+              Encontro Especial com os Amigos da Boa Pesca!
+            </h3>
+          </div>
+
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 sm:p-8 lg:p-10 border border-white/20">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <h4 className="text-xl sm:text-2xl font-bold flex items-center">
+                    <Utensils className="h-6 w-6 mr-3" />
+                    Uma Experiência Inesquecível
+                  </h4>
+                  <p className="text-base sm:text-lg opacity-90 leading-relaxed">
+                    Prepare-se para muito mais que uma simples pescaria! Como um presente especial do Prado, você e seu grupo serão convidados para um delicioso <strong>churrasco de cortesia</strong> que vai marcar sua jornada para sempre.
+                  </p>
+                </div>
+
+                <div className="space-y-4">
+                  <h4 className="text-lg sm:text-xl font-bold flex items-center">
+                    <Users className="h-5 w-5 mr-3" />
+                    Conheca os Colaboradores
+                  </h4>
+                  <p className="text-sm sm:text-base opacity-90 leading-relaxed">
+                    Este é o momento perfeito para conhecer pessoalmente toda a equipe que torna sua experiência especial: nossos <strong>guias experientes</strong>, a <strong>cozinheira dedicada</strong> e todos os <strong>amigos da boa pesca</strong> que estarão na sua jornada.
+                  </p>
+                </div>
+
+                <div className="bg-white/20 rounded-xl p-4 sm:p-6">
+                  <h5 className="font-bold text-lg mb-3 flex items-center">
+                    <Star className="h-5 w-5 mr-2" />
+                    O que esperar:
+                  </h5>
+                  <ul className="space-y-2 text-sm sm:text-base">
+                    <li className="flex items-start">
+                      <CheckCircle className="h-4 w-4 mr-2 mt-1 flex-shrink-0" />
+                      <span>Churrasco caprichado com carnes selecionadas</span>
+                    </li>
+                    <li className="flex items-start">
+                      <CheckCircle className="h-4 w-4 mr-2 mt-1 flex-shrink-0" />
+                      <span>Ambiente descontraído para trocar experiências</span>
+                    </li>
+                    <li className="flex items-start">
+                      <CheckCircle className="h-4 w-4 mr-2 mt-1 flex-shrink-0" />
+                      <span>Histórias de pesca dos veteranos da região</span>
+                    </li>
+                    <li className="flex items-start">
+                      <CheckCircle className="h-4 w-4 mr-2 mt-1 flex-shrink-0" />
+                      <span>Dicas exclusivas dos pontos secretos de pesca</span>
+                    </li>
+                    <li className="flex items-start">
+                      <CheckCircle className="h-4 w-4 mr-2 mt-1 flex-shrink-0" />
+                      <span>Camaradagem que só a paixão pela pesca proporciona</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                <div className="bg-white/20 rounded-xl p-6 text-center">
+                  <div className="text-6xl sm:text-7xl mb-4">🍖</div>
+                  <h4 className="text-xl font-bold mb-2">100% Gratuito</h4>
+                  <p className="text-sm opacity-90">Não paga nada a mais por isso!</p>
+                </div>
+
+                <div className="bg-white/20 rounded-xl p-6 text-center">
+                  <div className="text-6xl sm:text-7xl mb-4">👥</div>
+                  <h4 className="text-xl font-bold mb-2">Networking Pesqueiro</h4>
+                  <p className="text-sm opacity-90">Faça amigos que compartilham sua paixão</p>
+                </div>
+
+                <div className="bg-white/20 rounded-xl p-6 text-center">
+                  <div className="text-6xl sm:text-7xl mb-4">🎯</div>
+                  <h4 className="text-xl font-bold mb-2">Dicas Exclusivas</h4>
+                  <p className="text-sm opacity-90">Aprenda com quem conhece cada pedra do rio</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 sm:mt-10 text-center">
+              <div className="bg-white/20 rounded-xl p-6 sm:p-8">
+                <h4 className="text-xl sm:text-2xl font-bold mb-4 flex items-center justify-center">
+                  <Sparkles className="h-6 w-6 mr-3" />
+                  Valor Agregado Imensurável
+                </h4>
+                <p className="text-base sm:text-lg opacity-90 mb-4">
+                  Este bônus vai muito além da comida. É a oportunidade de criar <strong>memórias genuínas</strong>, conhecer <strong>histórias incríveis</strong> e fazer parte da <strong>família Prado Aqui</strong>. 
+                </p>
+                <p className="text-sm sm:text-base font-semibold bg-white/30 inline-block px-4 py-2 rounded-lg">
+                  ✨ Experiência que não tem preço, mas está inclusa no seu pacote! ✨
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
