@@ -8,18 +8,18 @@ const PackagesSection = () => {
     {
       id: 1,
       title: 'PACOTE VIP EXCLUSIVO – "Pesca e prosa Boa"',
-      description: "📍 Rancho Prado – Aldeia - Para 6 pescadores com exclusividade total do rancho",
+      description: "Rancho Prado – Aldeia - Para 6 pescadores com exclusividade total do rancho",
       price: "10 X R$147,97",
       duration: "5 dias / 4 noites",
       people: "6 pescadores",
       rating: 4.8,
       features: [
-        "🗓️ De quarta a domingo",
+        "De quarta a domingo",
         "Rancho inteiro reservado só pro grupo",
         "Exclusividade total do rancho",
         "Vista pro lago, sossego absoluto"
       ],
-      image: "src/assets/rancho-prado-pescador-feliz.jpg",
+      image: "/src/assets/rancho-prado-pescador-feliz.jpg",
       popular: true
     },
     {
@@ -38,7 +38,7 @@ const PackagesSection = () => {
         "Barco privativo",
         "Seguro incluso"
       ],
-      image: "/api/placeholder/400/250",
+      image: "/src/assets/gallery/dourado-gigante-sao-francisco.jpg",
       popular: true
     },
     {
@@ -57,7 +57,7 @@ const PackagesSection = () => {
         "Barco exclusivo",
         "Transfer incluso"
       ],
-      image: "/api/placeholder/400/250",
+      image: "/src/assets/gallery/rancho-prado-aldeia.jpg",
       popular: false
     }
   ];
