@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
-import { Clock, Users, MapPin, Star, Calendar, CheckCircle, Phone, CreditCard, Banknote, Percent, HelpCircle, Home, ChefHat, Fish, Sparkles, FileText, MessageCircle, Expand, X, Utensils, Shield } from 'lucide-react';
+import { Clock, Users, MapPin, Star, Calendar, CheckCircle, Phone, CreditCard, Banknote, Percent, HelpCircle, Home, ChefHat, Fish, Sparkles, FileText, MessageCircle, Expand, X, Utensils, Shield, PartyPopper, Flame, Target, Gift } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ranchoPradoImage from '@/assets/rancho-prado-pescador-feliz.jpg';
 import ranchoPradoAldeia from '@/assets/gallery/rancho-prado-aldeia.jpg';
@@ -316,7 +316,7 @@ const PackageOffer = () => {
         "Roupa de cama e banho",
         "Muita pescaria",
         "Assistência 24h",
-        "🎉 BÔNUS: Churrasco de cortesia com os amigos da boa pesca!"
+        "BÔNUS: Churrasco de cortesia com os amigos da boa pesca!"
       ]
     }
   ];
@@ -516,8 +516,10 @@ const PackageOffer = () => {
             <Badge className="bg-white/20 text-white border-white/30 mb-4 text-sm sm:text-base px-4 py-2">
               BÔNUS EXCLUSIVO INCLUÍDO
             </Badge>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6">
-              🔥 CHURRASCO DE CORTESIA 🔥
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 flex items-center justify-center gap-3">
+              <Flame className="h-8 w-8 sm:h-10 sm:w-10" />
+              CHURRASCO DE CORTESIA
+              <Flame className="h-8 w-8 sm:h-10 sm:w-10" />
             </h2>
             <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-semibold mb-6 sm:mb-8 opacity-90">
               Encontro Especial com os Amigos da Boa Pesca!
@@ -579,19 +581,31 @@ const PackageOffer = () => {
 
               <div className="space-y-6">
                 <div className="bg-white/20 rounded-xl p-6 text-center">
-                  <div className="text-6xl sm:text-7xl mb-4">🍖</div>
+                  <div className="flex justify-center mb-4">
+                    <div className="bg-white/20 p-4 rounded-full">
+                      <Utensils className="h-12 w-12 sm:h-16 sm:w-16" />
+                    </div>
+                  </div>
                   <h4 className="text-xl font-bold mb-2">100% Gratuito</h4>
                   <p className="text-sm opacity-90">Não paga nada a mais por isso!</p>
                 </div>
 
                 <div className="bg-white/20 rounded-xl p-6 text-center">
-                  <div className="text-6xl sm:text-7xl mb-4">👥</div>
+                  <div className="flex justify-center mb-4">
+                    <div className="bg-white/20 p-4 rounded-full">
+                      <Users className="h-12 w-12 sm:h-16 sm:w-16" />
+                    </div>
+                  </div>
                   <h4 className="text-xl font-bold mb-2">Networking Pesqueiro</h4>
                   <p className="text-sm opacity-90">Faça amigos que compartilham sua paixão</p>
                 </div>
 
                 <div className="bg-white/20 rounded-xl p-6 text-center">
-                  <div className="text-6xl sm:text-7xl mb-4">🎯</div>
+                  <div className="flex justify-center mb-4">
+                    <div className="bg-white/20 p-4 rounded-full">
+                      <Target className="h-12 w-12 sm:h-16 sm:w-16" />
+                    </div>
+                  </div>
                   <h4 className="text-xl font-bold mb-2">Dicas Exclusivas</h4>
                   <p className="text-sm opacity-90">Aprenda com quem conhece cada pedra do rio</p>
                 </div>
@@ -607,9 +621,11 @@ const PackageOffer = () => {
                 <p className="text-base sm:text-lg opacity-90 mb-4">
                   Este bônus vai muito além da comida. É a oportunidade de criar <strong>memórias genuínas</strong>, conhecer <strong>histórias incríveis</strong> e fazer parte da <strong>família Prado Aqui</strong>. 
                 </p>
-                <p className="text-sm sm:text-base font-semibold bg-white/30 inline-block px-4 py-2 rounded-lg">
-                  ✨ Experiência que não tem preço, mas está inclusa no seu pacote! ✨
-                </p>
+                <div className="flex items-center justify-center gap-2 text-sm sm:text-base font-semibold bg-white/30 inline-block px-4 py-2 rounded-lg">
+                  <Sparkles className="h-4 w-4" />
+                  <span>Experiência que não tem preço, mas está inclusa no seu pacote!</span>
+                  <Sparkles className="h-4 w-4" />
+                </div>
               </div>
             </div>
           </div>
