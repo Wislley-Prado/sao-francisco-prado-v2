@@ -3,12 +3,15 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Play, Calendar, MapPin, Waves } from 'lucide-react';
 import { useWeatherData } from '@/hooks/useWeatherData';
+import { useDamData } from '@/hooks/useDamData';
 
 const HeroSection = () => {
   const { data: weatherData } = useWeatherData();
+  const { data: damData } = useDamData();
 
   const temperature = weatherData?.current.temperature || 24;
-  const damLevel = 86;
+  const damLevel = damData?.volume_util_percentual ? 
+    parseFloat(damData.volume_util_percentual).toFixed(1) : '86.0';
   const windSpeed = weatherData?.current.wind_speed || 12;
   const conditions = weatherData?.current.weather_description || 'Excelente';
 
