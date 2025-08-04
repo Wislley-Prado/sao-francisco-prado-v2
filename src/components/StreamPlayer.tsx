@@ -21,7 +21,7 @@ const StreamPlayer = () => {
       {/* YouTube Live Stream */}
       <iframe
         className="w-full h-full"
-        src="https://www.youtube.com/embed/gRDmQvFc6R0?autoplay=1&mute=1&controls=1&rel=0&modestbranding=1&showinfo=0&enablejsapi=1"
+        src="https://www.youtube.com/embed/NDBXEZhyges?autoplay=1&mute=1&controls=1&rel=0&modestbranding=1&showinfo=0&enablejsapi=1"
         title="Rio São Francisco - Transmissão ao Vivo"
         frameBorder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
