@@ -108,7 +108,7 @@ const HeroSection = () => {
                   {/* Live Stream */}
                   <div className="aspect-video bg-black rounded-lg overflow-hidden relative">
                     <iframe
-                      src="https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&modestbranding=1&loop=1&playlist=jfKfPfyJRdk"
+                      src="https://www.youtube.com/embed/gRDmQvFc6R0?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&modestbranding=1"
                       title="Rio São Francisco - Transmissão Ao Vivo"
                       className="w-full h-full"
                       frameBorder="0"
