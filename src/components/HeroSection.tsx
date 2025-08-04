@@ -105,13 +105,29 @@ const HeroSection = () => {
                     </div>
                   </div>
                   
-                  {/* Live Stream Placeholder */}
-                  <div className="aspect-video bg-black bg-opacity-40 rounded-lg flex items-center justify-center">
-                    <div className="text-center text-white">
-                      <Play className="h-12 w-12 sm:h-16 sm:w-16 mx-auto mb-4 opacity-80" />
-                      <p className="text-base sm:text-lg font-medium">Transmissão do Rio São Francisco</p>
-                      <p className="text-xs sm:text-sm opacity-80">Condições atuais da pesca</p>
-                    </div>
+                  {/* Live Stream */}
+                  <div className="aspect-video bg-black rounded-lg overflow-hidden relative">
+                    <iframe
+                      src="https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&modestbranding=1&loop=1&playlist=jfKfPfyJRdk"
+                      title="Rio São Francisco - Transmissão Ao Vivo"
+                      className="w-full h-full"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                  
+                  {/* Button to Full Stream */}
+                  <div className="mt-4">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="w-full bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white"
+                      onClick={() => window.location.href = '/live'}
+                    >
+                      <Play className="mr-2 h-4 w-4" />
+                      Ver Transmissão Completa
+                    </Button>
                   </div>
 
                   {/* Live Info */}
