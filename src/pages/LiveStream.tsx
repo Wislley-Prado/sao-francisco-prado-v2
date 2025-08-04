@@ -11,20 +11,14 @@ import { ArrowLeft, Radio, Waves, Info, Settings } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useWeatherData } from '@/hooks/useWeatherData';
 import { useDamData } from '@/hooks/useDamData';
+import { getVisibilityText } from '@/utils/weatherUtils';
 
 const LiveStream = () => {
   const { data: weatherData, isLoading: weatherLoading } = useWeatherData();
   const { data: damData, isLoading: damLoading } = useDamData();
 
-  const getVisibilityText = (visibility: number): string => {
-    if (visibility >= 8000) return 'Excelente';
-    if (visibility >= 5000) return 'Boa';
-    if (visibility >= 2000) return 'Regular';
-    return 'Ruim';
-  };
-
   const currentTemp = weatherData?.current?.temperature ? Math.round(weatherData.current.temperature) : '--';
-  const currentWind = weatherData?.current?.wind_speed ? Math.round(weatherData.current.wind_speed * 3.6) : '--';
+  const currentWind = weatherData?.current?.wind_speed ? Math.round(weatherData.current.wind_speed) : '--';
   const currentVisibility = weatherData?.current?.visibility ? getVisibilityText(weatherData.current.visibility) : '--';
   const damLevel = damData?.volume_util_percentual ? parseFloat(damData.volume_util_percentual).toFixed(0) : '--';
 

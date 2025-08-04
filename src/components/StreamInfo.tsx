@@ -3,9 +3,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Thermometer, Wind, Eye, Droplets, Clock, TrendingUp } from 'lucide-react';
 import { useWeatherData } from '@/hooks/useWeatherData';
+import { useDamData } from '@/hooks/useDamData';
+import { getVisibilityText, getVisibilityColor } from '@/utils/weatherUtils';
 
 const StreamInfo = () => {
   const { data: weatherData } = useWeatherData();
+  const { data: damData } = useDamData();
   
   const currentTime = new Date().toLocaleTimeString('pt-BR', { 
     hour: '2-digit', 
@@ -17,19 +20,6 @@ const StreamInfo = () => {
   const humidity = weatherData?.current.humidity || 78;
   const visibility = weatherData?.current.visibility || 10;
 
-  const getVisibilityText = (visibility: number) => {
-    if (visibility >= 10) return 'Excelente';
-    if (visibility >= 5) return 'Boa';
-    if (visibility >= 2) return 'Regular';
-    return 'Ruim';
-  };
-
-  const getVisibilityColor = (visibility: number) => {
-    if (visibility >= 10) return 'bg-green-100 text-green-800';
-    if (visibility >= 5) return 'bg-blue-100 text-blue-800';
-    if (visibility >= 2) return 'bg-yellow-100 text-yellow-800';
-    return 'bg-red-100 text-red-800';
-  };
 
   return (
     <div className="space-y-4">
@@ -99,7 +89,9 @@ const StreamInfo = () => {
           </div>
           <div className="flex justify-between items-center">
             <span className="text-xs sm:text-sm text-gray-600">Nível da Água</span>
-            <span className="font-medium text-sm sm:text-base">85% Normal</span>
+            <span className="font-medium text-sm sm:text-base">
+              {damData?.volume_util_percentual ? `${parseFloat(damData.volume_util_percentual).toFixed(0)}%` : '--'}
+            </span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-xs sm:text-sm text-gray-600">Corrente</span>
