@@ -1,164 +1,63 @@
-
 import React from 'react';
-import StreamPlayer from './StreamPlayer';
-import StreamInfo from './StreamInfo';
-import StreamControls from './StreamControls';
-import ChatBox from './ChatBox';
-import StreamStats from './StreamStats';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Waves, Radio, MessageCircle, BarChart3 } from 'lucide-react';
-import { useWeatherData } from '@/hooks/useWeatherData';
-import { useDamData } from '@/hooks/useDamData';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Radio, Play } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const LiveStreamSection = () => {
-  const { data: weatherData, isLoading: weatherLoading } = useWeatherData();
-  const { data: damData, isLoading: damLoading } = useDamData();
-
-  const getVisibilityText = (visibility: number): string => {
-    if (visibility >= 8000) return 'Excelente';
-    if (visibility >= 5000) return 'Boa';
-    if (visibility >= 2000) return 'Regular';
-    return 'Ruim';
-  };
-
-  const currentTemp = weatherData?.current?.temperature ? Math.round(weatherData.current.temperature) : '--';
-  const currentWind = weatherData?.current?.wind_speed ? Math.round(weatherData.current.wind_speed * 3.6) : '--';
-  const currentVisibility = weatherData?.current?.visibility ? getVisibilityText(weatherData.current.visibility) : '--';
-  const damLevel = damData?.volume_util_percentual ? parseFloat(damData.volume_util_percentual).toFixed(0) : '--';
-
   return (
-    <section id="live" className="py-16 bg-gradient-to-br from-rio-blue/5 to-water-green/5">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
+    <section className="py-20 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-gray-900 dark:to-blue-950">
+      <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <div className="flex items-center justify-center mb-4">
-            <Radio className="h-8 w-8 text-rio-blue mr-3 animate-pulse" />
-            <Badge className="bg-red-500 text-white animate-pulse">
-              AO VIVO
-            </Badge>
-          </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
             Transmissão ao Vivo
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Acompanhe as condições do Rio São Francisco em tempo real. 
-            Veja como está o movimento dos peixes e planeje sua pescaria.
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Acompanhe as condições do Rio São Francisco em tempo real
           </p>
         </div>
 
-        {/* Main Content */}
-        <div className="grid lg:grid-cols-4 gap-8">
-          {/* Video Player - Takes more space */}
-          <div className="lg:col-span-3">
-            <Card className="overflow-hidden">
-              <CardContent className="p-0">
-                <StreamPlayer />
-                <div className="p-4">
-                  <StreamControls />
+        <div className="max-w-4xl mx-auto">
+          <Card className="overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white">
+              <CardTitle className="flex items-center justify-center">
+                <Radio className="h-5 w-5 mr-2 animate-pulse" />
+                Rio São Francisco - Ao Vivo
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="relative bg-black aspect-video">
+                <iframe
+                  className="w-full h-full"
+                  src="https://www.youtube.com/embed/gRDmQvFc6R0?autoplay=0&mute=0&controls=1&rel=0&modestbranding=1&showinfo=0"
+                  title="Rio São Francisco - Transmissão ao Vivo"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                />
+                
+                {/* Live Badge */}
+                <div className="absolute top-4 left-4 z-20">
+                  <div className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center">
+                    <div className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></div>
+                    AO VIVO
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Side Panel */}
-          <div className="lg:col-span-1">
-            {/* Mobile Tabs */}
-            <div className="lg:hidden">
-              <Tabs defaultValue="conditions" className="w-full">
-                <TabsList className="grid w-full grid-cols-4">
-                  <TabsTrigger value="conditions" className="text-xs">
-                    <Waves className="h-4 w-4" />
-                  </TabsTrigger>
-                  <TabsTrigger value="chat" className="text-xs">
-                    <MessageCircle className="h-4 w-4" />
-                  </TabsTrigger>
-                  <TabsTrigger value="stats" className="text-xs">
-                    <BarChart3 className="h-4 w-4" />
-                  </TabsTrigger>
-                  <TabsTrigger value="info" className="text-xs">
-                    Info
-                  </TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="conditions" className="mt-4">
-                  <Card>
-                    <CardContent className="p-4">
-                      <h3 className="text-lg font-semibold mb-4 flex items-center">
-                        <Waves className="h-5 w-5 text-rio-blue mr-2" />
-                        Condições Atuais
-                      </h3>
-                       <div className="grid grid-cols-2 gap-3">
-                        <div className="text-center p-3 bg-blue-50 rounded-lg">
-                          <div className="text-xl font-bold text-rio-blue">{currentTemp}°C</div>
-                          <div className="text-sm text-gray-600">Temperatura</div>
-                        </div>
-                        <div className="text-center p-3 bg-green-50 rounded-lg">
-                          <div className="text-xl font-bold text-water-green">{currentVisibility}</div>
-                          <div className="text-sm text-gray-600">Visibilidade</div>
-                        </div>
-                        <div className="text-center p-3 bg-orange-50 rounded-lg">
-                          <div className="text-xl font-bold text-sunset-orange">{currentWind} km/h</div>
-                          <div className="text-sm text-gray-600">Vento</div>
-                        </div>
-                        <div className="text-center p-3 bg-blue-50 rounded-lg">
-                          <div className="text-xl font-bold text-rio-blue">{damLevel}%</div>
-                          <div className="text-sm text-gray-600">Nível</div>
-                        </div>
-                       </div>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-                
-                <TabsContent value="chat" className="mt-4">
-                  <ChatBox />
-                </TabsContent>
-                
-                <TabsContent value="stats" className="mt-4">
-                  <StreamStats />
-                </TabsContent>
-                
-                <TabsContent value="info" className="mt-4">
-                  <StreamInfo />
-                </TabsContent>
-              </Tabs>
-            </div>
-
-            {/* Desktop Layout */}
-            <div className="hidden lg:block space-y-6">
-              <StreamStats />
-              <ChatBox />
+              </div>
               
-              {/* Quick Conditions */}
-              <Card>
-                <CardContent className="p-6">
-                  <h3 className="text-lg font-semibold mb-4 flex items-center">
-                    <Waves className="h-5 w-5 text-rio-blue mr-2" />
-                    Condições Atuais
-                  </h3>
-                   <div className="grid grid-cols-1 gap-3">
-                    <div className="flex justify-between items-center p-2 bg-blue-50 rounded">
-                      <span className="text-sm">Temperatura</span>
-                      <span className="font-bold text-rio-blue">{currentTemp}°C</span>
-                    </div>
-                    <div className="flex justify-between items-center p-2 bg-green-50 rounded">
-                      <span className="text-sm">Visibilidade</span>
-                      <span className="font-bold text-water-green">{currentVisibility}</span>
-                    </div>
-                    <div className="flex justify-between items-center p-2 bg-orange-50 rounded">
-                      <span className="text-sm">Vento</span>
-                      <span className="font-bold text-sunset-orange">{currentWind} km/h</span>
-                    </div>
-                    <div className="flex justify-between items-center p-2 bg-blue-50 rounded">
-                      <span className="text-sm">Nível</span>
-                      <span className="font-bold text-rio-blue">{damLevel}%</span>
-                    </div>
-                   </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
+              <div className="p-6 text-center">
+                <p className="text-muted-foreground mb-4">
+                  Veja as condições do rio, pescarias em tempo real e muito mais!
+                </p>
+                <Link to="/live">
+                  <Button size="lg" className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700">
+                    <Play className="h-5 w-5 mr-2" />
+                    Ver Transmissão Completa
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </section>
