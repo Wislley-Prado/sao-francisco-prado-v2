@@ -127,12 +127,38 @@ const StreamPlayer = () => {
       {/* YouTube Live Stream */}
       <iframe
         className="w-full h-full"
-        src="https://www.youtube.com/embed/gRDmQvFc6R0?autoplay=1&mute=0&controls=1&rel=0&modestbranding=1&showinfo=0"
+        src="https://www.youtube.com/embed/gRDmQvFc6R0"
         title="Rio São Francisco - Transmissão ao Vivo"
         frameBorder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
         allowFullScreen
+        onError={(e) => {
+          console.log('Erro no iframe YouTube:', e);
+          setIsLoading(false);
+        }}
+        onLoad={() => {
+          console.log('YouTube iframe carregado');
+          setIsLoading(false);
+        }}
       />
+
+      {/* Fallback: Link direto para o YouTube */}
+      <div className="absolute inset-0 flex items-center justify-center z-30 pointer-events-none">
+        <div className="text-center text-white bg-black/50 p-6 rounded-lg pointer-events-auto">
+          <Radio className="h-12 w-12 mx-auto mb-4 animate-pulse" />
+          <h3 className="text-lg font-semibold mb-2">Transmissão ao Vivo</h3>
+          <p className="text-sm mb-4">Rio São Francisco</p>
+          <a 
+            href="https://www.youtube.com/live/gRDmQvFc6R0" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+          >
+            <Play className="h-4 w-4 mr-2" />
+            Assistir no YouTube
+          </a>
+        </div>
+      </div>
 
       {/* Live Badge */}
       <div className="absolute top-4 left-4 z-20">
