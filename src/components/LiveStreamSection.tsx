@@ -29,7 +29,7 @@ const LiveStreamSection = () => {
               <div className="relative bg-black aspect-video">
                 <iframe
                   className="w-full h-full"
-                  src="https://www.youtube.com/embed/gRDmQvFc6R0?autoplay=0&mute=0&controls=1&rel=0&modestbranding=1&showinfo=0"
+                  src="https://www.youtube.com/embed/gRDmQvFc6R0?autoplay=1&mute=1&controls=1&rel=0&modestbranding=1&showinfo=0&enablejsapi=1"
                   title="Rio São Francisco - Transmissão ao Vivo"
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
