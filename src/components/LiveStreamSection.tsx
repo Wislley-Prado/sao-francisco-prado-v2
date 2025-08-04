@@ -9,8 +9,25 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Waves, Radio, MessageCircle, BarChart3 } from 'lucide-react';
+import { useWeatherData } from '@/hooks/useWeatherData';
+import { useDamData } from '@/hooks/useDamData';
 
 const LiveStreamSection = () => {
+  const { data: weatherData, isLoading: weatherLoading } = useWeatherData();
+  const { data: damData, isLoading: damLoading } = useDamData();
+
+  const getVisibilityText = (visibility: number): string => {
+    if (visibility >= 8000) return 'Excelente';
+    if (visibility >= 5000) return 'Boa';
+    if (visibility >= 2000) return 'Regular';
+    return 'Ruim';
+  };
+
+  const currentTemp = weatherData?.current?.temperature ? Math.round(weatherData.current.temperature) : '--';
+  const currentWind = weatherData?.current?.wind_speed ? Math.round(weatherData.current.wind_speed * 3.6) : '--';
+  const currentVisibility = weatherData?.current?.visibility ? getVisibilityText(weatherData.current.visibility) : '--';
+  const damLevel = damData?.volume_util_percentual ? parseFloat(damData.volume_util_percentual).toFixed(0) : '--';
+
   return (
     <section id="live" className="py-16 bg-gradient-to-br from-rio-blue/5 to-water-green/5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -72,24 +89,24 @@ const LiveStreamSection = () => {
                         <Waves className="h-5 w-5 text-rio-blue mr-2" />
                         Condições Atuais
                       </h3>
-                      <div className="grid grid-cols-2 gap-3">
+                       <div className="grid grid-cols-2 gap-3">
                         <div className="text-center p-3 bg-blue-50 rounded-lg">
-                          <div className="text-xl font-bold text-rio-blue">23°C</div>
+                          <div className="text-xl font-bold text-rio-blue">{currentTemp}°C</div>
                           <div className="text-sm text-gray-600">Temperatura</div>
                         </div>
                         <div className="text-center p-3 bg-green-50 rounded-lg">
-                          <div className="text-xl font-bold text-water-green">Boa</div>
+                          <div className="text-xl font-bold text-water-green">{currentVisibility}</div>
                           <div className="text-sm text-gray-600">Visibilidade</div>
                         </div>
                         <div className="text-center p-3 bg-orange-50 rounded-lg">
-                          <div className="text-xl font-bold text-sunset-orange">5 km/h</div>
+                          <div className="text-xl font-bold text-sunset-orange">{currentWind} km/h</div>
                           <div className="text-sm text-gray-600">Vento</div>
                         </div>
                         <div className="text-center p-3 bg-blue-50 rounded-lg">
-                          <div className="text-xl font-bold text-rio-blue">85%</div>
+                          <div className="text-xl font-bold text-rio-blue">{damLevel}%</div>
                           <div className="text-sm text-gray-600">Nível</div>
                         </div>
-                      </div>
+                       </div>
                     </CardContent>
                   </Card>
                 </TabsContent>
@@ -120,24 +137,24 @@ const LiveStreamSection = () => {
                     <Waves className="h-5 w-5 text-rio-blue mr-2" />
                     Condições Atuais
                   </h3>
-                  <div className="grid grid-cols-1 gap-3">
+                   <div className="grid grid-cols-1 gap-3">
                     <div className="flex justify-between items-center p-2 bg-blue-50 rounded">
                       <span className="text-sm">Temperatura</span>
-                      <span className="font-bold text-rio-blue">23°C</span>
+                      <span className="font-bold text-rio-blue">{currentTemp}°C</span>
                     </div>
                     <div className="flex justify-between items-center p-2 bg-green-50 rounded">
                       <span className="text-sm">Visibilidade</span>
-                      <span className="font-bold text-water-green">Boa</span>
+                      <span className="font-bold text-water-green">{currentVisibility}</span>
                     </div>
                     <div className="flex justify-between items-center p-2 bg-orange-50 rounded">
                       <span className="text-sm">Vento</span>
-                      <span className="font-bold text-sunset-orange">5 km/h</span>
+                      <span className="font-bold text-sunset-orange">{currentWind} km/h</span>
                     </div>
                     <div className="flex justify-between items-center p-2 bg-blue-50 rounded">
                       <span className="text-sm">Nível</span>
-                      <span className="font-bold text-rio-blue">85%</span>
+                      <span className="font-bold text-rio-blue">{damLevel}%</span>
                     </div>
-                  </div>
+                   </div>
                 </CardContent>
               </Card>
             </div>

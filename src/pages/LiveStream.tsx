@@ -9,8 +9,25 @@ import StreamInfo from '@/components/StreamInfo';
 import StreamControls from '@/components/StreamControls';
 import { ArrowLeft, Radio, Waves, Info, Settings } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useWeatherData } from '@/hooks/useWeatherData';
+import { useDamData } from '@/hooks/useDamData';
 
 const LiveStream = () => {
+  const { data: weatherData, isLoading: weatherLoading } = useWeatherData();
+  const { data: damData, isLoading: damLoading } = useDamData();
+
+  const getVisibilityText = (visibility: number): string => {
+    if (visibility >= 8000) return 'Excelente';
+    if (visibility >= 5000) return 'Boa';
+    if (visibility >= 2000) return 'Regular';
+    return 'Ruim';
+  };
+
+  const currentTemp = weatherData?.current?.temperature ? Math.round(weatherData.current.temperature) : '--';
+  const currentWind = weatherData?.current?.wind_speed ? Math.round(weatherData.current.wind_speed * 3.6) : '--';
+  const currentVisibility = weatherData?.current?.visibility ? getVisibilityText(weatherData.current.visibility) : '--';
+  const damLevel = damData?.volume_util_percentual ? parseFloat(damData.volume_util_percentual).toFixed(0) : '--';
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-rio-blue/5 to-water-green/5">
       {/* Header Compacto */}
@@ -74,19 +91,19 @@ const LiveStream = () => {
                   <h3 className="text-lg font-semibold mb-4">Condições Atuais do Rio</h3>
                   <div className="grid grid-cols-2 gap-3">
                     <div className="text-center p-3 bg-blue-50 rounded-lg">
-                      <div className="text-xl font-bold text-rio-blue">23°C</div>
+                      <div className="text-xl font-bold text-rio-blue">{currentTemp}°C</div>
                       <div className="text-sm text-gray-600">Temperatura</div>
                     </div>
                     <div className="text-center p-3 bg-green-50 rounded-lg">
-                      <div className="text-xl font-bold text-water-green">Boa</div>
+                      <div className="text-xl font-bold text-water-green">{currentVisibility}</div>
                       <div className="text-sm text-gray-600">Visibilidade</div>
                     </div>
                     <div className="text-center p-3 bg-orange-50 rounded-lg">
-                      <div className="text-xl font-bold text-sunset-orange">5 km/h</div>
+                      <div className="text-xl font-bold text-sunset-orange">{currentWind} km/h</div>
                       <div className="text-sm text-gray-600">Vento</div>
                     </div>
                     <div className="text-center p-3 bg-blue-50 rounded-lg">
-                      <div className="text-xl font-bold text-rio-blue">85%</div>
+                      <div className="text-xl font-bold text-rio-blue">{damLevel}%</div>
                       <div className="text-sm text-gray-600">Nível</div>
                     </div>
                   </div>
@@ -143,19 +160,19 @@ const LiveStream = () => {
                 </h3>
                 <div className="grid grid-cols-4 gap-4">
                   <div className="text-center p-3 bg-blue-50 rounded-lg">
-                    <div className="text-2xl font-bold text-rio-blue">23°C</div>
+                    <div className="text-2xl font-bold text-rio-blue">{currentTemp}°C</div>
                     <div className="text-sm text-gray-600">Temperatura</div>
                   </div>
                   <div className="text-center p-3 bg-green-50 rounded-lg">
-                    <div className="text-2xl font-bold text-water-green">Boa</div>
+                    <div className="text-2xl font-bold text-water-green">{currentVisibility}</div>
                     <div className="text-sm text-gray-600">Visibilidade</div>
                   </div>
                   <div className="text-center p-3 bg-orange-50 rounded-lg">
-                    <div className="text-2xl font-bold text-sunset-orange">5 km/h</div>
+                    <div className="text-2xl font-bold text-sunset-orange">{currentWind} km/h</div>
                     <div className="text-sm text-gray-600">Vento</div>
                   </div>
                   <div className="text-center p-3 bg-blue-50 rounded-lg">
-                    <div className="text-2xl font-bold text-rio-blue">85%</div>
+                    <div className="text-2xl font-bold text-rio-blue">{damLevel}%</div>
                     <div className="text-sm text-gray-600">Nível</div>
                   </div>
                 </div>
