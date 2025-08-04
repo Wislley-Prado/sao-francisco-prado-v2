@@ -122,7 +122,15 @@ const LunarCalendar = () => {
                 </div>
                 <div className="text-center sm:text-right">
                   <Badge className="bg-white text-blue-700 text-sm md:text-lg px-3 md:px-4 py-1 md:py-2">
-                    {lunarData.currentPhase.phase === 'Crescente Gibosa' ? 'Regular' : 'Boa'}
+                    {
+                      lunarData.currentPhase.phase === 'Nova' || lunarData.currentPhase.phase === 'Minguante Crescente' 
+                        ? 'Excelente' 
+                        : lunarData.currentPhase.phase === 'Crescente' || lunarData.currentPhase.phase === 'Minguante'
+                        ? 'Boa' 
+                        : lunarData.currentPhase.phase === 'Crescente Gibosa' || lunarData.currentPhase.phase === 'Minguante Gibosa'
+                        ? 'Regular'
+                        : 'Fraca'
+                    }
                   </Badge>
                   <p className="text-blue-100 text-xs md:text-sm mt-1">condição para pesca</p>
                 </div>
