@@ -124,25 +124,15 @@ const StreamPlayer = () => {
         </div>
       )}
 
-      {/* Video Element */}
-      <video
-        ref={videoRef}
-        className="w-full h-full object-cover"
-        poster="https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
-        onLoadStart={handleLoadStart}
-        onCanPlay={handleCanPlay}
-        muted={isMuted}
-        onClick={togglePlay}
-      >
-        <source src="#" type="video/mp4" />
-        <div className="absolute inset-0 bg-gradient-to-br from-rio-blue to-water-green flex items-center justify-center">
-          <div className="text-center text-white p-8">
-            <Radio className="h-16 w-16 mx-auto mb-4 animate-pulse" />
-            <h3 className="text-xl font-semibold mb-2">Transmissão do Rio São Francisco</h3>
-            <p className="text-sm opacity-90">Visualização em tempo real das condições do rio</p>
-          </div>
-        </div>
-      </video>
+      {/* YouTube Live Stream */}
+      <iframe
+        className="w-full h-full"
+        src="https://www.youtube.com/embed/gRDmQvFc6R0?autoplay=1&mute=0&controls=1&rel=0&modestbranding=1&showinfo=0"
+        title="Rio São Francisco - Transmissão ao Vivo"
+        frameBorder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowFullScreen
+      />
 
       {/* Live Badge */}
       <div className="absolute top-4 left-4 z-20">
