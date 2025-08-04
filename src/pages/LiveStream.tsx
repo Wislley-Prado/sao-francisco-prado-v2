@@ -98,7 +98,7 @@ const LiveStream = () => {
                     </div>
                     <div className="text-center p-3 bg-blue-50 rounded-lg">
                       <div className="text-xl font-bold text-rio-blue">{damLevel}%</div>
-                      <div className="text-sm text-gray-600">Nível</div>
+                      <div className="text-sm text-gray-600">Nível da Represa</div>
                     </div>
                   </div>
                 </CardContent>
@@ -167,7 +167,7 @@ const LiveStream = () => {
                   </div>
                   <div className="text-center p-3 bg-blue-50 rounded-lg">
                     <div className="text-2xl font-bold text-rio-blue">{damLevel}%</div>
-                    <div className="text-sm text-gray-600">Nível</div>
+                    <div className="text-sm text-gray-600">Nível da Represa</div>
                   </div>
                 </div>
               </CardContent>

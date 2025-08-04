@@ -88,7 +88,7 @@ const StreamInfo = () => {
             </Badge>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-xs sm:text-sm text-gray-600">Nível da Água</span>
+            <span className="text-xs sm:text-sm text-gray-600">Volume Útil da Represa</span>
             <span className="font-medium text-sm sm:text-base">
               {damData?.volume_util_percentual ? `${parseFloat(damData.volume_util_percentual).toFixed(0)}%` : '--'}
             </span>
