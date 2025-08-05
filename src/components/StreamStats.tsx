@@ -13,12 +13,15 @@ import {
   Activity,
   TrendingUp
 } from 'lucide-react';
+import { useViewerCount } from '@/hooks/useViewerCount';
 
 const StreamStats = () => {
+  const { currentViewers, peakViewers, totalViews } = useViewerCount();
+  
   const stats = {
-    viewers: 127,
-    peakViewers: 205,
-    totalViews: 1847,
+    viewers: currentViewers,
+    peakViewers: peakViewers,
+    totalViews: totalViews,
     uptime: '2h 34min',
     likes: 248,
     quality: '720p',

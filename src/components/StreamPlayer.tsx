@@ -1,10 +1,12 @@
 
 import React, { useState } from 'react';
 import { Loader2, Radio } from 'lucide-react';
+import { useViewerCount } from '@/hooks/useViewerCount';
 
 const StreamPlayer = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [quality] = useState('720p');
+  const { currentViewers } = useViewerCount();
 
   return (
     <div className="relative bg-black aspect-video">
@@ -51,7 +53,7 @@ const StreamPlayer = () => {
       <div className="absolute top-16 right-4 z-20">
         <div className="bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs flex items-center">
           <Radio className="h-3 w-3 mr-1" />
-          127 assistindo
+          {currentViewers} assistindo
         </div>
       </div>
     </div>
