@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Menu, X, Phone, Calendar, Fish } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -53,6 +54,7 @@ const Header = () => {
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center space-x-4">
+            <ThemeToggle />
             <Button
               variant="outline"
               size="sm"
@@ -109,6 +111,9 @@ const Header = () => {
                 )
               ))}
               <div className="flex flex-col space-y-2 pt-4">
+                <div className="flex justify-center mb-2">
+                  <ThemeToggle />
+                </div>
                 <Button
                   variant="outline"
                   size="sm"
