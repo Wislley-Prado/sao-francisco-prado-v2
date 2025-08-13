@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Clock, Users, Fish, Star, Calendar } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface Package {
   id: number;
@@ -23,6 +24,15 @@ interface PackageCardProps {
 }
 
 const PackageCard = ({ pkg }: PackageCardProps) => {
+  const getPackageRoute = (id: number) => {
+    switch (id) {
+      case 1: return '/pacote/vip';
+      case 2: return '/pacote/luxo';
+      case 3: return '/pacote/diamante';
+      default: return '/pacotes';
+    }
+  };
+
   return (
     <Card 
       className={`relative overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 ${
@@ -98,10 +108,12 @@ const PackageCard = ({ pkg }: PackageCardProps) => {
               ? 'bg-sunset-orange hover:bg-orange-600' 
               : 'bg-rio-blue hover:bg-blue-600'
           } text-white`}
-          onClick={() => window.location.href = '/pacote-vip'}
+          asChild
         >
-          <Calendar className="mr-2 h-4 w-4" />
-          Ver Detalhes
+          <Link to={getPackageRoute(pkg.id)}>
+            <Calendar className="mr-2 h-4 w-4" />
+            Ver Detalhes
+          </Link>
         </Button>
       </CardContent>
     </Card>
