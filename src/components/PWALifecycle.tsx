@@ -7,6 +7,8 @@ import { UpdatePrompt } from './UpdatePrompt';
 
 export const PWALifecycle: React.FC = () => {
   const pwaState = usePWALifecycle();
+  
+  console.log('🔄 PWALifecycle: Component rendered', pwaState);
 
   return (
     <>

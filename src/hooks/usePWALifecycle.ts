@@ -47,6 +47,11 @@ export const usePWALifecycle = () => {
   useEffect(() => {
     console.log('🔧 PWA Lifecycle: Initializing...');
     console.log('📱 Platform Detection:', { isIOS, isAndroid });
+    console.log('🌐 Navigator Info:', { 
+      userAgent: navigator.userAgent, 
+      onLine: navigator.onLine,
+      serviceWorker: 'serviceWorker' in navigator 
+    });
     
     // Check if app is already installed
     const isInstalled = window.matchMedia('(display-mode: standalone)').matches ||
