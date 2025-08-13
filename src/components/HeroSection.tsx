@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Play, Calendar, MapPin, Waves } from 'lucide-react';
@@ -6,6 +7,7 @@ import { useWeatherData } from '@/hooks/useWeatherData';
 import { useDamData } from '@/hooks/useDamData';
 
 const HeroSection = () => {
+  const navigate = useNavigate();
   const { data: weatherData } = useWeatherData();
   const { data: damData } = useDamData();
 
@@ -123,7 +125,7 @@ const HeroSection = () => {
                       variant="outline" 
                       size="sm"
                       className="w-full bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white"
-                      onClick={() => window.location.href = '/live'}
+                      onClick={() => navigate('/live')}
                     >
                       <Play className="mr-2 h-4 w-4" />
                       Ver Transmissão Completa
