@@ -38,7 +38,4 @@ jobs:
           log-level: verbose
 
 
-FTP_HOST	exemplo: ftp.seudominio.com
-FTP_USER	seu usuário FTP
-FTP_PASS	sua senha FTP
 
