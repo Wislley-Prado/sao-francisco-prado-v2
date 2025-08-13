@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { PWALifecycle } from "@/components/PWALifecycle";
 import Index from "./pages/Index";
 import LiveStream from "./pages/LiveStream";
 import PackageVip from "./pages/PackageVip";
@@ -28,6 +29,7 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
+        <PWALifecycle />
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
