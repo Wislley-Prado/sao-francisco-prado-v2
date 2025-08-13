@@ -1,9 +1,3 @@
-GitHub
-
-2. código deploy auto no arquivo:
-
-name: Deploy Lovable via FTP na Hostinger
-
 on:
   push:
     branches:
