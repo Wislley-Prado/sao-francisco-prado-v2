@@ -16,31 +16,7 @@ export default defineConfig(({ mode }) => ({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'icons/*.png', 'robots.txt'],
-      manifest: {
-        name: 'PradoAqui - Pesca no Rio São Francisco',
-        short_name: 'PradoAqui',
-        description: 'Sua experiência de pesca no Rio São Francisco começa aqui!',
-        theme_color: '#17A2B8',
-        background_color: '#17A2B8',
-        display: 'standalone',
-        orientation: 'portrait-primary',
-        start_url: '/',
-        scope: '/',
-        icons: [
-          {
-            src: '/icons/icon-192x192.png',
-            sizes: '192x192',
-            type: 'image/png',
-            purpose: 'any maskable'
-          },
-          {
-            src: '/icons/icon-512x512.png',
-            sizes: '512x512', 
-            type: 'image/png',
-            purpose: 'any maskable'
-          }
-        ]
-      },
+      manifestFilename: 'manifest.json',
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,jpg,jpeg,svg,woff,woff2}'],
         runtimeCaching: [
