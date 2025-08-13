@@ -1,6 +1,7 @@
 import React from 'react';
 import { usePWALifecycle } from '@/hooks/usePWALifecycle';
 import { InstallPrompt } from './InstallPrompt';
+import { IOSInstallPrompt } from './IOSInstallPrompt';
 import { OfflineIndicator } from './OfflineIndicator';
 import { UpdatePrompt } from './UpdatePrompt';
 
@@ -9,9 +10,14 @@ export const PWALifecycle: React.FC = () => {
 
   return (
     <>
-      {/* Show install prompt if app is installable and not installed */}
-      {pwaState.isInstallable && !pwaState.isInstalled && (
+      {/* Show install prompt for Android/Chrome if app is installable and not installed */}
+      {pwaState.isInstallable && !pwaState.isInstalled && pwaState.canInstallNatively && (
         <InstallPrompt onInstall={pwaState.installApp} />
+      )}
+      
+      {/* Show iOS manual install instructions */}
+      {pwaState.isIOS && !pwaState.isInstalled && (
+        <IOSInstallPrompt onDismiss={() => {}} />
       )}
       
       {/* Show offline indicator */}

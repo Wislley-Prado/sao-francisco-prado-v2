@@ -15,28 +15,49 @@ interface PWALifecycleState {
   isOnline: boolean;
   hasUpdate: boolean;
   isUpdateReady: boolean;
+  isIOS: boolean;
+  isAndroid: boolean;
+  canInstallNatively: boolean;
 }
 
+const detectPlatform = () => {
+  const userAgent = navigator.userAgent || navigator.vendor;
+  const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !(window as any).MSStream;
+  const isAndroid = /android/i.test(userAgent);
+  
+  return { isIOS, isAndroid };
+};
+
 export const usePWALifecycle = () => {
+  const { isIOS, isAndroid } = detectPlatform();
+  
   const [state, setState] = useState<PWALifecycleState>({
     isInstallable: false,
     isInstalled: false,
     isOnline: navigator.onLine,
     hasUpdate: false,
     isUpdateReady: false,
+    isIOS,
+    isAndroid,
+    canInstallNatively: !isIOS, // iOS doesn't support native install prompt
   });
 
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
 
   useEffect(() => {
+    console.log('🔧 PWA Lifecycle: Initializing...');
+    console.log('📱 Platform Detection:', { isIOS, isAndroid });
+    
     // Check if app is already installed
     const isInstalled = window.matchMedia('(display-mode: standalone)').matches ||
                        (window.navigator as any).standalone === true;
     
+    console.log('📦 Installation Status:', { isInstalled });
     setState(prev => ({ ...prev, isInstalled }));
 
     // Listen for beforeinstallprompt
     const handleBeforeInstallPrompt = (e: Event) => {
+      console.log('🎯 PWA: beforeinstallprompt event fired', e);
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
       setState(prev => ({ ...prev, isInstallable: true }));
@@ -44,6 +65,7 @@ export const usePWALifecycle = () => {
 
     // Listen for app installation
     const handleAppInstalled = () => {
+      console.log('✅ PWA: App installed successfully');
       setDeferredPrompt(null);
       setState(prev => ({ 
         ...prev, 
@@ -53,11 +75,18 @@ export const usePWALifecycle = () => {
     };
 
     // Listen for online/offline
-    const handleOnline = () => setState(prev => ({ ...prev, isOnline: true }));
-    const handleOffline = () => setState(prev => ({ ...prev, isOnline: false }));
+    const handleOnline = () => {
+      console.log('🌐 PWA: Online');
+      setState(prev => ({ ...prev, isOnline: true }));
+    };
+    const handleOffline = () => {
+      console.log('📴 PWA: Offline');
+      setState(prev => ({ ...prev, isOnline: false }));
+    };
 
     // Listen for service worker updates
     const handleSWUpdate = () => {
+      console.log('🔄 PWA: Service Worker update available');
       setState(prev => ({ ...prev, hasUpdate: true }));
     };
 
@@ -69,7 +98,17 @@ export const usePWALifecycle = () => {
 
     // Service Worker registration and update detection
     if ('serviceWorker' in navigator) {
+      console.log('⚙️ PWA: Service Worker supported');
       navigator.serviceWorker.addEventListener('controllerchange', handleSWUpdate);
+      
+      // Check registration status
+      navigator.serviceWorker.getRegistration().then(registration => {
+        if (registration) {
+          console.log('✅ PWA: Service Worker registered', registration);
+        } else {
+          console.log('❌ PWA: Service Worker not registered');
+        }
+      });
       
       // Check for updates periodically
       setInterval(() => {
@@ -79,6 +118,8 @@ export const usePWALifecycle = () => {
           }
         });
       }, 60000); // Check every minute
+    } else {
+      console.log('❌ PWA: Service Worker not supported');
     }
 
     return () => {
@@ -94,11 +135,24 @@ export const usePWALifecycle = () => {
   }, []);
 
   const installApp = async () => {
-    if (!deferredPrompt) return false;
+    console.log('📱 PWA: Install attempt', { isIOS, deferredPrompt: !!deferredPrompt });
+    
+    if (isIOS) {
+      console.log('🍎 PWA: iOS detected - manual installation required');
+      return false; // iOS requires manual installation
+    }
+    
+    if (!deferredPrompt) {
+      console.log('❌ PWA: No deferred prompt available');
+      return false;
+    }
 
     try {
+      console.log('🚀 PWA: Showing install prompt');
       await deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
+      
+      console.log('🎯 PWA: User choice:', outcome);
       
       if (outcome === 'accepted') {
         setDeferredPrompt(null);
@@ -111,7 +165,7 @@ export const usePWALifecycle = () => {
       }
       return false;
     } catch (error) {
-      console.error('Error installing app:', error);
+      console.error('❌ PWA: Error installing app:', error);
       return false;
     }
   };
