@@ -6,12 +6,14 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { PWALifecycle } from "@/components/PWALifecycle";
+import CookieConsent from "@/components/CookieConsent";
 import Index from "./pages/Index";
 import LiveStream from "./pages/LiveStream";
 import PackageVip from "./pages/PackageVip";
 import PackageLuxo from "./pages/PackageLuxo";
 import PackageDiamante from "./pages/PackageDiamante";
 import PackagesIndex from "./pages/PackagesIndex";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -41,11 +43,13 @@ const App = () => {
             <Route path="/pacote/vip" element={<PackageVip />} />
             <Route path="/pacote/luxo" element={<PackageLuxo />} />
             <Route path="/pacote/diamante" element={<PackageDiamante />} />
+            <Route path="/politica-privacidade" element={<PrivacyPolicy />} />
             {/* Backward compatibility */}
             <Route path="/pacote-vip" element={<PackageVip />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <CookieConsent />
         </BrowserRouter>
       </TooltipProvider>
     </ThemeProvider>

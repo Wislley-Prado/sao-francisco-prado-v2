@@ -9,6 +9,7 @@ import LunarCalendar from '@/components/LunarCalendar';
 import DamInfo from '@/components/DamInfo';
 import WeatherDashboard from '@/components/WeatherDashboard';
 import WhatsAppButton from '@/components/WhatsAppButton';
+import Footer from '@/components/Footer';
 
 const Index = () => {
   return (
@@ -22,6 +23,7 @@ const Index = () => {
       <WeatherDashboard />
       <DamInfo />
       <WhatsAppButton />
+      <Footer />
     </div>
   );
 };
