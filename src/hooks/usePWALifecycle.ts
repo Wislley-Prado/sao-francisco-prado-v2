@@ -21,6 +21,7 @@ interface PWALifecycleState {
 }
 
 const detectPlatform = () => {
+  console.log('🔍 Detecting platform...');
   const userAgent = navigator.userAgent || navigator.vendor;
   const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !(window as any).MSStream;
   const isAndroid = /android/i.test(userAgent);
