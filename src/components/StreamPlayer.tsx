@@ -7,6 +7,7 @@ const StreamPlayer = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [quality] = useState('720p');
   const { currentViewers } = useViewerCount();
+  const [cacheKey] = useState(() => Date.now());
 
   return (
     <div className="relative bg-black aspect-video">
@@ -22,14 +23,15 @@ const StreamPlayer = () => {
 
       {/* YouTube Live Stream */}
       <iframe
+        key={`stream-${cacheKey}`}
         className="w-full h-full"
-        src="https://www.youtube.com/embed/iGQdBZEuPAs?autoplay=1&mute=1&controls=1&rel=0&modestbranding=1&showinfo=0&enablejsapi=1"
+        src={`https://www.youtube.com/embed/iGQdBZEuPAs?autoplay=1&mute=1&controls=1&rel=0&modestbranding=1&showinfo=0&enablejsapi=1&t=${cacheKey}`}
         title="Rio São Francisco - Transmissão ao Vivo"
         frameBorder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
         allowFullScreen
         onLoad={() => {
-          console.log('YouTube iframe carregado com sucesso');
+          console.log('🎥 StreamPlayer: YouTube iframe carregado com novo ID iGQdBZEuPAs');
           setIsLoading(false);
         }}
       />

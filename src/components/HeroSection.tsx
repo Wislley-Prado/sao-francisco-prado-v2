@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -10,6 +10,7 @@ const HeroSection = () => {
   const navigate = useNavigate();
   const { data: weatherData } = useWeatherData();
   const { data: damData } = useDamData();
+  const [cacheKey] = useState(() => Date.now());
 
   const temperature = weatherData?.current.temperature || 24;
   const damLevel = damData?.volume_util_percentual ? 
@@ -110,12 +111,14 @@ const HeroSection = () => {
                   {/* Live Stream */}
                   <div className="aspect-video bg-black rounded-lg overflow-hidden relative">
                     <iframe
-                      src="https://www.youtube.com/embed/iGQdBZEuPAs?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&modestbranding=1"
+                      key={`hero-stream-${cacheKey}`}
+                      src={`https://www.youtube.com/embed/iGQdBZEuPAs?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&modestbranding=1&t=${cacheKey}`}
                       title="Rio São Francisco - Transmissão Ao Vivo"
                       className="w-full h-full"
                       frameBorder="0"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
+                      onLoad={() => console.log('🎥 HeroSection: YouTube preview carregado com novo ID iGQdBZEuPAs')}
                     />
                   </div>
                   
