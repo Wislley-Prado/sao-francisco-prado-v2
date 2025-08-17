@@ -67,7 +67,7 @@ const StreamPlayer = () => {
       </div>
 
       {/* Refresh Button */}
-      <div className="absolute bottom-4 right-4 z-20">
+      <div className="absolute top-4 left-16 z-20">
         <Button
           size="sm"
           variant="outline"
