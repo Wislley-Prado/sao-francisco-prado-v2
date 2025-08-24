@@ -170,10 +170,10 @@ const PackageOption = memo(({ option }: { option: any }) => (
       <div className="mb-4 p-4 bg-gradient-to-r from-red-50 to-orange-50 rounded-xl border border-red-200">
         <div className="flex items-center justify-center mb-2">
           <div className="text-lg text-red-500 line-through mr-3">
-            R$ 10.397,00
+            R$ 5.970,00
           </div>
           <Badge className="bg-red-500 text-white text-xs px-2 py-1">
-            -62% OFF!
+            -33% OFF!
           </Badge>
         </div>
         <div className="text-4xl md:text-5xl font-bold text-green-600 mb-1">
@@ -183,18 +183,15 @@ const PackageOption = memo(({ option }: { option: any }) => (
           POR PESSOA - Preço Promocional!
         </div>
         <div className="text-xs text-gray-600 mt-1">
-          Economia de R$ 6.427 por pessoa
+          Economia de R$ 2.000 por pessoa
         </div>
       </div>
 
       <div className="text-2xl md:text-3xl font-bold text-yellow-600 mb-2">
-        {option.installments}
+        10x sem juros
       </div>
       <div className="text-base md:text-lg font-semibold text-gray-900 mb-2">
-        por mês no boleto/cartão
-      </div>
-      <div className="text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
-        Total do Grupo: R$ {option.totalPrice.toLocaleString('pt-BR')}
+        no boleto/cartão
       </div>
     </CardHeader>
 
