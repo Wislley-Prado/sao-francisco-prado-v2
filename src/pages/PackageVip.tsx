@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Clock, Users, MapPin, Star, Calendar, CheckCircle, Phone, CreditCard, Banknote, Percent, HelpCircle, Home, ChefHat, Fish, Sparkles, FileText, MessageCircle, Expand, X, Utensils, Shield, PartyPopper, Flame, Target, Gift } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import ranchoPradoImage from '@/assets/rancho-prado-pescador-feliz.jpg';
+import headerImage from '@/assets/pescaria-rio-sao-francisco-header.jpg';
 import ranchoPradoAldeia from '@/assets/gallery/rancho-prado-aldeia.jpg';
 import rancho2Image from '@/assets/gallery/rancho-2.jpg';
 import rioSaoFranciscoImage from '@/assets/gallery/rio-sao-francisco.jpg';
@@ -368,7 +368,7 @@ const PackageOffer = () => {
           {/* Hero Image - Optimized for mobile */}
           <div className="relative mb-6 sm:mb-8 lg:mb-12">
             <img
-              src={ranchoPradoImage}
+              src={headerImage}
               alt="Rancho Prado - Pescador Feliz"
               className="w-full h-48 sm:h-64 md:h-80 lg:h-96 xl:h-[500px] object-cover rounded-lg shadow-xl"
               loading="eager"
