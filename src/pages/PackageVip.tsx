@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -253,6 +253,10 @@ const FeatureCard = memo(({ feature, index }: { feature: any; index: number }) =
 ));
 
 const PackageOffer = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const packageOptions = [
     {
       id: 1,

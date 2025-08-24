@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -253,6 +253,10 @@ const FeatureCard = memo(({ feature, index }: { feature: any; index: number }) =
 ));
 
 const PackageDiamante = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const packageOptions = [
     {
       id: 1,
@@ -376,6 +380,56 @@ const PackageDiamante = () => {
                 <Gem className="inline-block mr-1 h-3 w-3 sm:h-4 sm:w-4" />
                 Experiência Elite
               </Badge>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Video Section - Pescaria de Dourado */}
+      <section className="py-8 sm:py-12 lg:py-16 bg-gradient-to-r from-gray-900 to-black text-white">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-yellow-400 to-yellow-500 bg-clip-text text-transparent">
+              Pescaria de Dourado na Cachoeira da Escadinha
+            </h2>
+            <p className="text-base sm:text-lg lg:text-xl opacity-90 max-w-4xl mx-auto">
+              Veja um exemplar incrível de Dourado capturado nas águas cristalinas do Rio São Francisco! 
+              Esta é a experiência que você terá nos nossos pontos estratégicos de pesca.
+            </p>
+          </div>
+          
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-gradient-to-r from-yellow-400/10 to-yellow-500/10 backdrop-blur-sm rounded-lg p-4 sm:p-6 lg:p-8 border border-yellow-400/20">
+              <div className="aspect-video rounded-lg overflow-hidden shadow-2xl">
+                <iframe
+                  src="https://www.youtube.com/embed/9yTHncRU9Uk"
+                  title="Pescaria de Dourado - Cachoeira da Escadinha - Rio São Francisco"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="w-full h-full"
+                ></iframe>
+              </div>
+              
+              <div className="mt-4 sm:mt-6 text-center">
+                <div className="flex flex-wrap justify-center gap-4 sm:gap-6 text-sm sm:text-base">
+                  <div className="flex items-center">
+                    <span className="text-yellow-400 font-semibold">Espécie:</span>
+                    <span className="ml-2">Dourado (Salminus brasiliensis)</span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-yellow-400 font-semibold">Local:</span>
+                    <span className="ml-2">Cachoeira da Escadinha</span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-yellow-400 font-semibold">Rio:</span>
+                    <span className="ml-2">São Francisco</span>
+                  </div>
+                </div>
+                <p className="mt-3 sm:mt-4 text-xs sm:text-sm opacity-80">
+                  Esta é uma das muitas espécies que você pode capturar durante sua pescaria conosco!
+                </p>
+              </div>
             </div>
           </div>
         </div>
