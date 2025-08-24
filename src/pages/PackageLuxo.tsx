@@ -157,6 +157,11 @@ const PackageOption = memo(({ option }: { option: any }) => (
     )}
 
     <CardHeader className="text-center pb-4">
+      <div className="mb-2">
+        <Badge className="bg-amber-100 text-amber-800 text-xs">
+          {option.subtitle}
+        </Badge>
+      </div>
       <CardTitle className="text-xl md:text-2xl text-amber-700 mb-3 font-bold">
         {option.people} Pescadores
       </CardTitle>
@@ -164,7 +169,7 @@ const PackageOption = memo(({ option }: { option: any }) => (
         {option.installments}
       </div>
       <div className="text-base md:text-lg font-semibold text-gray-900 mb-2">
-        por mês, por pessoa
+        por mês no boleto/cartão
       </div>
       <div className="text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
         Total: R$ {option.totalPrice.toLocaleString('pt-BR')} | R$ {option.pricePerPerson.toLocaleString('pt-BR')} por pessoa
@@ -210,8 +215,11 @@ const PackageOption = memo(({ option }: { option: any }) => (
             <Percent className="h-4 w-4 text-orange-600 mr-2" />
             <span className="font-semibold text-orange-800 text-sm">À vista (PIX)</span>
           </div>
-          <div className="text-orange-700 text-sm font-medium">
-            5% de desconto
+          <div className="text-orange-700 text-sm font-medium mb-1">
+            R$ {option.pixPrice.toLocaleString('pt-BR')} (5% desconto!)
+          </div>
+          <div className="text-xs text-orange-600">
+            Economia de R$ {(option.totalPrice - option.pixPrice).toLocaleString('pt-BR')}
           </div>
         </div>
       </div>
@@ -259,77 +267,87 @@ const PackageLuxo = () => {
   const packageOptions = [
     {
       id: 1,
-      people: 2,
-      totalPrice: 5990,
-      pricePerPerson: 2995,
-      installments: "R$ 299,50",
-      popular: false
+      people: 6,
+      totalPrice: 23820,
+      pricePerPerson: 3970,
+      installments: "R$ 2.382,00",
+      pixPrice: 22629,
+      popular: false,
+      subtitle: "Grupo Ideal"
     },
     {
       id: 2,
-      people: 4,
-      totalPrice: 11980,
-      pricePerPerson: 2995,
-      installments: "R$ 299,50",
-      popular: true
+      people: 8,
+      totalPrice: 31760,
+      pricePerPerson: 3970,
+      installments: "R$ 3.176,00",
+      pixPrice: 30172,
+      popular: true,
+      subtitle: "Grupo Ideal"
     },
     {
       id: 3,
-      people: 6,
-      totalPrice: 17970,
-      pricePerPerson: 2995,
-      installments: "R$ 299,50",
-      popular: false
+      people: 10,
+      totalPrice: 39700,
+      pricePerPerson: 3970,
+      installments: "R$ 3.970,00",
+      pixPrice: 37715,
+      popular: false,
+      subtitle: "Grupo Máximo"
     }
   ];
 
   const packageFeatures = [
     {
-      icon: <Crown className="h-8 w-8 sm:h-10 sm:w-10 text-amber-700" />,
-      title: "Hospedagem Premium",
-      description: "Suítes com ar condicionado e vista para o rio",
+      icon: <Home className="h-8 w-8 sm:h-10 sm:w-10 text-amber-700" />,
+      title: "Hospedagem & Estrutura",
+      description: "Rancho exclusivo à beira do Velho Chico",
       items: [
-        "Suítes com banheiro privativo",
-        "Roupa de cama premium", 
-        "Wi-Fi de alta velocidade",
-        "Frigobar incluso",
-        "Vista panorâmica do rio"
+        "Rancho exclusivo à beira do Velho Chico",
+        "Suítes climatizadas com ar-condicionado e TV",
+        "Piscina privativa e deck exclusivo de pesca",
+        "Área gourmet, churrasqueira e freezer",
+        "Wi-Fi Starlink de alta velocidade",
+        "Roupa de cama e banho fornecidas",
+        "Serviço diário de limpeza + faxina final"
       ]
     },
     {
-      icon: <Utensils className="h-8 w-8 sm:h-10 sm:w-10 text-amber-700" />,
-      title: "Alimentação Gourmet",
-      description: "Refeições elaboradas com ingredientes selecionados",
+      icon: <ChefHat className="h-8 w-8 sm:h-10 sm:w-10 text-amber-700" />,
+      title: "Gastronomia All Inclusive",
+      description: "Cozinheira exclusiva com estilo caseiro mineiro",
       items: [
-        "Café da manhã completo",
-        "Almoço e jantar gourmet",
-        "Petiscos e bebidas premium",
-        "Cardápio personalizado",
-        "Chef especializado"
+        "Cozinheira exclusiva (07h às 22h)",
+        "Peixada, comida mineira, galinha caipira e churrasco",
+        "Estilo caseiro com capricho mineiro",
+        "Caixa térmica no barco com cerveja, água e refrigerante liberados",
+        "Churrasco de boas-vindas na chegada (quinta-feira)",
+        "Almoço especial combinado com os guias"
       ]
     },
     {
       icon: <Fish className="h-8 w-8 sm:h-10 sm:w-10 text-amber-700" />,
-      title: "Equipamentos Premium",
-      description: "Equipamentos de pesca de alta qualidade",
+      title: "Estrutura de Pesca Profissional",
+      description: "Barcos exclusivos com guias especializados",
       items: [
-        "Varas e molinetes premium",
-        "Iscas naturais e artificiais",
-        "Caixa térmica grande",
-        "Kit de primeiros socorros",
-        "Equipamentos Shimano"
+        "Barcos exclusivos com motor",
+        "1 guia especializado por barco (máx. 2 pescadores por guia)",
+        "Gasolina inclusa",
+        "Equipamentos de segurança e coletes",
+        "Guias especializados no Rio São Francisco"
       ]
     },
     {
-      icon: <Car className="h-8 w-8 sm:h-10 sm:w-10 text-amber-700" />,
-      title: "Transporte Executivo",
-      description: "Traslado confortável até o local de pesca",
+      icon: <Crown className="h-8 w-8 sm:h-10 sm:w-10 text-amber-700" />,
+      title: "Serviços VIP & Brindes",
+      description: "Atendimento personalizado e brindes exclusivos",
       items: [
-        "Veículo executivo",
-        "Motorista experiente",
-        "Combustível incluso",
-        "Seguro completo",
-        "Ar condicionado"
+        "Cozinheira, copeiro e limpeza diária",
+        "Assistência 24h durante toda a estadia",
+        "Atendimento personalizado e dedicado",
+        "Boné personalizado Reserva Prado",
+        "Camisa de pesca exclusiva",
+        "Churrasco de confraternização com o Prado"
       ]
     }
   ];
@@ -392,6 +410,94 @@ const PackageLuxo = () => {
                 Experiência Premium
               </Badge>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Schedule Section */}
+      <section className="py-8 sm:py-12 lg:py-16 bg-white">
+        <div className="max-w-5xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="text-center mb-8 sm:mb-12">
+            <Badge className="bg-amber-100 text-amber-800 mb-4 text-sm sm:text-base px-4 py-2">
+              <Calendar className="inline-block mr-2 h-4 w-4" />
+              CRONOGRAMA COMPLETO
+            </Badge>
+            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-6">
+              4 Dias de Pescaria Inesquecível
+            </h2>
+            <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto">
+              Total de <strong className="text-amber-700">24h30 de pesca</strong> no Rio São Francisco com cronograma otimizado
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <Card className="bg-gradient-to-br from-amber-50 to-yellow-50 border-amber-200 hover:shadow-lg transition-all">
+              <CardHeader className="text-center pb-4">
+                <div className="bg-amber-600 text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3">
+                  <span className="font-bold">QUI</span>
+                </div>
+                <CardTitle className="text-lg text-amber-700">Quinta-feira</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="text-center">
+                  <p className="text-sm text-gray-600 mb-2">Chegada & Acomodação</p>
+                  <div className="bg-white rounded-lg p-3 shadow-sm">
+                    <p className="text-xs text-gray-700">Churrasco de boas-vindas com apresentação da equipe (piloteiros e staff)</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200 hover:shadow-lg transition-all">
+              <CardHeader className="text-center pb-4">
+                <div className="bg-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3">
+                  <span className="font-bold">SEX</span>
+                </div>
+                <CardTitle className="text-lg text-blue-700">Sexta-feira</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="text-center">
+                  <p className="text-sm text-gray-600 mb-2">07h30 às 17h30</p>
+                  <div className="bg-white rounded-lg p-3 shadow-sm">
+                    <p className="font-semibold text-blue-700 text-sm">10 horas de pesca</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 hover:shadow-lg transition-all">
+              <CardHeader className="text-center pb-4">
+                <div className="bg-green-600 text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3">
+                  <span className="font-bold">SAB</span>
+                </div>
+                <CardTitle className="text-lg text-green-700">Sábado</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="text-center">
+                  <p className="text-sm text-gray-600 mb-2">07h30 às 17h30</p>
+                  <div className="bg-white rounded-lg p-3 shadow-sm">
+                    <p className="font-semibold text-green-700 text-sm">10 horas de pesca</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-purple-50 to-violet-50 border-purple-200 hover:shadow-lg transition-all">
+              <CardHeader className="text-center pb-4">
+                <div className="bg-purple-600 text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3">
+                  <span className="font-bold">DOM</span>
+                </div>
+                <CardTitle className="text-lg text-purple-700">Domingo</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="text-center">
+                  <p className="text-sm text-gray-600 mb-2">07h30 às 12h00</p>
+                  <div className="bg-white rounded-lg p-3 shadow-sm">
+                    <p className="font-semibold text-purple-700 text-sm">4h30 de pesca</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
@@ -472,6 +578,31 @@ const PackageLuxo = () => {
             {packageOptions.map((option) => (
               <PackageOption key={option.id} option={option} />
             ))}
+          </div>
+
+          {/* Individual Slot Information */}
+          <div className="max-w-4xl mx-auto">
+            <Card className="bg-gradient-to-r from-amber-50 to-yellow-50 border-amber-200">
+              <CardContent className="p-6 text-center">
+                <div className="flex items-center justify-center mb-4">
+                  <Users className="h-8 w-8 text-amber-700 mr-3" />
+                  <h3 className="text-xl font-bold text-amber-700">Vaga Individual Disponível</h3>
+                </div>
+                <p className="text-gray-700 mb-4">
+                  Se você não tem companhia, não tem problema! Comprando a vaga individual, 
+                  iremos encaixá-lo em um grupo compatível para viver a experiência completa da Reserva Prado.
+                </p>
+                <Button 
+                  className="bg-amber-600 hover:bg-amber-700 text-white"
+                  asChild
+                >
+                  <Link to="https://wa.me/5537999805019?text=Olá! Gostaria de uma vaga individual no Pacote Luxo Premium. Pode me dar mais detalhes?">
+                    <MessageCircle className="mr-2 h-4 w-4" />
+                    Consultar Vaga Individual
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
@@ -610,8 +741,11 @@ const PackageLuxo = () => {
                 </div>
               </div>
               <p className="text-gray-600 mb-4 italic">
-                "O Pacote Luxo superou todas as expectativas! O atendimento premium e o conforto das instalações fizeram toda a diferença. Experiência inesquecível!"
+                "Já fiz pescarias em vários lugares, mas a Reserva Prado superou todas as expectativas. O rancho exclusivo, a cozinheira dedicada e o atendimento VIP fazem toda a diferença. Vale cada centavo!"
               </p>
+              <div className="text-xs text-amber-600 font-semibold">
+                Grupo de São Paulo, 8 pescadores
+              </div>
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-lg border-l-4 border-yellow-500">
