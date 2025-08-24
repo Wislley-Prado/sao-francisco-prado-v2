@@ -18,6 +18,12 @@ import paiFilhoDourado from '@/assets/gallery/pai-filho-dourado.jpg';
 import imagem7 from '@/assets/gallery/imagem-7.jpg';
 import clienteMulherDourado from '@/assets/gallery/cliente-mulher-dourado.jpg';
 import pacoteDiamanteImage from '@/assets/gallery/pacote-diamante.png';
+import pescariaCapal1 from '@/assets/gallery/pescaria-casal-1.jpg';
+import pescariaCapal2 from '@/assets/gallery/pescaria-casal-2.jpg';
+import pescariaCapal3 from '@/assets/gallery/pescaria-casal-3.jpg';
+import douradoProvaSocial from '@/assets/gallery/dourado-prova-social.jpg';
+import douradoPrado from '@/assets/gallery/dourado-prado.jpg';
+import pescariaPintalAbaite from '@/assets/gallery/pescaria-pintal-abaite.jpg';
 import joaoSilvaDourado from '@/assets/testimonials/joao-silva-dourado.jpg';
 import carlosOliveira from '@/assets/testimonials/carlos-oliveira.jpg';
 
@@ -29,6 +35,12 @@ const PhotoGallery = () => {
     { src: pacoteDiamanteImage, alt: "Experiência Diamante Elite", badge: "Exclusivo" },
     { src: paiFilhoDourado, alt: "Momento Especial VIP com Dourado" },
     { src: clienteMulherDourado, alt: "Cliente VIP - Sucesso na Pescaria Elite" },
+    { src: pescariaCapal1, alt: "Pescaria para Casais - Experiência Especial" },
+    { src: pescariaCapal2, alt: "Pescaria de Casal - Momentos Únicos" },
+    { src: pescariaCapal3, alt: "Pescaria de Casal - Pacote Especial" },
+    { src: douradoProvaSocial, alt: "Dourado - Prova Social dos Resultados" },
+    { src: douradoPrado, alt: "Dourado Capturado no Prado" },
+    { src: pescariaPintalAbaite, alt: "Pescaria no Pintal do Abaité" },
     { src: imagem7, alt: "Estrutura VIP Premium" },
     { src: rancho2Image, alt: "Vista Exclusiva do Rancho Elite" },
     { src: rioSaoFranciscoImage, alt: "Rio São Francisco - Área VIP" },
