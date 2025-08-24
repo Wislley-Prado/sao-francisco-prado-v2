@@ -128,7 +128,7 @@ const HeroSection = () => {
                       onClick={() => navigate('/live')}
                     >
                       <Play className="mr-2 h-4 w-4" />
-                      Ver Transmissão Completa
+                      Rio São Francisco Online
                     </Button>
                   </div>
 

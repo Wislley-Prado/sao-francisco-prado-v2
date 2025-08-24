@@ -32,7 +32,7 @@ const StreamPlayer = () => {
       <iframe
         key={cacheKey}
         className="w-full h-full"
-        src={`https://www.youtube.com/embed/gIUFaUk2n2s?autoplay=1&mute=1&controls=1&rel=0&modestbranding=1&showinfo=0&enablejsapi=1&t=${cacheKey}`}
+        src={`https://www.youtube.com/embed/Hf_CBJtawfk?autoplay=1&mute=1&controls=1&rel=0&modestbranding=1&showinfo=0&enablejsapi=1&t=${cacheKey}`}
         title="Rio São Francisco - Transmissão ao Vivo"
         frameBorder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
