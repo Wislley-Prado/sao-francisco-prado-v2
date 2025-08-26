@@ -231,20 +231,20 @@ const PackageOption = memo(({ option }: { option: any }) => (
 ));
 
 const FeatureCard = memo(({ feature, index }: { feature: any; index: number }) => (
-  <Card className="hover:shadow-lg transition-shadow bg-gray-800/50 border border-yellow-400/20 hover:border-yellow-400/40">
+  <Card className="hover:shadow-lg transition-shadow">
     <CardHeader className="text-center">
       <div className="text-2xl sm:text-3xl lg:text-4xl mb-2">{feature.icon}</div>
-      <CardTitle className="text-base sm:text-lg lg:text-xl text-yellow-400">
+      <CardTitle className="text-base sm:text-lg lg:text-xl text-rio-blue">
         {feature.title}
       </CardTitle>
-      <p className="text-sm sm:text-base text-gray-300">{feature.description}</p>
+      <p className="text-sm sm:text-base text-gray-600">{feature.description}</p>
     </CardHeader>
     <CardContent>
       <div className="space-y-1 sm:space-y-2">
         {feature.items.map((item: string, itemIndex: number) => (
           <div key={itemIndex} className="flex items-start">
-            <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-400 mr-2 mt-0.5 flex-shrink-0" />
-            <span className="text-xs sm:text-sm text-gray-300">{item}</span>
+            <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-water-green mr-2 mt-0.5 flex-shrink-0" />
+            <span className="text-xs sm:text-sm text-gray-700">{item}</span>
           </div>
         ))}
       </div>
@@ -270,7 +270,7 @@ const PackageDiamante = () => {
 
   const packageFeatures = [
     {
-      icon: <Gem className="h-8 w-8 sm:h-10 sm:w-10 text-yellow-400" />,
+      icon: <Gem className="h-8 w-8 sm:h-10 sm:w-10 text-rio-blue" />,
       title: "Hospedagem VIP Exclusive",
       description: "Suítes presidenciais com máximo conforto e privacidade",
       items: [
@@ -283,7 +283,7 @@ const PackageDiamante = () => {
       ]
     },
     {
-      icon: <Wine className="h-8 w-8 sm:h-10 sm:w-10 text-yellow-400" />,
+      icon: <Wine className="h-8 w-8 sm:h-10 sm:w-10 text-rio-blue" />,
       title: "Gastronomia de Alto Nível",
       description: "Chef privativo e vinhos selecionados",
       items: [
@@ -296,7 +296,7 @@ const PackageDiamante = () => {
       ]
     },
     {
-      icon: <Crown className="h-8 w-8 sm:h-10 sm:w-10 text-yellow-400" />,
+      icon: <Crown className="h-8 w-8 sm:h-10 sm:w-10 text-rio-blue" />,
       title: "Equipamentos Profissionais",
       description: "Equipamentos de pesca profissionais e exclusivos",
       items: [
@@ -309,7 +309,7 @@ const PackageDiamante = () => {
       ]
     },
     {
-      icon: <Plane className="h-8 w-8 sm:h-10 sm:w-10 text-yellow-400" />,
+      icon: <Plane className="h-8 w-8 sm:h-10 sm:w-10 text-rio-blue" />,
       title: "Transporte Executivo",
       description: "Traslado VIP com todo conforto e segurança",
       items: [
@@ -324,16 +324,16 @@ const PackageDiamante = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white">
+    <div className="min-h-screen bg-gradient-to-b from-sky-50 to-blue-50">
       {/* Header */}
-      <header className="bg-black/50 backdrop-blur-sm shadow-lg sticky top-0 z-50 border-b border-yellow-400/20">
+      <header className="bg-white shadow-sm border-b sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-4">
           <div className="flex items-center justify-between">
-            <Link to="/" className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-yellow-400 to-yellow-500 bg-clip-text text-transparent">
+            <Link to="/" className="text-xl sm:text-2xl font-bold text-rio-blue">
               Prado Aqui
             </Link>
             <Link to="/">
-              <Button variant="outline" size="sm" className="text-xs sm:text-sm border-yellow-400/30 text-yellow-400 hover:bg-yellow-400 hover:text-black">
+              <Button variant="outline" size="sm" className="text-xs sm:text-sm">
                 Voltar ao Início
               </Button>
             </Link>
@@ -349,20 +349,20 @@ const PackageDiamante = () => {
               <Gem className="inline-block mr-1 h-3 w-3 sm:h-4 sm:w-4" />
               EXPERIÊNCIA ELITE EXCLUSIVA
             </Badge>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-bold bg-gradient-to-r from-yellow-400 to-yellow-500 bg-clip-text text-transparent mb-4 sm:mb-6 leading-tight">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-bold text-gray-900 mb-4 sm:mb-6 leading-tight">
               PACOTE DIAMANTE ELITE
             </h1>
-            <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-300 mb-3 sm:mb-4">
+            <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-rio-blue mb-3 sm:mb-4">
               "O Ápice do Luxo e Exclusividade"
             </h2>
             <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-6 mb-6 sm:mb-8">
               <div className="flex items-center justify-center">
-                <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-400 mr-2" />
-                <span className="text-sm sm:text-base text-gray-300">5 dias / 4 noites</span>
+                <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-water-green mr-2" />
+                <span className="text-sm sm:text-base text-gray-600">5 dias / 4 noites</span>
               </div>
               <div className="flex items-center justify-center">
-                <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-400 mr-2" />
-                <span className="text-sm sm:text-base text-gray-300">Rancho Prado – Aldeia VIP</span>
+                <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-water-green mr-2" />
+                <span className="text-sm sm:text-base text-gray-600">Rancho Prado – Aldeia VIP</span>
               </div>
             </div>
           </div>

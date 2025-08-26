@@ -75,7 +75,7 @@ const PhotoGallery = () => {
           </div>
           {galleryImages[0].badge && (
             <div className="absolute top-2 right-2">
-              <Badge className="bg-yellow-500 text-black text-xs">
+              <Badge className="bg-amber-500 text-white text-xs">
                 {galleryImages[0].badge}
               </Badge>
             </div>
@@ -260,7 +260,7 @@ const FeatureCard = memo(({ feature, index }: { feature: any; index: number }) =
   <Card className="hover:shadow-lg transition-shadow">
     <CardHeader className="text-center">
       <div className="text-2xl sm:text-3xl lg:text-4xl mb-2">{feature.icon}</div>
-      <CardTitle className="text-base sm:text-lg lg:text-xl text-amber-700">
+      <CardTitle className="text-base sm:text-lg lg:text-xl text-rio-blue">
         {feature.title}
       </CardTitle>
       <p className="text-sm sm:text-base text-gray-600">{feature.description}</p>
@@ -269,7 +269,7 @@ const FeatureCard = memo(({ feature, index }: { feature: any; index: number }) =
       <div className="space-y-1 sm:space-y-2">
         {feature.items.map((item: string, itemIndex: number) => (
           <div key={itemIndex} className="flex items-start">
-            <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-600 mr-2 mt-0.5 flex-shrink-0" />
+            <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-water-green mr-2 mt-0.5 flex-shrink-0" />
             <span className="text-xs sm:text-sm text-gray-700">{item}</span>
           </div>
         ))}
@@ -318,7 +318,7 @@ const PackageLuxo = () => {
 
   const packageFeatures = [
     {
-      icon: <Home className="h-8 w-8 sm:h-10 sm:w-10 text-amber-700" />,
+      icon: <Home className="h-8 w-8 sm:h-10 sm:w-10 text-rio-blue" />,
       title: "Hospedagem & Estrutura",
       description: "Rancho exclusivo à beira do Velho Chico",
       items: [
@@ -332,7 +332,7 @@ const PackageLuxo = () => {
       ]
     },
     {
-      icon: <ChefHat className="h-8 w-8 sm:h-10 sm:w-10 text-amber-700" />,
+      icon: <ChefHat className="h-8 w-8 sm:h-10 sm:w-10 text-rio-blue" />,
       title: "Gastronomia All Inclusive",
       description: "Cozinheira exclusiva com estilo caseiro mineiro",
       items: [
@@ -345,7 +345,7 @@ const PackageLuxo = () => {
       ]
     },
     {
-      icon: <Fish className="h-8 w-8 sm:h-10 sm:w-10 text-amber-700" />,
+      icon: <Fish className="h-8 w-8 sm:h-10 sm:w-10 text-rio-blue" />,
       title: "Estrutura de Pesca Profissional",
       description: "Barcos exclusivos com guias especializados",
       items: [
@@ -357,7 +357,7 @@ const PackageLuxo = () => {
       ]
     },
     {
-      icon: <Crown className="h-8 w-8 sm:h-10 sm:w-10 text-amber-700" />,
+      icon: <Crown className="h-8 w-8 sm:h-10 sm:w-10 text-rio-blue" />,
       title: "Serviços VIP & Brindes",
       description: "Atendimento personalizado e brindes exclusivos",
       items: [
@@ -372,12 +372,12 @@ const PackageLuxo = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-yellow-50">
+    <div className="min-h-screen bg-gradient-to-b from-sky-50 to-blue-50">
       {/* Header */}
       <header className="bg-white shadow-sm border-b sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-4">
           <div className="flex items-center justify-between">
-            <Link to="/" className="text-xl sm:text-2xl font-bold text-amber-700">
+            <Link to="/" className="text-xl sm:text-2xl font-bold text-rio-blue">
               Prado Aqui
             </Link>
             <Link to="/">
@@ -393,23 +393,23 @@ const PackageLuxo = () => {
       <section className="py-6 sm:py-8 lg:py-12">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="text-center mb-6 sm:mb-8 lg:mb-12">
-            <Badge className="bg-yellow-500 text-black mb-3 sm:mb-4 text-sm sm:text-lg px-3 sm:px-4 py-1 sm:py-2">
+            <Badge className="bg-amber-500 text-white mb-3 sm:mb-4 text-sm sm:text-lg px-3 sm:px-4 py-1 sm:py-2">
               <Crown className="inline-block mr-1 h-3 w-3 sm:h-4 sm:w-4" />
               EXPERIÊNCIA PREMIUM
             </Badge>
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-bold text-gray-900 mb-4 sm:mb-6 leading-tight">
               PACOTE LUXO PREMIUM
             </h1>
-            <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-amber-700 mb-3 sm:mb-4">
+            <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-rio-blue mb-3 sm:mb-4">
               "Conforto e Elegância na Pesca"
             </h2>
             <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-6 mb-6 sm:mb-8">
               <div className="flex items-center justify-center">
-                <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-600 mr-2" />
-                <span className="text-sm sm:text-base text-gray-600">3 dias / 2 noites</span>
+                <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-water-green mr-2" />
+                <span className="text-sm sm:text-base text-gray-600">Quarta a domingo – 5 dias / 4 noites</span>
               </div>
               <div className="flex items-center justify-center">
-                <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-600 mr-2" />
+                <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-water-green mr-2" />
                 <span className="text-sm sm:text-base text-gray-600">Rancho Prado – Aldeia</span>
               </div>
             </div>
@@ -424,9 +424,9 @@ const PackageLuxo = () => {
               loading="eager"
             />
             <div className="absolute top-2 sm:top-4 right-2 sm:right-4">
-              <Badge className="bg-yellow-500 text-black text-xs sm:text-sm lg:text-lg px-2 sm:px-4 py-1 sm:py-2">
+              <Badge className="bg-amber-500 text-white text-xs sm:text-sm lg:text-lg px-2 sm:px-4 py-1 sm:py-2">
                 <Crown className="inline-block mr-1 h-3 w-3 sm:h-4 sm:w-4" />
-                Experiência Premium
+                Exclusividade Premium
               </Badge>
             </div>
           </div>
