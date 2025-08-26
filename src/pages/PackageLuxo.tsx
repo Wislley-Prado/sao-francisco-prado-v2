@@ -235,10 +235,10 @@ const PackageOption = memo(({ option }: { option: any }) => (
             <span className="font-semibold text-orange-800 text-sm">À vista (PIX)</span>
           </div>
           <div className="text-orange-700 text-sm font-medium mb-1">
-            R$ {option.pixPrice.toLocaleString('pt-BR')} (5% desconto!)
+            R$ {option.pixPrice.toLocaleString('pt-BR')} por pessoa (5% desconto!)
           </div>
           <div className="text-xs text-orange-600">
-            Economia de R$ {(option.totalPrice - option.pixPrice).toLocaleString('pt-BR')}
+            Economia de R$ {(option.pricePerPerson - option.pixPrice).toLocaleString('pt-BR')} por pessoa
           </div>
         </div>
       </div>
@@ -290,7 +290,7 @@ const PackageLuxo = () => {
       totalPrice: 23820,
       pricePerPerson: 3970,
       installments: "R$ 2.382,00",
-      pixPrice: 22629,
+      pixPrice: 3771,
       popular: false,
       subtitle: "Grupo Ideal"
     },
@@ -299,8 +299,8 @@ const PackageLuxo = () => {
       people: 8,
       totalPrice: 31760,
       pricePerPerson: 3970,
-      installments: "R$ 3.176,00",
-      pixPrice: 30172,
+      installments: "R$ 2.382,00",
+      pixPrice: 3771,
       popular: true,
       subtitle: "Grupo Ideal"
     },
@@ -309,8 +309,8 @@ const PackageLuxo = () => {
       people: 10,
       totalPrice: 39700,
       pricePerPerson: 3970,
-      installments: "R$ 3.970,00",
-      pixPrice: 37715,
+      installments: "R$ 2.382,00",
+      pixPrice: 3771,
       popular: false,
       subtitle: "Grupo Máximo"
     }
