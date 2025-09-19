@@ -36,45 +36,45 @@ const App = () => {
   
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <ThemeProvider defaultTheme="system" storageKey="ui-theme">
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <PWALifecycle />
-            <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/live" element={<LiveStream />} />
-            <Route path="/pacotes" element={<PackagesIndex />} />
-            <Route path="/pacote/vip" element={<PackageVip />} />
-            <Route path="/pacote/luxo" element={<PackageLuxo />} />
-            <Route path="/pacote/diamante" element={<PackageDiamante />} />
-            <Route path="/politica-privacidade" element={<PrivacyPolicy />} />
-            <Route path="/admin" element={
-              <Suspense fallback={<div className="flex items-center justify-center min-h-screen">
-                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-              </div>}>
-                <Admin />
-              </Suspense>
-            } />
-            <Route path="/admin/login" element={
-              <Suspense fallback={<div className="flex items-center justify-center min-h-screen">
-                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-              </div>}>
-                <AdminLogin />
-              </Suspense>
-            } />
-            {/* Backward compatibility */}
-            <Route path="/pacote-vip" element={<PackageVip />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-            <CookieConsent />
+      <ThemeProvider defaultTheme="system" storageKey="ui-theme">
+        <TooltipProvider>
+          <BrowserRouter>
+            <AuthProvider>
+              <Toaster />
+              <Sonner />
+              <PWALifecycle />
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/live" element={<LiveStream />} />
+                <Route path="/pacotes" element={<PackagesIndex />} />
+                <Route path="/pacote/vip" element={<PackageVip />} />
+                <Route path="/pacote/luxo" element={<PackageLuxo />} />
+                <Route path="/pacote/diamante" element={<PackageDiamante />} />
+                <Route path="/politica-privacidade" element={<PrivacyPolicy />} />
+                <Route path="/admin" element={
+                  <Suspense fallback={<div className="flex items-center justify-center min-h-screen">
+                    <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+                  </div>}>
+                    <Admin />
+                  </Suspense>
+                } />
+                <Route path="/admin/login" element={
+                  <Suspense fallback={<div className="flex items-center justify-center min-h-screen">
+                    <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+                  </div>}>
+                    <AdminLogin />
+                  </Suspense>
+                } />
+                {/* Backward compatibility */}
+                <Route path="/pacote-vip" element={<PackageVip />} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+              <CookieConsent />
+            </AuthProvider>
           </BrowserRouter>
         </TooltipProvider>
       </ThemeProvider>
-      </AuthProvider>
     </QueryClientProvider>
 );
 };
