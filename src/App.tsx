@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { PWALifecycle } from "@/components/PWALifecycle";
 import CookieConsent from "@/components/CookieConsent";
+import { AuthProvider } from "@/contexts/AuthContext";
 import { Suspense, lazy } from "react";
 import Index from "./pages/Index";
 import LiveStream from "./pages/LiveStream";
@@ -35,12 +36,13 @@ const App = () => {
   
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="system" storageKey="ui-theme">
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <PWALifecycle />
-          <BrowserRouter>
+      <AuthProvider>
+        <ThemeProvider defaultTheme="system" storageKey="ui-theme">
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <PWALifecycle />
+            <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/live" element={<LiveStream />} />
@@ -68,11 +70,12 @@ const App = () => {
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
-          <CookieConsent />
-        </BrowserRouter>
-      </TooltipProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
+            <CookieConsent />
+          </BrowserRouter>
+        </TooltipProvider>
+      </ThemeProvider>
+      </AuthProvider>
+    </QueryClientProvider>
 );
 };
 

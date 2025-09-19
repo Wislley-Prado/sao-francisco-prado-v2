@@ -1,6 +1,8 @@
 import React from 'react';
 import { LayoutDashboard, Home, Package, ShoppingBag, Settings, LogOut } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import {
   Sidebar,
@@ -29,12 +31,12 @@ const menuItems = [
 ];
 
 export const AdminSidebar = ({ currentView, onViewChange }: AdminSidebarProps) => {
+  const { signOut } = useAuth();
   const { toast } = useToast();
 
   const handleLogout = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      await signOut();
       
       toast({
         title: "Logout realizado",
