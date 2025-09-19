@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { PWALifecycle } from "@/components/PWALifecycle";
 import CookieConsent from "@/components/CookieConsent";
+import { Suspense, lazy } from "react";
 import Index from "./pages/Index";
 import LiveStream from "./pages/LiveStream";
 import PackageVip from "./pages/PackageVip";
@@ -15,8 +16,10 @@ import PackageDiamante from "./pages/PackageDiamante";
 import PackagesIndex from "./pages/PackagesIndex";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
-import Admin from "./pages/Admin";
-import AdminLogin from "./pages/AdminLogin";
+
+// Lazy load admin components
+const Admin = lazy(() => import("./pages/Admin"));
+const AdminLogin = lazy(() => import("./pages/AdminLogin"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -46,8 +49,20 @@ const App = () => {
             <Route path="/pacote/luxo" element={<PackageLuxo />} />
             <Route path="/pacote/diamante" element={<PackageDiamante />} />
             <Route path="/politica-privacidade" element={<PrivacyPolicy />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/admin" element={
+              <Suspense fallback={<div className="flex items-center justify-center min-h-screen">
+                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+              </div>}>
+                <Admin />
+              </Suspense>
+            } />
+            <Route path="/admin/login" element={
+              <Suspense fallback={<div className="flex items-center justify-center min-h-screen">
+                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+              </div>}>
+                <AdminLogin />
+              </Suspense>
+            } />
             {/* Backward compatibility */}
             <Route path="/pacote-vip" element={<PackageVip />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -24,6 +24,7 @@ export default defineConfig(({ mode }) => ({
         cleanupOutdatedCaches: true,
         clientsClaim: true,
         skipWaiting: true,
+        maximumFileSizeToCacheInBytes: 3000000, // 3MB limit
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/api\./,
@@ -58,6 +59,25 @@ export default defineConfig(({ mode }) => ({
       }
     })
   ].filter(Boolean),
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'admin': [
+            './src/pages/Admin.tsx',
+            './src/pages/AdminLogin.tsx',
+            './src/components/admin/AdminSidebar.tsx',
+            './src/components/admin/AdminHeader.tsx',
+            './src/components/admin/AdminDashboard.tsx',
+            './src/components/admin/AdminRanchos.tsx',
+            './src/components/admin/AdminPacotes.tsx',
+            './src/components/admin/AdminLoja.tsx',
+            './src/components/admin/AdminConfiguracoes.tsx'
+          ]
+        }
+      }
+    }
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
