@@ -15,6 +15,8 @@ import PackageDiamante from "./pages/PackageDiamante";
 import PackagesIndex from "./pages/PackagesIndex";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
+import Admin from "./pages/Admin";
+import AdminLogin from "./pages/AdminLogin";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -44,6 +46,8 @@ const App = () => {
             <Route path="/pacote/luxo" element={<PackageLuxo />} />
             <Route path="/pacote/diamante" element={<PackageDiamante />} />
             <Route path="/politica-privacidade" element={<PrivacyPolicy />} />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="/admin/login" element={<AdminLogin />} />
             {/* Backward compatibility */}
             <Route path="/pacote-vip" element={<PackageVip />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
