@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      blog_posts: {
+        Row: {
+          autor_id: string | null
+          categoria: string | null
+          conteudo: string
+          created_at: string
+          data_publicacao: string | null
+          id: string
+          imagem_destaque: string | null
+          publicado: boolean
+          resumo: string | null
+          slug: string
+          tags: string[] | null
+          titulo: string
+          updated_at: string
+          visualizacoes: number
+        }
+        Insert: {
+          autor_id?: string | null
+          categoria?: string | null
+          conteudo: string
+          created_at?: string
+          data_publicacao?: string | null
+          id?: string
+          imagem_destaque?: string | null
+          publicado?: boolean
+          resumo?: string | null
+          slug: string
+          tags?: string[] | null
+          titulo: string
+          updated_at?: string
+          visualizacoes?: number
+        }
+        Update: {
+          autor_id?: string | null
+          categoria?: string | null
+          conteudo?: string
+          created_at?: string
+          data_publicacao?: string | null
+          id?: string
+          imagem_destaque?: string | null
+          publicado?: boolean
+          resumo?: string | null
+          slug?: string
+          tags?: string[] | null
+          titulo?: string
+          updated_at?: string
+          visualizacoes?: number
+        }
+        Relationships: []
+      }
       categorias: {
         Row: {
           ativo: boolean
