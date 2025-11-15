@@ -14,7 +14,359 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      categorias: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          descricao: string | null
+          id: string
+          nome: string
+          ordem: number
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          nome: string
+          ordem?: number
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          nome?: string
+          ordem?: number
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      configuracoes: {
+        Row: {
+          chave: string
+          created_at: string
+          descricao: string | null
+          id: string
+          tipo: string
+          updated_at: string
+          valor: string | null
+        }
+        Insert: {
+          chave: string
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          tipo?: string
+          updated_at?: string
+          valor?: string | null
+        }
+        Update: {
+          chave?: string
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          tipo?: string
+          updated_at?: string
+          valor?: string | null
+        }
+        Relationships: []
+      }
+      pacote_imagens: {
+        Row: {
+          alt_text: string | null
+          created_at: string
+          id: string
+          ordem: number
+          pacote_id: string
+          principal: boolean
+          url: string
+        }
+        Insert: {
+          alt_text?: string | null
+          created_at?: string
+          id?: string
+          ordem?: number
+          pacote_id: string
+          principal?: boolean
+          url: string
+        }
+        Update: {
+          alt_text?: string | null
+          created_at?: string
+          id?: string
+          ordem?: number
+          pacote_id?: string
+          principal?: boolean
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pacote_imagens_pacote_id_fkey"
+            columns: ["pacote_id"]
+            isOneToOne: false
+            referencedRelation: "pacotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pacotes: {
+        Row: {
+          ativo: boolean
+          caracteristicas: string[] | null
+          created_at: string
+          descricao: string | null
+          destaque: boolean
+          duracao: string
+          id: string
+          inclusos: string[] | null
+          nome: string
+          pessoas: number
+          popular: boolean
+          preco: number
+          rating: number
+          slug: string
+          tipo: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          caracteristicas?: string[] | null
+          created_at?: string
+          descricao?: string | null
+          destaque?: boolean
+          duracao: string
+          id?: string
+          inclusos?: string[] | null
+          nome: string
+          pessoas?: number
+          popular?: boolean
+          preco: number
+          rating?: number
+          slug: string
+          tipo?: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          caracteristicas?: string[] | null
+          created_at?: string
+          descricao?: string | null
+          destaque?: boolean
+          duracao?: string
+          id?: string
+          inclusos?: string[] | null
+          nome?: string
+          pessoas?: number
+          popular?: boolean
+          preco?: number
+          rating?: number
+          slug?: string
+          tipo?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      produto_imagens: {
+        Row: {
+          alt_text: string | null
+          created_at: string
+          id: string
+          ordem: number
+          principal: boolean
+          produto_id: string
+          url: string
+        }
+        Insert: {
+          alt_text?: string | null
+          created_at?: string
+          id?: string
+          ordem?: number
+          principal?: boolean
+          produto_id: string
+          url: string
+        }
+        Update: {
+          alt_text?: string | null
+          created_at?: string
+          id?: string
+          ordem?: number
+          principal?: boolean
+          produto_id?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "produto_imagens_produto_id_fkey"
+            columns: ["produto_id"]
+            isOneToOne: false
+            referencedRelation: "produtos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      produtos: {
+        Row: {
+          ativo: boolean
+          categoria_id: string | null
+          created_at: string
+          descricao: string | null
+          destaque: boolean
+          especificacoes: Json | null
+          estoque: number
+          id: string
+          nome: string
+          preco: number
+          preco_promocional: number | null
+          slug: string
+          tags: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          categoria_id?: string | null
+          created_at?: string
+          descricao?: string | null
+          destaque?: boolean
+          especificacoes?: Json | null
+          estoque?: number
+          id?: string
+          nome: string
+          preco: number
+          preco_promocional?: number | null
+          slug: string
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          categoria_id?: string | null
+          created_at?: string
+          descricao?: string | null
+          destaque?: boolean
+          especificacoes?: Json | null
+          estoque?: number
+          id?: string
+          nome?: string
+          preco?: number
+          preco_promocional?: number | null
+          slug?: string
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "produtos_categoria_id_fkey"
+            columns: ["categoria_id"]
+            isOneToOne: false
+            referencedRelation: "categorias"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rancho_imagens: {
+        Row: {
+          alt_text: string | null
+          created_at: string
+          id: string
+          ordem: number
+          principal: boolean
+          rancho_id: string
+          url: string
+        }
+        Insert: {
+          alt_text?: string | null
+          created_at?: string
+          id?: string
+          ordem?: number
+          principal?: boolean
+          rancho_id: string
+          url: string
+        }
+        Update: {
+          alt_text?: string | null
+          created_at?: string
+          id?: string
+          ordem?: number
+          principal?: boolean
+          rancho_id?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rancho_imagens_rancho_id_fkey"
+            columns: ["rancho_id"]
+            isOneToOne: false
+            referencedRelation: "ranchos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ranchos: {
+        Row: {
+          area: number | null
+          banheiros: number
+          capacidade: number
+          caracteristicas: Json | null
+          comodidades: string[] | null
+          created_at: string
+          descricao: string | null
+          destaque: boolean
+          disponivel: boolean
+          id: string
+          localizacao: string
+          nome: string
+          preco: number
+          quartos: number
+          rating: number
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          area?: number | null
+          banheiros?: number
+          capacidade: number
+          caracteristicas?: Json | null
+          comodidades?: string[] | null
+          created_at?: string
+          descricao?: string | null
+          destaque?: boolean
+          disponivel?: boolean
+          id?: string
+          localizacao: string
+          nome: string
+          preco: number
+          quartos?: number
+          rating?: number
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          area?: number | null
+          banheiros?: number
+          capacidade?: number
+          caracteristicas?: Json | null
+          comodidades?: string[] | null
+          created_at?: string
+          descricao?: string | null
+          destaque?: boolean
+          disponivel?: boolean
+          id?: string
+          localizacao?: string
+          nome?: string
+          preco?: number
+          quartos?: number
+          rating?: number
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
