@@ -7,6 +7,18 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Loader2, Fish } from 'lucide-react';
+import { z } from 'zod';
+import { toast } from 'sonner';
+
+const loginSchema = z.object({
+  email: z.string().trim().email({ message: 'Email inválido' }).max(255, { message: 'Email muito longo' }),
+  password: z.string().min(6, { message: 'Senha deve ter no mínimo 6 caracteres' }).max(100, { message: 'Senha muito longa' })
+});
+
+const signupSchema = z.object({
+  email: z.string().trim().email({ message: 'Email inválido' }).max(255, { message: 'Email muito longo' }),
+  password: z.string().min(8, { message: 'Senha deve ter no mínimo 8 caracteres' }).max(100, { message: 'Senha muito longa' })
+});
 
 const AdminLogin = () => {
   const [email, setEmail] = useState('');
@@ -24,9 +36,17 @@ const AdminLogin = () => {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate input
+    const validation = loginSchema.safeParse({ email: email.trim(), password });
+    if (!validation.success) {
+      toast.error(validation.error.errors[0].message);
+      return;
+    }
+
     setIsLoading(true);
 
-    const { error } = await signIn(email, password);
+    const { error } = await signIn(validation.data.email, validation.data.password);
 
     if (!error) {
       // Wait a bit for admin check, then navigate
@@ -40,9 +60,17 @@ const AdminLogin = () => {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate input
+    const validation = signupSchema.safeParse({ email: email.trim(), password });
+    if (!validation.success) {
+      toast.error(validation.error.errors[0].message);
+      return;
+    }
+
     setIsLoading(true);
 
-    const { error } = await signUp(email, password);
+    const { error } = await signUp(validation.data.email, validation.data.password);
 
     if (!error) {
       // After signup, wait for email confirmation
