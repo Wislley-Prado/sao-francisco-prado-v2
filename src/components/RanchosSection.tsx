@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 interface Ranch {
   id: string | number;
   name: string;
+  slug?: string;
   description: string;
   location: string;
   capacity: number;
@@ -73,6 +74,7 @@ const RanchosSection = () => {
             return {
               id: rancho.id,
               name: rancho.nome,
+              slug: rancho.slug,
               description: rancho.descricao || '',
               location: rancho.localizacao,
               capacity: rancho.capacidade,
