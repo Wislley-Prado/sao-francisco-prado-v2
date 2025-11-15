@@ -2,8 +2,11 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { X, Upload, Star, GripVertical } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { X, Upload, Star, GripVertical, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { compressImages } from '@/utils/imageCompression';
+import { toast } from 'sonner';
 
 export interface ImageFile {
   id: string;
@@ -26,25 +29,70 @@ export const ImageUploader = ({
   maxImages = 10,
 }: ImageUploaderProps) => {
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [isCompressing, setIsCompressing] = useState(false);
+  const [compressionProgress, setCompressionProgress] = useState(0);
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     
     if (files.length + images.length > maxImages) {
-      alert(`Máximo de ${maxImages} imagens permitidas`);
+      toast.error(`Máximo de ${maxImages} imagens permitidas`);
       return;
     }
 
-    const newImages: ImageFile[] = files.map((file, index) => ({
-      id: `new-${Date.now()}-${index}`,
-      file,
-      url: URL.createObjectURL(file),
-      principal: images.length === 0 && index === 0,
-      alt_text: '',
-      ordem: images.length + index,
-    }));
+    // Validar tipos de arquivo
+    const validFiles = files.filter(file => {
+      const isValid = file.type.startsWith('image/');
+      if (!isValid) {
+        toast.error(`${file.name} não é uma imagem válida`);
+      }
+      return isValid;
+    });
 
-    onChange([...images, ...newImages]);
+    if (validFiles.length === 0) return;
+
+    setIsCompressing(true);
+    setCompressionProgress(0);
+
+    try {
+      // Comprimir imagens
+      const compressedFiles = await compressImages(
+        validFiles,
+        {
+          maxWidth: 1920,
+          maxHeight: 1920,
+          quality: 0.85,
+          maxSizeMB: 1,
+        },
+        (current, total) => {
+          setCompressionProgress((current / total) * 100);
+        }
+      );
+
+      const newImages: ImageFile[] = compressedFiles.map((file, index) => ({
+        id: `new-${Date.now()}-${index}`,
+        file,
+        url: URL.createObjectURL(file),
+        principal: images.length === 0 && index === 0,
+        alt_text: '',
+        ordem: images.length + index,
+      }));
+
+      onChange([...images, ...newImages]);
+      
+      const totalSizeMB = compressedFiles.reduce((acc, f) => acc + f.size, 0) / 1024 / 1024;
+      toast.success(
+        `${compressedFiles.length} imagem(ns) otimizada(s) (${totalSizeMB.toFixed(2)}MB total)`
+      );
+    } catch (error) {
+      console.error('Error compressing images:', error);
+      toast.error('Erro ao processar imagens');
+    } finally {
+      setIsCompressing(false);
+      setCompressionProgress(0);
+      // Limpar input para permitir selecionar os mesmos arquivos novamente
+      e.target.value = '';
+    }
   };
 
   const removeImage = (id: string) => {
@@ -99,22 +147,39 @@ export const ImageUploader = ({
       <div>
         <Label htmlFor="images">Imagens do Rancho *</Label>
         <p className="text-sm text-muted-foreground mb-2">
-          Faça upload de até {maxImages} imagens. Arraste para reordenar.
+          Faça upload de até {maxImages} imagens. As imagens serão automaticamente otimizadas.
         </p>
         <div className="flex items-center gap-4">
           <Button
             type="button"
             variant="outline"
             onClick={() => document.getElementById('file-input')?.click()}
-            disabled={images.length >= maxImages}
+            disabled={images.length >= maxImages || isCompressing}
           >
-            <Upload className="w-4 h-4 mr-2" />
-            Selecionar Imagens
+            {isCompressing ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Otimizando...
+              </>
+            ) : (
+              <>
+                <Upload className="w-4 h-4 mr-2" />
+                Selecionar Imagens
+              </>
+            )}
           </Button>
           <span className="text-sm text-muted-foreground">
             {images.length} / {maxImages}
           </span>
         </div>
+        {isCompressing && (
+          <div className="mt-4 space-y-2">
+            <Progress value={compressionProgress} className="h-2" />
+            <p className="text-xs text-muted-foreground text-center">
+              Comprimindo imagens... {Math.round(compressionProgress)}%
+            </p>
+          </div>
+        )}
         <input
           id="file-input"
           type="file"
@@ -122,6 +187,7 @@ export const ImageUploader = ({
           multiple
           onChange={handleFileSelect}
           className="hidden"
+          disabled={isCompressing}
         />
       </div>
 
