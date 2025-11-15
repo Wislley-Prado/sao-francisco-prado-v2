@@ -20,6 +20,8 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import AdminLogin from "./pages/admin/Login";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminRanchos from "./pages/admin/Ranchos";
+import RanchoNovo from "./pages/admin/RanchoNovo";
+import RanchoEditar from "./pages/admin/RanchoEditar";
 import AdminPacotes from "./pages/admin/Pacotes";
 import AdminBlog from "./pages/admin/Blog";
 import NotFound from "./pages/NotFound";
@@ -69,6 +71,8 @@ const App = () => {
                 >
                   <Route index element={<AdminDashboard />} />
                   <Route path="ranchos" element={<AdminRanchos />} />
+                  <Route path="ranchos/novo" element={<RanchoNovo />} />
+                  <Route path="ranchos/editar/:id" element={<RanchoEditar />} />
                   <Route path="pacotes" element={<AdminPacotes />} />
                   <Route path="blog" element={<AdminBlog />} />
                 </Route>
