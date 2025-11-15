@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         .select('role')
         .eq('user_id', userId)
         .eq('role', 'admin')
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Error checking admin role:', error);
