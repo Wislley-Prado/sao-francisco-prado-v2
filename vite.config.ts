@@ -50,7 +50,7 @@ export default defineConfig(({ mode }) => ({
           }
         ],
         navigateFallback: '/offline.html',
-        navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/]
+        navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/, /^\/admin/]
       },
       devOptions: {
         enabled: true,
