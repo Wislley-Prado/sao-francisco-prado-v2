@@ -9,6 +9,7 @@ import { PWALifecycle } from "@/components/PWALifecycle";
 import CookieConsent from "@/components/CookieConsent";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { PrivateRoute } from "@/components/admin/PrivateRoute";
+import { AdminLayout } from "@/components/admin/AdminLayout";
 import Index from "./pages/Index";
 import LiveStream from "./pages/LiveStream";
 import PackageVip from "./pages/PackageVip";
@@ -18,6 +19,9 @@ import PackagesIndex from "./pages/PackagesIndex";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import AdminLogin from "./pages/admin/Login";
 import AdminDashboard from "./pages/admin/Dashboard";
+import AdminRanchos from "./pages/admin/Ranchos";
+import AdminPacotes from "./pages/admin/Pacotes";
+import AdminBlog from "./pages/admin/Blog";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -59,10 +63,15 @@ const App = () => {
                   path="/admin" 
                   element={
                     <PrivateRoute>
-                      <AdminDashboard />
+                      <AdminLayout />
                     </PrivateRoute>
-                  } 
-                />
+                  }
+                >
+                  <Route index element={<AdminDashboard />} />
+                  <Route path="ranchos" element={<AdminRanchos />} />
+                  <Route path="pacotes" element={<AdminPacotes />} />
+                  <Route path="blog" element={<AdminBlog />} />
+                </Route>
                 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
