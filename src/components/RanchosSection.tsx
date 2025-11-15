@@ -1,11 +1,13 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import RanchCard from './RanchCard';
 import RanchFilters from './RanchFilters';
-import { MapPin, Star } from 'lucide-react';
+import { MapPin, Star, Loader2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface Ranch {
-  id: number;
+  id: string | number;
   name: string;
   description: string;
   location: string;
@@ -41,110 +43,64 @@ const RanchosSection = () => {
     available: false,
   });
 
-  const ranchos: Ranch[] = [
-    {
-      id: 1,
-      name: "Rancho Vista Rio",
-      description: "Rancho familiar com vista privilegiada do Rio São Francisco, ideal para famílias que buscam tranquilidade.",
-      location: "Margem Norte",
-      capacity: 8,
-      price: 450,
-      rating: 4.8,
-      images: ["/api/placeholder/400/250"],
-      amenities: ["Wi-Fi", "Piscina", "Churrasqueira", "Deck de Pesca", "Estacionamento"],
-      available: true,
-      features: {
-        bedrooms: 3,
-        bathrooms: 2,
-        area: "150m²"
+  const [ranchos, setRanchos] = useState<Ranch[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchRanchos = async () => {
+      try {
+        setLoading(true);
+        
+        // Buscar ranchos disponíveis
+        const { data: ranchosData, error: ranchosError } = await supabase
+          .from('ranchos')
+          .select('*')
+          .eq('disponivel', true)
+          .order('destaque', { ascending: false })
+          .order('created_at', { ascending: false });
+
+        if (ranchosError) throw ranchosError;
+
+        // Buscar imagens para cada rancho
+        const ranchosWithImages = await Promise.all(
+          (ranchosData || []).map(async (rancho) => {
+            const { data: imagesData } = await supabase
+              .from('rancho_imagens')
+              .select('url, alt_text, principal, ordem')
+              .eq('rancho_id', rancho.id)
+              .order('ordem', { ascending: true });
+
+            return {
+              id: rancho.id,
+              name: rancho.nome,
+              description: rancho.descricao || '',
+              location: rancho.localizacao,
+              capacity: rancho.capacidade,
+              price: Number(rancho.preco),
+              rating: Number(rancho.rating),
+              images: (imagesData || []).map(img => img.url),
+              amenities: rancho.comodidades || [],
+              available: rancho.disponivel,
+              features: {
+                bedrooms: rancho.quartos,
+                bathrooms: rancho.banheiros,
+                area: rancho.area ? `${rancho.area}m²` : '0m²'
+              }
+            };
+          })
+        );
+
+        setRanchos(ranchosWithImages);
+      } catch (error) {
+        console.error('Erro ao buscar ranchos:', error);
+        toast.error('Erro ao carregar ranchos');
+      } finally {
+        setLoading(false);
       }
-    },
-    {
-      id: 2,
-      name: "Rancho Pescador Premium",
-      description: "Rancho de luxo com equipamentos profissionais de pesca e todas as comodidades modernas.",
-      location: "Ilha Particular",
-      capacity: 12,
-      price: 850,
-      rating: 4.9,
-      images: ["/api/placeholder/400/250"],
-      amenities: ["Wi-Fi", "Ar Condicionado", "Piscina", "Churrasqueira", "Deck de Pesca", "Cozinha Completa", "TV a Cabo"],
-      available: true,
-      features: {
-        bedrooms: 4,
-        bathrooms: 3,
-        area: "220m²"
-      }
-    },
-    {
-      id: 3,
-      name: "Rancho Família Ribeirinha",
-      description: "Ambiente acolhedor e rústico, perfeito para grupos que querem uma experiência autêntica.",
-      location: "Beira Rio",
-      capacity: 6,
-      price: 320,
-      rating: 4.6,
-      images: ["/api/placeholder/400/250"],
-      amenities: ["Churrasqueira", "Deck de Pesca", "Estacionamento", "Cozinha Completa"],
-      available: false,
-      features: {
-        bedrooms: 2,
-        bathrooms: 1,
-        area: "120m²"
-      }
-    },
-    {
-      id: 4,
-      name: "Rancho Sunset Lodge",
-      description: "Vista espetacular do pôr do sol, com deck amplo e estrutura completa para pescarias.",
-      location: "Margem Sul",
-      capacity: 10,
-      price: 680,
-      rating: 4.7,
-      images: ["/api/placeholder/400/250"],
-      amenities: ["Wi-Fi", "Piscina", "Churrasqueira", "Deck de Pesca", "Ar Condicionado", "Estacionamento"],
-      available: true,
-      features: {
-        bedrooms: 3,
-        bathrooms: 2,
-        area: "180m²"
-      }
-    },
-    {
-      id: 5,
-      name: "Rancho Águas Claras",
-      description: "Localizado em área preservada com águas cristalinas, ideal para pesca esportiva.",
-      location: "Margem Norte",
-      capacity: 4,
-      price: 380,
-      rating: 4.5,
-      images: ["/api/placeholder/400/250"],
-      amenities: ["Deck de Pesca", "Churrasqueira", "Estacionamento"],
-      available: true,
-      features: {
-        bedrooms: 2,
-        bathrooms: 1,
-        area: "100m²"
-      }
-    },
-    {
-      id: 6,
-      name: "Rancho Família Grande",
-      description: "Espaçoso rancho para grandes grupos, com área de lazer completa e múltiplos quartos.",
-      location: "Margem Sul",
-      capacity: 16,
-      price: 1200,
-      rating: 4.8,
-      images: ["/api/placeholder/400/250"],
-      amenities: ["Wi-Fi", "Piscina", "Churrasqueira", "Deck de Pesca", "Ar Condicionado", "Cozinha Completa", "TV a Cabo", "Estacionamento"],
-      available: true,
-      features: {
-        bedrooms: 5,
-        bathrooms: 4,
-        area: "300m²"
-      }
-    }
-  ];
+    };
+
+    fetchRanchos();
+  }, []);
 
   const filteredRanchos = useMemo(() => {
     return ranchos.filter(rancho => {

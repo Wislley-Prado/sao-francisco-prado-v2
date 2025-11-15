@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Users, MapPin, Wifi, Car, Waves, Utensils, Calendar, Star } from 'lucide-react';
 
 interface Ranch {
-  id: number;
+  id: string | number;
   name: string;
   description: string;
   location: string;
@@ -41,20 +41,27 @@ const RanchCard = ({ ranch }: RanchCardProps) => {
     <Card className="overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
       <CardHeader className="p-0">
         <div className="relative">
-          <div className="h-48 bg-gradient-to-br from-rio-blue to-water-green">
-            <div className="absolute inset-0 bg-black bg-opacity-20"></div>
-            <div className="absolute top-4 right-4">
-              {ranch.available ? (
-                <Badge className="bg-green-500 text-white">Disponível</Badge>
-              ) : (
-                <Badge className="bg-red-500 text-white">Ocupado</Badge>
-              )}
-            </div>
-            <div className="absolute bottom-4 left-4 text-white">
-              <div className="flex items-center space-x-1 mb-2">
-                <Star className="h-4 w-4 fill-current text-yellow-400" />
-                <span className="text-sm font-medium">{ranch.rating}</span>
-              </div>
+          {ranch.images && ranch.images.length > 0 ? (
+            <img 
+              src={ranch.images[0]} 
+              alt={ranch.name}
+              className="h-48 w-full object-cover"
+            />
+          ) : (
+            <div className="h-48 bg-gradient-to-br from-rio-blue to-water-green" />
+          )}
+          <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+          <div className="absolute top-4 right-4">
+            {ranch.available ? (
+              <Badge className="bg-green-500 text-white">Disponível</Badge>
+            ) : (
+              <Badge className="bg-red-500 text-white">Ocupado</Badge>
+            )}
+          </div>
+          <div className="absolute bottom-4 left-4 text-white">
+            <div className="flex items-center space-x-1 mb-2">
+              <Star className="h-4 w-4 fill-current text-yellow-400" />
+              <span className="text-sm font-medium">{ranch.rating}</span>
             </div>
           </div>
         </div>
