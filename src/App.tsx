@@ -7,6 +7,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { PWALifecycle } from "@/components/PWALifecycle";
 import CookieConsent from "@/components/CookieConsent";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { PrivateRoute } from "@/components/admin/PrivateRoute";
 import Index from "./pages/Index";
 import LiveStream from "./pages/LiveStream";
 import PackageVip from "./pages/PackageVip";
@@ -14,6 +16,8 @@ import PackageLuxo from "./pages/PackageLuxo";
 import PackageDiamante from "./pages/PackageDiamante";
 import PackagesIndex from "./pages/PackagesIndex";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import AdminLogin from "./pages/admin/Login";
+import AdminDashboard from "./pages/admin/Dashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -36,24 +40,39 @@ const App = () => {
           <Sonner />
           <PWALifecycle />
           <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/live" element={<LiveStream />} />
-            <Route path="/pacotes" element={<PackagesIndex />} />
-            <Route path="/pacote/vip" element={<PackageVip />} />
-            <Route path="/pacote/luxo" element={<PackageLuxo />} />
-            <Route path="/pacote/diamante" element={<PackageDiamante />} />
-            <Route path="/politica-privacidade" element={<PrivacyPolicy />} />
-            {/* Backward compatibility */}
-            <Route path="/pacote-vip" element={<PackageVip />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          <CookieConsent />
-        </BrowserRouter>
-      </TooltipProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
+            <AuthProvider>
+              <Routes>
+                {/* Public Routes */}
+                <Route path="/" element={<Index />} />
+                <Route path="/live" element={<LiveStream />} />
+                <Route path="/pacotes" element={<PackagesIndex />} />
+                <Route path="/pacote/vip" element={<PackageVip />} />
+                <Route path="/pacote/luxo" element={<PackageLuxo />} />
+                <Route path="/pacote/diamante" element={<PackageDiamante />} />
+                <Route path="/politica-privacidade" element={<PrivacyPolicy />} />
+                {/* Backward compatibility */}
+                <Route path="/pacote-vip" element={<PackageVip />} />
+                
+                {/* Admin Routes */}
+                <Route path="/admin/login" element={<AdminLogin />} />
+                <Route 
+                  path="/admin" 
+                  element={
+                    <PrivateRoute>
+                      <AdminDashboard />
+                    </PrivateRoute>
+                  } 
+                />
+                
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+              <CookieConsent />
+            </AuthProvider>
+          </BrowserRouter>
+        </TooltipProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
 );
 };
 
