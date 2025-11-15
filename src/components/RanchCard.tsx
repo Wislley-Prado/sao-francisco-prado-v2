@@ -1,13 +1,15 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Users, MapPin, Wifi, Car, Waves, Utensils, Calendar, Star } from 'lucide-react';
+import { Users, MapPin, Wifi, Car, Waves, Utensils, Star, Eye } from 'lucide-react';
 
 interface Ranch {
   id: string | number;
   name: string;
+  slug?: string;
   description: string;
   location: string;
   capacity: number;
@@ -114,18 +116,24 @@ const RanchCard = ({ ranch }: RanchCardProps) => {
         </div>
 
         {/* Price and Action */}
-        <div className="flex justify-between items-center">
-          <div>
-            <div className="text-2xl font-bold text-rio-blue">R$ {ranch.price}</div>
-            <div className="text-xs text-gray-500">por noite</div>
+        <div className="flex flex-col gap-2">
+          <div className="flex justify-between items-center">
+            <div>
+              <div className="text-2xl font-bold text-rio-blue">R$ {ranch.price.toFixed(2)}</div>
+              <div className="text-xs text-gray-500">por dia</div>
+            </div>
           </div>
-          <Button 
-            className="bg-sunset-orange hover:bg-orange-600 text-white"
-            disabled={!ranch.available}
-          >
-            <Calendar className="mr-2 h-4 w-4" />
-            {ranch.available ? 'Reservar' : 'Indisponível'}
-          </Button>
+          {ranch.slug && (
+            <Link to={`/rancho/${ranch.slug}`} className="w-full">
+              <Button 
+                className="w-full bg-primary hover:bg-primary/90 text-white"
+                disabled={!ranch.available}
+              >
+                <Eye className="mr-2 h-4 w-4" />
+                Ver Detalhes
+              </Button>
+            </Link>
+          )}
         </div>
       </CardContent>
     </Card>

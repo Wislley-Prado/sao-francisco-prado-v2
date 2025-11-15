@@ -12,6 +12,7 @@ import { PrivateRoute } from "@/components/admin/PrivateRoute";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import Index from "./pages/Index";
 import LiveStream from "./pages/LiveStream";
+import RanchoDetalhes from "./pages/RanchoDetalhes";
 import PackageVip from "./pages/PackageVip";
 import PackageLuxo from "./pages/PackageLuxo";
 import PackageDiamante from "./pages/PackageDiamante";
@@ -51,6 +52,7 @@ const App = () => {
                 {/* Public Routes */}
                 <Route path="/" element={<Index />} />
                 <Route path="/live" element={<LiveStream />} />
+                <Route path="/rancho/:slug" element={<RanchoDetalhes />} />
                 <Route path="/pacotes" element={<PackagesIndex />} />
                 <Route path="/pacote/vip" element={<PackageVip />} />
                 <Route path="/pacote/luxo" element={<PackageLuxo />} />
