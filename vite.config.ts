@@ -48,9 +48,10 @@ export default defineConfig(({ mode }) => ({
               }
             }
           }
-        ],
-        navigateFallback: '/offline.html',
-        navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/, /^\/admin/]
+        ]
+        // Offline page disabled for now
+        // navigateFallback: '/offline.html',
+        // navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/]
       },
       devOptions: {
         enabled: true,
