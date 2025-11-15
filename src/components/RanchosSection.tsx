@@ -128,7 +128,7 @@ const RanchosSection = () => {
       
       return true;
     });
-  }, [filters]);
+  }, [filters, ranchos]);
 
   const handleFiltersChange = (newFilters: FilterState) => {
     setFilters(newFilters);
