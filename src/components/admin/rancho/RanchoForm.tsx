@@ -67,6 +67,7 @@ const ranchoSchema = z.object({
         message: 'URL inválida. Use um link válido do YouTube (Shorts, vídeo normal ou youtu.be)',
       }
     ),
+  google_calendar_url: z.string().url('URL inválida do Google Calendar').optional().or(z.literal('')),
   latitude: z.string().optional().or(z.literal('')),
   longitude: z.string().optional().or(z.literal('')),
   endereco_completo: z.string().optional(),
@@ -110,6 +111,7 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
       comodidadeCustom: '',
       telefone_whatsapp: rancho?.telefone_whatsapp || '',
       video_youtube: rancho?.video_youtube || '',
+      google_calendar_url: rancho?.google_calendar_url || '',
       latitude: rancho?.latitude?.toString() || '',
       longitude: rancho?.longitude?.toString() || '',
       endereco_completo: rancho?.endereco_completo || '',
@@ -156,6 +158,7 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
         comodidades: comodidadesFinal,
         telefone_whatsapp: data.telefone_whatsapp || null,
         video_youtube: data.video_youtube || null,
+        google_calendar_url: data.google_calendar_url || null,
         latitude: data.latitude ? parseFloat(data.latitude) : null,
         longitude: data.longitude ? parseFloat(data.longitude) : null,
         endereco_completo: data.endereco_completo || null,
@@ -577,6 +580,23 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
                   </FormControl>
                   <FormDescription>
                     Cole o link completo do YouTube Shorts
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="google_calendar_url"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Google Calendar (URL Pública)</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="https://calendar.google.com/calendar/embed?src=..." />
+                  </FormControl>
+                  <FormDescription>
+                    Cole a URL pública do Google Calendar para exibir disponibilidade
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
