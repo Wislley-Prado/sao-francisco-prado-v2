@@ -56,6 +56,13 @@ export type Database = {
             foreignKeyName: "avaliacoes_rancho_id_fkey"
             columns: ["rancho_id"]
             isOneToOne: false
+            referencedRelation: "rancho_estatisticas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "avaliacoes_rancho_id_fkey"
+            columns: ["rancho_id"]
+            isOneToOne: false
             referencedRelation: "ranchos"
             referencedColumns: ["id"]
           },
@@ -367,6 +374,48 @@ export type Database = {
           },
         ]
       }
+      rancho_analytics: {
+        Row: {
+          created_at: string
+          evento: string
+          id: string
+          ip_address: string | null
+          rancho_id: string
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          evento: string
+          id?: string
+          ip_address?: string | null
+          rancho_id: string
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          evento?: string
+          id?: string
+          ip_address?: string | null
+          rancho_id?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rancho_analytics_rancho_id_fkey"
+            columns: ["rancho_id"]
+            isOneToOne: false
+            referencedRelation: "rancho_estatisticas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rancho_analytics_rancho_id_fkey"
+            columns: ["rancho_id"]
+            isOneToOne: false
+            referencedRelation: "ranchos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rancho_imagens: {
         Row: {
           alt_text: string | null
@@ -396,6 +445,13 @@ export type Database = {
           url?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "rancho_imagens_rancho_id_fkey"
+            columns: ["rancho_id"]
+            isOneToOne: false
+            referencedRelation: "rancho_estatisticas"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "rancho_imagens_rancho_id_fkey"
             columns: ["rancho_id"]
@@ -539,7 +595,20 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      rancho_estatisticas: {
+        Row: {
+          id: string | null
+          nome: string | null
+          slug: string | null
+          taxa_conversao: number | null
+          total_cliques_reserva: number | null
+          total_cliques_whatsapp: number | null
+          total_visualizacoes: number | null
+          visualizacoes_30_dias: number | null
+          visualizacoes_7_dias: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_role: {
