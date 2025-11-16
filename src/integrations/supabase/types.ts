@@ -14,6 +14,53 @@ export type Database = {
   }
   public: {
     Tables: {
+      avaliacoes: {
+        Row: {
+          comentario: string
+          created_at: string
+          email: string
+          id: string
+          nome_usuario: string
+          nota: number
+          rancho_id: string
+          resposta_admin: string | null
+          updated_at: string
+          verificado: boolean
+        }
+        Insert: {
+          comentario: string
+          created_at?: string
+          email: string
+          id?: string
+          nome_usuario: string
+          nota: number
+          rancho_id: string
+          resposta_admin?: string | null
+          updated_at?: string
+          verificado?: boolean
+        }
+        Update: {
+          comentario?: string
+          created_at?: string
+          email?: string
+          id?: string
+          nome_usuario?: string
+          nota?: number
+          rancho_id?: string
+          resposta_admin?: string | null
+          updated_at?: string
+          verificado?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "avaliacoes_rancho_id_fkey"
+            columns: ["rancho_id"]
+            isOneToOne: false
+            referencedRelation: "ranchos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       blog_posts: {
         Row: {
           autor_id: string | null
