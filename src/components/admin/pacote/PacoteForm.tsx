@@ -36,6 +36,21 @@ const pacoteSchema = z.object({
   popular: z.boolean(),
   destaque: z.boolean(),
   tracking_code: z.string().optional(),
+  video_youtube: z
+    .string()
+    .optional()
+    .or(z.literal(''))
+    .refine(
+      (val) => {
+        if (!val || val === '') return true;
+        // Validate YouTube URLs (Shorts, regular videos, youtu.be)
+        const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(shorts\/|watch\?v=)|youtu\.be\/)[a-zA-Z0-9_-]{11}.*$/;
+        return youtubeRegex.test(val);
+      },
+      {
+        message: 'URL inválida. Use um link válido do YouTube (Shorts, vídeo normal ou youtu.be)',
+      }
+    ),
 });
 
 type PacoteFormData = z.infer<typeof pacoteSchema>;
@@ -78,6 +93,7 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
       popular: pacote?.popular ?? false,
       destaque: pacote?.destaque ?? false,
       tracking_code: pacote?.tracking_code || '',
+      video_youtube: pacote?.video_youtube || '',
     },
   });
 
@@ -214,6 +230,7 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
         popular: data.popular,
         destaque: data.destaque,
         tracking_code: data.tracking_code || null,
+        video_youtube: data.video_youtube || null,
         caracteristicas,
         inclusos,
       };
@@ -538,6 +555,26 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
                 ))}
               </div>
             </div>
+
+            <FormField
+              control={form.control}
+              name="video_youtube"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Vídeo do YouTube (Opcional)</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder="https://www.youtube.com/shorts/xxxxx ou https://youtube.com/watch?v=xxxxx"
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Cole a URL do vídeo (aceita YouTube normal, Shorts e youtu.be)
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </TabsContent>
 
           <TabsContent value="imagens">
