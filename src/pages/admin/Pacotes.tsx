@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus } from 'lucide-react';
+import { Plus, TrendingUp } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { PacoteTable } from '@/components/admin/pacote/PacoteTable';
 import { PacoteStats } from '@/components/admin/pacote/PacoteStats';
@@ -79,12 +79,20 @@ const AdminPacotes = () => {
             Gerencie os pacotes de pescaria oferecidos
           </p>
         </div>
-        <Button asChild>
-          <Link to="/admin/pacotes/novo">
-            <Plus className="w-4 h-4 mr-2" />
-            Novo Pacote
-          </Link>
-        </Button>
+        <div className="flex gap-2">
+          <Button asChild variant="outline">
+            <Link to="/admin/pacotes/analytics">
+              <TrendingUp className="w-4 h-4 mr-2" />
+              Analytics
+            </Link>
+          </Button>
+          <Button asChild>
+            <Link to="/admin/pacotes/novo">
+              <Plus className="w-4 h-4 mr-2" />
+              Novo Pacote
+            </Link>
+          </Button>
+        </div>
       </div>
 
       <PacoteStats {...stats} />

@@ -35,6 +35,7 @@ const pacoteSchema = z.object({
   ativo: z.boolean(),
   popular: z.boolean(),
   destaque: z.boolean(),
+  tracking_code: z.string().optional(),
 });
 
 type PacoteFormData = z.infer<typeof pacoteSchema>;
@@ -76,6 +77,7 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
       ativo: pacote?.ativo ?? true,
       popular: pacote?.popular ?? false,
       destaque: pacote?.destaque ?? false,
+      tracking_code: pacote?.tracking_code || '',
     },
   });
 
@@ -211,6 +213,7 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
         ativo: data.ativo,
         popular: data.popular,
         destaque: data.destaque,
+        tracking_code: data.tracking_code || null,
         caracteristicas,
         inclusos,
       };
@@ -251,10 +254,11 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <Tabs defaultValue="basico" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="basico">Básico</TabsTrigger>
             <TabsTrigger value="detalhes">Detalhes</TabsTrigger>
             <TabsTrigger value="imagens">Imagens</TabsTrigger>
+            <TabsTrigger value="tracking">Tracking</TabsTrigger>
           </TabsList>
 
           <TabsContent value="basico" className="space-y-4">
@@ -538,6 +542,52 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
 
           <TabsContent value="imagens">
             <ImageUploader images={images} onChange={setImages} maxImages={10} />
+          </TabsContent>
+
+          <TabsContent value="tracking" className="space-y-4">
+            <div className="rounded-lg border p-4 bg-muted/50">
+              <h3 className="text-sm font-medium mb-2">Sobre o Código de Tracking</h3>
+              <p className="text-sm text-muted-foreground mb-2">
+                Use este campo para adicionar códigos de rastreamento personalizados para este pacote específico.
+              </p>
+              <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1">
+                <li>Facebook Pixel: Rastreie conversões e visualizações</li>
+                <li>Google Analytics: Acompanhe eventos personalizados</li>
+                <li>Google Tag Manager: Dispare tags específicas</li>
+                <li>Scripts personalizados para rastreamento de afiliados</li>
+              </ul>
+            </div>
+
+            <FormField
+              control={form.control}
+              name="tracking_code"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Código de Tracking</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      {...field}
+                      placeholder="Cole aqui seu código de tracking (Facebook Pixel, Google Analytics, etc.)"
+                      rows={8}
+                      className="font-mono text-xs"
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Exemplo Facebook Pixel: fbq('track', 'ViewContent', {'{'}'content_name': 'Pacote VIP'{'}'});
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="rounded-lg border p-4 bg-amber-50 dark:bg-amber-950/20">
+              <h4 className="text-sm font-medium mb-2 flex items-center gap-2">
+                <span className="text-amber-600">⚠️</span> Importante
+              </h4>
+              <p className="text-sm text-muted-foreground">
+                O código de tracking será executado automaticamente quando usuários visualizarem ou interagirem com este pacote. Certifique-se de que o código está correto para evitar problemas.
+              </p>
+            </div>
           </TabsContent>
         </Tabs>
 

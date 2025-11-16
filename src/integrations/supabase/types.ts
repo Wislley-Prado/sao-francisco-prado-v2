@@ -226,6 +226,44 @@ export type Database = {
         }
         Relationships: []
       }
+      pacote_analytics: {
+        Row: {
+          created_at: string
+          evento: string
+          id: string
+          ip_address: string | null
+          pacote_id: string
+          tipo: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          evento: string
+          id?: string
+          ip_address?: string | null
+          pacote_id: string
+          tipo?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          evento?: string
+          id?: string
+          ip_address?: string | null
+          pacote_id?: string
+          tipo?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pacote_analytics_pacote_id_fkey"
+            columns: ["pacote_id"]
+            isOneToOne: false
+            referencedRelation: "pacotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pacote_imagens: {
         Row: {
           alt_text: string | null
@@ -281,6 +319,7 @@ export type Database = {
           rating: number
           slug: string
           tipo: string
+          tracking_code: string | null
           updated_at: string
         }
         Insert: {
@@ -299,6 +338,7 @@ export type Database = {
           rating?: number
           slug: string
           tipo?: string
+          tracking_code?: string | null
           updated_at?: string
         }
         Update: {
@@ -317,6 +357,7 @@ export type Database = {
           rating?: number
           slug?: string
           tipo?: string
+          tracking_code?: string | null
           updated_at?: string
         }
         Relationships: []
