@@ -5,18 +5,19 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Play, Calendar, MapPin, Waves } from 'lucide-react';
 import { useWeatherData } from '@/hooks/useWeatherData';
 import { useDamData } from '@/hooks/useDamData';
-
 const HeroSection = () => {
   const navigate = useNavigate();
-  const { data: weatherData } = useWeatherData();
-  const { data: damData } = useDamData();
-
+  const {
+    data: weatherData
+  } = useWeatherData();
+  const {
+    data: damData
+  } = useDamData();
   const temperature = weatherData?.current.temperature || 24;
-  const damLevel = damData?.volume_util_percentual ? 
-    parseFloat(damData.volume_util_percentual).toFixed(1) : '86.0';
+  const damLevel = damData?.volume_util_percentual ? parseFloat(damData.volume_util_percentual).toFixed(1) : '86.0';
   const windSpeed = weatherData?.current.wind_speed || 12;
   const conditions = weatherData?.current.weather_description || 'Excelente';
-  
+
   // Formatação dos horários de nascer e pôr do sol
   const formatTime = (timestamp: number) => {
     return new Date(timestamp * 1000).toLocaleTimeString('pt-BR', {
@@ -24,12 +25,9 @@ const HeroSection = () => {
       minute: '2-digit'
     });
   };
-  
   const sunrise = weatherData?.current.sunrise ? formatTime(weatherData.current.sunrise) : '06:00';
   const sunset = weatherData?.current.sunset ? formatTime(weatherData.current.sunset) : '18:30';
-
-  return (
-    <section id="home" className="relative min-h-screen bg-river-gradient flex items-center overflow-hidden">
+  return <section id="home" className="relative min-h-screen bg-river-gradient flex items-center overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzR2LTRINHY0aC00djJoNHY0aDJWNmg0VjRoLTR6bTAtMzBWMGgtMnY0aC00djJoNHY0aDJWNmg0VjRoLTR6TTYgMzR2LTRINHY0SDB2Mmg0djRoMnYtNGg0di0ySDZ6TTYgNFYwSDR2NEgwdjJoNHY0aDJWNmg0VjRINnoiLz48L2c+PC9nPjwvc3ZnPg==')] animate-wave"></div>
@@ -51,23 +49,7 @@ const HeroSection = () => {
               </p>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button 
-                size="lg" 
-                className="bg-sunset-orange hover:bg-orange-600 text-white text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 animate-float"
-              >
-                <Calendar className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                Fazer Reserva
-              </Button>
-              <Button 
-                variant="outline" 
-                size="lg"
-                className="bg-transparent border-white text-white hover:bg-white hover:text-rio-blue text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4"
-              >
-                <MapPin className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                Ver Localização
-              </Button>
-            </div>
+            
 
             {/* Features */}
             <div className="grid grid-cols-3 gap-3 sm:gap-4 pt-6 sm:pt-8">
@@ -109,24 +91,12 @@ const HeroSection = () => {
                   
                   {/* Live Stream */}
                   <div className="aspect-video bg-black rounded-lg overflow-hidden relative">
-                    <iframe
-                      src="https://www.youtube.com/embed/cN_BspPR2gg?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&modestbranding=1"
-                      title="Rio São Francisco - Transmissão Ao Vivo"
-                      className="w-full h-full"
-                      frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
+                    <iframe src="https://www.youtube.com/embed/cN_BspPR2gg?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&modestbranding=1" title="Rio São Francisco - Transmissão Ao Vivo" className="w-full h-full" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
                   </div>
                   
                   {/* Button to Full Stream */}
                   <div className="mt-4">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      className="w-full bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white"
-                      onClick={() => navigate('/live')}
-                    >
+                    <Button variant="outline" size="sm" className="w-full bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white" onClick={() => navigate('/live')}>
                       <Play className="mr-2 h-4 w-4" />
                       Rio São Francisco Online
                     </Button>
@@ -165,8 +135,6 @@ const HeroSection = () => {
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default HeroSection;
