@@ -38,20 +38,27 @@ export const PaidMediaBannerDisplay = ({ postId, banner_midia_paga }: PaidMediaB
   };
 
   const BannerContent = () => (
-    <div className="relative group overflow-hidden rounded-lg border">
-      <img
-        src={banner_midia_paga.imagem_url}
-        alt={banner_midia_paga.alt_text || 'Banner publicitário'}
-        className="w-full h-auto transition-transform duration-300 group-hover:scale-105"
-        loading="lazy"
-      />
-      {banner_midia_paga.link_anunciante && (
-        <div className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm px-2 py-1 rounded text-xs flex items-center gap-1 text-muted-foreground">
-          <ExternalLink className="h-3 w-3" />
-          <span>Anúncio</span>
-        </div>
+    <figure className="space-y-2">
+      <div className="relative group overflow-hidden rounded-lg border">
+        <img
+          src={banner_midia_paga.imagem_url}
+          alt={banner_midia_paga.alt_text || 'Banner publicitário'}
+          className="w-full h-auto transition-transform duration-300 group-hover:scale-105"
+          loading="lazy"
+        />
+        {banner_midia_paga.link_anunciante && (
+          <div className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm px-2 py-1 rounded text-xs flex items-center gap-1 text-muted-foreground">
+            <ExternalLink className="h-3 w-3" />
+            <span>Anúncio</span>
+          </div>
+        )}
+      </div>
+      {banner_midia_paga.alt_text && (
+        <figcaption className="text-sm text-muted-foreground italic text-center">
+          {banner_midia_paga.alt_text}
+        </figcaption>
       )}
-    </div>
+    </figure>
   );
 
   if (banner_midia_paga.link_anunciante) {
