@@ -264,6 +264,10 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
         destaque: data.destaque,
         tracking_code: data.tracking_code || null,
         video_youtube: data.video_youtube || null,
+        telefone_whatsapp: data.telefone_whatsapp || null,
+        endereco_completo: data.endereco_completo || null,
+        latitude: data.latitude || null,
+        longitude: data.longitude || null,
         caracteristicas,
         inclusos,
       };
