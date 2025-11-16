@@ -271,7 +271,9 @@ export type Database = {
           created_at: string
           id: string
           ordem: number
+          pacote_id: string | null
           pergunta: string
+          rancho_id: string | null
           resposta: string
           updated_at: string
         }
@@ -280,7 +282,9 @@ export type Database = {
           created_at?: string
           id?: string
           ordem?: number
+          pacote_id?: string | null
           pergunta: string
+          rancho_id?: string | null
           resposta: string
           updated_at?: string
         }
@@ -289,11 +293,35 @@ export type Database = {
           created_at?: string
           id?: string
           ordem?: number
+          pacote_id?: string | null
           pergunta?: string
+          rancho_id?: string | null
           resposta?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "faqs_pacote_id_fkey"
+            columns: ["pacote_id"]
+            isOneToOne: false
+            referencedRelation: "pacotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "faqs_rancho_id_fkey"
+            columns: ["rancho_id"]
+            isOneToOne: false
+            referencedRelation: "rancho_estatisticas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "faqs_rancho_id_fkey"
+            columns: ["rancho_id"]
+            isOneToOne: false
+            referencedRelation: "ranchos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       pacote_analytics: {
         Row: {
