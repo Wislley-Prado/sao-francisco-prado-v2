@@ -1,8 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Star, TrendingUp, MessageSquare, ThumbsUp, BarChart3 } from "lucide-react";
+import { Star, TrendingUp, MessageSquare, ThumbsUp, BarChart3, FileDown } from "lucide-react";
+import { toast } from "sonner";
+import { exportarRelatorioAvaliacoes } from "@/utils/pdfExport";
 import {
   BarChart,
   Bar,
@@ -104,17 +107,39 @@ export default function EstatisticasAvaliacoes() {
 
   const COLORS = ['#ef4444', '#f97316', '#eab308', '#84cc16', '#22c55e'];
 
+  const handleExportPDF = () => {
+    if (!avaliacoes || avaliacoes.length === 0) {
+      toast.error("Não há dados para exportar");
+      return;
+    }
+
+    try {
+      exportarRelatorioAvaliacoes(avaliacoes, estatisticasPorRancho);
+      toast.success("Relatório PDF gerado com sucesso!");
+    } catch (error) {
+      console.error("Erro ao gerar PDF:", error);
+      toast.error("Erro ao gerar o relatório PDF");
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">Estatísticas de Avaliações</h1>
-            <p className="text-muted-foreground mt-1">
-              Análise detalhada das avaliações dos ranchos
-            </p>
-          </div>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Estatísticas de Avaliações</h1>
+          <p className="text-muted-foreground mt-1">
+            Análise detalhada das avaliações dos ranchos
+          </p>
         </div>
+        <Button 
+          onClick={handleExportPDF} 
+          disabled={totalAvaliacoes === 0}
+        >
+          <FileDown className="h-4 w-4 mr-2" />
+          Exportar PDF
+        </Button>
+      </div>
         
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {[1, 2, 3, 4].map((i) => (
