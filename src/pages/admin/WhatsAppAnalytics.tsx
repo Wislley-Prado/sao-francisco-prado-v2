@@ -15,6 +15,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { WhatsAppDataCleanup } from "@/components/admin/WhatsAppDataCleanup";
 
 interface Analytics {
   total_widget_aberto: number;
@@ -49,6 +50,8 @@ const WhatsAppAnalytics = () => {
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [compararPeriodos, setCompararPeriodos] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [dataInicio, setDataInicio] = useState<Date>(subDays(new Date(), 7));
+  const [dataFim, setDataFim] = useState<Date>(new Date());
 
   useEffect(() => {
     carregarAnalytics();
@@ -57,25 +60,34 @@ const WhatsAppAnalytics = () => {
   const carregarAnalytics = async () => {
     setLoading(true);
     try {
-      let dataInicio: string;
-      let dataFim: string;
+      let dataInicioStr: string;
+      let dataFimStr: string;
+      let dataInicioDate: Date;
+      let dataFimDate: Date;
       
       if (periodo === "custom" && dateRange?.from) {
-        dataInicio = startOfDay(dateRange.from).toISOString();
-        dataFim = dateRange.to ? endOfDay(dateRange.to).toISOString() : endOfDay(new Date()).toISOString();
+        dataInicioDate = startOfDay(dateRange.from);
+        dataFimDate = dateRange.to ? endOfDay(dateRange.to) : endOfDay(new Date());
+        dataInicioStr = dataInicioDate.toISOString();
+        dataFimStr = dataFimDate.toISOString();
       } else if (typeof periodo === "number") {
-        dataInicio = subDays(new Date(), periodo).toISOString();
-        dataFim = new Date().toISOString();
+        dataInicioDate = subDays(new Date(), periodo);
+        dataFimDate = new Date();
+        dataInicioStr = dataInicioDate.toISOString();
+        dataFimStr = dataFimDate.toISOString();
       } else {
         return;
       }
+
+      setDataInicio(dataInicioDate);
+      setDataFim(dataFimDate);
 
       // Totais gerais
       const { data: eventos } = await supabase
         .from("whatsapp_analytics")
         .select("evento")
-        .gte("created_at", dataInicio)
-        .lte("created_at", dataFim);
+        .gte("created_at", dataInicioStr)
+        .lte("created_at", dataFimStr);
 
       const widgetAberto = eventos?.filter(e => e.evento === "widget_aberto").length || 0;
       const mensagemRapida = eventos?.filter(e => e.evento === "mensagem_rapida").length || 0;
@@ -94,8 +106,8 @@ const WhatsAppAnalytics = () => {
 
       // Comparação de períodos
       if (compararPeriodos && typeof periodo === "number") {
-        const periodoAnteriorInicio = subDays(new Date(dataInicio), periodo).toISOString();
-        const periodoAnteriorFim = dataInicio;
+        const periodoAnteriorInicio = subDays(new Date(dataInicioStr), periodo).toISOString();
+        const periodoAnteriorFim = dataInicioStr;
         
         const { data: eventosAnteriores } = await supabase
           .from("whatsapp_analytics")
@@ -121,8 +133,8 @@ const WhatsAppAnalytics = () => {
       const { data: eventosCompletos } = await supabase
         .from("whatsapp_analytics")
         .select("evento, created_at")
-        .gte("created_at", dataInicio)
-        .lte("created_at", dataFim)
+        .gte("created_at", dataInicioStr)
+        .lte("created_at", dataFimStr)
         .order("created_at", { ascending: true });
 
       const eventosPorDia: { [key: string]: EventoTemporal } = {};
@@ -151,8 +163,8 @@ const WhatsAppAnalytics = () => {
         .from("whatsapp_analytics")
         .select("mensagem_tipo")
         .eq("evento", "mensagem_rapida")
-        .gte("created_at", dataInicio)
-        .lte("created_at", dataFim)
+        .gte("created_at", dataInicioStr)
+        .lte("created_at", dataFimStr)
         .not("mensagem_tipo", "is", null);
 
       const contagemMensagens: { [key: string]: number } = {};
@@ -274,6 +286,12 @@ const WhatsAppAnalytics = () => {
                 <Download className="h-4 w-4 mr-2" />
                 PDF
               </Button>
+              <WhatsAppDataCleanup
+                dataInicio={dataInicio}
+                dataFim={dataFim}
+                onCleanupComplete={carregarAnalytics}
+                onExport={exportarCSV}
+              />
             </div>
           </div>
 
