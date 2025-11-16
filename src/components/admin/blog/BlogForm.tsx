@@ -21,6 +21,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { BlogImageUploader } from './BlogImageUploader';
+import { RichTextEditor } from './RichTextEditor';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 
@@ -229,12 +230,15 @@ export const BlogForm = ({ initialData, onSubmit, onCancel, isSubmitting }: Blog
             <FormItem>
               <FormLabel>Conteúdo *</FormLabel>
               <FormControl>
-                <Textarea
+                <RichTextEditor
+                  value={field.value}
+                  onChange={field.onChange}
                   placeholder="Escreva o conteúdo completo do post..."
-                  className="min-h-[300px] resize-y"
-                  {...field}
                 />
               </FormControl>
+              <FormDescription>
+                Use a barra de ferramentas para formatar o conteúdo
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
