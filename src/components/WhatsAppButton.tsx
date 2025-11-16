@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { MessageCircle, X, Phone, Clock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { registrarEventoWhatsApp } from '@/hooks/useWhatsAppAnalytics';
 
 interface QuickMessage {
   text: string;
@@ -82,14 +83,23 @@ const WhatsAppButton = () => {
   }, []);
 
   const handleWhatsAppClick = () => {
+    registrarEventoWhatsApp("botao_whatsapp");
     const url = `https://wa.me/${settings.whatsapp_numero}?text=${encodeURIComponent(settings.whatsapp_mensagem_padrao)}`;
     window.open(url, '_blank');
   };
 
-  const handleQuickMessage = (msg: string) => {
+  const handleQuickMessage = (msg: string, index: number) => {
+    registrarEventoWhatsApp("mensagem_rapida", settings.whatsapp_opcoes[index].text);
     const url = `https://wa.me/${settings.whatsapp_numero}?text=${encodeURIComponent(msg)}`;
     window.open(url, '_blank');
     setIsOpen(false);
+  };
+
+  const handleToggleWidget = () => {
+    if (!isOpen) {
+      registrarEventoWhatsApp("widget_aberto");
+    }
+    setIsOpen(!isOpen);
   };
 
   return (
@@ -140,7 +150,7 @@ const WhatsAppButton = () => {
                     variant="outline"
                     size="sm"
                     className="w-full justify-start text-left h-auto p-3 hover:bg-green-50 hover:border-green-300"
-                    onClick={() => handleQuickMessage(item.message)}
+                    onClick={() => handleQuickMessage(item.message, index)}
                   >
                     <span className="text-sm">{item.text}</span>
                   </Button>
@@ -175,7 +185,7 @@ const WhatsAppButton = () => {
       {/* Floating Button */}
       <div className="fixed bottom-4 right-4 z-50">
         <Button
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={handleToggleWidget}
           size="lg"
           className="w-14 h-14 rounded-full bg-green-500 hover:bg-green-600 text-white shadow-2xl animate-float"
         >

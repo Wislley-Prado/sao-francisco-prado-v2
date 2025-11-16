@@ -867,6 +867,33 @@ export type Database = {
         }
         Relationships: []
       }
+      whatsapp_analytics: {
+        Row: {
+          created_at: string
+          evento: string
+          id: string
+          ip_address: string | null
+          mensagem_tipo: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          evento: string
+          id?: string
+          ip_address?: string | null
+          mensagem_tipo?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          evento?: string
+          id?: string
+          ip_address?: string | null
+          mensagem_tipo?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       faq_estatisticas: {
