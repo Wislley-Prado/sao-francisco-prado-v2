@@ -368,18 +368,22 @@ const RanchoDetalhes = () => {
               {rancho.video_youtube && (
                 <>
                   <Separator />
-                  <div>
-                    <h2 className="text-2xl font-bold mb-4">Conheça o Rancho</h2>
+                  <div id="video-section">
+                    <h2 className="text-2xl font-bold mb-4">🎥 Conheça o Rancho</h2>
                     {getYouTubeEmbedUrl(rancho.video_youtube) ? (
-                      <div className="relative w-full" style={{ paddingBottom: '177.78%', maxWidth: '315px', margin: '0 auto' }}>
-                        <iframe
-                          src={getYouTubeEmbedUrl(rancho.video_youtube) || ''}
-                          className="absolute top-0 left-0 w-full h-full rounded-lg"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                          title={`Vídeo ${rancho.nome}`}
-                        />
-                      </div>
+                      <Card className="overflow-hidden">
+                        <CardContent className="p-0">
+                          <div className="relative w-full bg-black" style={{ paddingBottom: '56.25%' }}>
+                            <iframe
+                              src={getYouTubeEmbedUrl(rancho.video_youtube) || ''}
+                              className="absolute top-0 left-0 w-full h-full"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                              allowFullScreen
+                              title={`Vídeo ${rancho.nome}`}
+                            />
+                          </div>
+                        </CardContent>
+                      </Card>
                     ) : (
                       <p className="text-muted-foreground">URL do vídeo inválida. Verifique o formato.</p>
                     )}
@@ -391,21 +395,25 @@ const RanchoDetalhes = () => {
               {rancho.latitude && rancho.longitude && (
                 <>
                   <Separator />
-                  <div>
-                    <h2 className="text-2xl font-bold mb-4">Localização</h2>
+                  <div id="map-section">
+                    <h2 className="text-2xl font-bold mb-4">📍 Localização</h2>
                     {rancho.endereco_completo && (
                       <p className="text-muted-foreground mb-4">{rancho.endereco_completo}</p>
                     )}
-                    <div className="relative w-full h-[400px] rounded-lg overflow-hidden">
-                      <iframe
-                        src={`https://www.google.com/maps?q=${rancho.latitude},${rancho.longitude}&hl=pt-BR&z=14&output=embed`}
-                        className="w-full h-full border-0"
-                        allowFullScreen
-                        loading="lazy"
-                        referrerPolicy="no-referrer-when-downgrade"
-                        title={`Mapa ${rancho.nome}`}
-                      />
-                    </div>
+                    <Card className="overflow-hidden">
+                      <CardContent className="p-0">
+                        <div className="relative w-full h-[450px] bg-muted">
+                          <iframe
+                            src={`https://www.google.com/maps?q=${rancho.latitude},${rancho.longitude}&hl=pt-BR&z=14&output=embed`}
+                            className="w-full h-full border-0"
+                            allowFullScreen
+                            loading="lazy"
+                            referrerPolicy="no-referrer-when-downgrade"
+                            title={`Mapa ${rancho.nome}`}
+                          />
+                        </div>
+                      </CardContent>
+                    </Card>
                   </div>
                 </>
               )}
@@ -414,12 +422,12 @@ const RanchoDetalhes = () => {
               {rancho.google_calendar_url && (
                 <>
                   <Separator />
-                  <div>
-                    <h2 className="text-2xl font-bold mb-4">Disponibilidade</h2>
+                  <div id="calendar-section">
+                    <h2 className="text-2xl font-bold mb-4">📅 Disponibilidade</h2>
                     <p className="text-muted-foreground mb-4">
                       Confira as datas disponíveis para reserva no calendário abaixo:
                     </p>
-                    <div className="relative w-full rounded-xl overflow-hidden bg-card shadow-lg border border-border/50">
+                    <Card className="overflow-hidden shadow-lg">
                       <div className="bg-gradient-to-r from-primary to-primary/80 p-4">
                         <h3 className="text-primary-foreground font-semibold text-lg flex items-center gap-2">
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -428,16 +436,18 @@ const RanchoDetalhes = () => {
                           Calendário de Reservas
                         </h3>
                       </div>
-                      <div className="relative w-full h-[600px] bg-background">
-                        <iframe
-                          src={`${rancho.google_calendar_url}&showTitle=0&showPrint=0&showTabs=0&showCalendars=0&showTz=0&mode=MONTH&wkst=1&bgcolor=%23ffffff&ctz=America/Sao_Paulo`}
-                          className="w-full h-full border-0"
-                          frameBorder="0"
-                          scrolling="yes"
-                          title={`Calendário de disponibilidade ${rancho.nome}`}
-                        />
-                      </div>
-                    </div>
+                      <CardContent className="p-0">
+                        <div className="relative w-full h-[600px] bg-background">
+                          <iframe
+                            src={`${rancho.google_calendar_url}&showTitle=0&showPrint=0&showTabs=0&showCalendars=0&showTz=0&mode=MONTH&wkst=1&bgcolor=%23ffffff&ctz=America/Sao_Paulo`}
+                            className="w-full h-full border-0"
+                            frameBorder="0"
+                            scrolling="yes"
+                            title={`Calendário de disponibilidade ${rancho.nome}`}
+                          />
+                        </div>
+                      </CardContent>
+                    </Card>
                   </div>
                 </>
               )}
