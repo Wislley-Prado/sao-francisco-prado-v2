@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Edit, Trash2, ExternalLink, Eye } from 'lucide-react';
 import { DeleteBlogDialog } from './DeleteBlogDialog';
 import { Tables } from '@/integrations/supabase/types';
+import React from 'react';
 
 type BlogPost = Tables<'blog_posts'>;
 
@@ -15,7 +16,7 @@ interface BlogTableProps {
   onDelete: () => void;
 }
 
-export const BlogTable = ({ posts, isLoading, onDelete }: BlogTableProps) => {
+const BlogTableComponent = ({ posts, isLoading, onDelete }: BlogTableProps) => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
 
@@ -180,6 +181,8 @@ export const BlogTable = ({ posts, isLoading, onDelete }: BlogTableProps) => {
     </>
   );
 };
+
+export const BlogTable = React.memo(BlogTableComponent);
 
 const FileText = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

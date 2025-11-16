@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -53,11 +53,13 @@ const AdminBlog = () => {
     }
   });
 
-  // Calcular estatísticas
-  const totalPosts = posts?.length || 0;
-  const publicados = posts?.filter(p => p.publicado).length || 0;
-  const rascunhos = posts?.filter(p => !p.publicado).length || 0;
-  const totalVisualizacoes = posts?.reduce((acc, p) => acc + p.visualizacoes, 0) || 0;
+  // Calcular estatísticas com useMemo
+  const stats = useMemo(() => ({
+    totalPosts: posts?.length || 0,
+    publicados: posts?.filter(p => p.publicado).length || 0,
+    rascunhos: posts?.filter(p => !p.publicado).length || 0,
+    totalVisualizacoes: posts?.reduce((acc, p) => acc + p.visualizacoes, 0) || 0,
+  }), [posts]);
 
   return (
     <div className="space-y-6">
@@ -76,13 +78,13 @@ const AdminBlog = () => {
         </Button>
       </div>
 
-      <BlogStats
-        totalPosts={totalPosts}
-        publicados={publicados}
-        rascunhos={rascunhos}
-        totalVisualizacoes={totalVisualizacoes}
-        isLoading={isLoading}
-      />
+        <BlogStats
+          totalPosts={stats.totalPosts}
+          publicados={stats.publicados}
+          rascunhos={stats.rascunhos}
+          totalVisualizacoes={stats.totalVisualizacoes}
+          isLoading={isLoading}
+        />
 
       <Card>
         <CardHeader>
