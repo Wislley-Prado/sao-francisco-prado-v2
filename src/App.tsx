@@ -38,6 +38,7 @@ import BlogEditar from "./pages/admin/BlogEditar";
 import BlogAnalytics from "./pages/admin/BlogAnalytics";
 import AdminConfiguracoes from "./pages/admin/Configuracoes";
 import WhatsAppConfig from "./pages/admin/WhatsAppConfig";
+import WhatsAppAnalytics from "./pages/admin/WhatsAppAnalytics";
 import AdminAvaliacoes from "./pages/admin/Avaliacoes";
 import EstatisticasAvaliacoes from "./pages/admin/EstatisticasAvaliacoes";
 import AdminAnalytics from "./pages/admin/Analytics";
@@ -123,6 +124,7 @@ const App = () => {
                   <Route path="depoimentos/editar/:id" element={<DepoimentoEditar />} />
                   <Route path="configuracoes" element={<AdminConfiguracoes />} />
                   <Route path="whatsapp-config" element={<WhatsAppConfig />} />
+                  <Route path="whatsapp-analytics" element={<WhatsAppAnalytics />} />
                 </Route>
                 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
