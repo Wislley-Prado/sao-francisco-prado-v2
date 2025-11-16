@@ -162,8 +162,8 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
         video_youtube: data.video_youtube || null,
         google_calendar_url: data.google_calendar_url || null,
         tracking_code: data.tracking_code || null,
-        latitude: data.latitude ? parseFloat(data.latitude) : null,
-        longitude: data.longitude ? parseFloat(data.longitude) : null,
+        latitude: data.latitude && data.latitude.trim() !== '' ? parseFloat(data.latitude) : null,
+        longitude: data.longitude && data.longitude.trim() !== '' ? parseFloat(data.longitude) : null,
         endereco_completo: data.endereco_completo || null,
       };
 
