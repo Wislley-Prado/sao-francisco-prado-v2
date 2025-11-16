@@ -1,7 +1,9 @@
 import React from 'react';
 import { ExternalLink } from 'lucide-react';
+import { useBlogAnalytics } from '@/hooks/useBlogAnalytics';
 
 interface PaidMediaBannerDisplayProps {
+  postId: string;
   banner_midia_paga?: {
     imagem_url?: string;
     link_anunciante?: string;
@@ -9,8 +11,18 @@ interface PaidMediaBannerDisplayProps {
   } | null;
 }
 
-export const PaidMediaBannerDisplay = ({ banner_midia_paga }: PaidMediaBannerDisplayProps) => {
+export const PaidMediaBannerDisplay = ({ postId, banner_midia_paga }: PaidMediaBannerDisplayProps) => {
+  const { trackEvent } = useBlogAnalytics();
+
   if (!banner_midia_paga?.imagem_url) return null;
+
+  const handleClick = () => {
+    trackEvent({
+      postId,
+      evento: 'click_banner',
+      tipo: 'paid_media',
+    });
+  };
 
   const BannerContent = () => (
     <div className="relative group overflow-hidden rounded-lg border">
@@ -37,6 +49,7 @@ export const PaidMediaBannerDisplay = ({ banner_midia_paga }: PaidMediaBannerDis
         rel="noopener noreferrer sponsored"
         className="block my-8"
         aria-label={`Anúncio: ${banner_midia_paga.alt_text || 'Clique para saber mais'}`}
+        onClick={handleClick}
       >
         <BannerContent />
       </a>

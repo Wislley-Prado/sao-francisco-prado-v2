@@ -1,8 +1,10 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Facebook, Instagram, Twitter, Linkedin } from 'lucide-react';
+import { useBlogAnalytics } from '@/hooks/useBlogAnalytics';
 
 interface SocialShareButtonsProps {
+  postId: string;
   redes_sociais?: {
     facebook?: string;
     instagram?: string;
@@ -11,11 +13,21 @@ interface SocialShareButtonsProps {
   };
 }
 
-export const SocialShareButtons = ({ redes_sociais }: SocialShareButtonsProps) => {
+export const SocialShareButtons = ({ postId, redes_sociais }: SocialShareButtonsProps) => {
+  const { trackEvent } = useBlogAnalytics();
+
   if (!redes_sociais) return null;
 
   const hasAnySocial = Object.values(redes_sociais).some(url => url);
   if (!hasAnySocial) return null;
+
+  const handleClick = (platform: string) => {
+    trackEvent({
+      postId,
+      evento: 'click_social',
+      tipo: platform,
+    });
+  };
 
   return (
     <div className="flex flex-col gap-4 p-6 border rounded-lg bg-muted/30">
@@ -33,6 +45,7 @@ export const SocialShareButtons = ({ redes_sociais }: SocialShareButtonsProps) =
               target="_blank" 
               rel="noopener noreferrer"
               aria-label="Compartilhar no Facebook"
+              onClick={() => handleClick('facebook')}
             >
               <Facebook className="h-4 w-4 text-blue-600" />
               Facebook
@@ -52,6 +65,7 @@ export const SocialShareButtons = ({ redes_sociais }: SocialShareButtonsProps) =
               target="_blank" 
               rel="noopener noreferrer"
               aria-label="Ver no Instagram"
+              onClick={() => handleClick('instagram')}
             >
               <Instagram className="h-4 w-4 text-pink-600" />
               Instagram
@@ -71,6 +85,7 @@ export const SocialShareButtons = ({ redes_sociais }: SocialShareButtonsProps) =
               target="_blank" 
               rel="noopener noreferrer"
               aria-label="Compartilhar no Twitter/X"
+              onClick={() => handleClick('twitter')}
             >
               <Twitter className="h-4 w-4 text-blue-400" />
               Twitter/X
@@ -90,6 +105,7 @@ export const SocialShareButtons = ({ redes_sociais }: SocialShareButtonsProps) =
               target="_blank" 
               rel="noopener noreferrer"
               aria-label="Compartilhar no LinkedIn"
+              onClick={() => handleClick('linkedin')}
             >
               <Linkedin className="h-4 w-4 text-blue-700" />
               LinkedIn

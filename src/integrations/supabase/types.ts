@@ -68,6 +68,44 @@ export type Database = {
           },
         ]
       }
+      blog_analytics: {
+        Row: {
+          created_at: string
+          evento: string
+          id: string
+          ip_address: string | null
+          post_id: string
+          tipo: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          evento: string
+          id?: string
+          ip_address?: string | null
+          post_id: string
+          tipo?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          evento?: string
+          id?: string
+          ip_address?: string | null
+          post_id?: string
+          tipo?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_analytics_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "blog_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       blog_posts: {
         Row: {
           autor_id: string | null
