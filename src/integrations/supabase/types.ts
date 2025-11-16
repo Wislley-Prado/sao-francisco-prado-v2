@@ -381,6 +381,7 @@ export type Database = {
           rating: number
           slug: string
           telefone_whatsapp: string | null
+          tracking_code: string | null
           updated_at: string
           video_youtube: string | null
         }
@@ -406,6 +407,7 @@ export type Database = {
           rating?: number
           slug: string
           telefone_whatsapp?: string | null
+          tracking_code?: string | null
           updated_at?: string
           video_youtube?: string | null
         }
@@ -431,8 +433,39 @@ export type Database = {
           rating?: number
           slug?: string
           telefone_whatsapp?: string | null
+          tracking_code?: string | null
           updated_at?: string
           video_youtube?: string | null
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          created_at: string
+          custom_head_scripts: string | null
+          facebook_pixel: string | null
+          google_analytics: string | null
+          google_tag_manager: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          custom_head_scripts?: string | null
+          facebook_pixel?: string | null
+          google_analytics?: string | null
+          google_tag_manager?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          custom_head_scripts?: string | null
+          facebook_pixel?: string | null
+          google_analytics?: string | null
+          google_tag_manager?: string | null
+          id?: string
+          updated_at?: string
         }
         Relationships: []
       }

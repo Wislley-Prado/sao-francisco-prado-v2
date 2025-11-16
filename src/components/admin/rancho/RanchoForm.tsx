@@ -68,6 +68,7 @@ const ranchoSchema = z.object({
       }
     ),
   google_calendar_url: z.string().url('URL inválida do Google Calendar').optional().or(z.literal('')),
+  tracking_code: z.string().optional(),
   latitude: z.string().optional().or(z.literal('')),
   longitude: z.string().optional().or(z.literal('')),
   endereco_completo: z.string().optional(),
@@ -112,6 +113,7 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
       telefone_whatsapp: rancho?.telefone_whatsapp || '',
       video_youtube: rancho?.video_youtube || '',
       google_calendar_url: rancho?.google_calendar_url || '',
+      tracking_code: rancho?.tracking_code || '',
       latitude: rancho?.latitude?.toString() || '',
       longitude: rancho?.longitude?.toString() || '',
       endereco_completo: rancho?.endereco_completo || '',
@@ -159,6 +161,7 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
         telefone_whatsapp: data.telefone_whatsapp || null,
         video_youtube: data.video_youtube || null,
         google_calendar_url: data.google_calendar_url || null,
+        tracking_code: data.tracking_code || null,
         latitude: data.latitude ? parseFloat(data.latitude) : null,
         longitude: data.longitude ? parseFloat(data.longitude) : null,
         endereco_completo: data.endereco_completo || null,
@@ -644,6 +647,28 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
                   </FormControl>
                   <FormDescription>
                     Obtenha as coordenadas em: <a href="https://www.google.com.br/maps" target="_blank" rel="noopener noreferrer" className="text-primary underline">Google Maps</a> (clique com botão direito no mapa)
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="tracking_code"
+              render={({ field }) => (
+                <FormItem>
+                  <Label>Código de Tracking (Pixel/Analytics)</Label>
+                  <FormControl>
+                    <Textarea
+                      {...field}
+                      placeholder="Cole o código de tracking específico para este rancho"
+                      rows={6}
+                      className="font-mono text-sm"
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Código específico de tracking apenas para a página deste rancho (opcional)
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

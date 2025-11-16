@@ -6,7 +6,8 @@ import {
   Package, 
   FileText, 
   LogOut,
-  Fish
+  Fish,
+  Settings
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -17,6 +18,7 @@ const navigation = [
   { name: 'Ranchos', href: '/admin/ranchos', icon: Home },
   { name: 'Pacotes', href: '/admin/pacotes', icon: Package },
   { name: 'Blog', href: '/admin/blog', icon: FileText },
+  { name: 'Configurações', href: '/admin/configuracoes', icon: Settings },
 ];
 
 export const AdminSidebar = () => {
