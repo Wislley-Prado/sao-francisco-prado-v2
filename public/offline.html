@@ -141,12 +141,30 @@
             </ul>
         </div>
         
-        <button class="retry-btn" onclick="window.location.reload()">
+        <button class="retry-btn" onclick="clearSWAndReload()">
             Tentar Reconectar
         </button>
     </div>
 
     <script>
+        async function clearSWAndReload() {
+            try {
+                if ('serviceWorker' in navigator) {
+                    const regs = await navigator.serviceWorker.getRegistrations();
+                    await Promise.all(regs.map(r => r.unregister()));
+                }
+                if ('caches' in window) {
+                    const keys = await caches.keys();
+                    await Promise.all(keys.map(k => caches.delete(k)));
+                }
+            } catch (e) {
+                // ignore errors cleaning up
+            } finally {
+                // Redirect to the SPA entry so the fresh SW (if any) is fetched
+                window.location.replace('/');
+            }
+        }
+
         // Monitor connection status
         function updateStatus() {
             const status = document.getElementById('status');
@@ -155,10 +173,8 @@
             if (navigator.onLine) {
                 status.textContent = '🟢 Online';
                 body.classList.add('online');
-                // Auto-reload when back online
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1000);
+                // When back online, clear old SW/caches and reload into the app
+                clearSWAndReload();
             } else {
                 status.textContent = '🔴 Offline';
                 body.classList.remove('online');
