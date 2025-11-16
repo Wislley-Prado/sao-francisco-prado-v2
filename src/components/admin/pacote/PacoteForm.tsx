@@ -164,65 +164,30 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
   };
 
   const uploadImages = async (pacoteId: string) => {
-    for (const image of images) {
-      if (image.file) {
-        // Sanitize filename: remove spaces, special chars, and accents
-        const sanitizedName = image.file.name
-          .normalize('NFD')
-          .replace(/[\u0300-\u036f]/g, '')
-          .replace(/\s+/g, '-')
-          .replace(/[^a-zA-Z0-9.-]/g, '')
-          .toLowerCase();
-        const fileName = `${pacoteId}/${Date.now()}-${sanitizedName}`;
-        const { error: uploadError, data } = await supabase.storage
-          .from('pacotes')
-          .upload(fileName, image.file);
-
-        if (uploadError) throw uploadError;
-
-        const { data: { publicUrl } } = supabase.storage
-          .from('pacotes')
-          .getPublicUrl(fileName);
-
-        const { error: dbError } = await supabase
-          .from('pacote_imagens')
-          .insert({
-            pacote_id: pacoteId,
-            url: publicUrl,
-            principal: image.principal,
-            alt_text: image.alt_text,
-            ordem: image.ordem,
-          });
-
-        if (dbError) throw dbError;
-      } else if (!pacote) {
-        const { error: dbError } = await supabase
-          .from('pacote_imagens')
-          .insert({
-            pacote_id: pacoteId,
-            url: image.url,
-            principal: image.principal,
-            alt_text: image.alt_text,
-            ordem: image.ordem,
-          });
-
-        if (dbError) throw dbError;
-      }
-    }
-
+    // When editing, handle deletions and updates first to avoid deleting
+    // freshly inserted rows later in the process.
     if (pacote) {
-      const existingImageIds = images
-        .filter((img) => !img.file)
+      const keepIds = images
+        .filter((img) => !img.file && !!img.id)
         .map((img) => img.id);
 
-      const { error: deleteError } = await supabase
-        .from('pacote_imagens')
-        .delete()
-        .eq('pacote_id', pacoteId)
-        .not('id', 'in', `(${existingImageIds.join(',')})`);
+      if (keepIds.length > 0) {
+        const { error: deleteError } = await supabase
+          .from('pacote_imagens')
+          .delete()
+          .eq('pacote_id', pacoteId)
+          .not('id', 'in', `(${keepIds.join(',')})`);
+        if (deleteError) throw deleteError;
+      } else {
+        // No existing IDs to keep -> remove all previous DB rows for this pacote
+        const { error: deleteAllError } = await supabase
+          .from('pacote_imagens')
+          .delete()
+          .eq('pacote_id', pacoteId);
+        if (deleteAllError) throw deleteAllError;
+      }
 
-      if (deleteError) throw deleteError;
-
+      // Update metadata of existing images that are being kept
       for (const image of images.filter((img) => !img.file)) {
         const { error: updateError } = await supabase
           .from('pacote_imagens')
@@ -232,9 +197,40 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
             ordem: image.ordem,
           })
           .eq('id', image.id);
-
         if (updateError) throw updateError;
       }
+    }
+
+    // Now upload and insert any new images
+    for (const image of images.filter((img) => !!img.file)) {
+      // Sanitize filename: remove spaces, special chars, and accents
+      const sanitizedName = image.file!.name
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/[^a-zA-Z0-9.-]/g, '')
+        .toLowerCase();
+
+      const fileName = `${pacoteId}/${Date.now()}-${sanitizedName}`;
+      const { error: uploadError } = await supabase.storage
+        .from('pacotes')
+        .upload(fileName, image.file!);
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('pacotes')
+        .getPublicUrl(fileName);
+
+      const { error: dbError } = await supabase
+        .from('pacote_imagens')
+        .insert({
+          pacote_id: pacoteId,
+          url: publicUrl,
+          principal: image.principal,
+          alt_text: image.alt_text,
+          ordem: image.ordem,
+        });
+      if (dbError) throw dbError;
     }
   };
 
