@@ -12,6 +12,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import DOMPurify from 'dompurify';
 import { SocialShareButtons } from '@/components/blog/SocialShareButtons';
 import { PaidMediaBannerDisplay } from '@/components/blog/PaidMediaBannerDisplay';
+import RelatedPosts from '@/components/blog/RelatedPosts';
+import RecentPostsCarousel from '@/components/blog/RecentPostsCarousel';
 
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -196,18 +198,18 @@ const BlogPost = () => {
             </>
           )}
 
-          {/* Footer CTA */}
-          <div className="mt-12 p-6 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border border-primary/20">
-            <h3 className="text-xl font-bold mb-2">Gostou deste conteúdo?</h3>
-            <p className="text-muted-foreground mb-4">
-              Explore mais artigos sobre pesca no Rio São Francisco
-            </p>
-            <Button asChild>
-              <Link to="/blog">Ver todos os posts</Link>
-            </Button>
-          </div>
         </article>
+
+        {/* Related Posts Section */}
+        <RelatedPosts 
+          currentPostId={post.id}
+          categoria={post.categoria}
+          tags={post.tags}
+        />
       </main>
+
+      {/* Recent Posts Carousel */}
+      <RecentPostsCarousel currentPostId={post.id} />
 
       <Footer />
     </div>
