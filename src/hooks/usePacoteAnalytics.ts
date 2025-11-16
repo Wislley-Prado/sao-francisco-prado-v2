@@ -5,6 +5,9 @@ type AnalyticsEvent = "visualizacao" | "clique_reserva" | "clique_whatsapp" | "c
 
 export const usePacoteAnalytics = (pacoteId: string, evento: AnalyticsEvent) => {
   useEffect(() => {
+    // Não registrar se o pacoteId estiver vazio
+    if (!pacoteId) return;
+
     const registrarEvento = async () => {
       try {
         const { error } = await supabase.from("pacote_analytics").insert([{
