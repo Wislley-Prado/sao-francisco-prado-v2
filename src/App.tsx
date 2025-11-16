@@ -29,6 +29,7 @@ import AdminPacotes from "./pages/admin/Pacotes";
 import AdminBlog from "./pages/admin/Blog";
 import BlogNovo from "./pages/admin/BlogNovo";
 import BlogEditar from "./pages/admin/BlogEditar";
+import BlogAnalytics from "./pages/admin/BlogAnalytics";
 import AdminConfiguracoes from "./pages/admin/Configuracoes";
 import AdminAvaliacoes from "./pages/admin/Avaliacoes";
 import EstatisticasAvaliacoes from "./pages/admin/EstatisticasAvaliacoes";
@@ -93,6 +94,7 @@ const App = () => {
                   <Route path="blog" element={<AdminBlog />} />
                   <Route path="blog/novo" element={<BlogNovo />} />
                   <Route path="blog/editar/:id" element={<BlogEditar />} />
+                  <Route path="blog/analytics" element={<BlogAnalytics />} />
                   <Route path="configuracoes" element={<AdminConfiguracoes />} />
                 </Route>
                 

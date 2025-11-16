@@ -167,6 +167,7 @@ const BlogPost = () => {
 
           {/* Paid Media Banner */}
           <PaidMediaBannerDisplay 
+            postId={post.id}
             banner_midia_paga={post.banner_midia_paga as any} 
           />
 
@@ -174,6 +175,7 @@ const BlogPost = () => {
           {post.redes_sociais && (
             <div className="my-8">
               <SocialShareButtons 
+                postId={post.id}
                 redes_sociais={post.redes_sociais as any} 
               />
             </div>

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus } from 'lucide-react';
+import { Plus, BarChart3 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { BlogStats } from '@/components/admin/blog/BlogStats';
 import { BlogFilters } from '@/components/admin/blog/BlogFilters';
@@ -70,12 +70,20 @@ const AdminBlog = () => {
             Gerencie os posts do blog e artigos publicados
           </p>
         </div>
-        <Button asChild>
-          <Link to="/admin/blog/novo">
-            <Plus className="w-4 h-4 mr-2" />
-            Novo Post
-          </Link>
-        </Button>
+        <div className="flex gap-2">
+          <Button asChild variant="outline">
+            <Link to="/admin/blog/analytics">
+              <BarChart3 className="w-4 h-4 mr-2" />
+              Analytics
+            </Link>
+          </Button>
+          <Button asChild>
+            <Link to="/admin/blog/novo">
+              <Plus className="w-4 h-4 mr-2" />
+              Novo Post
+            </Link>
+          </Button>
+        </div>
       </div>
 
         <BlogStats
