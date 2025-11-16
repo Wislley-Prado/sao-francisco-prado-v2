@@ -17,6 +17,7 @@ interface Package {
   features: string[];
   image: string;
   popular: boolean;
+  slug?: string;
 }
 
 interface PackageCardProps {
@@ -24,14 +25,7 @@ interface PackageCardProps {
 }
 
 const PackageCard = ({ pkg }: PackageCardProps) => {
-  const getPackageRoute = (id: number) => {
-    switch (id) {
-      case 1: return '/pacote/vip';
-      case 2: return '/pacote/luxo';
-      case 3: return '/pacote/diamante';
-      default: return '/pacotes';
-    }
-  };
+  const packageRoute = pkg.slug ? `/pacote/${pkg.slug}` : '/pacotes';
 
   return (
     <Card 
@@ -110,7 +104,7 @@ const PackageCard = ({ pkg }: PackageCardProps) => {
           } text-white`}
           asChild
         >
-          <Link to={getPackageRoute(pkg.id)}>
+          <Link to={packageRoute}>
             <Calendar className="mr-2 h-4 w-4" />
             Ver Detalhes
           </Link>

@@ -13,6 +13,7 @@ interface PacoteImage {
 
 interface Pacote {
   id: string;
+  slug: string;
   nome: string;
   descricao: string;
   preco: number;
@@ -49,12 +50,13 @@ const PackagesSection = () => {
 
         if (error) throw error;
 
-        const formattedPackages = data?.map((pacote: Pacote) => {
+        const formattedPackages = data?.map((pacote: Pacote, index: number) => {
           const mainImage = pacote.pacote_imagens.find(img => img.principal) || 
                            pacote.pacote_imagens.sort((a, b) => a.ordem - b.ordem)[0];
 
           return {
-            id: parseInt(pacote.id.split('-')[0], 16) % 1000, // Generate numeric id for routing
+            id: index + 1, // Simple numeric id for key
+            slug: pacote.slug || '', // Pass slug for routing
             title: pacote.nome,
             description: pacote.descricao || '',
             price: `R$ ${pacote.preco.toFixed(2)}`,
