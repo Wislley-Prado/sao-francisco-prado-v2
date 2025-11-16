@@ -55,6 +55,9 @@ const PacoteDetalhes = () => {
   // WhatsApp padrão do site, usado se o pacote não tiver um específico
   const whatsappPadrao = "5538999755886";
 
+  // Hook de analytics - SEMPRE deve ser chamado no nível superior
+  usePacoteAnalytics(pacote?.id || '', 'visualizacao');
+
   // Registra visualização automaticamente quando o pacote for carregado
   useEffect(() => {
     if (pacote?.id) {
@@ -70,11 +73,6 @@ const PacoteDetalhes = () => {
       }
     }
   }, [pacote]);
-
-  // Hook de analytics
-  if (pacote) {
-    usePacoteAnalytics(pacote.id, 'visualizacao');
-  }
 
   useEffect(() => {
     const fetchPacote = async () => {
