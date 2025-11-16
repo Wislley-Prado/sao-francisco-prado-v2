@@ -1,10 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Fish, Phone, Mail, MapPin, Facebook, Instagram, Youtube } from 'lucide-react';
-
 const Footer = () => {
-  return (
-    <footer className="bg-gray-900 text-white mt-20">
+  return <footer className="bg-gray-900 text-white mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Logo and Description */}
@@ -60,7 +58,7 @@ const Footer = () => {
             <div className="space-y-3 text-sm">
               <div className="flex items-center space-x-2">
                 <Phone className="h-4 w-4 text-rio-blue" />
-                <span className="text-gray-300">(38) 99999-9999</span>
+                <span className="text-gray-300">(38) 9</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Mail className="h-4 w-4 text-rio-blue" />
@@ -80,25 +78,13 @@ const Footer = () => {
           <div className="space-y-4">
             <h4 className="text-lg font-semibold">Redes Sociais</h4>
             <div className="flex space-x-4">
-              <a 
-                href="#" 
-                className="text-gray-300 hover:text-rio-blue transition-colors"
-                aria-label="Facebook"
-              >
+              <a href="#" className="text-gray-300 hover:text-rio-blue transition-colors" aria-label="Facebook">
                 <Facebook className="h-6 w-6" />
               </a>
-              <a 
-                href="#" 
-                className="text-gray-300 hover:text-rio-blue transition-colors"
-                aria-label="Instagram"
-              >
+              <a href="#" className="text-gray-300 hover:text-rio-blue transition-colors" aria-label="Instagram">
                 <Instagram className="h-6 w-6" />
               </a>
-              <a 
-                href="#" 
-                className="text-gray-300 hover:text-rio-blue transition-colors"
-                aria-label="YouTube"
-              >
+              <a href="#" className="text-gray-300 hover:text-rio-blue transition-colors" aria-label="YouTube">
                 <Youtube className="h-6 w-6" />
               </a>
             </div>
@@ -112,36 +98,24 @@ const Footer = () => {
               © 2024 PradoAqui. Todos os direitos reservados.
             </div>
             <div className="flex flex-wrap justify-center md:justify-end space-x-6 text-sm">
-              <Link 
-                to="/politica-privacidade" 
-                className="text-gray-300 hover:text-rio-blue transition-colors"
-              >
+              <Link to="/politica-privacidade" className="text-gray-300 hover:text-rio-blue transition-colors">
                 Política de Privacidade
               </Link>
-              <a 
-                href="#termos" 
-                className="text-gray-300 hover:text-rio-blue transition-colors"
-              >
+              <a href="#termos" className="text-gray-300 hover:text-rio-blue transition-colors">
                 Termos de Uso
               </a>
-              <a 
-                href="#cookies" 
-                className="text-gray-300 hover:text-rio-blue transition-colors"
-                onClick={(e) => {
-                  e.preventDefault();
-                  // Reset cookie consent to show banner again
-                  localStorage.removeItem('cookie-consent');
-                  window.location.reload();
-                }}
-              >
+              <a href="#cookies" className="text-gray-300 hover:text-rio-blue transition-colors" onClick={e => {
+              e.preventDefault();
+              // Reset cookie consent to show banner again
+              localStorage.removeItem('cookie-consent');
+              window.location.reload();
+            }}>
                 Configurar Cookies
               </a>
             </div>
           </div>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
-
 export default Footer;
