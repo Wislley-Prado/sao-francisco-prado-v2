@@ -18,6 +18,8 @@ import PackageLuxo from "./pages/PackageLuxo";
 import PackageDiamante from "./pages/PackageDiamante";
 import PackagesIndex from "./pages/PackagesIndex";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 import AdminLogin from "./pages/admin/Login";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminRanchos from "./pages/admin/Ranchos";
@@ -65,6 +67,8 @@ const App = () => {
                 <Route path="/pacote/luxo" element={<PackageLuxo />} />
                 <Route path="/pacote/diamante" element={<PackageDiamante />} />
                 <Route path="/politica-privacidade" element={<PrivacyPolicy />} />
+                <Route path="/blog" element={<Blog />} />
+                <Route path="/blog/:slug" element={<BlogPost />} />
                 {/* Backward compatibility */}
                 <Route path="/pacote-vip" element={<PackageVip />} />
                 

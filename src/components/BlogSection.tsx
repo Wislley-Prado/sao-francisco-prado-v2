@@ -1,59 +1,33 @@
 import React from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, CarouselApi } from '@/components/ui/carousel';
 import BlogCard from './BlogCard';
 import { BookOpen, TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react';
-
-// Importar as imagens do blog
-import dicasDePesca from '@/assets/blog/dicas-de-pesca.jpg';
-import fasesLua from '@/assets/blog/fases-da-lua.jpg';
-import douradoGigante from '@/assets/blog/dourado-gigante.jpg';
-import regulamentacaoPesca from '@/assets/blog/regulamentacao-pesca.png';
-
-// Dados mock dos posts mais recentes
-const recentPosts = [
-  {
-    id: '1',
-    title: 'Melhores Técnicas de Pesca no Rio São Francisco',
-    excerpt: 'Descubra as técnicas mais eficazes para pescar no Velho Chico, desde iscas naturais até equipamentos recomendados pelos pescadores experientes.',
-    author: 'João Pescador',
-    date: '15 Mai 2024',
-    image: dicasDePesca,
-    category: 'Técnicas'
-  },
-  {
-    id: '2',
-    title: 'Calendário Lunar da Pesca: Agosto 2024',
-    excerpt: 'Confira as melhores fases da lua para pescar neste mês e maximize suas chances de uma pescaria de sucesso no Rio São Francisco.',
-    author: 'Maria Santos',
-    date: '12 Ago 2024',
-    image: fasesLua,
-    category: 'Lunar'
-  },
-  {
-    id: '3',
-    title: 'Espécies de Peixes: Dourado do São Francisco',
-    excerpt: 'Conheça tudo sobre o dourado, o rei dos peixes do São Francisco, seus hábitos, melhores iscas e locais para encontrá-lo.',
-    author: 'Ana Bióloga',
-    date: '8 Ago 2024',
-    image: douradoGigante,
-    category: 'Espécies'
-  },
-  {
-    id: '4',
-    title: 'Regulamentação da Pesca em 2024',
-    excerpt: 'Fique por dentro das novas regras de pesca, períodos de defeso e licenças necessárias para pescar no Rio São Francisco.',
-    author: 'Roberto Legal',
-    date: '5 Ago 2024',
-    image: regulamentacaoPesca,
-    category: 'Regulamentação'
-  }
-];
+import { Button } from '@/components/ui/button';
 
 const BlogSection = () => {
   const [api, setApi] = React.useState<CarouselApi>();
   const [current, setCurrent] = React.useState(0);
   const [count, setCount] = React.useState(0);
+
+  // Fetch recent published posts
+  const { data: recentPosts, isLoading } = useQuery({
+    queryKey: ['recent-blog-posts'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .select('*')
+        .eq('publicado', true)
+        .order('data_publicacao', { ascending: false })
+        .limit(6);
+
+      if (error) throw error;
+      return data;
+    },
+  });
 
   React.useEffect(() => {
     if (!api) {
@@ -71,6 +45,10 @@ const BlogSection = () => {
   const scrollTo = (index: number) => {
     api?.scrollTo(index);
   };
+
+  if (isLoading || !recentPosts || recentPosts.length === 0) {
+    return null;
+  }
 
   return (
     <section id="blog" className="py-16 bg-gradient-to-br from-slate-50 to-blue-50">
@@ -110,7 +88,23 @@ const BlogSection = () => {
             <CarouselContent className="-ml-2 md:-ml-4">
               {recentPosts.map((post) => (
                 <CarouselItem key={post.id} className="pl-2 md:pl-4 basis-4/5 sm:basis-3/5 md:basis-1/2 lg:basis-1/3">
-                  <BlogCard post={post} />
+                  <Link to={`/blog/${post.slug}`}>
+                    <BlogCard 
+                      post={{
+                        id: post.id,
+                        title: post.titulo,
+                        excerpt: post.resumo || '',
+                        author: 'PradoAqui',
+                        date: new Date(post.data_publicacao || post.created_at).toLocaleDateString('pt-BR', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric'
+                        }),
+                        image: post.imagem_destaque || '/placeholder.svg',
+                        category: post.categoria || 'Geral'
+                      }}
+                    />
+                  </Link>
                 </CarouselItem>
               ))}
             </CarouselContent>
@@ -143,10 +137,12 @@ const BlogSection = () => {
 
         {/* CTA para ver todos os posts */}
         <div className="text-center mt-12">
-          <button className="bg-rio-blue hover:bg-blue-600 text-white px-8 py-3 rounded-lg font-medium transition-colors duration-200 inline-flex items-center space-x-2">
-            <BookOpen className="h-5 w-5" />
-            <span>Ver Todos os Posts</span>
-          </button>
+          <Button asChild size="lg" className="shadow-md hover:shadow-lg">
+            <Link to="/blog">
+              <BookOpen className="h-5 w-5 mr-2" />
+              Ver Todos os Posts
+            </Link>
+          </Button>
         </div>
       </div>
     </section>
