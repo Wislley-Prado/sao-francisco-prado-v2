@@ -26,6 +26,7 @@ import RanchoEditar from "./pages/admin/RanchoEditar";
 import AdminPacotes from "./pages/admin/Pacotes";
 import AdminBlog from "./pages/admin/Blog";
 import AdminConfiguracoes from "./pages/admin/Configuracoes";
+import AdminAvaliacoes from "./pages/admin/Avaliacoes";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -78,6 +79,7 @@ const App = () => {
                   <Route path="ranchos/novo" element={<RanchoNovo />} />
                   <Route path="ranchos/editar/:id" element={<RanchoEditar />} />
                   <Route path="pacotes" element={<AdminPacotes />} />
+                  <Route path="avaliacoes" element={<AdminAvaliacoes />} />
                   <Route path="blog" element={<AdminBlog />} />
                   <Route path="configuracoes" element={<AdminConfiguracoes />} />
                 </Route>

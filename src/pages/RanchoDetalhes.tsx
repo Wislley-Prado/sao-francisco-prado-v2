@@ -8,11 +8,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   MapPin, Users, Bed, Bath, Maximize, Star, 
   Wifi, Car, Waves, Utensils, Wind, Tv, 
   ArrowLeft, MessageCircle, Loader2, CheckCircle
 } from 'lucide-react';
+import { ReviewsList } from "@/components/reviews/ReviewsList";
+import { ReviewForm } from "@/components/reviews/ReviewForm";
 
 interface RanchoDetalhes {
   id: string;
@@ -452,6 +455,23 @@ const RanchoDetalhes = () => {
                 </CardContent>
               </Card>
             </div>
+          </div>
+
+          {/* Seção de Avaliações */}
+          <div className="mt-12">
+            <h2 className="text-3xl font-bold mb-6">Avaliações dos Hóspedes</h2>
+            <Tabs defaultValue="reviews" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="reviews">Ver Avaliações</TabsTrigger>
+                <TabsTrigger value="new">Deixar Avaliação</TabsTrigger>
+              </TabsList>
+              <TabsContent value="reviews" className="mt-6">
+                <ReviewsList ranchoId={rancho.id} />
+              </TabsContent>
+              <TabsContent value="new" className="mt-6">
+                <ReviewForm ranchoId={rancho.id} />
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
       </main>
