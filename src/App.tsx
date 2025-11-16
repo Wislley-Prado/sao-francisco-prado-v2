@@ -25,6 +25,8 @@ import RanchoNovo from "./pages/admin/RanchoNovo";
 import RanchoEditar from "./pages/admin/RanchoEditar";
 import AdminPacotes from "./pages/admin/Pacotes";
 import AdminBlog from "./pages/admin/Blog";
+import BlogNovo from "./pages/admin/BlogNovo";
+import BlogEditar from "./pages/admin/BlogEditar";
 import AdminConfiguracoes from "./pages/admin/Configuracoes";
 import AdminAvaliacoes from "./pages/admin/Avaliacoes";
 import EstatisticasAvaliacoes from "./pages/admin/EstatisticasAvaliacoes";
@@ -85,6 +87,8 @@ const App = () => {
                   <Route path="estatisticas-avaliacoes" element={<EstatisticasAvaliacoes />} />
                   <Route path="analytics" element={<AdminAnalytics />} />
                   <Route path="blog" element={<AdminBlog />} />
+                  <Route path="blog/novo" element={<BlogNovo />} />
+                  <Route path="blog/editar/:id" element={<BlogEditar />} />
                   <Route path="configuracoes" element={<AdminConfiguracoes />} />
                 </Route>
                 
