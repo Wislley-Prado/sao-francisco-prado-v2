@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
+import FeaturedPackagesCarousel from '@/components/FeaturedPackagesCarousel';
 
 interface PacoteImage {
   id: string;
@@ -123,9 +124,22 @@ const PackagesIndex = () => {
         </div>
       </section>
 
-      {/* Packages Grid */}
+      {/* Featured Packages Carousel */}
+      {!loading && packages.length > 0 && (
+        <FeaturedPackagesCarousel packages={packages} />
+      )}
+
+      {/* All Packages Section */}
       <section className="py-16">
         <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Todos os Pacotes
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Explore todas as opções disponíveis e encontre o pacote perfeito para você
+            </p>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
             {loading ? (
               <>
