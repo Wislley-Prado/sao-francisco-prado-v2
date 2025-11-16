@@ -1,93 +1,96 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Clock, Users, Fish, Star, Calendar, Crown, Gem, Award } from 'lucide-react';
+import { Clock, Users, Fish, Star, Calendar, Crown, Gem, Award } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Header from '@/components/Header';
+import { supabase } from '@/integrations/supabase/client';
+import { Skeleton } from '@/components/ui/skeleton';
 
-// Import das imagens
-import ranchoImage1 from '@/assets/gallery/rancho-prado-aldeia.jpg';
-import douradoImage from '@/assets/gallery/dourado-gigante-sao-francisco.jpg';
-import pacoteDiamanteImage from '@/assets/gallery/pacote-diamante.png';
+interface PacoteImage {
+  id: string;
+  url: string;
+  principal: boolean;
+  ordem: number;
+}
+
+interface Pacote {
+  id: string;
+  slug: string;
+  nome: string;
+  descricao: string;
+  preco: number;
+  duracao: string;
+  pessoas: number;
+  rating: number;
+  popular: boolean;
+  destaque: boolean;
+  ativo: boolean;
+  inclusos: string[];
+  pacote_imagens: PacoteImage[];
+}
 
 const PackagesIndex = () => {
-  const packages = [
-    {
-      id: 1,
-      title: "Pacote VIP Exclusivo",
-      description: "Experiência completa de pesca esportiva no Rio São Francisco com hospedagem, alimentação e equipamentos inclusos.",
-      price: "R$ 1.479,70",
-      originalPrice: "R$ 1.899,00",
-      duration: "2 dias / 1 noite",
-      people: "Até 6 pessoas",
-      rating: 4.8,
-      features: [
-        "Hospedagem confortável",
-        "Todas as refeições incluídas",
-        "Equipamentos de pesca completos",
-        "Guia especializado",
-        "Transporte incluso"
-      ],
-      image: ranchoImage1,
-      popular: true,
-      route: "/pacote/vip",
-      badge: "Mais Popular",
-      badgeColor: "bg-sunset-orange"
-    },
-    {
-      id: 2,
-      title: "Pacote Luxo Premium",
-      description: "Experiência premium com hospedagem de alto padrão, equipamentos profissionais e atendimento personalizado.",
-      price: "R$ 2.998,50",
-      duration: "3 dias / 2 noites",
-      people: "Até 4 pessoas",
-      rating: 4.9,
-      features: [
-        "Hospedagem premium com suítes",
-        "Alimentação gourmet",
-        "Equipamentos premium",
-        "Guia particular",
-        "Transporte executivo",
-        "Serviços extras inclusos"
-      ],
-      image: douradoImage,
-      popular: false,
-      route: "/pacote/luxo",
-      badge: "Premium",
-      badgeColor: "bg-blue-600"
-    },
-    {
-      id: 3,
-      title: "Pacote Diamante Elite",
-      description: "A experiência mais exclusiva e luxuosa, com atendimento VIP, chef privativo e momentos únicos.",
-      price: "R$ 5.999,40",
-      duration: "5 dias / 4 noites",
-      people: "Até 2 pessoas",
-      rating: 5.0,
-      features: [
-        "Suíte presidencial exclusiva",
-        "Chef privativo e vinhos premium",
-        "Equipamentos profissionais Shimano",
-        "Concierge pessoal",
-        "Fotógrafo profissional",
-        "Experiências únicas e exclusivas"
-      ],
-      image: pacoteDiamanteImage,
-      popular: false,
-      route: "/pacote/diamante",
-      badge: "Exclusivo",
-      badgeColor: "bg-gradient-to-r from-yellow-400 to-yellow-600"
-    }
-  ];
+  const [packages, setPackages] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const getIcon = (id: number) => {
-    switch (id) {
-      case 1: return Award;
-      case 2: return Crown;
-      case 3: return Gem;
-      default: return Fish;
-    }
+  useEffect(() => {
+    const fetchPackages = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('pacotes')
+          .select(`
+            *,
+            pacote_imagens (
+              id,
+              url,
+              principal,
+              ordem
+            )
+          `)
+          .eq('ativo', true)
+          .order('popular', { ascending: false })
+          .order('preco', { ascending: true });
+
+        if (error) throw error;
+
+        const formattedPackages = data?.map((pacote: Pacote, index: number) => {
+          const mainImage = pacote.pacote_imagens.find(img => img.principal) || 
+                           pacote.pacote_imagens.sort((a, b) => a.ordem - b.ordem)[0];
+
+          return {
+            id: index + 1,
+            slug: pacote.slug,
+            title: pacote.nome,
+            description: pacote.descricao || '',
+            price: `R$ ${pacote.preco.toFixed(2)}`,
+            duration: pacote.duracao,
+            people: `${pacote.pessoas} pessoas`,
+            rating: pacote.rating,
+            features: pacote.inclusos || [],
+            image: mainImage?.url || '',
+            popular: pacote.popular,
+            destaque: pacote.destaque,
+            badge: pacote.popular ? 'Mais Popular' : pacote.destaque ? 'Destaque' : 'Premium',
+            badgeColor: pacote.popular ? 'bg-sunset-orange' : pacote.destaque ? 'bg-gradient-to-r from-yellow-400 to-yellow-600' : 'bg-blue-600'
+          };
+        }) || [];
+
+        setPackages(formattedPackages);
+      } catch (error) {
+        console.error('Erro ao carregar pacotes:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPackages();
+  }, []);
+
+  const getIcon = (index: number) => {
+    const icons = [Award, Crown, Gem, Fish];
+    return icons[index % icons.length];
   };
 
   return (
@@ -124,102 +127,116 @@ const PackagesIndex = () => {
       <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-            {packages.map((pkg) => {
-              const IconComponent = getIcon(pkg.id);
-              return (
-                <Card 
-                  key={pkg.id}
-                  className={`relative overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 ${
-                    pkg.popular 
-                      ? 'ring-2 ring-sunset-orange shadow-xl scale-105' 
-                      : 'hover:shadow-lg'
-                  }`}
-                >
-                  {/* Badge */}
-                  <div className="absolute top-4 right-4 z-10">
-                    <Badge className={`${pkg.badgeColor} text-white`}>
-                      {pkg.badge}
-                    </Badge>
-                  </div>
-
-                  {/* Image Header */}
-                  <CardHeader className="p-0">
-                    <div className="h-48 relative overflow-hidden">
-                      <img 
-                        src={pkg.image} 
-                        alt={pkg.title}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                      <div className="absolute inset-0 bg-black bg-opacity-20"></div>
-                      <div className="absolute bottom-4 left-4 text-white">
-                        <div className="flex items-center space-x-1 mb-2">
-                          <Star className="h-4 w-4 fill-current text-yellow-400" />
-                          <span className="text-sm font-medium">{pkg.rating}</span>
-                        </div>
-                        <CardTitle className="text-2xl font-bold">{pkg.title}</CardTitle>
-                      </div>
+            {loading ? (
+              <>
+                <Skeleton className="h-[600px] w-full" />
+                <Skeleton className="h-[600px] w-full" />
+                <Skeleton className="h-[600px] w-full" />
+              </>
+            ) : packages.length > 0 ? (
+              packages.map((pkg, index) => {
+                const IconComponent = getIcon(index);
+                return (
+                  <Card 
+                    key={pkg.id}
+                    className={`relative overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 ${
+                      pkg.popular 
+                        ? 'ring-2 ring-sunset-orange shadow-xl scale-105' 
+                        : 'hover:shadow-lg'
+                    }`}
+                  >
+                    {/* Badge */}
+                    <div className="absolute top-4 right-4 z-10">
+                      <Badge className={`${pkg.badgeColor} text-white`}>
+                        {pkg.badge}
+                      </Badge>
                     </div>
-                  </CardHeader>
 
-                  <CardContent className="p-6">
-                    <p className="text-gray-600 mb-4">{pkg.description}</p>
+                    {/* Image Header */}
+                    <CardHeader className="p-0">
+                      <div className="h-48 relative overflow-hidden">
+                        <img 
+                          src={pkg.image} 
+                          alt={pkg.title}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                          onError={(e) => {
+                            console.log('Erro ao carregar imagem:', pkg.image);
+                            e.currentTarget.style.display = 'none';
+                            e.currentTarget.parentElement!.classList.add('bg-gradient-to-br', 'from-rio-blue', 'to-water-green');
+                          }}
+                        />
+                        <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+                        <div className="absolute bottom-4 left-4 text-white">
+                          <div className="flex items-center space-x-1 mb-2">
+                            <Star className="h-4 w-4 fill-current text-yellow-400" />
+                            <span className="text-sm font-medium">{pkg.rating}</span>
+                          </div>
+                          <CardTitle className="text-2xl font-bold">{pkg.title}</CardTitle>
+                        </div>
+                      </div>
+                    </CardHeader>
 
-                    {/* Package Info */}
-                    <div className="flex justify-between items-center mb-4">
-                      <div className="text-left">
-                        <div className="text-3xl font-bold text-rio-blue">{pkg.price}</div>
-                        {pkg.originalPrice && (
-                          <div className="text-sm text-gray-500 line-through">{pkg.originalPrice}</div>
+                    <CardContent className="p-6">
+                      <p className="text-gray-600 mb-4">{pkg.description}</p>
+
+                      {/* Package Info */}
+                      <div className="flex justify-between items-center mb-4">
+                        <div className="text-left">
+                          <div className="text-3xl font-bold text-rio-blue">{pkg.price}</div>
+                        </div>
+                        <div className="text-right text-sm text-gray-500">
+                          <div className="flex items-center justify-end">
+                            <Clock className="h-4 w-4 mr-1" />
+                            {pkg.duration}
+                          </div>
+                          <div className="flex items-center justify-end">
+                            <Users className="h-4 w-4 mr-1" />
+                            {pkg.people}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Features */}
+                      <div className="space-y-2 mb-6">
+                        {pkg.features.slice(0, 4).map((feature: string, featureIndex: number) => (
+                          <div key={featureIndex} className="flex items-center text-sm text-gray-600">
+                            <IconComponent className="h-4 w-4 mr-2 text-water-green" />
+                            {feature}
+                          </div>
+                        ))}
+                        {pkg.features.length > 4 && (
+                          <div className="text-sm text-gray-500 italic">
+                            +{pkg.features.length - 4} benefícios adicionais
+                          </div>
                         )}
                       </div>
-                      <div className="text-right text-sm text-gray-500">
-                        <div className="flex items-center justify-end">
-                          <Clock className="h-4 w-4 mr-1" />
-                          {pkg.duration}
-                        </div>
-                        <div className="flex items-center justify-end">
-                          <Users className="h-4 w-4 mr-1" />
-                          {pkg.people}
-                        </div>
-                      </div>
-                    </div>
 
-                    {/* Features */}
-                    <div className="space-y-2 mb-6">
-                      {pkg.features.slice(0, 4).map((feature, index) => (
-                        <div key={index} className="flex items-center text-sm text-gray-600">
-                          <IconComponent className="h-4 w-4 mr-2 text-water-green" />
-                          {feature}
-                        </div>
-                      ))}
-                      {pkg.features.length > 4 && (
-                        <div className="text-sm text-gray-500 italic">
-                          +{pkg.features.length - 4} benefícios adicionais
-                        </div>
-                      )}
-                    </div>
-
-                    {/* CTA Button */}
-                    <Button 
-                      className={`w-full ${
-                        pkg.id === 3 
-                          ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700'
-                          : pkg.popular 
-                            ? 'bg-sunset-orange hover:bg-orange-600' 
-                            : 'bg-rio-blue hover:bg-blue-600'
-                      } text-white`}
-                      asChild
-                    >
-                      <Link to={pkg.route}>
-                        <Calendar className="mr-2 h-4 w-4" />
-                        Ver Detalhes
-                      </Link>
-                    </Button>
-                  </CardContent>
-                </Card>
-              );
-            })}
+                      {/* CTA Button */}
+                      <Button 
+                        className={`w-full ${
+                          pkg.destaque
+                            ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700'
+                            : pkg.popular 
+                              ? 'bg-sunset-orange hover:bg-orange-600' 
+                              : 'bg-rio-blue hover:bg-blue-600'
+                        } text-white`}
+                        asChild
+                      >
+                        <Link to={`/pacote/${pkg.slug}`}>
+                          <Calendar className="mr-2 h-4 w-4" />
+                          Ver Detalhes
+                        </Link>
+                      </Button>
+                    </CardContent>
+                  </Card>
+                );
+              })
+            ) : (
+              <div className="col-span-3 text-center py-12">
+                <p className="text-gray-500">Nenhum pacote disponível no momento.</p>
+              </div>
+            )}
           </div>
         </div>
       </section>
