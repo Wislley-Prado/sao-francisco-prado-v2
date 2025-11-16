@@ -29,6 +29,7 @@ interface RanchoDetalhes {
   disponivel: boolean;
   telefone_whatsapp?: string;
   video_youtube?: string;
+  google_calendar_url?: string;
   latitude?: number;
   longitude?: number;
   endereco_completo?: string;
@@ -101,6 +102,7 @@ const RanchoDetalhes = () => {
           disponivel: ranchoData.disponivel,
           telefone_whatsapp: ranchoData.telefone_whatsapp,
           video_youtube: ranchoData.video_youtube,
+          google_calendar_url: ranchoData.google_calendar_url,
           latitude: ranchoData.latitude,
           longitude: ranchoData.longitude,
           endereco_completo: ranchoData.endereco_completo,
@@ -346,6 +348,28 @@ const RanchoDetalhes = () => {
                         loading="lazy"
                         referrerPolicy="no-referrer-when-downgrade"
                         title={`Mapa ${rancho.nome}`}
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* Google Calendar Availability */}
+              {rancho.google_calendar_url && (
+                <>
+                  <Separator />
+                  <div>
+                    <h2 className="text-2xl font-bold mb-4">Disponibilidade</h2>
+                    <p className="text-muted-foreground mb-4">
+                      Confira as datas disponíveis para reserva no calendário abaixo:
+                    </p>
+                    <div className="relative w-full h-[600px] rounded-lg overflow-hidden border border-border">
+                      <iframe
+                        src={rancho.google_calendar_url}
+                        className="w-full h-full border-0"
+                        frameBorder="0"
+                        scrolling="no"
+                        title={`Calendário de disponibilidade ${rancho.nome}`}
                       />
                     </div>
                   </div>

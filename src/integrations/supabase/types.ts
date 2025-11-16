@@ -370,6 +370,7 @@ export type Database = {
           destaque: boolean
           disponivel: boolean
           endereco_completo: string | null
+          google_calendar_url: string | null
           id: string
           latitude: number | null
           localizacao: string
@@ -394,6 +395,7 @@ export type Database = {
           destaque?: boolean
           disponivel?: boolean
           endereco_completo?: string | null
+          google_calendar_url?: string | null
           id?: string
           latitude?: number | null
           localizacao: string
@@ -418,6 +420,7 @@ export type Database = {
           destaque?: boolean
           disponivel?: boolean
           endereco_completo?: string | null
+          google_calendar_url?: string | null
           id?: string
           latitude?: number | null
           localizacao?: string
