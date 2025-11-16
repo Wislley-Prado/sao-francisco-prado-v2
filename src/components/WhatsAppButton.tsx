@@ -1,41 +1,93 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { MessageCircle, X, Phone, Clock } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+
+interface QuickMessage {
+  text: string;
+  message: string;
+}
+
+interface WhatsAppSettings {
+  whatsapp_numero: string;
+  whatsapp_titulo: string;
+  whatsapp_mensagem_padrao: string;
+  whatsapp_saudacao: string;
+  whatsapp_instrucao: string;
+  whatsapp_horario: string;
+  whatsapp_opcoes: QuickMessage[];
+}
+
+const SETTINGS_ID = "00000000-0000-0000-0000-000000000001";
 
 const WhatsAppButton = () => {
   const [isOpen, setIsOpen] = useState(false);
-  
-  const whatsappNumber = "5531999999999"; // Replace with actual number
-  const message = "Olá! Gostaria de saber mais sobre os pacotes de pesca no PradoAqui.";
+  const [settings, setSettings] = useState<WhatsAppSettings>({
+    whatsapp_numero: "5531999999999",
+    whatsapp_titulo: "PradoAqui - Atendimento",
+    whatsapp_mensagem_padrao: "Olá! Gostaria de saber mais sobre os pacotes de pesca no PradoAqui.",
+    whatsapp_saudacao: "👋 Olá! Como podemos ajudar você hoje?",
+    whatsapp_instrucao: "Escolha uma opção abaixo ou digite sua mensagem:",
+    whatsapp_horario: "Seg-Dom: 6h às 22h",
+    whatsapp_opcoes: [
+      {
+        text: "Quero fazer uma reserva",
+        message: "Olá! Gostaria de fazer uma reserva para pesca no Rio São Francisco."
+      },
+      {
+        text: "Consultar disponibilidade",
+        message: "Oi! Podem me informar a disponibilidade para os próximos finais de semana?"
+      },
+      {
+        text: "Informações sobre pacotes",
+        message: "Olá! Gostaria de saber mais detalhes sobre os pacotes de pesca disponíveis."
+      },
+      {
+        text: "Condições atuais do rio",
+        message: "Oi! Como estão as condições de pesca no rio hoje?"
+      }
+    ]
+  });
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("site_settings")
+          .select("*")
+          .eq("id", SETTINGS_ID)
+          .single();
+
+        if (error) throw error;
+
+        if (data) {
+          setSettings({
+            whatsapp_numero: data.whatsapp_numero || settings.whatsapp_numero,
+            whatsapp_titulo: data.whatsapp_titulo || settings.whatsapp_titulo,
+            whatsapp_mensagem_padrao: data.whatsapp_mensagem_padrao || settings.whatsapp_mensagem_padrao,
+            whatsapp_saudacao: data.whatsapp_saudacao || settings.whatsapp_saudacao,
+            whatsapp_instrucao: data.whatsapp_instrucao || settings.whatsapp_instrucao,
+            whatsapp_horario: data.whatsapp_horario || settings.whatsapp_horario,
+            whatsapp_opcoes: (data.whatsapp_opcoes as unknown as QuickMessage[]) || settings.whatsapp_opcoes,
+          });
+        }
+      } catch (error) {
+        console.error("Erro ao carregar configurações do WhatsApp:", error);
+      }
+    };
+
+    fetchSettings();
+  }, []);
 
   const handleWhatsAppClick = () => {
-    const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+    const url = `https://wa.me/${settings.whatsapp_numero}?text=${encodeURIComponent(settings.whatsapp_mensagem_padrao)}`;
     window.open(url, '_blank');
   };
 
-  const quickMessages = [
-    {
-      text: "Quero fazer uma reserva",
-      message: "Olá! Gostaria de fazer uma reserva para pesca no Rio São Francisco."
-    },
-    {
-      text: "Consultar disponibilidade",
-      message: "Oi! Podem me informar a disponibilidade para os próximos finais de semana?"
-    },
-    {
-      text: "Informações sobre pacotes",
-      message: "Olá! Gostaria de saber mais detalhes sobre os pacotes de pesca disponíveis."
-    },
-    {
-      text: "Condições atuais do rio",
-      message: "Oi! Como estão as condições de pesca no rio hoje?"
-    }
-  ];
-
   const handleQuickMessage = (msg: string) => {
-    const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(msg)}`;
+    const url = `https://wa.me/${settings.whatsapp_numero}?text=${encodeURIComponent(msg)}`;
     window.open(url, '_blank');
     setIsOpen(false);
   };
@@ -53,7 +105,7 @@ const WhatsAppButton = () => {
                     <MessageCircle className="h-5 w-5" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">PradoAqui - Atendimento</h3>
+                    <h3 className="font-semibold">{settings.whatsapp_titulo}</h3>
                     <div className="flex items-center space-x-1 text-green-100 text-xs">
                       <div className="w-2 h-2 bg-green-300 rounded-full animate-pulse"></div>
                       <span>Online agora</span>
@@ -74,15 +126,15 @@ const WhatsAppButton = () => {
             <CardContent className="p-4 space-y-3">
               <div className="bg-gray-100 rounded-lg p-3 text-sm">
                 <p className="text-gray-700 mb-2">
-                  👋 Olá! Como podemos ajudar você hoje?
+                  {settings.whatsapp_saudacao}
                 </p>
                 <p className="text-xs text-gray-500">
-                  Escolha uma opção abaixo ou digite sua mensagem:
+                  {settings.whatsapp_instrucao}
                 </p>
               </div>
 
               <div className="space-y-2">
-                {quickMessages.map((item, index) => (
+                {settings.whatsapp_opcoes.map((item, index) => (
                   <Button
                     key={index}
                     variant="outline"
@@ -108,7 +160,7 @@ const WhatsAppButton = () => {
               <div className="flex items-center justify-center space-x-4 text-xs text-gray-500">
                 <div className="flex items-center space-x-1">
                   <Clock className="h-3 w-3" />
-                  <span>Seg-Dom: 6h às 22h</span>
+                  <span>{settings.whatsapp_horario}</span>
                 </div>
                 <div className="flex items-center space-x-1">
                   <Phone className="h-3 w-3" />
