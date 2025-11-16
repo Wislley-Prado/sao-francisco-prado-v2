@@ -29,7 +29,8 @@ const navigation = [
   { name: 'Blog', href: '/admin/blog', icon: FileText },
   { name: 'FAQs', href: '/admin/faqs', icon: HelpCircle },
   { name: 'Depoimentos', href: '/admin/depoimentos', icon: MessageSquare },
-  { name: 'WhatsApp', href: '/admin/whatsapp-config', icon: MessageCircle },
+  { name: 'WhatsApp Config', href: '/admin/whatsapp-config', icon: MessageCircle },
+  { name: 'WhatsApp Analytics', href: '/admin/whatsapp-analytics', icon: TrendingUp },
   { name: 'Configurações', href: '/admin/configuracoes', icon: Settings },
 ];
 
