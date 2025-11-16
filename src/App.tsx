@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { PWALifecycle } from "@/components/PWALifecycle";
+import { ScrollToTop } from "@/components/ScrollToTop";
 import CookieConsent from "@/components/CookieConsent";
 import TrackingScripts from "@/components/TrackingScripts";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -57,6 +58,7 @@ const App = () => {
           <PWALifecycle />
           <TrackingScripts />
           <BrowserRouter>
+            <ScrollToTop />
             <AuthProvider>
               <Routes>
                 {/* Public Routes */}
