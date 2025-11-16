@@ -12,7 +12,8 @@ import {
   BarChart3,
   TrendingUp,
   HelpCircle,
-  MessageSquare
+  MessageSquare,
+  MessageCircle
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -28,6 +29,7 @@ const navigation = [
   { name: 'Blog', href: '/admin/blog', icon: FileText },
   { name: 'FAQs', href: '/admin/faqs', icon: HelpCircle },
   { name: 'Depoimentos', href: '/admin/depoimentos', icon: MessageSquare },
+  { name: 'WhatsApp', href: '/admin/whatsapp-config', icon: MessageCircle },
   { name: 'Configurações', href: '/admin/configuracoes', icon: Settings },
 ];
 

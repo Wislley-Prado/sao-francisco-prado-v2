@@ -804,6 +804,13 @@ export type Database = {
           google_tag_manager: string | null
           id: string
           updated_at: string
+          whatsapp_horario: string | null
+          whatsapp_instrucao: string | null
+          whatsapp_mensagem_padrao: string | null
+          whatsapp_numero: string | null
+          whatsapp_opcoes: Json | null
+          whatsapp_saudacao: string | null
+          whatsapp_titulo: string | null
         }
         Insert: {
           created_at?: string
@@ -813,6 +820,13 @@ export type Database = {
           google_tag_manager?: string | null
           id?: string
           updated_at?: string
+          whatsapp_horario?: string | null
+          whatsapp_instrucao?: string | null
+          whatsapp_mensagem_padrao?: string | null
+          whatsapp_numero?: string | null
+          whatsapp_opcoes?: Json | null
+          whatsapp_saudacao?: string | null
+          whatsapp_titulo?: string | null
         }
         Update: {
           created_at?: string
@@ -822,6 +836,13 @@ export type Database = {
           google_tag_manager?: string | null
           id?: string
           updated_at?: string
+          whatsapp_horario?: string | null
+          whatsapp_instrucao?: string | null
+          whatsapp_mensagem_padrao?: string | null
+          whatsapp_numero?: string | null
+          whatsapp_opcoes?: Json | null
+          whatsapp_saudacao?: string | null
+          whatsapp_titulo?: string | null
         }
         Relationships: []
       }
