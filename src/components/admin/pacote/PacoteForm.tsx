@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/form';
 import { ImageUploader, ImageFile } from './ImageUploader';
 import { YouTubePreview } from '@/components/YouTubePlayer';
+import { RichTextEditor } from '@/components/admin/blog/RichTextEditor';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Loader2, Plus, X } from 'lucide-react';
@@ -322,12 +323,15 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
                 <FormItem>
                   <FormLabel>Descrição</FormLabel>
                   <FormControl>
-                    <Textarea
-                      {...field}
-                      placeholder="Descreva o pacote..."
-                      rows={4}
+                    <RichTextEditor
+                      value={field.value || ''}
+                      onChange={field.onChange}
+                      placeholder="Descreva o pacote com formatação rica..."
                     />
                   </FormControl>
+                  <FormDescription>
+                    Use a barra de ferramentas para formatar o texto, adicionar listas, links e mais
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

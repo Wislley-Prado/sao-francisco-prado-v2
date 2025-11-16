@@ -5,16 +5,17 @@ import { toast } from 'sonner';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { 
   Clock, Users, Star, ArrowLeft, MessageCircle, 
-  Loader2, CheckCircle, Calendar, Sparkles, Package
+  Loader2, CheckCircle, Calendar, Sparkles, Package, HelpCircle
 } from 'lucide-react';
 import { YouTubePlayer } from '@/components/YouTubePlayer';
 import { usePacoteAnalytics, registrarEventoPacote, dispararPixel } from '@/hooks/usePacoteAnalytics';
 import { PacoteFAQs } from '@/components/PacoteFAQs';
+import { sanitizeHtml } from '@/utils/htmlSanitizer';
 
 interface PacoteDetalhes {
   id: string;
@@ -211,19 +212,19 @@ const PacoteDetalhes = () => {
 
       <main className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
-          <Link to="/" className="hover:text-foreground">Início</Link>
+        <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6" aria-label="Breadcrumb">
+          <Link to="/" className="hover:text-foreground transition-colors">Início</Link>
           <span>/</span>
-          <Link to="/pacotes" className="hover:text-foreground">Pacotes</Link>
+          <Link to="/pacotes" className="hover:text-foreground transition-colors">Pacotes</Link>
           <span>/</span>
           <span className="text-foreground">{pacote.nome}</span>
-        </div>
+        </nav>
 
         {/* Botão Voltar */}
         <Button
           variant="ghost"
           onClick={() => navigate('/pacotes')}
-          className="mb-6"
+          className="mb-6 text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Voltar para Pacotes
@@ -234,58 +235,66 @@ const PacoteDetalhes = () => {
           <div className="lg:col-span-2 space-y-6">
             {/* Header com Título e Badges */}
             <div>
-              <div className="flex items-center gap-3 mb-3">
+              <div className="flex items-center gap-2 mb-3 flex-wrap">
                 {pacote.popular && (
-                  <Badge variant="default" className="gap-1">
+                  <Badge variant="default" className="gap-1 bg-primary/10 text-primary hover:bg-primary/20 border-primary/20">
                     <Sparkles className="h-3 w-3" />
                     Popular
                   </Badge>
                 )}
                 {pacote.destaque && (
-                  <Badge variant="secondary">Destaque</Badge>
+                  <Badge variant="secondary" className="bg-muted text-muted-foreground">
+                    Destaque
+                  </Badge>
                 )}
-                <Badge variant="outline" className="capitalize">{pacote.tipo}</Badge>
+                <Badge variant="outline" className="capitalize border-border text-muted-foreground">
+                  {pacote.tipo}
+                </Badge>
               </div>
               
-              <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
+              <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
                 {pacote.nome}
               </h1>
 
-              <div className="flex items-center gap-4 text-muted-foreground">
-                <div className="flex items-center gap-1">
-                  <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
+              <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
+                <div className="flex items-center gap-1.5">
+                  <Star className="h-4 w-4 fill-amber-500 text-amber-500" />
                   <span className="font-medium text-foreground">{pacote.rating.toFixed(1)}</span>
                 </div>
-                <Separator orientation="vertical" className="h-5" />
-                <div className="flex items-center gap-1">
+                <Separator orientation="vertical" className="h-4" />
+                <div className="flex items-center gap-1.5">
                   <Clock className="h-4 w-4" />
-                  {pacote.duracao}
+                  <span>{pacote.duracao}</span>
                 </div>
-                <Separator orientation="vertical" className="h-5" />
-                <div className="flex items-center gap-1">
+                <Separator orientation="vertical" className="h-4" />
+                <div className="flex items-center gap-1.5">
                   <Users className="h-4 w-4" />
-                  {pacote.pessoas} pessoa{pacote.pessoas > 1 ? 's' : ''}
+                  <span>{pacote.pessoas} pessoa{pacote.pessoas > 1 ? 's' : ''}</span>
                 </div>
               </div>
             </div>
 
             {/* Galeria de Imagens */}
             {pacote.imagens.length > 0 && (
-              <Card>
+              <Card className="border-border overflow-hidden">
                 <CardContent className="p-0">
-                  <img
-                    src={pacote.imagens[selectedImage]?.url || mainImage?.url}
-                    alt={pacote.imagens[selectedImage]?.alt_text || pacote.nome}
-                    className="w-full h-[400px] object-cover rounded-t-lg"
-                  />
+                  <div className="relative aspect-video">
+                    <img
+                      src={pacote.imagens[selectedImage]?.url || mainImage?.url}
+                      alt={pacote.imagens[selectedImage]?.alt_text || pacote.nome}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                   {pacote.imagens.length > 1 && (
-                    <div className="grid grid-cols-4 gap-2 p-4">
+                    <div className="grid grid-cols-4 gap-2 p-4 bg-muted/30">
                       {pacote.imagens.slice(0, 4).map((img, idx) => (
                         <button
                           key={idx}
                           onClick={() => setSelectedImage(idx)}
-                          className={`relative aspect-video rounded-lg overflow-hidden ${
-                            selectedImage === idx ? 'ring-2 ring-primary' : ''
+                          className={`relative aspect-video rounded-md overflow-hidden transition-all hover:opacity-80 ${
+                            selectedImage === idx 
+                              ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' 
+                              : 'opacity-60 hover:opacity-100'
                           }`}
                         >
                           <img
@@ -303,9 +312,11 @@ const PacoteDetalhes = () => {
 
             {/* Vídeo YouTube/Shorts */}
             {pacote.video_youtube && (
-              <Card>
-                <CardContent className="p-6">
-                  <h2 className="text-xl font-semibold mb-4">Veja o Pacote em Ação</h2>
+              <Card className="border-border">
+                <CardHeader>
+                  <CardTitle className="text-xl">Veja o Pacote em Ação</CardTitle>
+                </CardHeader>
+                <CardContent>
                   <YouTubePlayer 
                     videoUrl={pacote.video_youtube} 
                     title={pacote.nome}
@@ -314,31 +325,44 @@ const PacoteDetalhes = () => {
               </Card>
             )}
 
-            {/* Descrição */}
+            {/* Descrição com HTML Rico */}
             {pacote.descricao && (
-              <Card>
-                <CardContent className="p-6">
-                  <h2 className="text-xl font-semibold mb-3">Sobre o Pacote</h2>
-                  <p className="text-muted-foreground whitespace-pre-line">
-                    {pacote.descricao}
-                  </p>
+              <Card className="border-border">
+                <CardHeader>
+                  <CardTitle className="text-xl">Sobre o Pacote</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div 
+                    className="prose prose-sm max-w-none text-muted-foreground
+                      prose-headings:text-foreground prose-headings:font-semibold
+                      prose-p:leading-relaxed prose-p:mb-4
+                      prose-a:text-primary prose-a:no-underline hover:prose-a:underline
+                      prose-strong:text-foreground prose-strong:font-semibold
+                      prose-ul:list-disc prose-ul:pl-6 prose-ul:space-y-2
+                      prose-ol:list-decimal prose-ol:pl-6 prose-ol:space-y-2
+                      prose-li:text-muted-foreground
+                      prose-img:rounded-lg prose-img:my-4"
+                    dangerouslySetInnerHTML={{ __html: sanitizeHtml(pacote.descricao) }}
+                  />
                 </CardContent>
               </Card>
             )}
 
             {/* Características */}
             {pacote.caracteristicas.length > 0 && (
-              <Card>
-                <CardContent className="p-6">
-                  <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                    <Package className="h-5 w-5" />
+              <Card className="border-border">
+                <CardHeader>
+                  <CardTitle className="text-xl flex items-center gap-2">
+                    <Package className="h-5 w-5 text-muted-foreground" />
                     Características
-                  </h2>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
                   <div className="grid sm:grid-cols-2 gap-3">
                     {pacote.caracteristicas.map((item, idx) => (
                       <div key={idx} className="flex items-start gap-2">
-                        <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                        <span className="text-sm">{item}</span>
+                        <CheckCircle className="h-5 w-5 text-primary/70 mt-0.5 flex-shrink-0" />
+                        <span className="text-sm text-muted-foreground">{item}</span>
                       </div>
                     ))}
                   </div>
@@ -348,56 +372,71 @@ const PacoteDetalhes = () => {
 
             {/* Inclusos */}
             {pacote.inclusos.length > 0 && (
-              <Card>
-                <CardContent className="p-6">
-                  <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                    <CheckCircle className="h-5 w-5 text-green-600" />
+              <Card className="border-border">
+                <CardHeader>
+                  <CardTitle className="text-xl flex items-center gap-2">
+                    <CheckCircle className="h-5 w-5 text-primary/70" />
                     O que está incluso
-                  </h2>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
                   <div className="grid sm:grid-cols-2 gap-3">
                     {pacote.inclusos.map((item, idx) => (
                       <div key={idx} className="flex items-start gap-2">
-                        <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                        <span className="text-sm">{item}</span>
+                        <CheckCircle className="h-5 w-5 text-primary/70 mt-0.5 flex-shrink-0" />
+                        <span className="text-sm text-muted-foreground">{item}</span>
                       </div>
                     ))}
                   </div>
                 </CardContent>
               </Card>
             )}
+
+            {/* FAQs integrado na coluna principal */}
+            <Card className="border-border">
+              <CardHeader>
+                <CardTitle className="text-xl flex items-center gap-2">
+                  <HelpCircle className="h-5 w-5 text-muted-foreground" />
+                  Perguntas Frequentes
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <PacoteFAQs pacoteId={pacote.id} />
+              </CardContent>
+            </Card>
           </div>
 
           {/* Sidebar - Card de Reserva */}
           <div className="lg:col-span-1">
-            <Card className="sticky top-24">
+            <Card className="sticky top-24 border-border shadow-lg">
               <CardContent className="p-6 space-y-6">
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">Valor por pessoa</p>
+                  <p className="text-sm text-muted-foreground mb-2">Valor por pessoa</p>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-3xl font-bold text-foreground">
+                    <span className="text-4xl font-bold text-foreground">
                       R$ {pacote.preco.toFixed(2)}
                     </span>
                   </div>
                 </div>
 
-                <Separator />
+                <Separator className="bg-border" />
 
                 <div className="space-y-3">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">Duração</span>
-                    <span className="font-medium">{pacote.duracao}</span>
+                    <span className="font-medium text-foreground">{pacote.duracao}</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">Pessoas</span>
-                    <span className="font-medium">{pacote.pessoas}</span>
+                    <span className="font-medium text-foreground">{pacote.pessoas}</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">Tipo</span>
-                    <span className="font-medium capitalize">{pacote.tipo}</span>
+                    <span className="font-medium text-foreground capitalize">{pacote.tipo}</span>
                   </div>
                 </div>
 
-                <Separator />
+                <Separator className="bg-border" />
 
                 <div className="space-y-3">
                   <Button
@@ -412,7 +451,7 @@ const PacoteDetalhes = () => {
                   <Button
                     onClick={handleWhatsAppClick}
                     variant="outline"
-                    className="w-full"
+                    className="w-full border-border hover:bg-muted"
                     size="lg"
                   >
                     <MessageCircle className="mr-2 h-4 w-4" />
@@ -420,29 +459,15 @@ const PacoteDetalhes = () => {
                   </Button>
                 </div>
 
-                <div className="text-xs text-muted-foreground text-center">
+                <div className="text-xs text-muted-foreground text-center pt-2 space-y-1">
                   <p>Dúvidas? Entre em contato pelo WhatsApp</p>
-                  <p className="mt-1">Resposta em até 1 hora</p>
+                  <p>Resposta em até 1 hora</p>
                 </div>
               </CardContent>
             </Card>
           </div>
         </div>
       </main>
-
-      {/* Seção de FAQs */}
-      {pacote && (
-        <section className="py-16 bg-muted/50">
-          <div className="container mx-auto px-4">
-            <Card>
-              <CardContent className="p-6">
-                <h2 className="text-2xl font-bold mb-6">Perguntas Frequentes</h2>
-                <PacoteFAQs pacoteId={pacote.id} />
-              </CardContent>
-            </Card>
-          </div>
-        </section>
-      )}
 
       <Footer />
     </div>
