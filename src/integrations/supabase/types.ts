@@ -369,14 +369,19 @@ export type Database = {
           descricao: string | null
           destaque: boolean
           disponivel: boolean
+          endereco_completo: string | null
           id: string
+          latitude: number | null
           localizacao: string
+          longitude: number | null
           nome: string
           preco: number
           quartos: number
           rating: number
           slug: string
+          telefone_whatsapp: string | null
           updated_at: string
+          video_youtube: string | null
         }
         Insert: {
           area?: number | null
@@ -388,14 +393,19 @@ export type Database = {
           descricao?: string | null
           destaque?: boolean
           disponivel?: boolean
+          endereco_completo?: string | null
           id?: string
+          latitude?: number | null
           localizacao: string
+          longitude?: number | null
           nome: string
           preco: number
           quartos?: number
           rating?: number
           slug: string
+          telefone_whatsapp?: string | null
           updated_at?: string
+          video_youtube?: string | null
         }
         Update: {
           area?: number | null
@@ -407,14 +417,19 @@ export type Database = {
           descricao?: string | null
           destaque?: boolean
           disponivel?: boolean
+          endereco_completo?: string | null
           id?: string
+          latitude?: number | null
           localizacao?: string
+          longitude?: number | null
           nome?: string
           preco?: number
           quartos?: number
           rating?: number
           slug?: string
+          telefone_whatsapp?: string | null
           updated_at?: string
+          video_youtube?: string | null
         }
         Relationships: []
       }

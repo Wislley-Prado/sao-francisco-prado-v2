@@ -51,6 +51,11 @@ const ranchoSchema = z.object({
   destaque: z.boolean(),
   comodidades: z.array(z.string()),
   comodidadeCustom: z.string().optional(),
+  telefone_whatsapp: z.string().regex(/^\d+$/, 'Apenas números').min(10, 'Mínimo 10 dígitos').optional().or(z.literal('')),
+  video_youtube: z.string().url('URL inválida do YouTube').optional().or(z.literal('')),
+  latitude: z.string().optional().or(z.literal('')),
+  longitude: z.string().optional().or(z.literal('')),
+  endereco_completo: z.string().optional(),
 });
 
 type RanchoFormData = z.infer<typeof ranchoSchema>;
@@ -89,6 +94,11 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
       destaque: rancho?.destaque ?? false,
       comodidades: rancho?.comodidades || [],
       comodidadeCustom: '',
+      telefone_whatsapp: rancho?.telefone_whatsapp || '',
+      video_youtube: rancho?.video_youtube || '',
+      latitude: rancho?.latitude?.toString() || '',
+      longitude: rancho?.longitude?.toString() || '',
+      endereco_completo: rancho?.endereco_completo || '',
     },
   });
 
@@ -130,6 +140,11 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
         disponivel: data.disponivel,
         destaque: data.destaque,
         comodidades: comodidadesFinal,
+        telefone_whatsapp: data.telefone_whatsapp || null,
+        video_youtube: data.video_youtube || null,
+        latitude: data.latitude ? parseFloat(data.latitude) : null,
+        longitude: data.longitude ? parseFloat(data.longitude) : null,
+        endereco_completo: data.endereco_completo || null,
       };
 
       let ranchoId = rancho?.id;
@@ -240,10 +255,11 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <Tabs defaultValue="basico" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="basico">Básico</TabsTrigger>
             <TabsTrigger value="estrutura">Estrutura</TabsTrigger>
             <TabsTrigger value="comodidades">Comodidades</TabsTrigger>
+            <TabsTrigger value="midia">Mídia e Contato</TabsTrigger>
             <TabsTrigger value="imagens">Imagens</TabsTrigger>
           </TabsList>
 
@@ -512,6 +528,89 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
                     <Input {...field} placeholder="Ex: Freezer para iscas" />
                   </FormControl>
                   <FormDescription>Adicione uma comodidade não listada acima</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </TabsContent>
+
+          <TabsContent value="midia" className="space-y-4">
+            <FormField
+              control={form.control}
+              name="telefone_whatsapp"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Telefone WhatsApp</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="5531999999999" />
+                  </FormControl>
+                  <FormDescription>
+                    Apenas números, com DDI e DDD (Ex: 5531999999999)
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="video_youtube"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Vídeo YouTube (Shorts)</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="https://youtube.com/shorts/..." />
+                  </FormControl>
+                  <FormDescription>
+                    Cole o link completo do YouTube Shorts
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="latitude"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Latitude</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="-16.12345" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="longitude"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Longitude</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="-45.67890" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <FormField
+              control={form.control}
+              name="endereco_completo"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Endereço Completo</FormLabel>
+                  <FormControl>
+                    <Textarea {...field} rows={3} placeholder="Endereço completo para exibição" />
+                  </FormControl>
+                  <FormDescription>
+                    Obtenha as coordenadas em: <a href="https://www.google.com.br/maps" target="_blank" rel="noopener noreferrer" className="text-primary underline">Google Maps</a> (clique com botão direito no mapa)
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
