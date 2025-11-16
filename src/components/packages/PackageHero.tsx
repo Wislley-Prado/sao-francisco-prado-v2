@@ -1,6 +1,7 @@
 import { Star, TrendingUp, Sparkles } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useParallax } from '@/hooks/useParallax';
 
 interface PackageHeroProps {
   title: string;
@@ -41,12 +42,17 @@ export const PackageHero = ({
   tier,
   onCtaClick,
 }: PackageHeroProps) => {
+  const parallaxOffset = useParallax({ speed: 0.5 });
+
   return (
     <div className="relative h-[65vh] md:h-[70vh] overflow-hidden">
       {/* Background Image with Parallax Effect */}
       <div 
-        className="absolute inset-0 bg-cover bg-center scale-105 transition-transform duration-700"
-        style={{ backgroundImage: `url(${imageUrl})` }}
+        className="absolute inset-0 bg-cover bg-center scale-110 transition-transform duration-100"
+        style={{ 
+          backgroundImage: `url(${imageUrl})`,
+          transform: `translateY(${parallaxOffset}px)`
+        }}
       >
         {/* Gradient Overlay - Dual Layer for Depth */}
         <div className="absolute inset-0 bg-black/40" />
