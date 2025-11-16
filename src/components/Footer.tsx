@@ -58,7 +58,7 @@ const Footer = () => {
             <div className="space-y-3 text-sm">
               <div className="flex items-center space-x-2">
                 <Phone className="h-4 w-4 text-rio-blue" />
-                <span className="text-gray-300">(38) 9</span>
+                <span className="text-gray-300">(38) 98832-0108</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Mail className="h-4 w-4 text-rio-blue" />
