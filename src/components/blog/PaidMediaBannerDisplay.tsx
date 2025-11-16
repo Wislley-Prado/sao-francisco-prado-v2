@@ -8,6 +8,8 @@ interface PaidMediaBannerDisplayProps {
     imagem_url?: string;
     link_anunciante?: string;
     alt_text?: string;
+    data_inicio?: string;
+    data_fim?: string;
   } | null;
 }
 
@@ -15,6 +17,17 @@ export const PaidMediaBannerDisplay = ({ postId, banner_midia_paga }: PaidMediaB
   const { trackEvent } = useBlogAnalytics();
 
   if (!banner_midia_paga?.imagem_url) return null;
+
+  // Verifica se a campanha está ativa baseado nas datas
+  const now = new Date();
+  const dataInicio = banner_midia_paga.data_inicio ? new Date(banner_midia_paga.data_inicio) : null;
+  const dataFim = banner_midia_paga.data_fim ? new Date(banner_midia_paga.data_fim) : null;
+
+  // Se tem data de início e ainda não começou, não exibe
+  if (dataInicio && now < dataInicio) return null;
+  
+  // Se tem data de fim e já passou, não exibe
+  if (dataFim && now > dataFim) return null;
 
   const handleClick = () => {
     trackEvent({
