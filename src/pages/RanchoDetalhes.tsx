@@ -412,14 +412,24 @@ const RanchoDetalhes = () => {
                     <p className="text-muted-foreground mb-4">
                       Confira as datas disponíveis para reserva no calendário abaixo:
                     </p>
-                    <div className="relative w-full h-[600px] rounded-lg overflow-hidden border border-border">
-                      <iframe
-                        src={rancho.google_calendar_url}
-                        className="w-full h-full border-0"
-                        frameBorder="0"
-                        scrolling="no"
-                        title={`Calendário de disponibilidade ${rancho.nome}`}
-                      />
+                    <div className="relative w-full rounded-xl overflow-hidden bg-card shadow-lg border border-border/50">
+                      <div className="bg-gradient-to-r from-primary to-primary/80 p-4">
+                        <h3 className="text-primary-foreground font-semibold text-lg flex items-center gap-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+                          </svg>
+                          Calendário de Reservas
+                        </h3>
+                      </div>
+                      <div className="relative w-full h-[600px] bg-background">
+                        <iframe
+                          src={`${rancho.google_calendar_url}&showTitle=0&showPrint=0&showTabs=0&showCalendars=0&showTz=0&mode=MONTH&wkst=1&bgcolor=%23ffffff&ctz=America/Sao_Paulo`}
+                          className="w-full h-full border-0"
+                          frameBorder="0"
+                          scrolling="yes"
+                          title={`Calendário de disponibilidade ${rancho.nome}`}
+                        />
+                      </div>
                     </div>
                   </div>
                 </>
