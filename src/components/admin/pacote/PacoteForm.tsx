@@ -19,6 +19,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { ImageUploader, ImageFile } from './ImageUploader';
+import { YouTubePreview } from '@/components/YouTubePlayer';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Loader2, Plus, X } from 'lucide-react';
@@ -575,6 +576,14 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
                 </FormItem>
               )}
             />
+
+            {/* Preview do vídeo */}
+            {form.watch('video_youtube') && (
+              <div className="space-y-2">
+                <Label>Preview do Vídeo</Label>
+                <YouTubePreview videoUrl={form.watch('video_youtube')} />
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="imagens">

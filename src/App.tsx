@@ -18,6 +18,8 @@ import PackageVip from "./pages/PackageVip";
 import PackageLuxo from "./pages/PackageLuxo";
 import PackageDiamante from "./pages/PackageDiamante";
 import PackagesIndex from "./pages/PackagesIndex";
+import PackagesIndexDynamic from "./pages/PackagesIndexDynamic";
+import PacoteDetalhes from "./pages/PacoteDetalhes";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
@@ -68,7 +70,10 @@ const App = () => {
                 <Route path="/" element={<Index />} />
                 <Route path="/live" element={<LiveStream />} />
                 <Route path="/rancho/:slug" element={<RanchoDetalhes />} />
-                <Route path="/pacotes" element={<PackagesIndex />} />
+                <Route path="/pacotes" element={<PackagesIndexDynamic />} />
+                <Route path="/pacote/:slug" element={<PacoteDetalhes />} />
+                {/* Páginas estáticas antigas (manter para compatibilidade) */}
+                <Route path="/pacotes-estaticos" element={<PackagesIndex />} />
                 <Route path="/pacote/vip" element={<PackageVip />} />
                 <Route path="/pacote/luxo" element={<PackageLuxo />} />
                 <Route path="/pacote/diamante" element={<PackageDiamante />} />
