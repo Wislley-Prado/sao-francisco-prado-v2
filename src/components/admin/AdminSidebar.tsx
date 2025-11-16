@@ -10,7 +10,9 @@ import {
   Settings,
   Star,
   BarChart3,
-  TrendingUp
+  TrendingUp,
+  HelpCircle,
+  MessageSquare
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -24,6 +26,8 @@ const navigation = [
   { name: 'Estatísticas', href: '/admin/estatisticas-avaliacoes', icon: TrendingUp },
   { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
   { name: 'Blog', href: '/admin/blog', icon: FileText },
+  { name: 'FAQs', href: '/admin/faqs', icon: HelpCircle },
+  { name: 'Depoimentos', href: '/admin/depoimentos', icon: MessageSquare },
   { name: 'Configurações', href: '/admin/configuracoes', icon: Settings },
 ];
 

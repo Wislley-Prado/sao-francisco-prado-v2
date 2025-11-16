@@ -10,6 +10,8 @@ import DamInfo from '@/components/DamInfo';
 import WeatherDashboard from '@/components/WeatherDashboard';
 import WhatsAppButton from '@/components/WhatsAppButton';
 import Footer from '@/components/Footer';
+import { FAQSection } from '@/components/FAQSection';
+import { TestimonialsSection } from '@/components/TestimonialsSection';
 
 const Index = () => {
   return (
@@ -19,6 +21,8 @@ const Index = () => {
       <RanchosSection />
       <PackagesSection />
       <BlogSection />
+      <TestimonialsSection />
+      <FAQSection />
       <LunarCalendar />
       <WeatherDashboard />
       <DamInfo />
