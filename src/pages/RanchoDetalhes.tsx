@@ -18,6 +18,7 @@ import {
 import { ReviewsList } from "@/components/reviews/ReviewsList";
 import { ReviewForm } from "@/components/reviews/ReviewForm";
 import { useRanchoAnalytics, registrarEvento } from "@/hooks/useRanchoAnalytics";
+import { RanchoFAQs } from '@/components/RanchoFAQs';
 
 interface RanchoDetalhes {
   id: string;
@@ -521,6 +522,20 @@ const RanchoDetalhes = () => {
           </div>
         </div>
       </main>
+
+      {/* Seção de FAQs */}
+      {rancho && (
+        <section className="py-16 bg-muted/50">
+          <div className="container mx-auto px-4">
+            <Card>
+              <CardContent className="p-6">
+                <h2 className="text-2xl font-bold mb-6">Perguntas Frequentes</h2>
+                <RanchoFAQs ranchoId={rancho.id} />
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+      )}
 
       <Footer />
     </div>

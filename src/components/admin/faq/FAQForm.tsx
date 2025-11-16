@@ -1,11 +1,13 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -15,6 +17,9 @@ const formSchema = z.object({
   resposta: z.string().min(20, "A resposta deve ter pelo menos 20 caracteres"),
   ordem: z.number().min(0, "A ordem deve ser um número positivo"),
   ativo: z.boolean().default(true),
+  tipo: z.enum(["global", "pacote", "rancho"]).default("global"),
+  pacote_id: z.string().optional().nullable(),
+  rancho_id: z.string().optional().nullable(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -26,20 +31,59 @@ interface FAQFormProps {
     resposta: string;
     ordem: number;
     ativo: boolean;
+    pacote_id?: string | null;
+    rancho_id?: string | null;
   };
 }
 
 export const FAQForm = ({ initialData }: FAQFormProps) => {
   const navigate = useNavigate();
   const isEditing = !!initialData;
+  const [pacotes, setPacotes] = useState<any[]>([]);
+  const [ranchos, setRanchos] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetchPacotes();
+    fetchRanchos();
+  }, []);
+
+  const fetchPacotes = async () => {
+    const { data } = await supabase
+      .from("pacotes")
+      .select("id, nome")
+      .eq("ativo", true)
+      .order("nome");
+    setPacotes(data || []);
+  };
+
+  const fetchRanchos = async () => {
+    const { data } = await supabase
+      .from("ranchos")
+      .select("id, nome")
+      .eq("disponivel", true)
+      .order("nome");
+    setRanchos(data || []);
+  };
+
+  const getTipo = () => {
+    if (initialData?.pacote_id) return "pacote";
+    if (initialData?.rancho_id) return "rancho";
+    return "global";
+  };
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData || {
+    defaultValues: initialData ? {
+      ...initialData,
+      tipo: getTipo(),
+    } : {
       pergunta: "",
       resposta: "",
       ordem: 0,
       ativo: true,
+      tipo: "global",
+      pacote_id: null,
+      rancho_id: null,
     },
   });
 
@@ -50,6 +94,8 @@ export const FAQForm = ({ initialData }: FAQFormProps) => {
         resposta: data.resposta,
         ordem: data.ordem,
         ativo: data.ativo,
+        pacote_id: data.tipo === "pacote" ? data.pacote_id : null,
+        rancho_id: data.tipo === "rancho" ? data.rancho_id : null,
       };
 
       if (isEditing) {
@@ -110,6 +156,95 @@ export const FAQForm = ({ initialData }: FAQFormProps) => {
             </FormItem>
           )}
         />
+
+        <FormField
+          control={form.control}
+          name="tipo"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Onde Exibir</FormLabel>
+              <Select
+                onValueChange={field.onChange}
+                value={field.value}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="global">Global (Todas as Páginas)</SelectItem>
+                  <SelectItem value="pacote">Pacote Específico</SelectItem>
+                  <SelectItem value="rancho">Rancho Específico</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormDescription>
+                Escolha onde este FAQ será exibido
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {form.watch("tipo") === "pacote" && (
+          <FormField
+            control={form.control}
+            name="pacote_id"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Selecione o Pacote</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value || ""}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Escolha um pacote" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {pacotes.map((pacote) => (
+                      <SelectItem key={pacote.id} value={pacote.id}>
+                        {pacote.nome}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+
+        {form.watch("tipo") === "rancho" && (
+          <FormField
+            control={form.control}
+            name="rancho_id"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Selecione o Rancho</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value || ""}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Escolha um rancho" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {ranchos.map((rancho) => (
+                      <SelectItem key={rancho.id} value={rancho.id}>
+                        {rancho.nome}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
         <FormField
           control={form.control}

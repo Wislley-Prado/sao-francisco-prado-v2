@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { YouTubePlayer } from '@/components/YouTubePlayer';
 import { usePacoteAnalytics, registrarEventoPacote, dispararPixel } from '@/hooks/usePacoteAnalytics';
+import { PacoteFAQs } from '@/components/PacoteFAQs';
 
 interface PacoteDetalhes {
   id: string;
@@ -428,6 +429,20 @@ const PacoteDetalhes = () => {
           </div>
         </div>
       </main>
+
+      {/* Seção de FAQs */}
+      {pacote && (
+        <section className="py-16 bg-muted/50">
+          <div className="container mx-auto px-4">
+            <Card>
+              <CardContent className="p-6">
+                <h2 className="text-2xl font-bold mb-6">Perguntas Frequentes</h2>
+                <PacoteFAQs pacoteId={pacote.id} />
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+      )}
 
       <Footer />
     </div>

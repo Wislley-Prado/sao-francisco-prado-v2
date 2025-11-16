@@ -29,6 +29,8 @@ export const FAQSection = () => {
         .from("faqs")
         .select("*")
         .eq("ativo", true)
+        .is("pacote_id", null)
+        .is("rancho_id", null)
         .order("ordem", { ascending: true });
 
       if (error) throw error;

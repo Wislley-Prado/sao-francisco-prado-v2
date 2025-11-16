@@ -13,6 +13,10 @@ interface FAQ {
   ordem: number;
   ativo: boolean;
   created_at: string;
+  pacote_id?: string | null;
+  rancho_id?: string | null;
+  pacotes?: { nome: string } | null;
+  ranchos?: { nome: string } | null;
 }
 
 export default function FAQs() {
@@ -35,7 +39,11 @@ export default function FAQs() {
     try {
       const { data, error } = await supabase
         .from("faqs")
-        .select("*")
+        .select(`
+          *,
+          pacotes:pacote_id (nome),
+          ranchos:rancho_id (nome)
+        `)
         .order("ordem", { ascending: true });
 
       if (error) throw error;

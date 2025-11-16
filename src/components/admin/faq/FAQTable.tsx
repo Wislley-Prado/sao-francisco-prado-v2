@@ -24,6 +24,10 @@ interface FAQ {
   ordem: number;
   ativo: boolean;
   created_at: string;
+  pacote_id?: string | null;
+  rancho_id?: string | null;
+  pacotes?: { nome: string } | null;
+  ranchos?: { nome: string } | null;
 }
 
 interface FAQTableProps {
@@ -64,6 +68,7 @@ export const FAQTable = ({ faqs, onUpdate }: FAQTableProps) => {
             <TableRow>
               <TableHead className="w-[50px]">Ordem</TableHead>
               <TableHead>Pergunta</TableHead>
+              <TableHead className="w-[150px]">Exibir em</TableHead>
               <TableHead className="w-[100px]">Status</TableHead>
               <TableHead className="w-[150px] text-right">Ações</TableHead>
             </TableRow>
@@ -71,7 +76,7 @@ export const FAQTable = ({ faqs, onUpdate }: FAQTableProps) => {
           <TableBody>
             {faqs.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center text-muted-foreground">
+                <TableCell colSpan={5} className="text-center text-muted-foreground">
                   Nenhum FAQ encontrado
                 </TableCell>
               </TableRow>
@@ -86,6 +91,15 @@ export const FAQTable = ({ faqs, onUpdate }: FAQTableProps) => {
                         {faq.resposta.substring(0, 100)}...
                       </p>
                     </div>
+                  </TableCell>
+                  <TableCell>
+                    {faq.pacote_id && faq.pacotes ? (
+                      <Badge variant="outline">📦 {faq.pacotes.nome}</Badge>
+                    ) : faq.rancho_id && faq.ranchos ? (
+                      <Badge variant="outline">🏡 {faq.ranchos.nome}</Badge>
+                    ) : (
+                      <Badge>🌍 Global</Badge>
+                    )}
                   </TableCell>
                   <TableCell>
                     <Badge variant={faq.ativo ? "default" : "secondary"}>
