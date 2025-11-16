@@ -321,6 +321,7 @@ export type Database = {
           tipo: string
           tracking_code: string | null
           updated_at: string
+          video_youtube: string | null
         }
         Insert: {
           ativo?: boolean
@@ -340,6 +341,7 @@ export type Database = {
           tipo?: string
           tracking_code?: string | null
           updated_at?: string
+          video_youtube?: string | null
         }
         Update: {
           ativo?: boolean
@@ -359,6 +361,7 @@ export type Database = {
           tipo?: string
           tracking_code?: string | null
           updated_at?: string
+          video_youtube?: string | null
         }
         Relationships: []
       }
