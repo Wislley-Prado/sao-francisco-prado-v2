@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { ReviewsList } from "@/components/reviews/ReviewsList";
 import { ReviewForm } from "@/components/reviews/ReviewForm";
+import { useRanchoAnalytics, registrarEvento } from "@/hooks/useRanchoAnalytics";
 
 interface RanchoDetalhes {
   id: string;
@@ -127,6 +128,9 @@ const RanchoDetalhes = () => {
     }
   }, [slug, navigate]);
 
+  // Registrar visualização da página
+  useRanchoAnalytics(rancho?.id || "", "visualizacao");
+
   // Injetar tracking code específico do rancho
   useEffect(() => {
     if (rancho?.tracking_code) {
@@ -154,6 +158,10 @@ const RanchoDetalhes = () => {
 
   const handleWhatsAppReserva = () => {
     if (!rancho) return;
+    
+    // Registrar clique no WhatsApp
+    registrarEvento(rancho.id, "clique_whatsapp");
+    
     const phone = rancho.telefone_whatsapp || "5531999999999";
     const message = `Olá! Gostaria de fazer uma reserva no ${rancho.nome} (${rancho.localizacao}). Pode me passar mais informações sobre disponibilidade e valores?`;
     const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
