@@ -22,6 +22,7 @@ import {
 import { ImageUploader, ImageFile } from './ImageUploader';
 import { YouTubePreview } from '@/components/YouTubePlayer';
 import { RichTextEditor } from '@/components/admin/blog/RichTextEditor';
+import { CoordenadasHelper } from './CoordenadasHelper';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Loader2, Plus, X } from 'lucide-react';
@@ -647,6 +648,14 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
                 </p>
               </div>
 
+              {/* Helper para extrair coordenadas */}
+              <CoordenadasHelper 
+                onCoordenadasExtraidas={(latitude, longitude) => {
+                  form.setValue('latitude', latitude);
+                  form.setValue('longitude', longitude);
+                }}
+              />
+
               <FormField
                 control={form.control}
                 name="endereco_completo"
@@ -715,21 +724,6 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
                     </FormItem>
                   )}
                 />
-              </div>
-
-              <div className="rounded-lg border p-3 bg-blue-50 dark:bg-blue-950/20 text-xs">
-                <p className="text-blue-900 dark:text-blue-100">
-                  💡 <strong>Dica:</strong> Para obter as coordenadas, acesse{' '}
-                  <a 
-                    href="https://www.google.com/maps" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="underline hover:text-blue-700"
-                  >
-                    Google Maps
-                  </a>
-                  , clique com o botão direito no local desejado e copie as coordenadas.
-                </p>
               </div>
             </div>
           </TabsContent>
