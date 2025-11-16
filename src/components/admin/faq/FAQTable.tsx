@@ -28,6 +28,12 @@ interface FAQ {
   rancho_id?: string | null;
   pacotes?: { nome: string } | null;
   ranchos?: { nome: string } | null;
+  votos_stats?: {
+    total_votos: number;
+    votos_uteis: number;
+    votos_nao_uteis: number;
+    taxa_utilidade: number;
+  };
 }
 
 interface FAQTableProps {
@@ -69,6 +75,7 @@ export const FAQTable = ({ faqs, onUpdate }: FAQTableProps) => {
               <TableHead className="w-[50px]">Ordem</TableHead>
               <TableHead>Pergunta</TableHead>
               <TableHead className="w-[150px]">Exibir em</TableHead>
+              <TableHead className="w-[150px]">Avaliações</TableHead>
               <TableHead className="w-[100px]">Status</TableHead>
               <TableHead className="w-[150px] text-right">Ações</TableHead>
             </TableRow>
@@ -76,7 +83,7 @@ export const FAQTable = ({ faqs, onUpdate }: FAQTableProps) => {
           <TableBody>
             {faqs.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center text-muted-foreground">
+                <TableCell colSpan={6} className="text-center text-muted-foreground">
                   Nenhum FAQ encontrado
                 </TableCell>
               </TableRow>
@@ -99,6 +106,25 @@ export const FAQTable = ({ faqs, onUpdate }: FAQTableProps) => {
                       <Badge variant="outline">🏡 {faq.ranchos.nome}</Badge>
                     ) : (
                       <Badge>🌍 Global</Badge>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {faq.votos_stats && faq.votos_stats.total_votos > 0 ? (
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-2">
+                          <Badge 
+                            variant={faq.votos_stats.taxa_utilidade >= 70 ? "default" : "outline"}
+                            className={faq.votos_stats.taxa_utilidade >= 70 ? "bg-green-500" : ""}
+                          >
+                            {faq.votos_stats.taxa_utilidade.toFixed(0)}% útil
+                          </Badge>
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          {faq.votos_stats.votos_uteis} 👍 / {faq.votos_stats.votos_nao_uteis} 👎
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-sm text-muted-foreground">Sem votos</span>
                     )}
                   </TableCell>
                   <TableCell>

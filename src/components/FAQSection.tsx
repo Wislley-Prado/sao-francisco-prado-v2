@@ -7,6 +7,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { FAQVoteButtons } from "@/components/FAQVoteButtons";
 
 interface FAQ {
   id: string;
@@ -70,7 +71,8 @@ export const FAQSection = () => {
                     {faq.pergunta}
                   </AccordionTrigger>
                   <AccordionContent className="text-muted-foreground">
-                    {faq.resposta}
+                    <p>{faq.resposta}</p>
+                    <FAQVoteButtons faqId={faq.id} />
                   </AccordionContent>
                 </AccordionItem>
               ))}

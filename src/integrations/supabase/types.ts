@@ -265,6 +265,48 @@ export type Database = {
         }
         Relationships: []
       }
+      faq_votes: {
+        Row: {
+          created_at: string
+          faq_id: string
+          id: string
+          ip_address: string | null
+          user_agent: string | null
+          voto: boolean
+        }
+        Insert: {
+          created_at?: string
+          faq_id: string
+          id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+          voto: boolean
+        }
+        Update: {
+          created_at?: string
+          faq_id?: string
+          id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+          voto?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "faq_votes_faq_id_fkey"
+            columns: ["faq_id"]
+            isOneToOne: false
+            referencedRelation: "faq_estatisticas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "faq_votes_faq_id_fkey"
+            columns: ["faq_id"]
+            isOneToOne: false
+            referencedRelation: "faqs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       faqs: {
         Row: {
           ativo: boolean
@@ -780,6 +822,43 @@ export type Database = {
       }
     }
     Views: {
+      faq_estatisticas: {
+        Row: {
+          ativo: boolean | null
+          id: string | null
+          ordem: number | null
+          pacote_id: string | null
+          pergunta: string | null
+          rancho_id: string | null
+          taxa_utilidade: number | null
+          total_votos: number | null
+          votos_nao_uteis: number | null
+          votos_uteis: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "faqs_pacote_id_fkey"
+            columns: ["pacote_id"]
+            isOneToOne: false
+            referencedRelation: "pacotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "faqs_rancho_id_fkey"
+            columns: ["rancho_id"]
+            isOneToOne: false
+            referencedRelation: "rancho_estatisticas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "faqs_rancho_id_fkey"
+            columns: ["rancho_id"]
+            isOneToOne: false
+            referencedRelation: "ranchos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rancho_estatisticas: {
         Row: {
           id: string | null

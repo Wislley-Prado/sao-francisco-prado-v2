@@ -5,6 +5,7 @@ import { Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { FAQTable } from "@/components/admin/faq/FAQTable";
 import { FAQFilters } from "@/components/admin/faq/FAQFilters";
+import { FAQStats } from "@/components/admin/faq/FAQStats";
 
 interface FAQ {
   id: string;
@@ -17,6 +18,12 @@ interface FAQ {
   rancho_id?: string | null;
   pacotes?: { nome: string } | null;
   ranchos?: { nome: string } | null;
+  votos_stats?: {
+    total_votos: number;
+    votos_uteis: number;
+    votos_nao_uteis: number;
+    taxa_utilidade: number;
+  };
 }
 
 export default function FAQs() {
@@ -26,10 +33,17 @@ export default function FAQs() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("todos");
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState<any>(null);
 
   useEffect(() => {
     fetchFaqs();
   }, []);
+
+  useEffect(() => {
+    if (faqs.length > 0) {
+      fetchStats();
+    }
+  }, [faqs]);
 
   useEffect(() => {
     filterFaqs();
@@ -37,7 +51,8 @@ export default function FAQs() {
 
   const fetchFaqs = async () => {
     try {
-      const { data, error } = await supabase
+      // Buscar FAQs
+      const { data: faqsData, error: faqsError } = await supabase
         .from("faqs")
         .select(`
           *,
@@ -46,12 +61,70 @@ export default function FAQs() {
         `)
         .order("ordem", { ascending: true });
 
-      if (error) throw error;
-      setFaqs(data || []);
+      if (faqsError) throw faqsError;
+
+      // Buscar estatísticas de votos
+      const { data: statsData, error: statsError } = await supabase
+        .from("faq_estatisticas")
+        .select("*");
+
+      if (statsError) throw statsError;
+
+      // Combinar FAQs com suas estatísticas
+      const faqsComStats = faqsData?.map(faq => {
+        const stats = statsData?.find(s => s.id === faq.id);
+        return {
+          ...faq,
+          votos_stats: stats ? {
+            total_votos: stats.total_votos || 0,
+            votos_uteis: stats.votos_uteis || 0,
+            votos_nao_uteis: stats.votos_nao_uteis || 0,
+            taxa_utilidade: stats.taxa_utilidade || 0,
+          } : undefined,
+        };
+      }) || [];
+
+      setFaqs(faqsComStats);
     } catch (error) {
       console.error("Erro ao buscar FAQs:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchStats = async () => {
+    try {
+      const { data: estatisticas, error } = await supabase
+        .from("faq_estatisticas")
+        .select("*");
+
+      if (error) throw error;
+
+      const totalFaqs = faqs.length;
+      const totalVotos = estatisticas?.reduce((acc, curr) => acc + (curr.total_votos || 0), 0) || 0;
+      const taxaUtilidade = estatisticas?.length > 0
+        ? estatisticas.reduce((acc, curr) => acc + (curr.taxa_utilidade || 0), 0) / estatisticas.length
+        : 0;
+
+      const maisUteis = estatisticas
+        ?.filter(e => e.total_votos >= 5)
+        ?.sort((a, b) => b.taxa_utilidade - a.taxa_utilidade)
+        ?.slice(0, 3) || [];
+
+      const menosUteis = estatisticas
+        ?.filter(e => e.total_votos >= 5 && e.taxa_utilidade < 70)
+        ?.sort((a, b) => a.taxa_utilidade - b.taxa_utilidade)
+        ?.slice(0, 3) || [];
+
+      setStats({
+        totalFaqs,
+        totalVotos,
+        taxaUtilidade,
+        maisUteis,
+        menosUteis,
+      });
+    } catch (error) {
+      console.error("Erro ao buscar estatísticas:", error);
     }
   };
 
@@ -93,6 +166,8 @@ export default function FAQs() {
         </Button>
       </div>
 
+      {stats && <FAQStats stats={stats} />}
+
       <FAQFilters
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
@@ -100,7 +175,7 @@ export default function FAQs() {
         onStatusChange={setStatusFilter}
       />
 
-      <FAQTable faqs={filteredFaqs} onUpdate={fetchFaqs} />
+      <FAQTable faqs={filteredFaqs} onUpdate={() => { fetchFaqs(); fetchStats(); }} />
     </div>
   );
 }
