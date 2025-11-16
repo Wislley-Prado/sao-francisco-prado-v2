@@ -92,7 +92,7 @@ const RanchoDetalhes = () => {
           .eq('rancho_id', ranchoData.id)
           .order('ordem', { ascending: true });
 
-        setRancho({
+        const ranchoCompleto = {
           id: ranchoData.id,
           nome: ranchoData.nome,
           descricao: ranchoData.descricao || '',
@@ -113,7 +113,14 @@ const RanchoDetalhes = () => {
           longitude: ranchoData.longitude,
           endereco_completo: ranchoData.endereco_completo,
           imagens: imagesData || []
-        });
+        };
+
+        // Debug logs
+        console.log('🎥 Vídeo YouTube:', ranchoCompleto.video_youtube);
+        console.log('📅 Google Calendar:', ranchoCompleto.google_calendar_url);
+        console.log('📍 Coordenadas:', { lat: ranchoCompleto.latitude, lng: ranchoCompleto.longitude });
+        
+        setRancho(ranchoCompleto);
       } catch (error) {
         console.error('Erro ao buscar rancho:', error);
         toast.error('Erro ao carregar detalhes do rancho');
@@ -351,20 +358,24 @@ const RanchoDetalhes = () => {
               </div>
 
               {/* YouTube Video */}
-              {rancho.video_youtube && getYouTubeEmbedUrl(rancho.video_youtube) && (
+              {rancho.video_youtube && (
                 <>
                   <Separator />
                   <div>
                     <h2 className="text-2xl font-bold mb-4">Conheça o Rancho</h2>
-                    <div className="relative w-full" style={{ paddingBottom: '177.78%', maxWidth: '315px', margin: '0 auto' }}>
-                      <iframe
-                        src={getYouTubeEmbedUrl(rancho.video_youtube) || ''}
-                        className="absolute top-0 left-0 w-full h-full rounded-lg"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                        title={`Vídeo ${rancho.nome}`}
-                      />
-                    </div>
+                    {getYouTubeEmbedUrl(rancho.video_youtube) ? (
+                      <div className="relative w-full" style={{ paddingBottom: '177.78%', maxWidth: '315px', margin: '0 auto' }}>
+                        <iframe
+                          src={getYouTubeEmbedUrl(rancho.video_youtube) || ''}
+                          className="absolute top-0 left-0 w-full h-full rounded-lg"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                          title={`Vídeo ${rancho.nome}`}
+                        />
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground">URL do vídeo inválida. Verifique o formato.</p>
+                    )}
                   </div>
                 </>
               )}
