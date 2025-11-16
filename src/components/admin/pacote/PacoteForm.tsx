@@ -1,0 +1,557 @@
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { ImageUploader, ImageFile } from './ImageUploader';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { Loader2, Plus, X } from 'lucide-react';
+
+const pacoteSchema = z.object({
+  nome: z.string().min(3, 'Nome deve ter no mínimo 3 caracteres'),
+  slug: z.string().min(3, 'Slug deve ter no mínimo 3 caracteres'),
+  descricao: z.string().optional(),
+  preco: z.number().min(0.01, 'Preço deve ser maior que zero'),
+  duracao: z.string().min(1, 'Duração é obrigatória'),
+  pessoas: z.number().min(1, 'Mínimo 1 pessoa'),
+  rating: z.number().min(0).max(5),
+  tipo: z.enum(['pescaria', 'completo', 'personalizado']),
+  ativo: z.boolean(),
+  popular: z.boolean(),
+  destaque: z.boolean(),
+});
+
+type PacoteFormData = z.infer<typeof pacoteSchema>;
+
+interface PacoteFormProps {
+  pacote?: any;
+  onSuccess: () => void;
+}
+
+export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [images, setImages] = useState<ImageFile[]>(
+    pacote?.pacote_imagens?.map((img: any, index: number) => ({
+      id: img.id,
+      url: img.url,
+      principal: img.principal,
+      alt_text: img.alt_text || '',
+      ordem: img.ordem || index,
+    })) || []
+  );
+  const [caracteristicas, setCaracteristicas] = useState<string[]>(
+    pacote?.caracteristicas || []
+  );
+  const [novaCaracteristica, setNovaCaracteristica] = useState('');
+  const [inclusos, setInclusos] = useState<string[]>(pacote?.inclusos || []);
+  const [novoIncluso, setNovoIncluso] = useState('');
+
+  const form = useForm<PacoteFormData>({
+    resolver: zodResolver(pacoteSchema),
+    defaultValues: {
+      nome: pacote?.nome || '',
+      slug: pacote?.slug || '',
+      descricao: pacote?.descricao || '',
+      preco: pacote?.preco ? Number(pacote.preco) : 0,
+      duracao: pacote?.duracao || '',
+      pessoas: pacote?.pessoas || 2,
+      rating: pacote?.rating ? Number(pacote.rating) : 5.0,
+      tipo: pacote?.tipo || 'pescaria',
+      ativo: pacote?.ativo ?? true,
+      popular: pacote?.popular ?? false,
+      destaque: pacote?.destaque ?? false,
+    },
+  });
+
+  const generateSlug = (nome: string) => {
+    return nome
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '');
+  };
+
+  const handleNomeChange = (nome: string) => {
+    form.setValue('nome', nome);
+    if (!pacote) {
+      form.setValue('slug', generateSlug(nome));
+    }
+  };
+
+  const addCaracteristica = () => {
+    if (novaCaracteristica.trim()) {
+      setCaracteristicas([...caracteristicas, novaCaracteristica.trim()]);
+      setNovaCaracteristica('');
+    }
+  };
+
+  const removeCaracteristica = (index: number) => {
+    setCaracteristicas(caracteristicas.filter((_, i) => i !== index));
+  };
+
+  const addIncluso = () => {
+    if (novoIncluso.trim()) {
+      setInclusos([...inclusos, novoIncluso.trim()]);
+      setNovoIncluso('');
+    }
+  };
+
+  const removeIncluso = (index: number) => {
+    setInclusos(inclusos.filter((_, i) => i !== index));
+  };
+
+  const uploadImages = async (pacoteId: string) => {
+    for (const image of images) {
+      if (image.file) {
+        const fileName = `${pacoteId}/${Date.now()}-${image.file.name}`;
+        const { error: uploadError, data } = await supabase.storage
+          .from('pacotes')
+          .upload(fileName, image.file);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('pacotes')
+          .getPublicUrl(fileName);
+
+        const { error: dbError } = await supabase
+          .from('pacote_imagens')
+          .insert({
+            pacote_id: pacoteId,
+            url: publicUrl,
+            principal: image.principal,
+            alt_text: image.alt_text,
+            ordem: image.ordem,
+          });
+
+        if (dbError) throw dbError;
+      } else if (!pacote) {
+        const { error: dbError } = await supabase
+          .from('pacote_imagens')
+          .insert({
+            pacote_id: pacoteId,
+            url: image.url,
+            principal: image.principal,
+            alt_text: image.alt_text,
+            ordem: image.ordem,
+          });
+
+        if (dbError) throw dbError;
+      }
+    }
+
+    if (pacote) {
+      const existingImageIds = images
+        .filter((img) => !img.file)
+        .map((img) => img.id);
+
+      const { error: deleteError } = await supabase
+        .from('pacote_imagens')
+        .delete()
+        .eq('pacote_id', pacoteId)
+        .not('id', 'in', `(${existingImageIds.join(',')})`);
+
+      if (deleteError) throw deleteError;
+
+      for (const image of images.filter((img) => !img.file)) {
+        const { error: updateError } = await supabase
+          .from('pacote_imagens')
+          .update({
+            principal: image.principal,
+            alt_text: image.alt_text,
+            ordem: image.ordem,
+          })
+          .eq('id', image.id);
+
+        if (updateError) throw updateError;
+      }
+    }
+  };
+
+  const onSubmit = async (data: PacoteFormData) => {
+    if (images.length === 0) {
+      toast.error('Adicione pelo menos uma imagem do pacote');
+      return;
+    }
+
+    if (!images.some((img) => img.principal)) {
+      toast.error('Defina uma imagem principal');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const pacoteData = {
+        nome: data.nome,
+        slug: data.slug,
+        descricao: data.descricao || null,
+        preco: data.preco,
+        duracao: data.duracao,
+        pessoas: data.pessoas,
+        rating: data.rating,
+        tipo: data.tipo,
+        ativo: data.ativo,
+        popular: data.popular,
+        destaque: data.destaque,
+        caracteristicas,
+        inclusos,
+      };
+
+      if (pacote) {
+        const { error } = await supabase
+          .from('pacotes')
+          .update(pacoteData)
+          .eq('id', pacote.id);
+
+        if (error) throw error;
+
+        await uploadImages(pacote.id);
+        toast.success('Pacote atualizado com sucesso!');
+      } else {
+        const { data: newPacote, error } = await supabase
+          .from('pacotes')
+          .insert([pacoteData])
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        await uploadImages(newPacote.id);
+        toast.success('Pacote criado com sucesso!');
+      }
+
+      onSuccess();
+    } catch (error: any) {
+      console.error('Error saving pacote:', error);
+      toast.error(error.message || 'Erro ao salvar pacote');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <Tabs defaultValue="basico" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="basico">Básico</TabsTrigger>
+            <TabsTrigger value="detalhes">Detalhes</TabsTrigger>
+            <TabsTrigger value="imagens">Imagens</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="basico" className="space-y-4">
+            <FormField
+              control={form.control}
+              name="nome"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nome do Pacote</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      onChange={(e) => handleNomeChange(e.target.value)}
+                      placeholder="Ex: Pacote Pescaria VIP"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="slug"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Slug (URL)</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="pacote-pescaria-vip" />
+                  </FormControl>
+                  <FormDescription>
+                    Usado na URL do pacote
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="descricao"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Descrição</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      {...field}
+                      placeholder="Descreva o pacote..."
+                      rows={4}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="preco"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Preço (R$)</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        {...field}
+                        onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="duracao"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Duração</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Ex: 3 dias/2 noites" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="pessoas"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Número de Pessoas</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        {...field}
+                        onChange={(e) => field.onChange(parseInt(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="rating"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Rating (0-5)</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        max="5"
+                        {...field}
+                        onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <FormField
+              control={form.control}
+              name="tipo"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Tipo de Pacote</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o tipo" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="pescaria">Pescaria</SelectItem>
+                      <SelectItem value="completo">Completo</SelectItem>
+                      <SelectItem value="personalizado">Personalizado</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <FormField
+                control={form.control}
+                name="ativo"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">Ativo</FormLabel>
+                      <FormDescription>
+                        Pacote visível no site
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="popular"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">Popular</FormLabel>
+                      <FormDescription>
+                        Badge de popular
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="destaque"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">Destaque</FormLabel>
+                      <FormDescription>
+                        Destacado na home
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="detalhes" className="space-y-6">
+            <div className="space-y-4">
+              <Label>Características</Label>
+              <div className="flex gap-2">
+                <Input
+                  value={novaCaracteristica}
+                  onChange={(e) => setNovaCaracteristica(e.target.value)}
+                  placeholder="Ex: Guia especializado"
+                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCaracteristica())}
+                />
+                <Button type="button" onClick={addCaracteristica} size="icon">
+                  <Plus className="w-4 h-4" />
+                </Button>
+              </div>
+              <div className="space-y-2">
+                {caracteristicas.map((item, index) => (
+                  <div key={index} className="flex items-center justify-between p-2 border rounded-lg">
+                    <span className="text-sm">{item}</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removeCaracteristica(index)}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <Label>Itens Inclusos</Label>
+              <div className="flex gap-2">
+                <Input
+                  value={novoIncluso}
+                  onChange={(e) => setNovoIncluso(e.target.value)}
+                  placeholder="Ex: Café da manhã"
+                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addIncluso())}
+                />
+                <Button type="button" onClick={addIncluso} size="icon">
+                  <Plus className="w-4 h-4" />
+                </Button>
+              </div>
+              <div className="space-y-2">
+                {inclusos.map((item, index) => (
+                  <div key={index} className="flex items-center justify-between p-2 border rounded-lg">
+                    <span className="text-sm">{item}</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removeIncluso(index)}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="imagens">
+            <ImageUploader images={images} onChange={setImages} maxImages={10} />
+          </TabsContent>
+        </Tabs>
+
+        <div className="flex justify-end gap-4">
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            size="lg"
+          >
+            {isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+            {pacote ? 'Atualizar Pacote' : 'Criar Pacote'}
+          </Button>
+        </div>
+      </form>
+    </Form>
+  );
+};
