@@ -164,7 +164,14 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
   const uploadImages = async (pacoteId: string) => {
     for (const image of images) {
       if (image.file) {
-        const fileName = `${pacoteId}/${Date.now()}-${image.file.name}`;
+        // Sanitize filename: remove spaces, special chars, and accents
+        const sanitizedName = image.file.name
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/\s+/g, '-')
+          .replace(/[^a-zA-Z0-9.-]/g, '')
+          .toLowerCase();
+        const fileName = `${pacoteId}/${Date.now()}-${sanitizedName}`;
         const { error: uploadError, data } = await supabase.storage
           .from('pacotes')
           .upload(fileName, image.file);
