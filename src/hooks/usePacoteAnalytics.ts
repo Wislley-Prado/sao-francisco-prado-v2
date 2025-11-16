@@ -67,12 +67,13 @@ export const dispararPixel = (trackingCode: string, evento: string, dados?: any)
       });
     }
 
-    // Código personalizado
+    // Código personalizado via Function constructor (mais seguro que eval)
     if (trackingCode && trackingCode.trim()) {
       try {
-        // Se o tracking code contém código executável, executa
+        // Se o tracking code contém código executável, executa usando Function constructor
         if (trackingCode.includes('fbq(') || trackingCode.includes('gtag(') || trackingCode.includes('dataLayer')) {
-          eval(trackingCode);
+          const executar = new Function('evento', 'dados', trackingCode);
+          executar(evento, dados);
         }
       } catch (error) {
         console.error('Erro ao executar tracking code:', error);
