@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { PWALifecycle } from "@/components/PWALifecycle";
 import CookieConsent from "@/components/CookieConsent";
+import TrackingScripts from "@/components/TrackingScripts";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { PrivateRoute } from "@/components/admin/PrivateRoute";
 import { AdminLayout } from "@/components/admin/AdminLayout";
@@ -25,6 +25,7 @@ import RanchoNovo from "./pages/admin/RanchoNovo";
 import RanchoEditar from "./pages/admin/RanchoEditar";
 import AdminPacotes from "./pages/admin/Pacotes";
 import AdminBlog from "./pages/admin/Blog";
+import AdminConfiguracoes from "./pages/admin/Configuracoes";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -46,6 +47,7 @@ const App = () => {
           <Toaster />
           <Sonner />
           <PWALifecycle />
+          <TrackingScripts />
           <BrowserRouter>
             <AuthProvider>
               <Routes>
@@ -77,6 +79,7 @@ const App = () => {
                   <Route path="ranchos/editar/:id" element={<RanchoEditar />} />
                   <Route path="pacotes" element={<AdminPacotes />} />
                   <Route path="blog" element={<AdminBlog />} />
+                  <Route path="configuracoes" element={<AdminConfiguracoes />} />
                 </Route>
                 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

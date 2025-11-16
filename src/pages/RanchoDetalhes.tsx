@@ -30,6 +30,7 @@ interface RanchoDetalhes {
   telefone_whatsapp?: string;
   video_youtube?: string;
   google_calendar_url?: string;
+  tracking_code?: string;
   latitude?: number;
   longitude?: number;
   endereco_completo?: string;
@@ -103,6 +104,7 @@ const RanchoDetalhes = () => {
           telefone_whatsapp: ranchoData.telefone_whatsapp,
           video_youtube: ranchoData.video_youtube,
           google_calendar_url: ranchoData.google_calendar_url,
+          tracking_code: ranchoData.tracking_code,
           latitude: ranchoData.latitude,
           longitude: ranchoData.longitude,
           endereco_completo: ranchoData.endereco_completo,
@@ -121,6 +123,31 @@ const RanchoDetalhes = () => {
       fetchRancho();
     }
   }, [slug, navigate]);
+
+  // Injetar tracking code específico do rancho
+  useEffect(() => {
+    if (rancho?.tracking_code) {
+      const trackingDiv = document.createElement('div');
+      trackingDiv.innerHTML = rancho.tracking_code;
+      
+      Array.from(trackingDiv.children).forEach((element) => {
+        const clonedElement = element.cloneNode(true) as HTMLElement;
+        
+        if (clonedElement.tagName === 'SCRIPT') {
+          const script = document.createElement('script');
+          if ((element as HTMLScriptElement).src) {
+            script.src = (element as HTMLScriptElement).src;
+            script.async = true;
+          } else {
+            script.innerHTML = element.innerHTML;
+          }
+          document.head.appendChild(script);
+        } else {
+          document.head.appendChild(clonedElement);
+        }
+      });
+    }
+  }, [rancho]);
 
   const handleWhatsAppReserva = () => {
     if (!rancho) return;
