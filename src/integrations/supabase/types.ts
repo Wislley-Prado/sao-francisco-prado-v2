@@ -236,7 +236,9 @@ export type Database = {
           id: string
           nome: string
           ordem: number
+          pacote_id: string | null
           rating: number
+          tipo_pacote: string | null
           updated_at: string
         }
         Insert: {
@@ -248,7 +250,9 @@ export type Database = {
           id?: string
           nome: string
           ordem?: number
+          pacote_id?: string | null
           rating?: number
+          tipo_pacote?: string | null
           updated_at?: string
         }
         Update: {
@@ -260,10 +264,20 @@ export type Database = {
           id?: string
           nome?: string
           ordem?: number
+          pacote_id?: string | null
           rating?: number
+          tipo_pacote?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "depoimentos_pacote_id_fkey"
+            columns: ["pacote_id"]
+            isOneToOne: false
+            referencedRelation: "pacotes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       faq_votes: {
         Row: {

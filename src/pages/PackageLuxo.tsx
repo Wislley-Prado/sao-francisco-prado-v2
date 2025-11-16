@@ -7,7 +7,7 @@ import { PackagePricing } from '@/components/packages/PackagePricing';
 import { PackageFeatures } from '@/components/packages/PackageFeatures';
 import { PackageGallery } from '@/components/packages/PackageGallery';
 import { PackageAbout } from '@/components/packages/PackageAbout';
-import { TestimonialsSection } from '@/components/TestimonialsSection';
+import { PackageTestimonials } from '@/components/packages/PackageTestimonials';
 import { PacoteFAQs } from '@/components/PacoteFAQs';
 import ranchoImage1 from '@/assets/gallery/rancho-prado-aldeia.jpg';
 
@@ -34,7 +34,16 @@ const PackageLuxo = () => {
       <PackageAbout description="Luxo e conforto." highlights={['Premium', 'Chef', 'Exclusivo']} />
       <PackageFeatures features={features} tier="luxo" />
       <PackageGallery images={photos} />
-      <div className="container max-w-7xl mx-auto px-4 py-12"><TestimonialsSection /></div>
+      
+      <section className="py-16 bg-muted/30">
+        <div className="container max-w-7xl mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">O Que Nossos Clientes Dizem</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">Experiências reais de quem já viveu momentos inesquecíveis</p>
+          </div>
+          <PackageTestimonials tipoPacote="completo" maxItems={4} />
+        </div>
+      </section>
     </PackagePageLayout>
   );
 };
