@@ -26,14 +26,15 @@ export const PaidMediaBanner = ({ value, onChange }: PaidMediaBannerProps) => {
     onChange(null);
   };
 
-  const isActive = value && (value.imagem_url || value.link_anunciante);
+  // Considera ativo se value não for null/undefined
+  const isActive = value !== null && value !== undefined;
 
   if (!isActive) {
     return (
       <Button
         type="button"
         variant="outline"
-        onClick={() => onChange({ imagem_url: '', link_anunciante: '', alt_text: '' })}
+        onClick={() => onChange({})}
         className="w-full"
       >
         + Adicionar Banner de Mídia Paga
