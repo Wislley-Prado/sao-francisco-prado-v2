@@ -43,6 +43,8 @@ const BlogEditar = () => {
           imagem_destaque: data.imagem_destaque || null,
           publicado: data.publicado,
           data_publicacao: data.data_publicacao?.toISOString() || null,
+          redes_sociais: data.redes_sociais || {},
+          banner_midia_paga: data.banner_midia_paga || null,
           updated_at: new Date().toISOString(),
         })
         .eq('id', id);
@@ -119,6 +121,8 @@ const BlogEditar = () => {
               imagem_destaque: post.imagem_destaque || null,
               publicado: post.publicado,
               data_publicacao: post.data_publicacao ? new Date(post.data_publicacao) : null,
+              redes_sociais: post.redes_sociais || {},
+              banner_midia_paga: post.banner_midia_paga || null,
             }}
             onSubmit={handleSubmit}
             onCancel={handleCancel}

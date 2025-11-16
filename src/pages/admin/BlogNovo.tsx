@@ -22,6 +22,8 @@ const BlogNovo = () => {
         imagem_destaque: data.imagem_destaque || null,
         publicado: data.publicado,
         data_publicacao: data.data_publicacao?.toISOString() || null,
+        redes_sociais: data.redes_sociais || {},
+        banner_midia_paga: data.banner_midia_paga || null,
       });
 
       if (error) throw error;

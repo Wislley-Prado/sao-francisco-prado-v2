@@ -25,6 +25,8 @@ import { BlogImageUploader } from '../BlogImageUploader';
 import { TagsInput } from './TagsInput';
 import { PublicationSettings } from './PublicationSettings';
 import { FormSection } from './FormSection';
+import { SocialMediaLinks } from './SocialMediaLinks';
+import { PaidMediaBanner } from './PaidMediaBanner';
 
 const blogFormSchema = z.object({
   titulo: z.string().min(1, 'Título é obrigatório'),
@@ -36,6 +38,8 @@ const blogFormSchema = z.object({
   imagem_destaque: z.string().optional(),
   publicado: z.boolean().default(false),
   data_publicacao: z.date().optional(),
+  redes_sociais: z.any().optional(),
+  banner_midia_paga: z.any().optional(),
 });
 
 export type BlogFormData = z.infer<typeof blogFormSchema>;
@@ -60,6 +64,8 @@ export const BlogForm = ({ initialData, onSubmit, onCancel, isSubmitting }: Blog
       imagem_destaque: initialData?.imagem_destaque || '',
       publicado: initialData?.publicado || false,
       data_publicacao: initialData?.data_publicacao || undefined,
+      redes_sociais: initialData?.redes_sociais || {},
+      banner_midia_paga: initialData?.banner_midia_paga || null,
     },
   });
 
@@ -235,6 +241,48 @@ export const BlogForm = ({ initialData, onSubmit, onCancel, isSubmitting }: Blog
               <FormItem>
                 <FormControl>
                   <BlogImageUploader
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </FormSection>
+
+        <FormSection 
+          title="Redes Sociais" 
+          description="Links para compartilhamento nas redes sociais"
+        >
+          <FormField
+            control={form.control}
+            name="redes_sociais"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <SocialMediaLinks
+                    value={field.value || {}}
+                    onChange={field.onChange}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </FormSection>
+
+        <FormSection 
+          title="Mídia Paga" 
+          description="Banner publicitário com link para o anunciante"
+        >
+          <FormField
+            control={form.control}
+            name="banner_midia_paga"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <PaidMediaBanner
                     value={field.value}
                     onChange={field.onChange}
                   />

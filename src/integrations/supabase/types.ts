@@ -71,6 +71,7 @@ export type Database = {
       blog_posts: {
         Row: {
           autor_id: string | null
+          banner_midia_paga: Json | null
           categoria: string | null
           conteudo: string
           created_at: string
@@ -78,6 +79,7 @@ export type Database = {
           id: string
           imagem_destaque: string | null
           publicado: boolean
+          redes_sociais: Json | null
           resumo: string | null
           slug: string
           tags: string[] | null
@@ -87,6 +89,7 @@ export type Database = {
         }
         Insert: {
           autor_id?: string | null
+          banner_midia_paga?: Json | null
           categoria?: string | null
           conteudo: string
           created_at?: string
@@ -94,6 +97,7 @@ export type Database = {
           id?: string
           imagem_destaque?: string | null
           publicado?: boolean
+          redes_sociais?: Json | null
           resumo?: string | null
           slug: string
           tags?: string[] | null
@@ -103,6 +107,7 @@ export type Database = {
         }
         Update: {
           autor_id?: string | null
+          banner_midia_paga?: Json | null
           categoria?: string | null
           conteudo?: string
           created_at?: string
@@ -110,6 +115,7 @@ export type Database = {
           id?: string
           imagem_destaque?: string | null
           publicado?: boolean
+          redes_sociais?: Json | null
           resumo?: string | null
           slug?: string
           tags?: string[] | null

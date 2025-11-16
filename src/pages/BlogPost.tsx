@@ -10,6 +10,8 @@ import { Separator } from '@/components/ui/separator';
 import { Calendar, User, ArrowLeft, Eye, Tag } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import DOMPurify from 'dompurify';
+import { SocialShareButtons } from '@/components/blog/SocialShareButtons';
+import { PaidMediaBannerDisplay } from '@/components/blog/PaidMediaBannerDisplay';
 
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -162,6 +164,20 @@ const BlogPost = () => {
             className="prose prose-lg max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-li:text-foreground prose-a:text-primary hover:prose-a:text-primary/80"
             dangerouslySetInnerHTML={{ __html: sanitizedContent }}
           />
+
+          {/* Paid Media Banner */}
+          <PaidMediaBannerDisplay 
+            banner_midia_paga={post.banner_midia_paga as any} 
+          />
+
+          {/* Social Media Links */}
+          {post.redes_sociais && (
+            <div className="my-8">
+              <SocialShareButtons 
+                redes_sociais={post.redes_sociais as any} 
+              />
+            </div>
+          )}
 
           {/* Tags */}
           {post.tags && post.tags.length > 0 && (
