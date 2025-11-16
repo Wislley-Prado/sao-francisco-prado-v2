@@ -27,6 +27,11 @@ interface RanchoDetalhes {
   area: number;
   comodidades: string[];
   disponivel: boolean;
+  telefone_whatsapp?: string;
+  video_youtube?: string;
+  latitude?: number;
+  longitude?: number;
+  endereco_completo?: string;
   imagens: {
     url: string;
     alt_text: string;
@@ -52,7 +57,7 @@ const RanchoDetalhes = () => {
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
 
-  const whatsappNumber = "5531999999999";
+  const whatsappNumber = rancho?.telefone_whatsapp || "5531999999999";
 
   useEffect(() => {
     const fetchRancho = async () => {
@@ -94,6 +99,11 @@ const RanchoDetalhes = () => {
           area: ranchoData.area,
           comodidades: ranchoData.comodidades || [],
           disponivel: ranchoData.disponivel,
+          telefone_whatsapp: ranchoData.telefone_whatsapp,
+          video_youtube: ranchoData.video_youtube,
+          latitude: ranchoData.latitude,
+          longitude: ranchoData.longitude,
+          endereco_completo: ranchoData.endereco_completo,
           imagens: imagesData || []
         });
       } catch (error) {
@@ -112,9 +122,28 @@ const RanchoDetalhes = () => {
 
   const handleWhatsAppReserva = () => {
     if (!rancho) return;
+    const phone = rancho.telefone_whatsapp || "5531999999999";
     const message = `Olá! Gostaria de fazer uma reserva no ${rancho.nome} (${rancho.localizacao}). Pode me passar mais informações sobre disponibilidade e valores?`;
-    const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
+  };
+
+  const getYouTubeEmbedUrl = (url: string) => {
+    if (!url) return null;
+    
+    // Extract video ID from YouTube Shorts URL
+    const shortsMatch = url.match(/shorts\/([a-zA-Z0-9_-]+)/);
+    if (shortsMatch) {
+      return `https://www.youtube.com/embed/${shortsMatch[1]}`;
+    }
+    
+    // Handle regular YouTube URLs as fallback
+    const videoMatch = url.match(/[?&]v=([a-zA-Z0-9_-]+)/);
+    if (videoMatch) {
+      return `https://www.youtube.com/embed/${videoMatch[1]}`;
+    }
+    
+    return null;
   };
 
   if (loading) {
@@ -280,6 +309,48 @@ const RanchoDetalhes = () => {
                   ))}
                 </div>
               </div>
+
+              {/* YouTube Video */}
+              {rancho.video_youtube && getYouTubeEmbedUrl(rancho.video_youtube) && (
+                <>
+                  <Separator />
+                  <div>
+                    <h2 className="text-2xl font-bold mb-4">Conheça o Rancho</h2>
+                    <div className="relative w-full" style={{ paddingBottom: '177.78%', maxWidth: '315px', margin: '0 auto' }}>
+                      <iframe
+                        src={getYouTubeEmbedUrl(rancho.video_youtube) || ''}
+                        className="absolute top-0 left-0 w-full h-full rounded-lg"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        title={`Vídeo ${rancho.nome}`}
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* Google Maps Location */}
+              {rancho.latitude && rancho.longitude && (
+                <>
+                  <Separator />
+                  <div>
+                    <h2 className="text-2xl font-bold mb-4">Localização</h2>
+                    {rancho.endereco_completo && (
+                      <p className="text-muted-foreground mb-4">{rancho.endereco_completo}</p>
+                    )}
+                    <div className="relative w-full h-[400px] rounded-lg overflow-hidden">
+                      <iframe
+                        src={`https://www.google.com/maps?q=${rancho.latitude},${rancho.longitude}&hl=pt-BR&z=14&output=embed`}
+                        className="w-full h-full border-0"
+                        allowFullScreen
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                        title={`Mapa ${rancho.nome}`}
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Sidebar - Booking Card */}
