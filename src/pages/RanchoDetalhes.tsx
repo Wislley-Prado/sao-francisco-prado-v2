@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import DOMPurify from 'dompurify';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -138,11 +139,17 @@ const RanchoDetalhes = () => {
   // Registrar visualização da página
   useRanchoAnalytics(rancho?.id || "", "visualizacao");
 
-  // Injetar tracking code específico do rancho
+  // Injetar tracking code específico do rancho (sanitizado)
   useEffect(() => {
     if (rancho?.tracking_code) {
       const trackingDiv = document.createElement('div');
-      trackingDiv.innerHTML = rancho.tracking_code;
+      // Sanitize HTML to prevent XSS attacks
+      const sanitizedHTML = DOMPurify.sanitize(rancho.tracking_code, {
+        ADD_TAGS: ['script', 'style', 'link'],
+        ADD_ATTR: ['src', 'href', 'rel', 'type', 'async', 'defer'],
+        ALLOW_DATA_ATTR: false
+      });
+      trackingDiv.innerHTML = sanitizedHTML;
       
       Array.from(trackingDiv.children).forEach((element) => {
         const clonedElement = element.cloneNode(true) as HTMLElement;

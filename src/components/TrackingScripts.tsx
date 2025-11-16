@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import DOMPurify from 'dompurify';
 
 const SETTINGS_ID = '00000000-0000-0000-0000-000000000001';
 
@@ -104,10 +105,16 @@ const TrackingScripts = () => {
       document.body.insertBefore(gtmNoscript, document.body.firstChild);
     }
 
-    // Scripts personalizados
+    // Scripts personalizados (sanitizados)
     if (scripts.custom_head_scripts) {
       const customDiv = document.createElement('div');
-      customDiv.innerHTML = scripts.custom_head_scripts;
+      // Sanitize HTML to prevent XSS attacks
+      const sanitizedHTML = DOMPurify.sanitize(scripts.custom_head_scripts, {
+        ADD_TAGS: ['script', 'style', 'link'],
+        ADD_ATTR: ['src', 'href', 'rel', 'type', 'async', 'defer'],
+        ALLOW_DATA_ATTR: false
+      });
+      customDiv.innerHTML = sanitizedHTML;
       Array.from(customDiv.children).forEach((element) => {
         document.head.appendChild(element.cloneNode(true));
       });
