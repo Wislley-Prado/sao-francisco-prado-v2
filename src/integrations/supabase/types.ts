@@ -449,14 +449,18 @@ export type Database = {
           descricao: string | null
           destaque: boolean
           duracao: string
+          endereco_completo: string | null
           id: string
           inclusos: string[] | null
+          latitude: number | null
+          longitude: number | null
           nome: string
           pessoas: number
           popular: boolean
           preco: number
           rating: number
           slug: string
+          telefone_whatsapp: string | null
           tipo: string
           tracking_code: string | null
           updated_at: string
@@ -469,14 +473,18 @@ export type Database = {
           descricao?: string | null
           destaque?: boolean
           duracao: string
+          endereco_completo?: string | null
           id?: string
           inclusos?: string[] | null
+          latitude?: number | null
+          longitude?: number | null
           nome: string
           pessoas?: number
           popular?: boolean
           preco: number
           rating?: number
           slug: string
+          telefone_whatsapp?: string | null
           tipo?: string
           tracking_code?: string | null
           updated_at?: string
@@ -489,14 +497,18 @@ export type Database = {
           descricao?: string | null
           destaque?: boolean
           duracao?: string
+          endereco_completo?: string | null
           id?: string
           inclusos?: string[] | null
+          latitude?: number | null
+          longitude?: number | null
           nome?: string
           pessoas?: number
           popular?: boolean
           preco?: number
           rating?: number
           slug?: string
+          telefone_whatsapp?: string | null
           tipo?: string
           tracking_code?: string | null
           updated_at?: string
