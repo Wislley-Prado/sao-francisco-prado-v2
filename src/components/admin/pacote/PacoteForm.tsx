@@ -102,6 +102,8 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
 
   const form = useForm<PacoteFormData>({
     resolver: zodResolver(pacoteSchema),
+    mode: 'onChange',
+    reValidateMode: 'onChange',
     defaultValues: {
       nome: pacote?.nome || '',
       slug: pacote?.slug || '',
