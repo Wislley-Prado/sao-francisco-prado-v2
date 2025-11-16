@@ -117,9 +117,9 @@ const RanchoDetalhes = () => {
         };
 
         // Debug logs
-        console.log('🎥 Vídeo YouTube:', ranchoCompleto.video_youtube);
-        console.log('📅 Google Calendar:', ranchoCompleto.google_calendar_url);
-        console.log('📍 Coordenadas:', { lat: ranchoCompleto.latitude, lng: ranchoCompleto.longitude });
+        console.log('Video YouTube:', ranchoCompleto.video_youtube);
+        console.log('Google Calendar:', ranchoCompleto.google_calendar_url);
+        console.log('Coordenadas:', { lat: ranchoCompleto.latitude, lng: ranchoCompleto.longitude });
         
         setRancho(ranchoCompleto);
       } catch (error) {
@@ -369,11 +369,11 @@ const RanchoDetalhes = () => {
                 <>
                   <Separator />
                   <div id="video-section">
-                    <h2 className="text-2xl font-bold mb-4">🎥 Conheça o Rancho</h2>
+                    <h2 className="text-2xl font-bold mb-4">Conheça o Rancho</h2>
                     {getYouTubeEmbedUrl(rancho.video_youtube) ? (
                       <Card className="overflow-hidden">
                         <CardContent className="p-0">
-                          <div className="relative w-full bg-black" style={{ paddingBottom: '56.25%' }}>
+                          <div className="relative w-full max-w-md mx-auto bg-black" style={{ paddingBottom: '177.78%' }}>
                             <iframe
                               src={getYouTubeEmbedUrl(rancho.video_youtube) || ''}
                               className="absolute top-0 left-0 w-full h-full"
@@ -396,7 +396,7 @@ const RanchoDetalhes = () => {
                 <>
                   <Separator />
                   <div id="map-section">
-                    <h2 className="text-2xl font-bold mb-4">📍 Localização</h2>
+                    <h2 className="text-2xl font-bold mb-4">Localização</h2>
                     {rancho.endereco_completo && (
                       <p className="text-muted-foreground mb-4">{rancho.endereco_completo}</p>
                     )}
@@ -423,7 +423,7 @@ const RanchoDetalhes = () => {
                 <>
                   <Separator />
                   <div id="calendar-section">
-                    <h2 className="text-2xl font-bold mb-4">📅 Disponibilidade</h2>
+                    <h2 className="text-2xl font-bold mb-4">Disponibilidade</h2>
                     <p className="text-muted-foreground mb-4">
                       Confira as datas disponíveis para reserva no calendário abaixo:
                     </p>
