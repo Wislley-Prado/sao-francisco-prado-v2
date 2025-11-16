@@ -269,7 +269,7 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <Tabs defaultValue="basico" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-5 h-auto">
             <TabsTrigger value="basico">Básico</TabsTrigger>
             <TabsTrigger value="estrutura">Estrutura</TabsTrigger>
             <TabsTrigger value="comodidades">Comodidades</TabsTrigger>
@@ -277,7 +277,7 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
             <TabsTrigger value="imagens">Imagens</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="basico" className="space-y-4">
+          <TabsContent value="basico" className="space-y-4 mt-6">
             <FormField
               control={form.control}
               name="nome"
@@ -344,7 +344,7 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
             />
           </TabsContent>
 
-          <TabsContent value="estrutura" className="space-y-4">
+          <TabsContent value="estrutura" className="space-y-4 mt-6">
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
@@ -491,7 +491,7 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
             </div>
           </TabsContent>
 
-          <TabsContent value="comodidades" className="space-y-4">
+          <TabsContent value="comodidades" className="space-y-4 mt-6">
             <FormField
               control={form.control}
               name="comodidades"
@@ -548,7 +548,7 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
             />
           </TabsContent>
 
-          <TabsContent value="midia" className="space-y-4">
+          <TabsContent value="midia" className="space-y-4 mt-6">
             <FormField
               control={form.control}
               name="telefone_whatsapp"
@@ -631,7 +631,7 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
             />
           </TabsContent>
 
-          <TabsContent value="imagens" className="space-y-4">
+          <TabsContent value="imagens" className="space-y-4 mt-6">
             <ImageUploader images={images} onChange={setImages} />
           </TabsContent>
         </Tabs>
