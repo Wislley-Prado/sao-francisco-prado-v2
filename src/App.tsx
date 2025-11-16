@@ -27,6 +27,8 @@ import AdminRanchos from "./pages/admin/Ranchos";
 import RanchoNovo from "./pages/admin/RanchoNovo";
 import RanchoEditar from "./pages/admin/RanchoEditar";
 import AdminPacotes from "./pages/admin/Pacotes";
+import PacoteNovo from "./pages/admin/PacoteNovo";
+import PacoteEditar from "./pages/admin/PacoteEditar";
 import AdminBlog from "./pages/admin/Blog";
 import BlogNovo from "./pages/admin/BlogNovo";
 import BlogEditar from "./pages/admin/BlogEditar";
@@ -90,6 +92,8 @@ const App = () => {
                   <Route path="ranchos/novo" element={<RanchoNovo />} />
                   <Route path="ranchos/editar/:id" element={<RanchoEditar />} />
                   <Route path="pacotes" element={<AdminPacotes />} />
+                  <Route path="pacotes/novo" element={<PacoteNovo />} />
+                  <Route path="pacotes/:id/editar" element={<PacoteEditar />} />
                   <Route path="avaliacoes" element={<AdminAvaliacoes />} />
                   <Route path="estatisticas-avaliacoes" element={<EstatisticasAvaliacoes />} />
                   <Route path="analytics" element={<AdminAnalytics />} />
