@@ -226,6 +226,75 @@ export type Database = {
         }
         Relationships: []
       }
+      depoimentos: {
+        Row: {
+          ativo: boolean
+          cargo: string | null
+          created_at: string
+          depoimento: string
+          foto_url: string | null
+          id: string
+          nome: string
+          ordem: number
+          rating: number
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          cargo?: string | null
+          created_at?: string
+          depoimento: string
+          foto_url?: string | null
+          id?: string
+          nome: string
+          ordem?: number
+          rating?: number
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          cargo?: string | null
+          created_at?: string
+          depoimento?: string
+          foto_url?: string | null
+          id?: string
+          nome?: string
+          ordem?: number
+          rating?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      faqs: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          id: string
+          ordem: number
+          pergunta: string
+          resposta: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          id?: string
+          ordem?: number
+          pergunta: string
+          resposta: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          id?: string
+          ordem?: number
+          pergunta?: string
+          resposta?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       pacote_analytics: {
         Row: {
           created_at: string

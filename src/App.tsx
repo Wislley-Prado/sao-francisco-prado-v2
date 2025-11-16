@@ -40,6 +40,12 @@ import AdminConfiguracoes from "./pages/admin/Configuracoes";
 import AdminAvaliacoes from "./pages/admin/Avaliacoes";
 import EstatisticasAvaliacoes from "./pages/admin/EstatisticasAvaliacoes";
 import AdminAnalytics from "./pages/admin/Analytics";
+import FAQs from "./pages/admin/FAQs";
+import FAQNovo from "./pages/admin/FAQNovo";
+import FAQEditar from "./pages/admin/FAQEditar";
+import Depoimentos from "./pages/admin/Depoimentos";
+import DepoimentoNovo from "./pages/admin/DepoimentoNovo";
+import DepoimentoEditar from "./pages/admin/DepoimentoEditar";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -108,6 +114,12 @@ const App = () => {
                   <Route path="blog/novo" element={<BlogNovo />} />
                   <Route path="blog/editar/:id" element={<BlogEditar />} />
                   <Route path="blog/analytics" element={<BlogAnalytics />} />
+                  <Route path="faqs" element={<FAQs />} />
+                  <Route path="faqs/novo" element={<FAQNovo />} />
+                  <Route path="faqs/editar/:id" element={<FAQEditar />} />
+                  <Route path="depoimentos" element={<Depoimentos />} />
+                  <Route path="depoimentos/novo" element={<DepoimentoNovo />} />
+                  <Route path="depoimentos/editar/:id" element={<DepoimentoEditar />} />
                   <Route path="configuracoes" element={<AdminConfiguracoes />} />
                 </Route>
                 
