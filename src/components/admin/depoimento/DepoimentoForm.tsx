@@ -11,7 +11,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { ImageUploader } from "./ImageUploader";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 const formSchema = z.object({
   nome: z.string().min(3, "O nome deve ter pelo menos 3 caracteres"),
@@ -21,6 +22,8 @@ const formSchema = z.object({
   rating: z.number().min(1).max(5),
   ordem: z.number().min(0, "A ordem deve ser um número positivo"),
   ativo: z.boolean().default(true),
+  pacote_id: z.string().optional(),
+  tipo_pacote: z.enum(['pescaria', 'completo', 'personalizado']).optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -35,6 +38,8 @@ interface DepoimentoFormProps {
     rating: number;
     ordem: number;
     ativo: boolean;
+    pacote_id?: string | null;
+    tipo_pacote?: 'pescaria' | 'completo' | 'personalizado' | null;
   };
 }
 
@@ -42,6 +47,21 @@ export const DepoimentoForm = ({ initialData }: DepoimentoFormProps) => {
   const navigate = useNavigate();
   const isEditing = !!initialData;
   const [uploading, setUploading] = useState(false);
+
+  // Buscar pacotes disponíveis
+  const { data: pacotes } = useQuery({
+    queryKey: ['pacotes-select'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('pacotes')
+        .select('id, nome')
+        .eq('ativo', true)
+        .order('nome');
+      
+      if (error) throw error;
+      return data || [];
+    },
+  });
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -53,6 +73,8 @@ export const DepoimentoForm = ({ initialData }: DepoimentoFormProps) => {
       rating: 5,
       ordem: 0,
       ativo: true,
+      pacote_id: undefined,
+      tipo_pacote: undefined,
     },
   });
 
@@ -66,6 +88,8 @@ export const DepoimentoForm = ({ initialData }: DepoimentoFormProps) => {
         rating: data.rating,
         ordem: data.ordem,
         ativo: data.ativo,
+        pacote_id: data.pacote_id || null,
+        tipo_pacote: data.tipo_pacote || null,
       };
 
       if (isEditing) {
@@ -236,6 +260,76 @@ export const DepoimentoForm = ({ initialData }: DepoimentoFormProps) => {
             </FormItem>
           )}
         />
+
+        <div className="border-t pt-6 space-y-4">
+          <h3 className="text-lg font-semibold">Vinculação com Pacotes</h3>
+          <p className="text-sm text-muted-foreground">
+            Vincule este depoimento a um pacote específico ou a um tipo de pacote. 
+            Se não vincular, o depoimento será exibido em todos os pacotes.
+          </p>
+
+          <FormField
+            control={form.control}
+            name="pacote_id"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Pacote Específico (Opcional)</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value || ""}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione um pacote específico" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="">Nenhum (geral)</SelectItem>
+                    {pacotes?.map((pacote) => (
+                      <SelectItem key={pacote.id} value={pacote.id}>
+                        {pacote.nome}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormDescription>
+                  Depoimento será exibido apenas neste pacote
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="tipo_pacote"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Tipo de Pacote (Opcional)</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value || ""}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione um tipo de pacote" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="">Nenhum (geral)</SelectItem>
+                    <SelectItem value="pescaria">Pescaria</SelectItem>
+                    <SelectItem value="completo">Completo</SelectItem>
+                    <SelectItem value="personalizado">Personalizado</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormDescription>
+                  Depoimento será exibido em todos os pacotes deste tipo
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <div className="flex gap-4">
           <Button type="submit" disabled={uploading}>

@@ -7,7 +7,7 @@ import { PackagePricing } from '@/components/packages/PackagePricing';
 import { PackageFeatures } from '@/components/packages/PackageFeatures';
 import { PackageGallery } from '@/components/packages/PackageGallery';
 import { PackageAbout } from '@/components/packages/PackageAbout';
-import { TestimonialsSection } from '@/components/TestimonialsSection';
+import { PackageTestimonials } from '@/components/packages/PackageTestimonials';
 import { PacoteFAQs } from '@/components/PacoteFAQs';
 import ranchoPradoAldeia from '@/assets/gallery/rancho-prado-aldeia.jpg';
 import paiFilhoDourado from '@/assets/gallery/pai-filho-dourado.jpg';
@@ -47,7 +47,17 @@ const PackageVip = () => {
       <PackageAbout description="Experiência completa de pesca com conforto e estrutura." highlights={['Rancho exclusivo', 'Guias experientes', 'Equipamentos premium']} />
       <PackageFeatures features={features} tier="vip" />
       <PackageGallery images={photos} />
-      <div className="container max-w-7xl mx-auto px-4 py-12"><TestimonialsSection /></div>
+      
+      <section className="py-16 bg-muted/30">
+        <div className="container max-w-7xl mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">O Que Nossos Clientes Dizem</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">Experiências reais de quem já viveu momentos inesquecíveis</p>
+          </div>
+          <PackageTestimonials tipoPacote="completo" maxItems={4} />
+        </div>
+      </section>
+
       <div className="container max-w-7xl mx-auto px-4 pb-12"><PacoteFAQs pacoteId={null} /></div>
     </PackagePageLayout>
   );
