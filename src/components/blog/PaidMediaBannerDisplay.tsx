@@ -2,6 +2,42 @@ import React from 'react';
 import { ExternalLink } from 'lucide-react';
 import { useBlogAnalytics } from '@/hooks/useBlogAnalytics';
 
+// Função para processar formatação básica (negrito e itálico)
+const parseFormattedText = (text: string) => {
+  const parts: React.ReactNode[] = [];
+  let currentIndex = 0;
+  let key = 0;
+
+  // Regex para capturar **negrito** e *itálico*
+  const regex = /(\*\*(.+?)\*\*)|(\*(.+?)\*)/g;
+  let match;
+
+  while ((match = regex.exec(text)) !== null) {
+    // Adiciona texto antes do match
+    if (match.index > currentIndex) {
+      parts.push(text.substring(currentIndex, match.index));
+    }
+
+    // Verifica se é negrito ou itálico
+    if (match[1]) {
+      // Negrito **texto**
+      parts.push(<strong key={`bold-${key++}`}>{match[2]}</strong>);
+    } else if (match[3]) {
+      // Itálico *texto*
+      parts.push(<em key={`italic-${key++}`}>{match[4]}</em>);
+    }
+
+    currentIndex = match.index + match[0].length;
+  }
+
+  // Adiciona texto restante
+  if (currentIndex < text.length) {
+    parts.push(text.substring(currentIndex));
+  }
+
+  return parts.length > 0 ? parts : text;
+};
+
 interface PaidMediaBannerDisplayProps {
   postId: string;
   banner_midia_paga?: {
@@ -54,8 +90,8 @@ export const PaidMediaBannerDisplay = ({ postId, banner_midia_paga }: PaidMediaB
         )}
       </div>
       {banner_midia_paga.alt_text && (
-        <figcaption className="text-sm text-muted-foreground italic text-center">
-          {banner_midia_paga.alt_text}
+        <figcaption className="text-sm text-muted-foreground text-center">
+          {parseFormattedText(banner_midia_paga.alt_text)}
         </figcaption>
       )}
     </figure>

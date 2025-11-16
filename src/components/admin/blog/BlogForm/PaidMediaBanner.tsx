@@ -96,6 +96,9 @@ export const PaidMediaBanner = ({ value, onChange }: PaidMediaBannerProps) => {
             value={value?.alt_text || ''}
             onChange={(e) => handleChange('alt_text', e.target.value)}
           />
+          <p className="text-xs text-muted-foreground">
+            Use **negrito** e *itálico* para formatar. Emoji são suportados 🎣
+          </p>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
