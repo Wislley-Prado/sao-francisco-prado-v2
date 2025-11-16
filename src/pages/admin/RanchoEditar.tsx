@@ -5,12 +5,13 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, ExternalLink } from 'lucide-react';
 import { RanchoForm } from '@/components/admin/rancho/RanchoForm';
 import { supabase } from '@/integrations/supabase/client';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 const RanchoEditar = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const queryClient = useQueryClient();
 
   const { data: rancho, isLoading } = useQuery({
     queryKey: ['rancho', id],
@@ -32,6 +33,8 @@ const RanchoEditar = () => {
 
   const handleSuccess = () => {
     toast.success('Rancho atualizado com sucesso!');
+    queryClient.invalidateQueries({ queryKey: ['rancho', id] });
+    queryClient.invalidateQueries({ queryKey: ['ranchos'] });
     navigate('/admin/ranchos');
   };
 
