@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
@@ -38,6 +39,24 @@ const pacoteSchema = z.object({
   popular: z.boolean(),
   destaque: z.boolean(),
   tracking_code: z.string().optional(),
+  telefone_whatsapp: z
+    .string()
+    .optional()
+    .or(z.literal(''))
+    .refine(
+      (val) => {
+        if (!val || val === '') return true;
+        // Validate phone number format (Brazilian format)
+        const phoneRegex = /^[1-9]{2}9?[0-9]{8}$/;
+        return phoneRegex.test(val.replace(/\D/g, ''));
+      },
+      {
+        message: 'Formato inválido. Use apenas números (DDD + número)',
+      }
+    ),
+  endereco_completo: z.string().optional(),
+  latitude: z.number().optional().or(z.string().transform((val) => val ? parseFloat(val) : undefined)),
+  longitude: z.number().optional().or(z.string().transform((val) => val ? parseFloat(val) : undefined)),
   video_youtube: z
     .string()
     .optional()
@@ -95,6 +114,10 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
       popular: pacote?.popular ?? false,
       destaque: pacote?.destaque ?? false,
       tracking_code: pacote?.tracking_code || '',
+      telefone_whatsapp: pacote?.telefone_whatsapp || '',
+      endereco_completo: pacote?.endereco_completo || '',
+      latitude: pacote?.latitude ? Number(pacote.latitude) : undefined,
+      longitude: pacote?.longitude ? Number(pacote.longitude) : undefined,
       video_youtube: pacote?.video_youtube || '',
     },
   });
@@ -588,6 +611,127 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
                 <YouTubePreview videoUrl={form.watch('video_youtube')} />
               </div>
             )}
+
+            <Separator className="my-6" />
+
+            {/* WhatsApp */}
+            <FormField
+              control={form.control}
+              name="telefone_whatsapp"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>WhatsApp para Contato (Opcional)</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder="5538999999999 (apenas números com DDD)"
+                      maxLength={13}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Número específico para este pacote. Se deixar vazio, será usado o WhatsApp padrão do site
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Separator className="my-6" />
+
+            {/* Localização */}
+            <div className="space-y-4">
+              <div className="rounded-lg border p-4 bg-muted/50">
+                <h3 className="text-sm font-medium mb-2">Localização da Pescaria</h3>
+                <p className="text-xs text-muted-foreground">
+                  Adicione o endereço e coordenadas do local onde será realizada a pescaria. Isso ajudará os clientes a visualizarem a localização no mapa.
+                </p>
+              </div>
+
+              <FormField
+                control={form.control}
+                name="endereco_completo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Endereço Completo</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="Ex: Rio São Francisco, Prado - MG"
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Endereço ou descrição do local da pescaria
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="latitude"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Latitude</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="number"
+                          step="any"
+                          placeholder="-17.341050"
+                          value={field.value || ''}
+                          onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                        />
+                      </FormControl>
+                      <FormDescription className="text-xs">
+                        Coordenada de latitude
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="longitude"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Longitude</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="number"
+                          step="any"
+                          placeholder="-44.892090"
+                          value={field.value || ''}
+                          onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                        />
+                      </FormControl>
+                      <FormDescription className="text-xs">
+                        Coordenada de longitude
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="rounded-lg border p-3 bg-blue-50 dark:bg-blue-950/20 text-xs">
+                <p className="text-blue-900 dark:text-blue-100">
+                  💡 <strong>Dica:</strong> Para obter as coordenadas, acesse{' '}
+                  <a 
+                    href="https://www.google.com/maps" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="underline hover:text-blue-700"
+                  >
+                    Google Maps
+                  </a>
+                  , clique com o botão direito no local desejado e copie as coordenadas.
+                </p>
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="imagens">

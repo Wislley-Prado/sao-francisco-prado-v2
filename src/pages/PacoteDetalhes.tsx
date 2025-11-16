@@ -16,6 +16,7 @@ import { YouTubePlayer } from '@/components/YouTubePlayer';
 import { usePacoteAnalytics, registrarEventoPacote, dispararPixel } from '@/hooks/usePacoteAnalytics';
 import { PacoteFAQs } from '@/components/PacoteFAQs';
 import { sanitizeHtml } from '@/utils/htmlSanitizer';
+import PacoteMap from '@/components/PacoteMap';
 
 interface PacoteDetalhes {
   id: string;
@@ -34,6 +35,10 @@ interface PacoteDetalhes {
   destaque: boolean;
   video_youtube?: string;
   tracking_code?: string;
+  telefone_whatsapp?: string;
+  endereco_completo?: string;
+  latitude?: number;
+  longitude?: number;
   imagens: {
     url: string;
     alt_text: string;
@@ -48,7 +53,8 @@ const PacoteDetalhes = () => {
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
 
-  const whatsappNumber = "5538999755886";
+  // WhatsApp padrão do site, usado se o pacote não tiver um específico
+  const whatsappPadrao = "5538999755886";
 
   // Registra visualização automaticamente quando o pacote for carregado
   useEffect(() => {
@@ -113,6 +119,10 @@ const PacoteDetalhes = () => {
           destaque: pacoteData.destaque,
           video_youtube: pacoteData.video_youtube,
           tracking_code: pacoteData.tracking_code,
+          telefone_whatsapp: pacoteData.telefone_whatsapp,
+          endereco_completo: pacoteData.endereco_completo,
+          latitude: pacoteData.latitude ? Number(pacoteData.latitude) : undefined,
+          longitude: pacoteData.longitude ? Number(pacoteData.longitude) : undefined,
           imagens: imagesData || [],
         };
 
@@ -154,6 +164,8 @@ const PacoteDetalhes = () => {
       });
     }
 
+    // Usar WhatsApp específico do pacote ou o padrão do site
+    const whatsappNumber = pacote.telefone_whatsapp || whatsappPadrao;
     const message = encodeURIComponent(
       `Olá! Gostaria de saber mais sobre o ${pacote.nome} (${pacote.duracao}).`
     );
@@ -390,6 +402,16 @@ const PacoteDetalhes = () => {
                   </div>
                 </CardContent>
               </Card>
+            )}
+
+            {/* Mapa da Localização */}
+            {pacote.latitude && pacote.longitude && pacote.endereco_completo && (
+              <PacoteMap
+                latitude={pacote.latitude}
+                longitude={pacote.longitude}
+                endereco={pacote.endereco_completo}
+                titulo={pacote.nome}
+              />
             )}
 
             {/* FAQs integrado na coluna principal */}
