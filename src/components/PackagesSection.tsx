@@ -1,75 +1,82 @@
-
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import PackageCard from './PackageCard';
 import PackageFeatures from './PackageFeatures';
-import ranchoPradoPescadorFeliz from '@/assets/rancho-prado-pescador-feliz.jpg';
-import douradoGiganteSaoFrancisco from '@/assets/gallery/dourado-gigante-sao-francisco.jpg';
-import pacoteDiamante from '@/assets/gallery/pacote-diamante.png';
+import { supabase } from '@/integrations/supabase/client';
+import { Skeleton } from './ui/skeleton';
+
+interface PacoteImage {
+  id: string;
+  url: string;
+  principal: boolean;
+  ordem: number;
+}
+
+interface Pacote {
+  id: string;
+  nome: string;
+  descricao: string;
+  preco: number;
+  duracao: string;
+  pessoas: number;
+  rating: number;
+  popular: boolean;
+  ativo: boolean;
+  inclusos: string[];
+  pacote_imagens: PacoteImage[];
+}
 
 const PackagesSection = () => {
-  const packages = [
-    {
-      id: 1,
-      title: 'PACOTE VIP EXCLUSIVO – "Pesca e prosa Boa"',
-      description: "Rancho Prado – Aldeia - Para 6 pescadores com exclusividade total do rancho",
-      price: "10 X R$147,97",
-      duration: "5 dias / 4 noites",
-      people: "6 pescadores",
-      rating: 4.8,
-      features: [
-        "De quarta a domingo",
-        "Rancho inteiro reservado só pro grupo",
-        "Exclusividade total do rancho",
-        "Vista pro lago, sossego absoluto"
-      ],
-      image: ranchoPradoPescadorFeliz,
-      popular: true
-    },
-    {
-      id: 2,
-      title: "PACOTE LUXO – 'Conforto Premium'",
-      description: "Experiência de luxo com hospedagem premium e serviços exclusivos",
-      price: "15 X R$199,90",
-      duration: "7 dias / 6 noites",
-      people: "4-8 pescadores",
-      rating: 4.9,
-      features: [
-        "Hospedagem de luxo com suítes",
-        "Chef particular incluso",
-        "Equipamentos premium",
-        "Guia especializado 24h",
-        "Barco exclusivo de luxo",
-        "Transfer VIP incluso",
-        "Spa e relaxamento",
-        "Vista panorâmica do lago"
-      ],
-      image: douradoGiganteSaoFrancisco,
-      popular: true
-    },
-    {
-      id: 3,
-      title: "PACOTE DIAMANTE – 'Elite Experience'",
-      description: "O mais exclusivo pacote de pesca esportiva do Rio São Francisco",
-      price: "20 X R$299,97",
-      duration: "10 dias / 9 noites",
-      people: "6-12 pescadores",
-      rating: 5.0,
-      features: [
-        "Resort privativo exclusivo",
-        "Helicóptero para translado",
-        "Chef renomado e sommelier",
-        "Equipamentos de última geração",
-        "Guias especializados 24/7",
-        "Frota de barcos de luxo",
-        "Serviço de concierge",
-        "Experiências gastronômicas únicas",
-        "Spa completo e wellness",
-        "Fotógrafo profissional incluso"
-      ],
-      image: pacoteDiamante,
-      popular: false
-    }
-  ];
+  const [packages, setPackages] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPackages = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('pacotes')
+          .select(`
+            *,
+            pacote_imagens (
+              id,
+              url,
+              principal,
+              ordem
+            )
+          `)
+          .eq('ativo', true)
+          .order('popular', { ascending: false })
+          .order('preco', { ascending: true });
+
+        if (error) throw error;
+
+        const formattedPackages = data?.map((pacote: Pacote) => {
+          const mainImage = pacote.pacote_imagens.find(img => img.principal) || 
+                           pacote.pacote_imagens.sort((a, b) => a.ordem - b.ordem)[0];
+
+          return {
+            id: parseInt(pacote.id.split('-')[0], 16) % 1000, // Generate numeric id for routing
+            title: pacote.nome,
+            description: pacote.descricao || '',
+            price: `R$ ${pacote.preco.toFixed(2)}`,
+            duration: pacote.duracao,
+            people: `${pacote.pessoas} pessoas`,
+            rating: pacote.rating,
+            features: pacote.inclusos || [],
+            image: mainImage?.url || '',
+            popular: pacote.popular
+          };
+        }) || [];
+
+        setPackages(formattedPackages);
+      } catch (error) {
+        console.error('Erro ao carregar pacotes:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPackages();
+  }, []);
 
   return (
     <section id="pacotes" className="py-20 bg-sand-beige">
@@ -87,9 +94,21 @@ const PackagesSection = () => {
 
         {/* Packages Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {packages.map((pkg) => (
-            <PackageCard key={pkg.id} pkg={pkg} />
-          ))}
+          {loading ? (
+            <>
+              <Skeleton className="h-[500px] w-full" />
+              <Skeleton className="h-[500px] w-full" />
+              <Skeleton className="h-[500px] w-full" />
+            </>
+          ) : packages.length > 0 ? (
+            packages.map((pkg) => (
+              <PackageCard key={pkg.id} pkg={pkg} />
+            ))
+          ) : (
+            <div className="col-span-3 text-center py-12">
+              <p className="text-gray-500">Nenhum pacote disponível no momento.</p>
+            </div>
+          )}
         </div>
 
         {/* Additional Info */}
