@@ -52,7 +52,21 @@ const ranchoSchema = z.object({
   comodidades: z.array(z.string()),
   comodidadeCustom: z.string().optional(),
   telefone_whatsapp: z.string().regex(/^\d+$/, 'Apenas números').min(10, 'Mínimo 10 dígitos').optional().or(z.literal('')),
-  video_youtube: z.string().url('URL inválida do YouTube').optional().or(z.literal('')),
+  video_youtube: z
+    .string()
+    .optional()
+    .or(z.literal(''))
+    .refine(
+      (val) => {
+        if (!val || val === '') return true;
+        // Validate YouTube URLs (Shorts, regular videos, youtu.be)
+        const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(shorts\/|watch\?v=)|youtu\.be\/)[a-zA-Z0-9_-]{11}.*$/;
+        return youtubeRegex.test(val);
+      },
+      {
+        message: 'URL inválida. Use um link válido do YouTube (Shorts, vídeo normal ou youtu.be)',
+      }
+    ),
   latitude: z.string().optional().or(z.literal('')),
   longitude: z.string().optional().or(z.literal('')),
   endereco_completo: z.string().optional(),
