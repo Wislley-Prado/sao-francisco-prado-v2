@@ -16,6 +16,7 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { ArrowLeft, Plus, X } from 'lucide-react';
 import { toast } from 'sonner';
+import { ImageUploader } from '@/components/admin/propriedade/ImageUploader';
 
 export default function PropriedadeVendaNova() {
   const navigate = useNavigate();
@@ -40,7 +41,6 @@ export default function PropriedadeVendaNova() {
   const [caracteristicas, setCaracteristicas] = useState<string[]>([]);
   const [novaCaracteristica, setNovaCaracteristica] = useState('');
   const [imagens, setImagens] = useState<string[]>([]);
-  const [novaImagem, setNovaImagem] = useState('');
 
   const generateSlug = (text: string) => {
     return text
@@ -70,17 +70,6 @@ export default function PropriedadeVendaNova() {
 
   const removeCaracteristica = (index: number) => {
     setCaracteristicas(caracteristicas.filter((_, i) => i !== index));
-  };
-
-  const addImagem = () => {
-    if (novaImagem.trim()) {
-      setImagens([...imagens, novaImagem.trim()]);
-      setNovaImagem('');
-    }
-  };
-
-  const removeImagem = (index: number) => {
-    setImagens(imagens.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -363,35 +352,14 @@ export default function PropriedadeVendaNova() {
           <Card>
             <CardHeader>
               <CardTitle>Imagens</CardTitle>
-              <CardDescription>URLs das imagens da propriedade</CardDescription>
+              <CardDescription>Faça upload das fotos da propriedade</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex gap-2">
-                <Input
-                  value={novaImagem}
-                  onChange={(e) => setNovaImagem(e.target.value)}
-                  placeholder="Cole a URL da imagem"
-                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addImagem())}
-                />
-                <Button type="button" onClick={addImagem}>
-                  <Plus className="w-4 h-4" />
-                </Button>
-              </div>
-              <div className="space-y-2">
-                {imagens.map((url, index) => (
-                  <div key={index} className="flex items-center gap-2">
-                    <Input value={url} readOnly />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => removeImagem(index)}
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
+            <CardContent>
+              <ImageUploader
+                images={imagens}
+                onImagesChange={setImagens}
+                maxImages={10}
+              />
             </CardContent>
           </Card>
 
