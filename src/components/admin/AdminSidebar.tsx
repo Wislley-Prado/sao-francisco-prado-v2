@@ -14,7 +14,8 @@ import {
   HelpCircle,
   MessageSquare,
   MessageCircle,
-  BookOpen
+  BookOpen,
+  Landmark
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -24,6 +25,7 @@ const navigation = [
   { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
   { name: 'Ranchos', href: '/admin/ranchos', icon: Home },
   { name: 'Pacotes', href: '/admin/pacotes', icon: Package },
+  { name: 'Propriedades Venda', href: '/admin/propriedades-venda', icon: Landmark },
   { name: 'Avaliações', href: '/admin/avaliacoes', icon: Star },
   { name: 'Estatísticas', href: '/admin/estatisticas-avaliacoes', icon: TrendingUp },
   { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
