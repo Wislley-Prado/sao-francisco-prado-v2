@@ -2,6 +2,7 @@
 import React from 'react';
 import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
+import { AnunciosSection } from '@/components/AnunciosSection';
 import RanchosSection from '@/components/RanchosSection';
 import PackagesSection from '@/components/PackagesSection';
 import { PropriedadesVendaSection } from '@/components/PropriedadesVendaSection';
@@ -19,8 +20,10 @@ const Index = () => {
     <div className="min-h-screen">
       <Header />
       <HeroSection />
+      <AnunciosSection posicao="topo" />
       <RanchosSection />
       <PackagesSection />
+      <AnunciosSection posicao="meio" />
       <PropriedadesVendaSection />
       <BlogSection />
       <TestimonialsSection />
@@ -28,6 +31,7 @@ const Index = () => {
       <LunarCalendar />
       <WeatherDashboard />
       <DamInfo />
+      <AnunciosSection posicao="rodape" />
       <WhatsAppButton />
       <Footer />
     </div>

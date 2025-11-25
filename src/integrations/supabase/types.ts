@@ -14,6 +14,69 @@ export type Database = {
   }
   public: {
     Tables: {
+      anuncios: {
+        Row: {
+          ativo: boolean
+          cliques: number
+          created_at: string
+          data_fim: string | null
+          data_inicio: string | null
+          descricao: string | null
+          destaque: boolean
+          id: string
+          imagem_url: string
+          link_url: string | null
+          ordem: number
+          posicao: string
+          subtitulo: string | null
+          texto_botao: string | null
+          tipo: string
+          titulo: string
+          updated_at: string
+          visualizacoes: number
+        }
+        Insert: {
+          ativo?: boolean
+          cliques?: number
+          created_at?: string
+          data_fim?: string | null
+          data_inicio?: string | null
+          descricao?: string | null
+          destaque?: boolean
+          id?: string
+          imagem_url: string
+          link_url?: string | null
+          ordem?: number
+          posicao: string
+          subtitulo?: string | null
+          texto_botao?: string | null
+          tipo: string
+          titulo: string
+          updated_at?: string
+          visualizacoes?: number
+        }
+        Update: {
+          ativo?: boolean
+          cliques?: number
+          created_at?: string
+          data_fim?: string | null
+          data_inicio?: string | null
+          descricao?: string | null
+          destaque?: boolean
+          id?: string
+          imagem_url?: string
+          link_url?: string | null
+          ordem?: number
+          posicao?: string
+          subtitulo?: string | null
+          texto_botao?: string | null
+          tipo?: string
+          titulo?: string
+          updated_at?: string
+          visualizacoes?: number
+        }
+        Relationships: []
+      }
       avaliacoes: {
         Row: {
           comentario: string
