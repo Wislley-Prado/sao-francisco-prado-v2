@@ -15,7 +15,8 @@ import {
   MessageSquare,
   MessageCircle,
   BookOpen,
-  Landmark
+  Landmark,
+  Megaphone
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -26,6 +27,7 @@ const navigation = [
   { name: 'Ranchos', href: '/admin/ranchos', icon: Home },
   { name: 'Pacotes', href: '/admin/pacotes', icon: Package },
   { name: 'Propriedades Venda', href: '/admin/propriedades-venda', icon: Landmark },
+  { name: 'Anúncios', href: '/admin/anuncios', icon: Megaphone },
   { name: 'Avaliações', href: '/admin/avaliacoes', icon: Star },
   { name: 'Estatísticas', href: '/admin/estatisticas-avaliacoes', icon: TrendingUp },
   { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
