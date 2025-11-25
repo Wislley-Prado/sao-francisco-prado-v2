@@ -40,6 +40,7 @@ import AdminConfiguracoes from "./pages/admin/Configuracoes";
 import WhatsAppConfig from "./pages/admin/WhatsAppConfig";
 import WhatsAppAnalytics from "./pages/admin/WhatsAppAnalytics";
 import Ajuda from "./pages/admin/Ajuda";
+import ConfiguracoesVideos from "./pages/admin/ConfiguracoesVideos";
 import Anuncios from "./pages/admin/Anuncios";
 import AnuncioNovo from "./pages/admin/AnuncioNovo";
 import AnuncioEditar from "./pages/admin/AnuncioEditar";
@@ -132,6 +133,7 @@ const App = () => {
                   <Route path="configuracoes" element={<AdminConfiguracoes />} />
                   <Route path="whatsapp-config" element={<WhatsAppConfig />} />
                   <Route path="whatsapp-analytics" element={<WhatsAppAnalytics />} />
+                  <Route path="videos" element={<ConfiguracoesVideos />} />
                   <Route path="ajuda" element={<Ajuda />} />
                 </Route>
                 

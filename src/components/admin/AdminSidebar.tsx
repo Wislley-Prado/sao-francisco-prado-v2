@@ -15,7 +15,8 @@ import {
   MessageSquare,
   MessageCircle,
   BookOpen,
-  Megaphone
+  Megaphone,
+  Video
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -36,6 +37,7 @@ const navigation = [
   { name: 'WhatsApp Analytics', href: '/admin/whatsapp-analytics', icon: TrendingUp },
   { name: 'Manual', href: '/admin/ajuda', icon: BookOpen },
   { name: 'Configurações', href: '/admin/configuracoes', icon: Settings },
+  { name: 'Vídeos', href: '/admin/videos', icon: Video },
 ];
 
 export const AdminSidebar = () => {
