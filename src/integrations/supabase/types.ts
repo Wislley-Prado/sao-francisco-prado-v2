@@ -23,6 +23,7 @@ export type Database = {
           data_inicio: string | null
           descricao: string | null
           destaque: boolean
+          duracao_exibicao: number
           id: string
           imagem_url: string
           link_url: string | null
@@ -43,6 +44,7 @@ export type Database = {
           data_inicio?: string | null
           descricao?: string | null
           destaque?: boolean
+          duracao_exibicao?: number
           id?: string
           imagem_url: string
           link_url?: string | null
@@ -63,6 +65,7 @@ export type Database = {
           data_inicio?: string | null
           descricao?: string | null
           destaque?: boolean
+          duracao_exibicao?: number
           id?: string
           imagem_url?: string
           link_url?: string | null
