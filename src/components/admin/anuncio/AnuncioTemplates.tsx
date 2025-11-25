@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Check, Zap, Building2, Megaphone, Gift, TrendingUp, Clock } from 'lucide-react';
+import { Check, Zap, Building2, Megaphone, Gift, TrendingUp, Clock, Home } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface Template {
@@ -29,6 +29,24 @@ interface AnuncioTemplatesProps {
 }
 
 const templates: Template[] = [
+  {
+    id: 'imoveis-propriedades',
+    nome: 'Imóveis e Propriedades',
+    descricao: 'Para anunciar terrenos, ranchos e propriedades à venda',
+    icon: Home,
+    categoria: 'imoveis',
+    config: {
+      tipo: 'card_secundario',
+      posicao: 'meio',
+      duracao_exibicao: 12,
+      ordem: 5,
+      texto_botao: 'Ver Propriedade',
+    },
+    preview: {
+      cores: 'bg-gradient-to-r from-green-600 to-emerald-600',
+      exemplo: 'Card com foto, área, preço e localização',
+    },
+  },
   {
     id: 'promocao-flash',
     nome: 'Promoção Flash',
@@ -140,6 +158,7 @@ const templates: Template[] = [
 ];
 
 const categoriaLabels: Record<string, { label: string; color: string }> = {
+  imoveis: { label: 'Imóveis', color: 'bg-green-500/10 text-green-500 border-green-500/20' },
   promocional: { label: 'Promocional', color: 'bg-red-500/10 text-red-500 border-red-500/20' },
   institucional: { label: 'Institucional', color: 'bg-blue-500/10 text-blue-500 border-blue-500/20' },
   lancamento: { label: 'Lançamento', color: 'bg-purple-500/10 text-purple-500 border-purple-500/20' },
@@ -256,6 +275,7 @@ export function AnuncioTemplates({ onSelectTemplate, selectedTemplate }: Anuncio
         <div className="mt-6 p-4 bg-muted rounded-lg">
           <h4 className="font-semibold mb-2">Dicas de uso:</h4>
           <ul className="text-sm text-muted-foreground space-y-1">
+            <li>• <strong>Imóveis e Propriedades</strong>: Duração adequada para mostrar detalhes importantes (12s)</li>
             <li>• <strong>Promoções rápidas</strong>: Use durações curtas (5-7s) para criar urgência</li>
             <li>• <strong>Conteúdo institucional</strong>: Use durações longas (12-15s) para leitura completa</li>
             <li>• <strong>Posição topo</strong>: Melhor para anúncios de alta prioridade</li>
