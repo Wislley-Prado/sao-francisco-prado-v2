@@ -34,6 +34,11 @@ export default function AnuncioNovo() {
     duracao_exibicao: 8,
     data_inicio: '',
     data_fim: '',
+    // Campos específicos para imóveis
+    imovel_area: '',
+    imovel_unidade_area: 'm2',
+    imovel_preco: '',
+    imovel_localizacao: '',
   });
 
   const handleTemplateSelect = (config: any) => {
@@ -75,6 +80,11 @@ export default function AnuncioNovo() {
         duracao_exibicao: formData.duracao_exibicao,
         data_inicio: formData.data_inicio || null,
         data_fim: formData.data_fim || null,
+        // Campos de imóveis (nullable)
+        imovel_area: formData.imovel_area ? parseFloat(formData.imovel_area) : null,
+        imovel_unidade_area: formData.imovel_area ? formData.imovel_unidade_area : null,
+        imovel_preco: formData.imovel_preco ? parseFloat(formData.imovel_preco) : null,
+        imovel_localizacao: formData.imovel_localizacao || null,
       });
 
       if (error) throw error;
@@ -230,6 +240,87 @@ export default function AnuncioNovo() {
                 rows={4}
               />
             </div>
+
+            {/* Campos específicos para anúncios de imóveis */}
+            <Card className="border-2 border-dashed border-muted-foreground/20">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Switch
+                    checked={!!formData.imovel_area || !!formData.imovel_preco}
+                    onCheckedChange={(checked) => {
+                      if (!checked) {
+                        setFormData({
+                          ...formData,
+                          imovel_area: '',
+                          imovel_preco: '',
+                          imovel_localizacao: '',
+                        });
+                      }
+                    }}
+                  />
+                  Informações de Imóvel (opcional)
+                </CardTitle>
+                <CardDescription>
+                  Adicione detalhes específicos se este anúncio for de uma propriedade ou terreno
+                </CardDescription>
+              </CardHeader>
+              {(formData.imovel_area || formData.imovel_preco || formData.imovel_localizacao) && (
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="imovel_area">Área</Label>
+                      <Input
+                        id="imovel_area"
+                        type="number"
+                        step="0.01"
+                        value={formData.imovel_area}
+                        onChange={(e) => setFormData({ ...formData, imovel_area: e.target.value })}
+                        placeholder="1000"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="imovel_unidade_area">Unidade</Label>
+                      <Select 
+                        value={formData.imovel_unidade_area} 
+                        onValueChange={(value) => setFormData({ ...formData, imovel_unidade_area: value })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="m2">m² (metros quadrados)</SelectItem>
+                          <SelectItem value="hectares">Hectares</SelectItem>
+                          <SelectItem value="alqueires">Alqueires</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="imovel_preco">Preço (R$)</Label>
+                      <Input
+                        id="imovel_preco"
+                        type="number"
+                        step="0.01"
+                        value={formData.imovel_preco}
+                        onChange={(e) => setFormData({ ...formData, imovel_preco: e.target.value })}
+                        placeholder="150000"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="imovel_localizacao">Localização</Label>
+                    <Input
+                      id="imovel_localizacao"
+                      value={formData.imovel_localizacao}
+                      onChange={(e) => setFormData({ ...formData, imovel_localizacao: e.target.value })}
+                      placeholder="Ex: Velho Chico, Prado - MG"
+                    />
+                  </div>
+                </CardContent>
+              )}
+            </Card>
 
             <ImageUploader
               value={formData.imagem_url}
