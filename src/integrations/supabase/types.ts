@@ -26,6 +26,10 @@ export type Database = {
           duracao_exibicao: number
           id: string
           imagem_url: string
+          imovel_area: number | null
+          imovel_localizacao: string | null
+          imovel_preco: number | null
+          imovel_unidade_area: string | null
           link_url: string | null
           ordem: number
           posicao: string
@@ -47,6 +51,10 @@ export type Database = {
           duracao_exibicao?: number
           id?: string
           imagem_url: string
+          imovel_area?: number | null
+          imovel_localizacao?: string | null
+          imovel_preco?: number | null
+          imovel_unidade_area?: string | null
           link_url?: string | null
           ordem?: number
           posicao: string
@@ -68,6 +76,10 @@ export type Database = {
           duracao_exibicao?: number
           id?: string
           imagem_url?: string
+          imovel_area?: number | null
+          imovel_localizacao?: string | null
+          imovel_preco?: number | null
+          imovel_unidade_area?: string | null
           link_url?: string | null
           ordem?: number
           posicao?: string

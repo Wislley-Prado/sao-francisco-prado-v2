@@ -2,7 +2,8 @@ import { useEffect, useState, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { ExternalLink, ChevronLeft, ChevronRight, Pause, Play, MapPin, Ruler, DollarSign } from 'lucide-react';
 
 interface Anuncio {
   id: string;
@@ -17,6 +18,11 @@ interface Anuncio {
   cliques: number;
   visualizacoes: number;
   duracao_exibicao: number;
+  // Campos de imóveis
+  imovel_area: number | null;
+  imovel_unidade_area: string | null;
+  imovel_preco: number | null;
+  imovel_localizacao: string | null;
 }
 
 interface AnunciosSectionProps {
@@ -199,6 +205,8 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
 
     // Card Secundário
     if (anuncio.tipo === 'card_secundario') {
+      const hasImovelInfo = anuncio.imovel_area || anuncio.imovel_preco || anuncio.imovel_localizacao;
+      
       return (
         <Card
           className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
@@ -211,6 +219,13 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
                 alt={anuncio.titulo}
                 className="w-full h-full object-cover"
               />
+              {hasImovelInfo && (
+                <div className="absolute top-4 left-4">
+                  <Badge className="bg-green-600 hover:bg-green-700">
+                    Imóvel
+                  </Badge>
+                </div>
+              )}
             </div>
             <CardContent className="p-8 flex flex-col justify-center">
               {anuncio.subtitulo && (
@@ -218,8 +233,37 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
               )}
               <h3 className="text-3xl font-bold mb-4">{anuncio.titulo}</h3>
               {anuncio.descricao && (
-                <p className="text-muted-foreground mb-6">{anuncio.descricao}</p>
+                <p className="text-muted-foreground mb-4">{anuncio.descricao}</p>
               )}
+              
+              {/* Informações de imóvel */}
+              {hasImovelInfo && (
+                <div className="grid grid-cols-1 gap-2 mb-4 p-4 bg-muted/50 rounded-lg">
+                  {anuncio.imovel_area && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <Ruler className="w-4 h-4 text-primary" />
+                      <span className="font-medium">
+                        {anuncio.imovel_area.toLocaleString('pt-BR')} {anuncio.imovel_unidade_area === 'm2' ? 'm²' : anuncio.imovel_unidade_area}
+                      </span>
+                    </div>
+                  )}
+                  {anuncio.imovel_preco && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <DollarSign className="w-4 h-4 text-primary" />
+                      <span className="font-bold text-lg">
+                        R$ {anuncio.imovel_preco.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                  )}
+                  {anuncio.imovel_localizacao && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <MapPin className="w-4 h-4 text-primary" />
+                      <span>{anuncio.imovel_localizacao}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+              
               <Button className="w-fit">
                 {anuncio.texto_botao}
                 <ExternalLink className="w-4 h-4 ml-2" />
