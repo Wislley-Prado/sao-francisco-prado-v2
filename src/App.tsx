@@ -40,6 +40,9 @@ import AdminConfiguracoes from "./pages/admin/Configuracoes";
 import WhatsAppConfig from "./pages/admin/WhatsAppConfig";
 import WhatsAppAnalytics from "./pages/admin/WhatsAppAnalytics";
 import Ajuda from "./pages/admin/Ajuda";
+import PropriedadesVenda from "./pages/admin/PropriedadesVenda";
+import PropriedadeVendaNova from "./pages/admin/PropriedadeVendaNova";
+import PropriedadeVendaEditar from "./pages/admin/PropriedadeVendaEditar";
 import AdminAvaliacoes from "./pages/admin/Avaliacoes";
 import EstatisticasAvaliacoes from "./pages/admin/EstatisticasAvaliacoes";
 import AdminAnalytics from "./pages/admin/Analytics";
@@ -123,6 +126,9 @@ const App = () => {
                   <Route path="depoimentos" element={<Depoimentos />} />
                   <Route path="depoimentos/novo" element={<DepoimentoNovo />} />
                   <Route path="depoimentos/editar/:id" element={<DepoimentoEditar />} />
+                  <Route path="propriedades-venda" element={<PropriedadesVenda />} />
+                  <Route path="propriedades-venda/novo" element={<PropriedadeVendaNova />} />
+                  <Route path="propriedades-venda/editar/:id" element={<PropriedadeVendaEditar />} />
                   <Route path="configuracoes" element={<AdminConfiguracoes />} />
                   <Route path="whatsapp-config" element={<WhatsAppConfig />} />
                   <Route path="whatsapp-analytics" element={<WhatsAppAnalytics />} />

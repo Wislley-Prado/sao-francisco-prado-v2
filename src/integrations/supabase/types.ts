@@ -627,6 +627,75 @@ export type Database = {
           },
         ]
       }
+      propriedades_venda: {
+        Row: {
+          area: number | null
+          ativo: boolean
+          caracteristicas: string[] | null
+          created_at: string
+          descricao: string | null
+          destaque: boolean
+          id: string
+          imagens: string[] | null
+          latitude: number | null
+          localizacao: string
+          longitude: number | null
+          ordem: number
+          preco: number
+          slug: string
+          telefone_contato: string | null
+          tipo: string
+          titulo: string
+          unidade_area: string | null
+          updated_at: string
+          whatsapp_contato: string | null
+        }
+        Insert: {
+          area?: number | null
+          ativo?: boolean
+          caracteristicas?: string[] | null
+          created_at?: string
+          descricao?: string | null
+          destaque?: boolean
+          id?: string
+          imagens?: string[] | null
+          latitude?: number | null
+          localizacao: string
+          longitude?: number | null
+          ordem?: number
+          preco: number
+          slug: string
+          telefone_contato?: string | null
+          tipo: string
+          titulo: string
+          unidade_area?: string | null
+          updated_at?: string
+          whatsapp_contato?: string | null
+        }
+        Update: {
+          area?: number | null
+          ativo?: boolean
+          caracteristicas?: string[] | null
+          created_at?: string
+          descricao?: string | null
+          destaque?: boolean
+          id?: string
+          imagens?: string[] | null
+          latitude?: number | null
+          localizacao?: string
+          longitude?: number | null
+          ordem?: number
+          preco?: number
+          slug?: string
+          telefone_contato?: string | null
+          tipo?: string
+          titulo?: string
+          unidade_area?: string | null
+          updated_at?: string
+          whatsapp_contato?: string | null
+        }
+        Relationships: []
+      }
       rancho_analytics: {
         Row: {
           created_at: string
