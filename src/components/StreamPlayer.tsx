@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Loader2, Radio, RefreshCw } from 'lucide-react';
 import { useViewerCount } from '@/hooks/useViewerCount';
+import { useVideoSettings, extractYouTubeId } from '@/hooks/useVideoSettings';
 import { Button } from '@/components/ui/button';
 
 const StreamPlayer = () => {
@@ -9,6 +10,13 @@ const StreamPlayer = () => {
   const [quality] = useState('720p');
   const [cacheKey, setCacheKey] = useState(Date.now());
   const { currentViewers } = useViewerCount();
+  const { settings } = useVideoSettings();
+
+  // Default video ID if no URL is configured
+  const defaultVideoId = 'Hf_CBJtawfk';
+  const videoId = settings?.youtube_live_url 
+    ? extractYouTubeId(settings.youtube_live_url) 
+    : defaultVideoId;
 
   const handleRefresh = () => {
     console.log('Atualizando stream...');
@@ -32,13 +40,12 @@ const StreamPlayer = () => {
       <iframe
         key={cacheKey}
         className="w-full h-full"
-        src={`https://www.youtube.com/embed/Hf_CBJtawfk?autoplay=1&mute=1&controls=1&rel=0&modestbranding=1&showinfo=0&enablejsapi=1&t=${cacheKey}`}
+        src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=1&rel=0&modestbranding=1&showinfo=0&enablejsapi=1&t=${cacheKey}`}
         title="Rio São Francisco - Transmissão ao Vivo"
         frameBorder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
         allowFullScreen
         onLoad={() => {
-          console.log('YouTube iframe carregado com sucesso');
           setIsLoading(false);
         }}
       />

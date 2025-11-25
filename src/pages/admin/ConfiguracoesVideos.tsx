@@ -1,0 +1,206 @@
+import { useState, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Loader2, Video, Radio, Film } from 'lucide-react';
+import { useVideoSettings, extractYouTubeId, isValidYouTubeUrl } from '@/hooks/useVideoSettings';
+import { YouTubePreview } from '@/components/YouTubePlayer';
+
+const ConfiguracoesVideos = () => {
+  const { settings, isLoading, updateSettings, isUpdating } = useVideoSettings();
+  const [liveUrl, setLiveUrl] = useState('');
+  const [videoUrl, setVideoUrl] = useState('');
+  const [liveUrlError, setLiveUrlError] = useState('');
+  const [videoUrlError, setVideoUrlError] = useState('');
+
+  useEffect(() => {
+    if (settings) {
+      setLiveUrl(settings.youtube_live_url || '');
+      setVideoUrl(settings.youtube_video_url || '');
+    }
+  }, [settings]);
+
+  const validateLiveUrl = (url: string) => {
+    if (url && !isValidYouTubeUrl(url)) {
+      setLiveUrlError('URL do YouTube inválida');
+      return false;
+    }
+    setLiveUrlError('');
+    return true;
+  };
+
+  const validateVideoUrl = (url: string) => {
+    if (url && !isValidYouTubeUrl(url)) {
+      setVideoUrlError('URL do YouTube inválida');
+      return false;
+    }
+    setVideoUrlError('');
+    return true;
+  };
+
+  const handleSave = () => {
+    const isLiveValid = validateLiveUrl(liveUrl);
+    const isVideoValid = validateVideoUrl(videoUrl);
+
+    if (!isLiveValid || !isVideoValid) {
+      return;
+    }
+
+    updateSettings({
+      youtube_live_url: liveUrl || null,
+      youtube_video_url: videoUrl || null,
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  const liveVideoId = extractYouTubeId(liveUrl);
+  const videoId = extractYouTubeId(videoUrl);
+
+  return (
+    <div className="container mx-auto py-8 px-4 max-w-6xl">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold mb-2">Configurações de Vídeos</h1>
+        <p className="text-muted-foreground">
+          Configure as URLs dos vídeos do YouTube do Rio São Francisco
+        </p>
+      </div>
+
+      <div className="grid gap-6">
+        {/* Live Stream Configuration */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Radio className="h-5 w-5 text-red-500" />
+              Transmissão ao Vivo
+            </CardTitle>
+            <CardDescription>
+              URL da live do YouTube que será exibida na página de transmissão ao vivo
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="live-url">URL da Live no YouTube</Label>
+              <Input
+                id="live-url"
+                type="url"
+                placeholder="https://www.youtube.com/watch?v=..."
+                value={liveUrl}
+                onChange={(e) => {
+                  setLiveUrl(e.target.value);
+                  validateLiveUrl(e.target.value);
+                }}
+                className={liveUrlError ? 'border-destructive' : ''}
+              />
+              {liveUrlError && (
+                <p className="text-sm text-destructive">{liveUrlError}</p>
+              )}
+              <p className="text-sm text-muted-foreground">
+                Formatos aceitos: youtube.com/watch?v=..., youtu.be/..., youtube.com/shorts/...
+              </p>
+            </div>
+
+            {liveVideoId && (
+              <div className="space-y-2">
+                <Label>Preview da Live</Label>
+                <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
+                  <iframe
+                    className="w-full h-full"
+                    src={`https://www.youtube.com/embed/${liveVideoId}?autoplay=0&mute=1`}
+                    title="Preview da Live"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Recorded Video Configuration */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Film className="h-5 w-5" />
+              Vídeo Gravado
+            </CardTitle>
+            <CardDescription>
+              URL do vídeo gravado do YouTube do Rio São Francisco
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="video-url">URL do Vídeo Gravado</Label>
+              <Input
+                id="video-url"
+                type="url"
+                placeholder="https://www.youtube.com/watch?v=..."
+                value={videoUrl}
+                onChange={(e) => {
+                  setVideoUrl(e.target.value);
+                  validateVideoUrl(e.target.value);
+                }}
+                className={videoUrlError ? 'border-destructive' : ''}
+              />
+              {videoUrlError && (
+                <p className="text-sm text-destructive">{videoUrlError}</p>
+              )}
+              <p className="text-sm text-muted-foreground">
+                Este vídeo pode ser usado em outras páginas do site
+              </p>
+            </div>
+
+            {videoId && (
+              <div className="space-y-2">
+                <Label>Preview do Vídeo</Label>
+                <YouTubePreview videoUrl={videoUrl} />
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Save Button */}
+        <div className="flex justify-end gap-4">
+          <Button
+            variant="outline"
+            onClick={() => {
+              setLiveUrl(settings?.youtube_live_url || '');
+              setVideoUrl(settings?.youtube_video_url || '');
+              setLiveUrlError('');
+              setVideoUrlError('');
+            }}
+            disabled={isUpdating}
+          >
+            Cancelar
+          </Button>
+          <Button
+            onClick={handleSave}
+            disabled={isUpdating || !!liveUrlError || !!videoUrlError}
+          >
+            {isUpdating ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Salvando...
+              </>
+            ) : (
+              <>
+                <Video className="mr-2 h-4 w-4" />
+                Salvar Configurações
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ConfiguracoesVideos;

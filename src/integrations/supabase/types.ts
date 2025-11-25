@@ -958,6 +958,8 @@ export type Database = {
           whatsapp_opcoes: Json | null
           whatsapp_saudacao: string | null
           whatsapp_titulo: string | null
+          youtube_live_url: string | null
+          youtube_video_url: string | null
         }
         Insert: {
           created_at?: string
@@ -974,6 +976,8 @@ export type Database = {
           whatsapp_opcoes?: Json | null
           whatsapp_saudacao?: string | null
           whatsapp_titulo?: string | null
+          youtube_live_url?: string | null
+          youtube_video_url?: string | null
         }
         Update: {
           created_at?: string
@@ -990,6 +994,8 @@ export type Database = {
           whatsapp_opcoes?: Json | null
           whatsapp_saudacao?: string | null
           whatsapp_titulo?: string | null
+          youtube_live_url?: string | null
+          youtube_video_url?: string | null
         }
         Relationships: []
       }
