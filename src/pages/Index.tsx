@@ -5,7 +5,6 @@ import HeroSection from '@/components/HeroSection';
 import { AnunciosSection } from '@/components/AnunciosSection';
 import RanchosSection from '@/components/RanchosSection';
 import PackagesSection from '@/components/PackagesSection';
-import { PropriedadesVendaSection } from '@/components/PropriedadesVendaSection';
 import BlogSection from '@/components/BlogSection';
 import LunarCalendar from '@/components/LunarCalendar';
 import DamInfo from '@/components/DamInfo';
@@ -24,7 +23,6 @@ const Index = () => {
       <RanchosSection />
       <PackagesSection />
       <AnunciosSection posicao="meio" />
-      <PropriedadesVendaSection />
       <BlogSection />
       <TestimonialsSection />
       <FAQSection />
