@@ -39,6 +39,7 @@ import BlogAnalytics from "./pages/admin/BlogAnalytics";
 import AdminConfiguracoes from "./pages/admin/Configuracoes";
 import WhatsAppConfig from "./pages/admin/WhatsAppConfig";
 import WhatsAppAnalytics from "./pages/admin/WhatsAppAnalytics";
+import Ajuda from "./pages/admin/Ajuda";
 import AdminAvaliacoes from "./pages/admin/Avaliacoes";
 import EstatisticasAvaliacoes from "./pages/admin/EstatisticasAvaliacoes";
 import AdminAnalytics from "./pages/admin/Analytics";
@@ -125,6 +126,7 @@ const App = () => {
                   <Route path="configuracoes" element={<AdminConfiguracoes />} />
                   <Route path="whatsapp-config" element={<WhatsAppConfig />} />
                   <Route path="whatsapp-analytics" element={<WhatsAppAnalytics />} />
+                  <Route path="ajuda" element={<Ajuda />} />
                 </Route>
                 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
