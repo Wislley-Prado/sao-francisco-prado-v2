@@ -16,6 +16,7 @@ interface Anuncio {
   posicao: string;
   cliques: number;
   visualizacoes: number;
+  duracao_exibicao: number;
 }
 
 interface AnunciosSectionProps {
@@ -28,27 +29,49 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [progress, setProgress] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  
-  const ROTATION_INTERVAL = 8000; // 8 segundos
+  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     fetchAnuncios();
   }, [posicao]);
 
-  // Auto-rotation effect
+  // Auto-rotation effect with individual timing
   useEffect(() => {
     if (anuncios.length <= 1 || isPaused) {
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+      }
       return;
     }
 
-    intervalRef.current = setInterval(() => {
+    const currentAnuncio = anuncios[currentIndex];
+    const duration = (currentAnuncio?.duracao_exibicao || 8) * 1000;
+    
+    // Reset progress
+    setProgress(0);
+
+    // Progress animation (update every 100ms)
+    const progressStep = 100 / (duration / 100);
+    progressIntervalRef.current = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) return 100;
+        return prev + progressStep;
+      });
+    }, 100);
+
+    // Auto advance to next slide
+    intervalRef.current = setTimeout(() => {
       handleNext();
-    }, ROTATION_INTERVAL);
+    }, duration);
 
     return () => {
       if (intervalRef.current) {
-        clearInterval(intervalRef.current);
+        clearTimeout(intervalRef.current);
+      }
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
       }
     };
   }, [anuncios.length, currentIndex, isPaused]);
@@ -109,6 +132,7 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
   const handleNext = () => {
     if (isTransitioning) return;
     setIsTransitioning(true);
+    setProgress(0);
     setCurrentIndex((prev) => (prev + 1) % anuncios.length);
     setTimeout(() => setIsTransitioning(false), 500);
   };
@@ -116,6 +140,7 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
   const handlePrev = () => {
     if (isTransitioning) return;
     setIsTransitioning(true);
+    setProgress(0);
     setCurrentIndex((prev) => (prev - 1 + anuncios.length) % anuncios.length);
     setTimeout(() => setIsTransitioning(false), 500);
   };
@@ -123,6 +148,7 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
   const goToSlide = (index: number) => {
     if (isTransitioning || index === currentIndex) return;
     setIsTransitioning(true);
+    setProgress(0);
     setCurrentIndex(index);
     setTimeout(() => setIsTransitioning(false), 500);
   };
@@ -284,20 +310,31 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
 
             {/* Indicadores de slide (pontos) */}
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-10">
-              {anuncios.map((_, index) => (
+              {anuncios.map((anuncio, index) => (
                 <button
                   key={index}
                   onClick={(e) => {
                     e.stopPropagation();
                     goToSlide(index);
                   }}
-                  className={`h-2 rounded-full transition-all ${
+                  className={`h-2 rounded-full transition-all relative overflow-hidden ${
                     index === currentIndex 
-                      ? 'w-8 bg-primary' 
+                      ? 'w-8' 
                       : 'w-2 bg-white/50 hover:bg-white/80'
                   }`}
                   aria-label={`Ir para anúncio ${index + 1}`}
-                />
+                  title={`${anuncio.titulo} (${anuncio.duracao_exibicao}s)`}
+                >
+                  {index === currentIndex && (
+                    <>
+                      <div className="absolute inset-0 bg-white/30" />
+                      <div 
+                        className="absolute inset-0 bg-primary transition-all ease-linear"
+                        style={{ width: `${progress}%` }}
+                      />
+                    </>
+                  )}
+                </button>
               ))}
               
               {/* Botão de Pause/Play */}
@@ -309,6 +346,7 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
                   e.stopPropagation();
                   setIsPaused(!isPaused);
                 }}
+                title={isPaused ? 'Retomar rotação' : 'Pausar rotação'}
               >
                 {isPaused ? (
                   <Play className="w-3 h-3" />
@@ -321,6 +359,7 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
             {/* Contador de anúncios */}
             <div className="absolute top-4 right-4 bg-black/50 text-white px-3 py-1 rounded-full text-sm z-10">
               {currentIndex + 1} / {anuncios.length}
+              <span className="ml-2 text-white/70">({currentAnuncio.duracao_exibicao}s)</span>
             </div>
           </>
         )}

@@ -30,6 +30,7 @@ export default function AnuncioEditar() {
     ativo: true,
     destaque: false,
     ordem: 0,
+    duracao_exibicao: 8,
     data_inicio: '',
     data_fim: '',
   });
@@ -61,6 +62,7 @@ export default function AnuncioEditar() {
           ativo: data.ativo,
           destaque: data.destaque,
           ordem: data.ordem,
+          duracao_exibicao: data.duracao_exibicao || 8,
           data_inicio: data.data_inicio ? data.data_inicio.split('T')[0] : '',
           data_fim: data.data_fim ? data.data_fim.split('T')[0] : '',
         });
@@ -99,6 +101,7 @@ export default function AnuncioEditar() {
           ativo: formData.ativo,
           destaque: formData.destaque,
           ordem: formData.ordem,
+          duracao_exibicao: formData.duracao_exibicao,
           data_inicio: formData.data_inicio || null,
           data_fim: formData.data_fim || null,
         })
@@ -201,7 +204,7 @@ export default function AnuncioEditar() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="tipo">Tipo</Label>
                 <Select value={formData.tipo} onValueChange={(value) => setFormData({ ...formData, tipo: value })}>
@@ -240,6 +243,22 @@ export default function AnuncioEditar() {
                   onChange={(e) => setFormData({ ...formData, ordem: parseInt(e.target.value) || 0 })}
                   min="0"
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="duracao_exibicao">Duração (segundos)</Label>
+                <Input
+                  id="duracao_exibicao"
+                  type="number"
+                  value={formData.duracao_exibicao}
+                  onChange={(e) => setFormData({ ...formData, duracao_exibicao: parseInt(e.target.value) || 8 })}
+                  min="3"
+                  max="60"
+                  placeholder="8"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Tempo que o anúncio fica visível na rotação (3-60s)
+                </p>
               </div>
             </div>
 
