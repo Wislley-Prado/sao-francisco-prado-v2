@@ -11,13 +11,16 @@ const ConfiguracoesVideos = () => {
   const { settings, isLoading, updateSettings, isUpdating } = useVideoSettings();
   const [liveUrl, setLiveUrl] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
+  const [institucionalUrl, setInstitucionalUrl] = useState('');
   const [liveUrlError, setLiveUrlError] = useState('');
   const [videoUrlError, setVideoUrlError] = useState('');
+  const [institucionalUrlError, setInstitucionalUrlError] = useState('');
 
   useEffect(() => {
     if (settings) {
       setLiveUrl(settings.youtube_live_url || '');
       setVideoUrl(settings.youtube_video_url || '');
+      setInstitucionalUrl(settings.youtube_institucional_url || '');
     }
   }, [settings]);
 
@@ -39,17 +42,28 @@ const ConfiguracoesVideos = () => {
     return true;
   };
 
+  const validateInstitucionalUrl = (url: string) => {
+    if (url && !isValidYouTubeUrl(url)) {
+      setInstitucionalUrlError('URL do YouTube inválida');
+      return false;
+    }
+    setInstitucionalUrlError('');
+    return true;
+  };
+
   const handleSave = () => {
     const isLiveValid = validateLiveUrl(liveUrl);
     const isVideoValid = validateVideoUrl(videoUrl);
+    const isInstitucionalValid = validateInstitucionalUrl(institucionalUrl);
 
-    if (!isLiveValid || !isVideoValid) {
+    if (!isLiveValid || !isVideoValid || !isInstitucionalValid) {
       return;
     }
 
     updateSettings({
       youtube_live_url: liveUrl || null,
       youtube_video_url: videoUrl || null,
+      youtube_institucional_url: institucionalUrl || null,
     });
   };
 
@@ -63,6 +77,7 @@ const ConfiguracoesVideos = () => {
 
   const liveVideoId = extractYouTubeId(liveUrl);
   const videoId = extractYouTubeId(videoUrl);
+  const institucionalVideoId = extractYouTubeId(institucionalUrl);
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-6xl">
@@ -167,6 +182,48 @@ const ConfiguracoesVideos = () => {
           </CardContent>
         </Card>
 
+        {/* Institutional Video Configuration */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Video className="h-5 w-5" />
+              Vídeo Institucional
+            </CardTitle>
+            <CardDescription>
+              URL do vídeo institucional/apresentação do Rancho Prado
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="institucional-url">URL do Vídeo Institucional</Label>
+              <Input
+                id="institucional-url"
+                type="url"
+                placeholder="https://www.youtube.com/watch?v=..."
+                value={institucionalUrl}
+                onChange={(e) => {
+                  setInstitucionalUrl(e.target.value);
+                  validateInstitucionalUrl(e.target.value);
+                }}
+                className={institucionalUrlError ? 'border-destructive' : ''}
+              />
+              {institucionalUrlError && (
+                <p className="text-sm text-destructive">{institucionalUrlError}</p>
+              )}
+              <p className="text-sm text-muted-foreground">
+                Vídeo de apresentação do rancho para ser usado na página inicial e outras seções
+              </p>
+            </div>
+
+            {institucionalVideoId && (
+              <div className="space-y-2">
+                <Label>Preview do Vídeo</Label>
+                <YouTubePreview videoUrl={institucionalUrl} />
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Save Button */}
         <div className="flex justify-end gap-4">
           <Button
@@ -174,8 +231,10 @@ const ConfiguracoesVideos = () => {
             onClick={() => {
               setLiveUrl(settings?.youtube_live_url || '');
               setVideoUrl(settings?.youtube_video_url || '');
+              setInstitucionalUrl(settings?.youtube_institucional_url || '');
               setLiveUrlError('');
               setVideoUrlError('');
+              setInstitucionalUrlError('');
             }}
             disabled={isUpdating}
           >
@@ -183,7 +242,7 @@ const ConfiguracoesVideos = () => {
           </Button>
           <Button
             onClick={handleSave}
-            disabled={isUpdating || !!liveUrlError || !!videoUrlError}
+            disabled={isUpdating || !!liveUrlError || !!videoUrlError || !!institucionalUrlError}
           >
             {isUpdating ? (
               <>
