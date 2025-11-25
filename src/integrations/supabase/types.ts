@@ -958,6 +958,7 @@ export type Database = {
           whatsapp_opcoes: Json | null
           whatsapp_saudacao: string | null
           whatsapp_titulo: string | null
+          youtube_institucional_url: string | null
           youtube_live_url: string | null
           youtube_video_url: string | null
         }
@@ -976,6 +977,7 @@ export type Database = {
           whatsapp_opcoes?: Json | null
           whatsapp_saudacao?: string | null
           whatsapp_titulo?: string | null
+          youtube_institucional_url?: string | null
           youtube_live_url?: string | null
           youtube_video_url?: string | null
         }
@@ -994,6 +996,7 @@ export type Database = {
           whatsapp_opcoes?: Json | null
           whatsapp_saudacao?: string | null
           whatsapp_titulo?: string | null
+          youtube_institucional_url?: string | null
           youtube_live_url?: string | null
           youtube_video_url?: string | null
         }

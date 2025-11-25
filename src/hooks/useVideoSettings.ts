@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 export interface VideoSettings {
   youtube_live_url: string | null;
   youtube_video_url: string | null;
+  youtube_institucional_url: string | null;
 }
 
 export const useVideoSettings = () => {
@@ -15,7 +16,7 @@ export const useVideoSettings = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('site_settings')
-        .select('youtube_live_url, youtube_video_url')
+        .select('youtube_live_url, youtube_video_url, youtube_institucional_url')
         .single();
 
       if (error) throw error;
