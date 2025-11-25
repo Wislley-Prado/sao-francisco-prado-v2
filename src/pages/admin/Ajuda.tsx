@@ -22,7 +22,10 @@ import {
   CheckCircle,
   XCircle,
   ExternalLink,
-  Download
+  Download,
+  ShieldAlert,
+  Building2,
+  MapPin
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -596,6 +599,159 @@ const Ajuda = () => {
           <Badge variant="secondary">Marketing e Análise</Badge>
         </div>
       )
+    },
+    {
+      id: 'anuncios',
+      icon: Building2,
+      title: 'Anúncios',
+      color: 'text-blue-600',
+      content: (
+        <div className="space-y-4">
+          <p className="text-muted-foreground">
+            Crie e gerencie anúncios de imóveis, pacotes ou outras ofertas para exibição no site.
+          </p>
+          <div className="space-y-2">
+            <h4 className="font-semibold flex items-center gap-2">
+              <Edit className="w-4 h-4" /> Criar Novo Anúncio:
+            </h4>
+            <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground">
+              <li>Clique em "Novo Anúncio"</li>
+              <li>Escolha um template pré-configurado ou configure manualmente</li>
+              <li>Preencha título (obrigatório) e subtítulo</li>
+              <li>Adicione descrição detalhada do anúncio</li>
+              <li>Faça upload da imagem principal</li>
+              <li>Configure link de destino e texto do botão</li>
+              <li>Defina período de exibição (data início e fim)</li>
+              <li>Configure duração de exibição em rotações (3-60 segundos)</li>
+            </ol>
+          </div>
+          <div className="space-y-2">
+            <h4 className="font-semibold flex items-center gap-2">
+              <Building2 className="w-4 h-4" /> Anúncios de Imóveis:
+            </h4>
+            <p className="text-sm text-muted-foreground mb-2">
+              Para anúncios de propriedades ou terrenos, ative a opção "Informações de Imóvel":
+            </p>
+            <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+              <li><strong>Área:</strong> Tamanho da propriedade (m², hectares ou alqueires)</li>
+              <li><strong>Preço:</strong> Valor de venda ou aluguel em reais</li>
+              <li><strong>Localização:</strong> Endereço ou região (ex: "Velho Chico, Prado - MG")</li>
+              <li>Essas informações aparecem como badges destacados no card do anúncio</li>
+            </ul>
+          </div>
+          <div className="space-y-2">
+            <h4 className="font-semibold">Tipos de Anúncios:</h4>
+            <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+              <li><strong>Banner Principal:</strong> Destaque no topo da página</li>
+              <li><strong>Card Secundário:</strong> Cards menores em grid</li>
+              <li><strong>Largura Total:</strong> Anúncio que ocupa toda a largura</li>
+            </ul>
+          </div>
+          <div className="space-y-2">
+            <h4 className="font-semibold">Posicionamento:</h4>
+            <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+              <li><strong>Topo:</strong> Primeira seção da página</li>
+              <li><strong>Meio:</strong> Entre conteúdos principais</li>
+              <li><strong>Rodapé:</strong> Antes do footer</li>
+              <li><strong>Lateral:</strong> Sidebar (se disponível)</li>
+            </ul>
+          </div>
+          <div className="space-y-2">
+            <h4 className="font-semibold flex items-center gap-2">
+              <Eye className="w-4 h-4" /> Analytics de Anúncios:
+            </h4>
+            <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+              <li>Visualizações: quantas vezes o anúncio foi exibido</li>
+              <li>Cliques: interações com o botão/link do anúncio</li>
+              <li>CTR (Click-through rate): taxa de conversão de visualizações em cliques</li>
+            </ul>
+          </div>
+          <Badge variant="secondary">Promoção e Vendas</Badge>
+        </div>
+      )
+    },
+    {
+      id: 'seguranca',
+      icon: ShieldAlert,
+      title: 'Segurança e Boas Práticas',
+      color: 'text-red-600',
+      content: (
+        <div className="space-y-4">
+          <p className="text-muted-foreground">
+            Diretrizes de segurança e boas práticas para manter o sistema protegido.
+          </p>
+          <div className="space-y-2">
+            <h4 className="font-semibold flex items-center gap-2">
+              <ShieldAlert className="w-4 h-4" /> Proteções Implementadas:
+            </h4>
+            <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+              <li><strong>RLS (Row Level Security):</strong> Todas as tabelas protegidas com políticas de acesso</li>
+              <li><strong>Autenticação Admin:</strong> Verificação server-side de permissões de administrador</li>
+              <li><strong>Sanitização HTML:</strong> Conteúdo do blog sanitizado contra XSS com DOMPurify</li>
+              <li><strong>Validação de Formulários:</strong> Schemas Zod validam entradas de usuários</li>
+              <li><strong>Edge Functions Seguras:</strong> Funções serverless com validação de role</li>
+            </ul>
+          </div>
+          <div className="space-y-2">
+            <h4 className="font-semibold flex items-center gap-2">
+              <Settings className="w-4 h-4" /> Boas Práticas - Tracking Scripts:
+            </h4>
+            <div className="bg-yellow-500/10 border border-yellow-500/20 p-3 rounded-lg space-y-2">
+              <p className="text-sm text-yellow-700 dark:text-yellow-500">
+                <strong>⚠️ Validação de Códigos:</strong>
+              </p>
+              <ul className="list-disc list-inside space-y-1 text-xs text-yellow-700 dark:text-yellow-500">
+                <li>Facebook Pixel: deve ter 15-16 dígitos numéricos</li>
+                <li>Google Analytics: formato G-XXXXXXXXXX</li>
+                <li>Google Tag Manager: formato GTM-XXXXXXX</li>
+                <li>Scripts personalizados: adicione apenas de fontes 100% confiáveis</li>
+              </ul>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <h4 className="font-semibold flex items-center gap-2">
+              <TrendingUp className="w-4 h-4" /> Analytics - Integridade dos Dados:
+            </h4>
+            <div className="bg-blue-500/10 border border-blue-500/20 p-3 rounded-lg space-y-2">
+              <p className="text-sm text-blue-700 dark:text-blue-400">
+                <strong>ℹ️ Nota sobre Analytics Públicos:</strong>
+              </p>
+              <p className="text-xs text-blue-700 dark:text-blue-400">
+                Os sistemas de analytics (visualizações, cliques, votos) permitem inserts públicos para 
+                facilitar tracking sem autenticação. Isso é intencional, mas pode estar sujeito a:
+              </p>
+              <ul className="list-disc list-inside space-y-1 text-xs text-blue-700 dark:text-blue-400 ml-2">
+                <li>Inflação artificial de métricas por bots ou concorrentes</li>
+                <li>Use os dados como indicadores, não como verdade absoluta</li>
+                <li>Combine com ferramentas externas (Google Analytics) para validação</li>
+                <li>Considere exportar e limpar dados mensalmente para manter banco otimizado</li>
+              </ul>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <h4 className="font-semibold flex items-center gap-2">
+              <CheckCircle className="w-4 h-4" /> Privacidade e LGPD:
+            </h4>
+            <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+              <li>Sistema coleta User-Agent e IPs para analytics (anonimizados)</li>
+              <li>Avaliações armazenam email e nome de usuários</li>
+              <li>Certifique-se que sua Política de Privacidade divulga essas coletas</li>
+              <li>Cookie Consent configurado e ativo no site</li>
+            </ul>
+          </div>
+          <div className="space-y-2">
+            <h4 className="font-semibold">Recomendações Gerais:</h4>
+            <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+              <li>Nunca compartilhe suas credenciais de administrador</li>
+              <li>Use senhas fortes e únicas</li>
+              <li>Revise regularmente logs de atividades suspeitas</li>
+              <li>Mantenha backups regulares do banco de dados</li>
+              <li>Monitore métricas de segurança no Supabase Dashboard</li>
+            </ul>
+          </div>
+          <Badge variant="secondary">Proteção e Conformidade</Badge>
+        </div>
+      )
     }
   ];
 
@@ -628,7 +784,7 @@ const Ajuda = () => {
         <Card>
           <CardHeader className="pb-3">
             <CardDescription>Funcionalidades</CardDescription>
-            <CardTitle className="text-3xl">12</CardTitle>
+            <CardTitle className="text-3xl">14</CardTitle>
           </CardHeader>
         </Card>
         <Card>
