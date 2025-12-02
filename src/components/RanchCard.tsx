@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -46,23 +47,23 @@ const RanchCard = ({ ranch }: RanchCardProps) => {
             <img 
               src={ranch.images[0]} 
               alt={ranch.name}
-              className="h-48 w-full object-cover transition-transform duration-500 hover:scale-110"
+              className="h-48 w-full object-cover"
             />
           ) : (
-            <div className="h-48 bg-river-gradient" />
+            <div className="h-48 bg-gradient-to-br from-rio-blue to-water-green" />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+          <div className="absolute inset-0 bg-black bg-opacity-20"></div>
           <div className="absolute top-4 right-4">
             {ranch.available ? (
-              <Badge className="bg-secondary text-secondary-foreground font-semibold">Disponível</Badge>
+              <Badge className="bg-green-500 text-white">Disponível</Badge>
             ) : (
-              <Badge className="bg-destructive text-destructive-foreground">Ocupado</Badge>
+              <Badge className="bg-red-500 text-white">Ocupado</Badge>
             )}
           </div>
           <div className="absolute bottom-4 left-4 text-white">
             <div className="flex items-center space-x-1 mb-2">
               <Star className="h-4 w-4 fill-current text-yellow-400" />
-              <span className="text-sm font-medium drop-shadow-md">{ranch.rating}</span>
+              <span className="text-sm font-medium">{ranch.rating}</span>
             </div>
           </div>
         </div>
@@ -70,63 +71,62 @@ const RanchCard = ({ ranch }: RanchCardProps) => {
 
       <CardContent className="p-6">
         <div className="mb-4">
-          <h3 className="text-xl font-bold text-foreground mb-2">{ranch.name}</h3>
-          <div className="flex items-center text-muted-foreground mb-2">
-            <MapPin className="h-4 w-4 mr-1 text-primary" />
+          <h3 className="text-xl font-bold text-gray-900 mb-2">{ranch.name}</h3>
+          <div className="flex items-center text-gray-600 mb-2">
+            <MapPin className="h-4 w-4 mr-1" />
             <span className="text-sm">{ranch.location}</span>
           </div>
-          <p className="text-muted-foreground text-sm line-clamp-2">{ranch.description}</p>
+          <p className="text-gray-600 text-sm">{ranch.description}</p>
         </div>
 
         {/* Features */}
-        <div className="grid grid-cols-3 gap-4 mb-4 p-3 bg-muted/50 rounded-lg">
+        <div className="grid grid-cols-3 gap-4 mb-4 p-3 bg-gray-50 rounded-lg">
           <div className="text-center">
-            <div className="font-semibold text-foreground">{ranch.features.bedrooms}</div>
-            <div className="text-xs text-muted-foreground">Quartos</div>
+            <div className="font-semibold text-gray-900">{ranch.features.bedrooms}</div>
+            <div className="text-xs text-gray-600">Quartos</div>
           </div>
           <div className="text-center">
-            <div className="font-semibold text-foreground">{ranch.features.bathrooms}</div>
-            <div className="text-xs text-muted-foreground">Banheiros</div>
+            <div className="font-semibold text-gray-900">{ranch.features.bathrooms}</div>
+            <div className="text-xs text-gray-600">Banheiros</div>
           </div>
           <div className="text-center">
-            <div className="font-semibold text-foreground">{ranch.features.area}</div>
-            <div className="text-xs text-muted-foreground">Área</div>
+            <div className="font-semibold text-gray-900">{ranch.features.area}</div>
+            <div className="text-xs text-gray-600">Área</div>
           </div>
         </div>
 
         {/* Capacity and Amenities */}
         <div className="mb-4">
           <div className="flex items-center mb-3">
-            <Users className="h-4 w-4 mr-2 text-secondary" />
-            <span className="text-sm text-muted-foreground">Até {ranch.capacity} pessoas</span>
+            <Users className="h-4 w-4 mr-2 text-water-green" />
+            <span className="text-sm text-gray-600">Até {ranch.capacity} pessoas</span>
           </div>
           
           <div className="flex flex-wrap gap-2 mb-4">
             {ranch.amenities.slice(0, 4).map((amenity, index) => (
-              <div key={index} className="flex items-center bg-primary/10 px-2 py-1 rounded-md text-xs text-primary font-medium">
+              <div key={index} className="flex items-center bg-blue-50 px-2 py-1 rounded text-xs text-rio-blue">
                 {amenityIcons[amenity] || <Wifi className="h-3 w-3 mr-1" />}
                 <span className="ml-1">{amenity}</span>
               </div>
             ))}
             {ranch.amenities.length > 4 && (
-              <span className="text-xs text-muted-foreground">+{ranch.amenities.length - 4} mais</span>
+              <span className="text-xs text-gray-500">+{ranch.amenities.length - 4} mais</span>
             )}
           </div>
         </div>
 
         {/* Price and Action */}
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-2">
           <div className="flex justify-between items-center">
             <div>
-              <div className="text-2xl font-bold text-primary">R$ {ranch.price.toFixed(2)}</div>
-              <div className="text-xs text-muted-foreground">por dia</div>
+              <div className="text-2xl font-bold text-rio-blue">R$ {ranch.price.toFixed(2)}</div>
+              <div className="text-xs text-gray-500">por dia</div>
             </div>
           </div>
           {ranch.slug && (
             <Link to={`/rancho/${ranch.slug}`} className="w-full">
               <Button 
-                variant="water"
-                className="w-full"
+                className="w-full bg-primary hover:bg-primary/90 text-white"
                 disabled={!ranch.available}
               >
                 <Eye className="mr-2 h-4 w-4" />

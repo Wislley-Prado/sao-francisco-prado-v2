@@ -4,113 +4,99 @@
 
 @layer base {
   :root {
-    --background: 210 20% 98%;
-    --foreground: 200 25% 15%;
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
 
     --card: 0 0% 100%;
-    --card-foreground: 200 25% 15%;
+    --card-foreground: 222.2 84% 4.9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 200 25% 15%;
+    --popover-foreground: 222.2 84% 4.9%;
 
-    /* Rio São Francisco Blue - primary */
-    --primary: 193 72% 43%;
+    --primary: 217 91% 60%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 152 47% 45%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
 
-    --muted: 200 20% 94%;
-    --muted-foreground: 200 15% 45%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
 
-    /* Warm accent - sunset orange */
-    --accent: 36 100% 50%;
-    --accent-foreground: 200 25% 15%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
 
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 200 20% 88%;
-    --input: 200 20% 88%;
-    --ring: 193 72% 43%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 217 91% 60%;
 
     --radius: 0.5rem;
 
-    /* Package Tier Colors - harmonious palette */
-    --tier-vip: 193 72% 43%;
-    --tier-vip-light: 193 72% 55%;
-    --tier-luxo: 152 47% 45%;
-    --tier-luxo-light: 152 47% 55%;
-    --tier-diamante: 36 100% 50%;
-    --tier-diamante-light: 36 100% 60%;
+    /* Package Tier Colors */
+    --tier-vip: 217 91% 60%;
+    --tier-vip-light: 217 91% 70%;
+    --tier-luxo: 142 76% 36%;
+    --tier-luxo-light: 142 76% 46%;
+    --tier-diamante: 45 93% 47%;
+    --tier-diamante-light: 45 93% 57%;
 
-    /* Nature-inspired colors */
-    --water: 193 72% 43%;
-    --forest: 152 47% 45%;
-    --sand: 43 55% 90%;
-    --sunset: 36 100% 50%;
-
-    --sidebar-background: 200 15% 97%;
-    --sidebar-foreground: 200 25% 25%;
-    --sidebar-primary: 193 72% 43%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 200 15% 93%;
-    --sidebar-accent-foreground: 200 25% 15%;
-    --sidebar-border: 200 20% 88%;
-    --sidebar-ring: 193 72% 43%;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
   .dark {
-    --background: 200 30% 8%;
-    --foreground: 200 15% 95%;
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
 
-    --card: 200 25% 12%;
-    --card-foreground: 200 15% 95%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
 
-    --popover: 200 25% 12%;
-    --popover-foreground: 200 15% 95%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
 
-    --primary: 193 72% 50%;
+    --primary: 217 91% 60%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 152 47% 40%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
 
-    --muted: 200 20% 18%;
-    --muted-foreground: 200 15% 60%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 36 100% 55%;
-    --accent-foreground: 200 25% 10%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
 
-    --destructive: 0 72% 45%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 200 20% 20%;
-    --input: 200 20% 20%;
-    --ring: 193 72% 50%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 217 91% 60%;
 
     /* Package Tier Colors */
-    --tier-vip: 193 72% 50%;
-    --tier-vip-light: 193 72% 60%;
-    --tier-luxo: 152 47% 45%;
-    --tier-luxo-light: 152 47% 55%;
-    --tier-diamante: 36 100% 55%;
-    --tier-diamante-light: 36 100% 65%;
+    --tier-vip: 217 91% 60%;
+    --tier-vip-light: 217 91% 70%;
+    --tier-luxo: 142 76% 36%;
+    --tier-luxo-light: 142 76% 46%;
+    --tier-diamante: 45 93% 47%;
+    --tier-diamante-light: 45 93% 57%;
 
-    /* Nature-inspired colors */
-    --water: 193 72% 50%;
-    --forest: 152 47% 45%;
-    --sand: 43 40% 25%;
-    --sunset: 36 100% 55%;
-
-    --sidebar-background: 200 25% 10%;
-    --sidebar-foreground: 200 15% 90%;
-    --sidebar-primary: 193 72% 50%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 200 20% 15%;
-    --sidebar-accent-foreground: 200 15% 95%;
-    --sidebar-border: 200 20% 18%;
-    --sidebar-ring: 193 72% 50%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
 

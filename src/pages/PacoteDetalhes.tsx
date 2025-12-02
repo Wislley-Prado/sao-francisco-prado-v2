@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { Loader2, Fish, Home, Map, Utensils, Wifi, Car, Shield, Play, MapPin, Navigation, Compass, ExternalLink, Copy, Sparkles } from 'lucide-react';
+import { Loader2, Fish, Home, Map, Utensils, Wifi, Car, Shield, Play, MapPin, Navigation, Compass, ExternalLink, Copy } from 'lucide-react';
 import { YouTubePlayer } from '@/components/YouTubePlayer';
 import { usePacoteAnalytics, dispararPixel } from '@/hooks/usePacoteAnalytics';
 import { PacoteFAQs } from '@/components/PacoteFAQs';
@@ -296,7 +296,7 @@ const PacoteDetalhes = () => {
             <div className="container max-w-7xl mx-auto px-4">
               {/* Header com ícone gradiente */}
               <div className="flex items-center gap-3 mb-8">
-                <div className="p-3 rounded-xl bg-gradient-to-br from-water to-forest shadow-lg shadow-water/25">
+                <div className="p-3 rounded-xl bg-gradient-to-br from-red-500 to-red-600 shadow-lg shadow-red-500/25">
                   <Play className="h-6 w-6 text-white fill-white" />
                 </div>
                 <div>
@@ -305,15 +305,15 @@ const PacoteDetalhes = () => {
                 </div>
               </div>
               
-              <Card className="overflow-hidden shadow-2xl border border-water/20 dark:border-water/10">
-                <div className="bg-gradient-to-r from-water via-forest to-water px-4 py-3">
+              <Card className="overflow-hidden shadow-xl border-0">
+                <div className="bg-gradient-to-r from-red-500 to-red-600 px-4 py-3">
                   <div className="flex items-center justify-between">
                     <span className="text-white text-sm font-medium flex items-center gap-2">
                       <Play className="h-4 w-4 fill-white" />
                       Vídeo do Pacote
                     </span>
-                    <Badge className="bg-white/15 text-white border border-white/30 hover:bg-white/25 backdrop-blur-sm">
-                      <Sparkles className="h-3 w-3 mr-1" /> Exclusivo
+                    <Badge className="bg-white/20 text-white border-0 hover:bg-white/30">
+                      🎬 Exclusivo
                     </Badge>
                   </div>
                 </div>
