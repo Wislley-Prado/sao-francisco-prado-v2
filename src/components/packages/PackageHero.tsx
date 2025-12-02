@@ -54,10 +54,10 @@ export const PackageHero = ({
           transform: `translateY(${parallaxOffset}px)`
         }}
       >
-        {/* Gradient Overlay - Dual Layer for Depth */}
-        <div className="absolute inset-0 bg-black/40" />
-        <div className={`absolute inset-0 bg-gradient-to-br ${tierGradients[tier]} opacity-80`} />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+      {/* Gradient Overlay - Subtle for better image visibility */}
+        <div className="absolute inset-0 bg-black/30" />
+        <div className={`absolute inset-0 bg-gradient-to-br ${tierGradients[tier]} opacity-30`} />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
       </div>
 
       {/* Decorative Elements */}
