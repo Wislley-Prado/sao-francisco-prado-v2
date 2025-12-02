@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import DOMPurify from 'dompurify';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { ImageGallery } from '@/components/ImageGallery';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -64,7 +65,6 @@ const RanchoDetalhes = () => {
   const navigate = useNavigate();
   const [rancho, setRancho] = useState<RanchoDetalhes | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedImage, setSelectedImage] = useState(0);
 
   const whatsappNumber = rancho?.telefone_whatsapp || "5531999999999";
 
@@ -233,45 +233,7 @@ const RanchoDetalhes = () => {
 
         {/* Image Gallery */}
         <div className="max-w-7xl mx-auto px-4 mb-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {/* Main Image */}
-            <div className="lg:col-span-2">
-              {rancho.imagens.length > 0 ? (
-                <img
-                  src={rancho.imagens[selectedImage]?.url || rancho.imagens[0].url}
-                  alt={rancho.imagens[selectedImage]?.alt_text || rancho.nome}
-                  className="w-full h-[400px] lg:h-[500px] object-cover rounded-lg"
-                />
-              ) : (
-                <div className="w-full h-[400px] lg:h-[500px] bg-gradient-to-br from-rio-blue to-water-green rounded-lg flex items-center justify-center">
-                  <span className="text-white text-xl">Sem imagens disponíveis</span>
-                </div>
-              )}
-            </div>
-
-            {/* Thumbnail Gallery */}
-            {rancho.imagens.length > 1 && (
-              <div className="lg:col-span-2 grid grid-cols-4 md:grid-cols-6 gap-2">
-                {rancho.imagens.map((img, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setSelectedImage(index)}
-                    className={`relative h-20 rounded-lg overflow-hidden transition-all ${
-                      selectedImage === index 
-                        ? 'ring-2 ring-primary scale-105' 
-                        : 'opacity-70 hover:opacity-100'
-                    }`}
-                  >
-                    <img
-                      src={img.url}
-                      alt={img.alt_text || `${rancho.nome} - Foto ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+          <ImageGallery images={rancho.imagens} title={rancho.nome} />
         </div>
 
         {/* Content */}
