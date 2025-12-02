@@ -95,6 +95,13 @@ const RanchoDetalhes = () => {
           .eq('rancho_id', ranchoData.id)
           .order('ordem', { ascending: true });
 
+        // Ordenar imagens para que a principal venha primeiro
+        const sortedImages = (imagesData || []).sort((a, b) => {
+          if (a.principal && !b.principal) return -1;
+          if (!a.principal && b.principal) return 1;
+          return (a.ordem ?? 0) - (b.ordem ?? 0);
+        });
+
         const ranchoCompleto = {
           id: ranchoData.id,
           nome: ranchoData.nome,
@@ -115,7 +122,7 @@ const RanchoDetalhes = () => {
           latitude: ranchoData.latitude,
           longitude: ranchoData.longitude,
           endereco_completo: ranchoData.endereco_completo,
-          imagens: imagesData || []
+          imagens: sortedImages
         };
 
         // Debug logs

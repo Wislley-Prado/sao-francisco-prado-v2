@@ -71,6 +71,13 @@ const RanchosSection = () => {
               .eq('rancho_id', rancho.id)
               .order('ordem', { ascending: true });
 
+            // Ordenar imagens para que a principal venha primeiro
+            const sortedImages = (imagesData || []).sort((a, b) => {
+              if (a.principal && !b.principal) return -1;
+              if (!a.principal && b.principal) return 1;
+              return (a.ordem ?? 0) - (b.ordem ?? 0);
+            });
+
             return {
               id: rancho.id,
               name: rancho.nome,
@@ -80,7 +87,7 @@ const RanchosSection = () => {
               capacity: rancho.capacidade,
               price: Number(rancho.preco),
               rating: Number(rancho.rating),
-              images: (imagesData || []).map(img => img.url),
+              images: sortedImages.map(img => img.url),
               amenities: rancho.comodidades || [],
               available: rancho.disponivel,
               features: {
