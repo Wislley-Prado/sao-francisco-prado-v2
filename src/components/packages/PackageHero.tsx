@@ -48,7 +48,7 @@ export const PackageHero = ({
     <div className="relative h-[65vh] md:h-[70vh] overflow-hidden">
       {/* Background Image with Parallax Effect */}
       <div 
-        className="absolute inset-0 bg-cover bg-center scale-110 transition-transform duration-100"
+        className="absolute inset-0 bg-cover bg-center scale-110 will-change-transform"
         style={{ 
           backgroundImage: `url(${imageUrl})`,
           transform: `translateY(${parallaxOffset}px)`
@@ -67,7 +67,10 @@ export const PackageHero = ({
       <div className="relative h-full container max-w-7xl mx-auto px-4 flex flex-col justify-center">
         <div className="max-w-4xl animate-in fade-in slide-in-from-bottom-4 duration-700">
           {badge && (
-            <Badge className={`mb-6 text-sm px-4 py-2 ${tierAccents[tier]}`}>
+            <Badge 
+              className={`mb-6 text-sm px-4 py-2 ${tierAccents[tier]}`}
+              style={{ textShadow: '0 1px 3px rgba(0,0,0,0.4)' }}
+            >
               <Sparkles className="w-4 h-4 mr-2" />
               {badgeLabels[badge]}
             </Badge>
@@ -100,6 +103,7 @@ export const PackageHero = ({
               size="lg" 
               onClick={onCtaClick}
               className="bg-white text-gray-900 hover:bg-white/95 font-bold text-lg px-8 py-6 rounded-xl transition-all hover:scale-105"
+              style={{ textShadow: '0 1px 2px rgba(255,255,255,0.3)' }}
             >
               Reservar Agora
             </Button>
@@ -108,6 +112,7 @@ export const PackageHero = ({
               variant="outline"
               onClick={onCtaClick}
               className="bg-white/15 backdrop-blur-md text-white border-2 border-white/40 hover:bg-white/25 font-semibold text-lg px-8 py-6 rounded-xl transition-all hover:scale-105"
+              style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}
             >
               Falar no WhatsApp
             </Button>
