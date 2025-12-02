@@ -19,6 +19,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { ImageUploader, ImageFile } from './ImageUploader';
+import { CoordenadasHelper } from '../pacote/CoordenadasHelper';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Loader2, X, Plus } from 'lucide-react';
@@ -662,34 +663,52 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
               )}
             />
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="latitude"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Latitude</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="-16.12345" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+            {/* Seção de Localização */}
+            <div className="space-y-4 rounded-lg border p-4 bg-muted/50">
+              <div>
+                <h3 className="text-sm font-medium mb-1">📍 Localização do Rancho</h3>
+                <p className="text-xs text-muted-foreground">
+                  Adicione as coordenadas para exibir a localização no mapa do site.
+                </p>
+              </div>
+
+              {/* Helper para extrair coordenadas do Google Maps */}
+              <CoordenadasHelper 
+                onCoordenadasExtraidas={(latitude, longitude) => {
+                  form.setValue('latitude', latitude.toString());
+                  form.setValue('longitude', longitude.toString());
+                }}
               />
 
-              <FormField
-                control={form.control}
-                name="longitude"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Longitude</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="-45.67890" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="latitude"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Latitude</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="-16.12345" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="longitude"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Longitude</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="-45.67890" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             </div>
 
             <FormField
