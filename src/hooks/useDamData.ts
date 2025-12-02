@@ -104,6 +104,7 @@ const mapNewApiDataToDamData = (apiData: NewApiResponseItem[]): DamData => {
     hora_atualizacao: new Date().toLocaleTimeString('pt-BR'),
     historico_dias: historicoDias,
     tendencia_represa: tendencia,
+    usando_dados_historicos: usandoHistorico,
   };
   
   console.log('✅ [MAPPING] Dados mapeados:', mappedData);
