@@ -117,11 +117,12 @@ const fetchDamData = async (): Promise<DamData> => {
   
   try {
     const response = await fetch('https://n8n.vendopro.com.br/webhook-test/v1.represa.online', {
-      method: 'GET',
+      method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
+      body: JSON.stringify({}),
       mode: 'cors',
       cache: 'no-cache',
     });
