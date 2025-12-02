@@ -55,8 +55,8 @@ export const PackageHero = ({
         }}
       >
       {/* Gradient Overlay - Subtle for better image visibility */}
-        <div className="absolute inset-0 bg-black/30" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
       </div>
 
       {/* Decorative Elements */}
