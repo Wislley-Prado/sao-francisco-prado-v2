@@ -445,9 +445,24 @@ const RanchoDetalhes = () => {
                           />
                         </div>
                       </CardContent>
-                      <div className="bg-gradient-to-r from-muted/50 to-muted/30 px-5 py-3 border-t border-border/50">
-                        <p className="text-xs text-muted-foreground text-center">
-                          🟦 Datas em azul = reservado • Datas livres = disponível para reserva
+                      {/* Legenda de cores */}
+                      <div className="bg-gradient-to-r from-muted/30 via-muted/50 to-muted/30 px-5 py-4 border-t border-border/50">
+                        <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6">
+                          <div className="flex items-center gap-2">
+                            <div className="w-4 h-4 rounded bg-[#4285f4] shadow-sm"></div>
+                            <span className="text-sm text-foreground font-medium">Reservado</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-4 h-4 rounded bg-emerald-500 shadow-sm"></div>
+                            <span className="text-sm text-foreground font-medium">Disponível</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-4 h-4 rounded bg-amber-500 shadow-sm"></div>
+                            <span className="text-sm text-foreground font-medium">Consulte</span>
+                          </div>
+                        </div>
+                        <p className="text-xs text-muted-foreground text-center mt-3">
+                          Para verificar disponibilidade exata, entre em contato via WhatsApp
                         </p>
                       </div>
                     </Card>
