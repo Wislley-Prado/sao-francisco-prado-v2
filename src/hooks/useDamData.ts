@@ -2,86 +2,117 @@
 import { useQuery } from '@tanstack/react-query';
 import { DamData } from '@/types/damData';
 
-// Interface para os dados que vêm da nova API de produção
-interface ProductionApiResponse {
-  nivel_atual?: string;
-  volume_util_percentual?: string;
-  afluencia?: string;
-  defluencia?: string;
-  'Tendencia_da_represa '?: string;
-  dados_painel?: {
-    timestamp_atualizacao?: string;
-  };
-  historico_dias?: string;
+// Interface para o novo formato da API do n8n
+interface NewApiResponseItem {
+  tipo: 'tempo_real' | 'historico';
+  data_leitura: string;        // "02/12/2025" (formato BR)
+  afluencia: string;           // "192" ou "Verificar site"
+  nivel_inicial: string;       // "564,24" ou "--"
+  volume_inicial: string;      // "51,1" ou "--"
+  defluencia: string;          // "448" ou "--"
+  nivel_atual: string;         // "564,18" ou "Não detectado"
+  volume_percentual: string;   // "50,8" ou "--"
 }
 
-// Função para converter o histórico de string JSON para array
-const parseHistoricoDias = (historicoString: string | undefined) => {
-  if (!historicoString) return [];
-  try {
-    return JSON.parse(historicoString);
-  } catch (error) {
-    console.error('❌ [PARSE] Erro ao fazer parse do histórico:', error);
-    return [];
+// Converter número brasileiro para float (564,24 → 564.24)
+const parseNumberBR = (value: string): number => {
+  if (!value || value === '--' || 
+      value.toLowerCase().includes('verificar') || 
+      value.toLowerCase().includes('detectado')) {
+    return 0;
   }
+  return parseFloat(value.replace(',', '.')) || 0;
 };
 
-// Função para extrair data e hora do timestamp
-const extractDateTimeFromTimestamp = (timestamp: string | undefined) => {
-  if (!timestamp) {
-    const now = new Date();
-    return {
-      data_atualizacao: now.toLocaleDateString('pt-BR'),
-      hora_atualizacao: now.toLocaleTimeString('pt-BR')
-    };
-  }
-  
-  try {
-    const date = new Date(timestamp);
-    return {
-      data_atualizacao: date.toLocaleDateString('pt-BR'),
-      hora_atualizacao: date.toLocaleTimeString('pt-BR')
-    };
-  } catch (error) {
-    console.error('❌ [TIMESTAMP] Erro ao processar timestamp:', error);
-    const now = new Date();
-    return {
-      data_atualizacao: now.toLocaleDateString('pt-BR'),
-      hora_atualizacao: now.toLocaleTimeString('pt-BR')
-    };
-  }
+// Converter data BR para ISO (01/12/2025 → 2025-12-01)
+const parseDateBR = (dateStr: string): string => {
+  if (!dateStr || !dateStr.includes('/')) return dateStr;
+  const [day, month, year] = dateStr.split('/');
+  return `${year}-${month}-${day}`;
 };
 
-// Função para converter os dados da API de produção para o formato esperado
-const mapProductionDataToDamData = (productionData: ProductionApiResponse): DamData => {
-  console.log('🔄 [MAPPING] Mapeando dados da API de produção:', productionData);
+// Verificar se os dados são válidos
+const isValidData = (item: NewApiResponseItem): boolean => {
+  return item.nivel_atual !== 'Não detectado' && 
+         item.nivel_atual !== '--' &&
+         item.volume_percentual !== '--';
+};
+
+// Calcular tendência baseada no histórico
+const calcularTendencia = (historico: NewApiResponseItem[]): string => {
+  if (historico.length < 2) return 'estável';
   
-  const { data_atualizacao, hora_atualizacao } = extractDateTimeFromTimestamp(
-    productionData.dados_painel?.timestamp_atualizacao
-  );
+  const volumeRecente = parseNumberBR(historico[0].volume_percentual);
+  const volumeAnterior = parseNumberBR(historico[1].volume_percentual);
   
-  const historicoDias = parseHistoricoDias(productionData.historico_dias);
+  if (volumeRecente > volumeAnterior + 0.3) return 'subindo';
+  if (volumeRecente < volumeAnterior - 0.3) return 'descendo';
+  return 'estável';
+};
+
+// Mapear dados do novo formato da API para DamData
+const mapNewApiDataToDamData = (apiData: NewApiResponseItem[]): DamData => {
+  console.log('🔄 [MAPPING] Processando novo formato da API:', apiData);
   
-  const mappedData = {
-    nivel_atual: productionData.nivel_atual || '0',
-    volume_util_percentual: productionData.volume_util_percentual || '0',
-    afluencia: productionData.afluencia || '0',
-    defluencia: productionData.defluencia || '0',
-    data_atualizacao,
-    hora_atualizacao,
+  // 1. Separar dados em tempo real e histórico
+  const tempoReal = apiData.find(item => item.tipo === 'tempo_real');
+  const historico = apiData.filter(item => item.tipo === 'historico');
+  
+  console.log('📊 [MAPPING] Tempo real:', tempoReal);
+  console.log('📊 [MAPPING] Histórico:', historico.length, 'registros');
+  
+  // 2. Se tempo real não tem dados válidos, usar primeiro histórico
+  const dadosAtuais = (tempoReal && isValidData(tempoReal)) 
+    ? tempoReal 
+    : historico[0];
+  
+  const usandoHistorico = !tempoReal || !isValidData(tempoReal);
+  if (usandoHistorico) {
+    console.log('⚠️ [MAPPING] Dados em tempo real indisponíveis, usando histórico mais recente');
+  }
+  
+  // 3. Extrair valores atuais
+  const nivelAtual = parseNumberBR(dadosAtuais?.nivel_atual || '0');
+  const volumePercentual = parseNumberBR(dadosAtuais?.volume_percentual || '0');
+  const afluencia = parseNumberBR(dadosAtuais?.afluencia || '0');
+  const defluencia = parseNumberBR(dadosAtuais?.defluencia || '0');
+  
+  // 4. Mapear histórico para DamHistoryDay[]
+  const historicoDias = historico.map(item => ({
+    dia: parseDateBR(item.data_leitura),
+    data_original: item.data_leitura,
+    vazao_afl: parseNumberBR(item.afluencia).toString(),
+    cota_inicial: parseNumberBR(item.nivel_inicial).toString(),
+    vol_util_inicial: parseNumberBR(item.volume_inicial).toString(),
+    vazao_def: parseNumberBR(item.defluencia).toString(),
+    cota_final: parseNumberBR(item.nivel_atual).toString(),
+    vol_util_final: parseNumberBR(item.volume_percentual).toString(),
+  }));
+  
+  // 5. Calcular tendência baseada no histórico
+  const tendencia = calcularTendencia(historico);
+  
+  // 6. Extrair data/hora de atualização
+  const dataAtualizacao = dadosAtuais?.data_leitura || new Date().toLocaleDateString('pt-BR');
+  
+  const mappedData: DamData = {
+    nivel_atual: nivelAtual.toFixed(2),
+    volume_util_percentual: volumePercentual.toFixed(1),
+    afluencia: afluencia.toString(),
+    defluencia: defluencia.toString(),
+    data_atualizacao: dataAtualizacao,
+    hora_atualizacao: new Date().toLocaleTimeString('pt-BR'),
     historico_dias: historicoDias,
-    // Campos adicionais da nova estrutura
-    tendencia_represa: productionData['Tendencia_da_represa ']?.trim() || 'estável',
-    timestamp_atualizacao: productionData.dados_painel?.timestamp_atualizacao
+    tendencia_represa: tendencia,
   };
   
-  console.log('✅ [MAPPING] Dados mapeados da produção:', mappedData);
+  console.log('✅ [MAPPING] Dados mapeados:', mappedData);
   return mappedData;
 };
 
 const fetchDamData = async (): Promise<DamData> => {
   const timestamp = new Date().toISOString();
-  console.log(`🚀 [FETCH] ${timestamp} - Buscando dados da API de produção...`);
+  console.log(`🚀 [FETCH] ${timestamp} - Buscando dados da API...`);
   
   try {
     const response = await fetch('https://n8n.prado.vendopro.com.br/webhook/v1.represa.online', {
@@ -101,60 +132,38 @@ const fetchDamData = async (): Promise<DamData> => {
     }
     
     const responseData = await response.json();
-    console.log('📦 [FETCH] Dados brutos da API de produção:', responseData);
+    console.log('📦 [FETCH] Dados brutos da API:', responseData);
     
-    // A resposta é um array, pegar o primeiro item
-    let productionData: ProductionApiResponse;
-    
-    if (Array.isArray(responseData) && responseData.length > 0) {
-      productionData = responseData[0];
-      console.log('📋 [FETCH] Dados extraídos do array:', productionData);
-    } else {
-      productionData = responseData;
-      console.log('📋 [FETCH] Dados diretos:', productionData);
+    // Verificar se é o novo formato (array com campo 'tipo')
+    if (Array.isArray(responseData) && responseData.length > 0 && 'tipo' in responseData[0]) {
+      console.log('✅ [FETCH] Detectado novo formato da API');
+      return mapNewApiDataToDamData(responseData as NewApiResponseItem[]);
     }
     
-    // Converter para o formato esperado
-    const damData = mapProductionDataToDamData(productionData);
-    console.log('✅ [FETCH] Dados finais processados:', damData);
-    console.log(`🎉 [FETCH] ${timestamp} - Busca da produção concluída com sucesso!`);
+    // Fallback: se for array sem 'tipo', tentar processar como novo formato mesmo assim
+    if (Array.isArray(responseData) && responseData.length > 0) {
+      console.log('⚠️ [FETCH] Array sem campo tipo, tentando processar...');
+      return mapNewApiDataToDamData(responseData as NewApiResponseItem[]);
+    }
     
-    return damData;
+    throw new Error('Formato de dados não reconhecido');
     
   } catch (error) {
-    console.error('❌ [FETCH] Erro ao buscar dados da produção:', error);
+    console.error('❌ [FETCH] Erro ao buscar dados:', error);
     throw error;
   }
 };
 
 export const useDamData = () => {
-  console.log('🔧 [HOOK] Inicializando hook useDamData para produção');
+  console.log('🔧 [HOOK] Inicializando hook useDamData');
   
-  const query = useQuery(
-    ['damData', 'production'],
-    fetchDamData,
-    {
-      refetchInterval: 5 * 60 * 1000, // Refetch a cada 5 minutos
-      staleTime: 2 * 60 * 1000, // Dados ficam fresh por 2 minutos
-      retry: 2,
-      retryDelay: 3000,
-      onSuccess: (data) => {
-        console.log('🎊 [HOOK] Query Success - Dados da produção carregados:', data);
-      },
-      onError: (error) => {
-        console.error('💥 [HOOK] Query Error - Erro no hook da produção:', error);
-      },
-    }
-  );
-
-  console.log('📊 [HOOK] Estado atual do query da produção:', {
-    isLoading: query.isLoading,
-    isFetching: query.isFetching,
-    isError: query.isError,
-    isSuccess: query.isSuccess,
-    data: query.data,
-    error: query.error,
-    dataUpdatedAt: new Date(query.dataUpdatedAt).toISOString()
+  const query = useQuery({
+    queryKey: ['damData', 'production'],
+    queryFn: fetchDamData,
+    refetchInterval: 5 * 60 * 1000, // Refetch a cada 5 minutos
+    staleTime: 2 * 60 * 1000, // Dados ficam fresh por 2 minutos
+    retry: 2,
+    retryDelay: 3000,
   });
 
   return query;
