@@ -15,7 +15,7 @@ import {
   MapPin, Users, Bed, Bath, Maximize, Star, 
   Wifi, Car, Waves, Utensils, Wind, Tv, 
   ArrowLeft, MessageCircle, Loader2, CheckCircle,
-  Calendar, Play, CalendarDays
+  Calendar, Play, CalendarDays, Navigation, Compass, ExternalLink, Copy
 } from 'lucide-react';
 import { ReviewsList } from "@/components/reviews/ReviewsList";
 import { ReviewForm } from "@/components/reviews/ReviewForm";
@@ -375,13 +375,73 @@ const RanchoDetalhes = () => {
                 <>
                   <Separator />
                   <div id="map-section">
-                    <h2 className="text-2xl font-bold mb-4">Localização</h2>
+                    {/* Header com ícone */}
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/25">
+                        <MapPin className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <h2 className="text-2xl font-bold">Localização</h2>
+                        <p className="text-sm text-muted-foreground">Veja como chegar ao rancho</p>
+                      </div>
+                    </div>
+
+                    {/* Card de Endereço */}
                     {rancho.endereco_completo && (
-                      <p className="text-muted-foreground mb-4">{rancho.endereco_completo}</p>
+                      <Card className="mb-4 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200/50 dark:border-blue-800/50">
+                        <CardContent className="p-4">
+                          <div className="flex items-start gap-3">
+                            <Navigation className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                            <div className="flex-1">
+                              <p className="font-medium text-foreground">{rancho.endereco_completo}</p>
+                              <div className="flex flex-wrap gap-2 mt-3">
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  className="text-blue-600 border-blue-300 hover:bg-blue-50 dark:text-blue-400 dark:border-blue-700 dark:hover:bg-blue-950/50"
+                                  onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${rancho.latitude},${rancho.longitude}`, '_blank')}
+                                >
+                                  <ExternalLink className="h-4 w-4 mr-2" />
+                                  Abrir no Maps
+                                </Button>
+                                <Button 
+                                  size="sm" 
+                                  variant="ghost"
+                                  className="text-muted-foreground hover:text-foreground"
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(rancho.endereco_completo || '');
+                                    toast.success('Endereço copiado!');
+                                  }}
+                                >
+                                  <Copy className="h-4 w-4 mr-2" />
+                                  Copiar
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
                     )}
-                    <Card className="overflow-hidden">
+
+                    {/* Mapa com Visual Premium */}
+                    <Card className="overflow-hidden shadow-xl border-0 rounded-2xl">
+                      <div className="bg-gradient-to-r from-blue-500 to-indigo-600 px-4 py-3">
+                        <div className="flex items-center justify-between flex-wrap gap-2">
+                          <span className="text-white text-sm font-medium flex items-center gap-2">
+                            <Compass className="h-4 w-4" />
+                            {Math.abs(rancho.latitude).toFixed(4)}°S, {Math.abs(rancho.longitude).toFixed(4)}°W
+                          </span>
+                          <Badge className="bg-white/20 text-white border-white/30 hover:bg-white/30">
+                            <span className="relative flex h-2 w-2 mr-2">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                              <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                            </span>
+                            Localização exata
+                          </Badge>
+                        </div>
+                      </div>
                       <CardContent className="p-0">
-                        <div className="relative w-full h-[450px] bg-muted">
+                        <div className="relative w-full h-[400px] bg-muted">
                           <iframe
                             src={`https://www.google.com/maps?q=${rancho.latitude},${rancho.longitude}&hl=pt-BR&z=14&output=embed`}
                             className="w-full h-full border-0"
