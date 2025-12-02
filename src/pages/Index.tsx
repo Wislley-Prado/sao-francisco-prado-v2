@@ -20,15 +20,23 @@ const Index = () => {
       <Header />
       <HeroSection />
       <AnunciosSection posicao="topo" />
-      <RanchosSection />
-      <PackagesSection />
-      <AnunciosSection posicao="meio" />
-      <BlogSection />
-      <TestimonialsSection />
-      <FAQSection />
+      
+      {/* Dados em tempo real */}
+      <DamInfo />
       <LunarCalendar />
       <WeatherDashboard />
-      <DamInfo />
+      
+      <AnunciosSection posicao="meio" />
+      
+      {/* Conteúdo principal */}
+      <RanchosSection />
+      <PackagesSection />
+      <BlogSection />
+      
+      {/* Seções de suporte */}
+      <TestimonialsSection />
+      <FAQSection />
+      
       <AnunciosSection posicao="rodape" />
       <WhatsAppButton />
       <Footer />
