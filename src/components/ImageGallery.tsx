@@ -14,7 +14,9 @@ interface ImageGalleryProps {
 }
 
 export const ImageGallery = ({ images, title }: ImageGalleryProps) => {
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  // Encontrar o índice da imagem principal na inicialização
+  const principalIndex = images.findIndex(img => img.principal);
+  const [selectedIndex, setSelectedIndex] = useState(principalIndex >= 0 ? principalIndex : 0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
 
   const goToPrevious = useCallback(() => {
