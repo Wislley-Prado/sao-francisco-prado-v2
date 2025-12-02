@@ -133,13 +133,19 @@ const fetchDamData = async (): Promise<DamData> => {
     const responseData = await response.json();
     console.log('📦 [FETCH] Dados brutos da API:', responseData);
     
-    // Verificar se é o novo formato (array com campo 'tipo')
+    // Novo formato do n8n: { sucesso: true, atualizado_em: "...", dados: [...] }
+    if (responseData && responseData.sucesso && Array.isArray(responseData.dados)) {
+      console.log('✅ [FETCH] Detectado formato com wrapper (sucesso/dados)');
+      return mapNewApiDataToDamData(responseData.dados as NewApiResponseItem[]);
+    }
+    
+    // Formato antigo: array direto com campo 'tipo'
     if (Array.isArray(responseData) && responseData.length > 0 && 'tipo' in responseData[0]) {
-      console.log('✅ [FETCH] Detectado novo formato da API');
+      console.log('✅ [FETCH] Detectado formato array direto');
       return mapNewApiDataToDamData(responseData as NewApiResponseItem[]);
     }
     
-    // Fallback: se for array sem 'tipo', tentar processar como novo formato mesmo assim
+    // Fallback: se for array sem 'tipo', tentar processar mesmo assim
     if (Array.isArray(responseData) && responseData.length > 0) {
       console.log('⚠️ [FETCH] Array sem campo tipo, tentando processar...');
       return mapNewApiDataToDamData(responseData as NewApiResponseItem[]);
