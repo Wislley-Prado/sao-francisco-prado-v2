@@ -13,7 +13,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   MapPin, Users, Bed, Bath, Maximize, Star, 
   Wifi, Car, Waves, Utensils, Wind, Tv, 
-  ArrowLeft, MessageCircle, Loader2, CheckCircle
+  ArrowLeft, MessageCircle, Loader2, CheckCircle,
+  Calendar, Play, CalendarDays
 } from 'lucide-react';
 import { ReviewsList } from "@/components/reviews/ReviewsList";
 import { ReviewForm } from "@/components/reviews/ReviewForm";
@@ -370,23 +371,38 @@ const RanchoDetalhes = () => {
                 <>
                   <Separator />
                   <div id="video-section">
-                    <h2 className="text-2xl font-bold mb-4">Conheça o Rancho</h2>
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="p-3 rounded-xl bg-gradient-to-br from-red-500 to-red-600 shadow-lg">
+                        <Play className="h-6 w-6 text-white fill-white" />
+                      </div>
+                      <div>
+                        <h2 className="text-2xl font-bold">Conheça o Rancho</h2>
+                        <p className="text-sm text-muted-foreground">Assista ao vídeo e conheça cada detalhe</p>
+                      </div>
+                    </div>
                     {getYouTubeEmbedUrl(rancho.video_youtube) ? (
-                      <Card className="overflow-hidden">
-                        <CardContent className="p-0">
-                          <div className="relative w-full max-w-md mx-auto bg-black" style={{ paddingBottom: '177.78%' }}>
-                            <iframe
-                              src={getYouTubeEmbedUrl(rancho.video_youtube) || ''}
-                              className="absolute top-0 left-0 w-full h-full"
-                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                              allowFullScreen
-                              title={`Vídeo ${rancho.nome}`}
-                            />
+                      <Card className="overflow-hidden shadow-xl border-0 bg-gradient-to-b from-muted/50 to-background">
+                        <CardContent className="p-4 md:p-6">
+                          <div className="relative w-full max-w-lg mx-auto rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10">
+                            <div className="bg-gradient-to-b from-black to-zinc-900" style={{ paddingBottom: '177.78%' }}>
+                              <iframe
+                                src={getYouTubeEmbedUrl(rancho.video_youtube) || ''}
+                                className="absolute top-0 left-0 w-full h-full"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                allowFullScreen
+                                title={`Vídeo ${rancho.nome}`}
+                              />
+                            </div>
                           </div>
                         </CardContent>
                       </Card>
                     ) : (
-                      <p className="text-muted-foreground">URL do vídeo inválida. Verifique o formato.</p>
+                      <Card className="border-dashed">
+                        <CardContent className="py-8 text-center">
+                          <Play className="h-12 w-12 mx-auto mb-3 text-muted-foreground/50" />
+                          <p className="text-muted-foreground">URL do vídeo inválida. Verifique o formato.</p>
+                        </CardContent>
+                      </Card>
                     )}
                   </div>
                 </>
@@ -424,18 +440,26 @@ const RanchoDetalhes = () => {
                 <>
                   <Separator />
                   <div id="calendar-section">
-                    <h2 className="text-2xl font-bold mb-4">Disponibilidade</h2>
-                    <p className="text-muted-foreground mb-4">
-                      Confira as datas disponíveis para reserva no calendário abaixo:
-                    </p>
-                    <Card className="overflow-hidden shadow-lg">
-                      <div className="bg-gradient-to-r from-primary to-primary/80 p-4">
-                        <h3 className="text-primary-foreground font-semibold text-lg flex items-center gap-2">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
-                          </svg>
-                          Calendário de Reservas
-                        </h3>
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg">
+                        <CalendarDays className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <h2 className="text-2xl font-bold">Disponibilidade</h2>
+                        <p className="text-sm text-muted-foreground">Confira as datas disponíveis para reserva</p>
+                      </div>
+                    </div>
+                    <Card className="overflow-hidden shadow-xl border-0">
+                      <div className="bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 p-4">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-white font-semibold text-lg flex items-center gap-2">
+                            <Calendar className="h-5 w-5" />
+                            Calendário de Reservas
+                          </h3>
+                          <Badge className="bg-white/20 text-white border-white/30 hover:bg-white/30">
+                            Atualizado em tempo real
+                          </Badge>
+                        </div>
                       </div>
                       <CardContent className="p-0">
                         <div className="relative w-full h-[600px] bg-background">
