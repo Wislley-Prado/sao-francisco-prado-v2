@@ -74,17 +74,17 @@ export const PackageHero = ({
             </Badge>
           )}
           
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-white mb-6 leading-tight drop-shadow-2xl">
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-white mb-6 leading-tight">
             {title}
           </h1>
           
-          <p className="text-xl md:text-2xl text-white/95 mb-8 max-w-3xl leading-relaxed drop-shadow-lg">
+          <p className="text-xl md:text-2xl text-white/95 mb-8 max-w-3xl leading-relaxed">
             {subtitle}
           </p>
 
           <div className="flex flex-wrap items-center gap-4 mb-8">
-            <div className="flex items-center gap-3 bg-white/15 backdrop-blur-md px-5 py-3 rounded-full border border-white/20 shadow-xl">
-              <Star className="w-6 h-6 text-yellow-300 fill-yellow-300 drop-shadow-lg" />
+            <div className="flex items-center gap-3 bg-white/15 backdrop-blur-md px-5 py-3 rounded-full border border-white/20">
+              <Star className="w-6 h-6 text-yellow-300 fill-yellow-300" />
               <span className="text-white font-bold text-lg">{rating}</span>
               <span className="text-white/90 text-base">({reviewsCount} avaliações)</span>
             </div>
@@ -94,7 +94,7 @@ export const PackageHero = ({
             <Button 
               size="lg" 
               onClick={onCtaClick}
-              className="bg-white text-gray-900 hover:bg-white/95 font-bold shadow-2xl text-lg px-8 py-6 rounded-xl transition-all hover:scale-105"
+              className="bg-white text-gray-900 hover:bg-white/95 font-bold text-lg px-8 py-6 rounded-xl transition-all hover:scale-105"
             >
               Reservar Agora
             </Button>
@@ -102,7 +102,7 @@ export const PackageHero = ({
               size="lg" 
               variant="outline"
               onClick={onCtaClick}
-              className="bg-white/15 backdrop-blur-md text-white border-2 border-white/40 hover:bg-white/25 font-semibold shadow-xl text-lg px-8 py-6 rounded-xl transition-all hover:scale-105"
+              className="bg-white/15 backdrop-blur-md text-white border-2 border-white/40 hover:bg-white/25 font-semibold text-lg px-8 py-6 rounded-xl transition-all hover:scale-105"
             >
               Falar no WhatsApp
             </Button>
