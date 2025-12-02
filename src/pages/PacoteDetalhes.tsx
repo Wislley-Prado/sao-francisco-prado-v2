@@ -4,19 +4,22 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { Loader2, Fish, Home, Map, Utensils, Wifi, Car, Shield } from 'lucide-react';
+import { Loader2, Fish, Home, Map, Utensils, Wifi, Car, Shield, Play, MapPin, Navigation, Compass, ExternalLink, Copy } from 'lucide-react';
 import { YouTubePlayer } from '@/components/YouTubePlayer';
 import { usePacoteAnalytics, dispararPixel } from '@/hooks/usePacoteAnalytics';
 import { PacoteFAQs } from '@/components/PacoteFAQs';
-import PacoteMap from '@/components/PacoteMap';
 import { PackagePageLayout } from '@/components/packages/PackagePageLayout';
 import { PackageHero } from '@/components/packages/PackageHero';
 import { PackageQuickInfo } from '@/components/packages/PackageQuickInfo';
 import { PackageAbout } from '@/components/packages/PackageAbout';
 import { PackageFeatures } from '@/components/packages/PackageFeatures';
-import { PackageGallery } from '@/components/packages/PackageGallery';
 import { PackagePricing } from '@/components/packages/PackagePricing';
 import { PackageTestimonials } from '@/components/packages/PackageTestimonials';
+import { ImageGallery } from '@/components/ImageGallery';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 
 interface PacoteDetalhes {
   id: string;
@@ -205,12 +208,6 @@ const PacoteDetalhes = () => {
     return 'vip';
   };
 
-  // Preparar imagens para galeria
-  const galleryImages = pacote?.imagens.map(img => ({
-    url: img.url,
-    alt: img.alt_text
-  })) || [];
-
   // Imagem principal
   const mainImage = pacote?.imagens.find(img => img.principal)?.url || 
                    pacote?.imagens[0]?.url || 
@@ -275,35 +272,143 @@ const PacoteDetalhes = () => {
           <PackageFeatures features={features} tier={tier} />
         )}
 
-        {galleryImages.length > 0 && (
-          <PackageGallery images={galleryImages} initialVisible={6} />
-        )}
-
-        {pacote.video_youtube && (
+        {/* Galeria Premium */}
+        {pacote.imagens.length > 0 && (
           <section className="py-12">
             <div className="container max-w-7xl mx-auto px-4">
-              <h2 className="text-3xl font-bold text-foreground mb-8 text-center">
-                Conheça o Pacote
-              </h2>
-              <div className="max-w-4xl mx-auto">
-                <YouTubePlayer videoUrl={pacote.video_youtube} title={pacote.nome} />
-              </div>
+              <ImageGallery 
+                images={pacote.imagens.map(img => ({
+                  url: img.url,
+                  alt_text: img.alt_text,
+                  principal: img.principal
+                }))} 
+                title={pacote.nome} 
+              />
             </div>
           </section>
         )}
 
+        <Separator className="my-4" />
+
+        {/* Seção de Vídeo Premium */}
+        {pacote.video_youtube && (
+          <section className="py-12">
+            <div className="container max-w-7xl mx-auto px-4">
+              {/* Header com ícone gradiente */}
+              <div className="flex items-center gap-3 mb-8">
+                <div className="p-3 rounded-xl bg-gradient-to-br from-red-500 to-red-600 shadow-lg shadow-red-500/25">
+                  <Play className="h-6 w-6 text-white fill-white" />
+                </div>
+                <div>
+                  <h2 className="text-2xl md:text-3xl font-bold text-foreground">Conheça o Pacote</h2>
+                  <p className="text-sm text-muted-foreground">Assista ao vídeo e veja tudo que te espera</p>
+                </div>
+              </div>
+              
+              <Card className="overflow-hidden shadow-xl border-0">
+                <div className="bg-gradient-to-r from-red-500 to-red-600 px-4 py-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-white text-sm font-medium flex items-center gap-2">
+                      <Play className="h-4 w-4 fill-white" />
+                      Vídeo do Pacote
+                    </span>
+                    <Badge className="bg-white/20 text-white border-0 hover:bg-white/30">
+                      🎬 Exclusivo
+                    </Badge>
+                  </div>
+                </div>
+                <CardContent className="p-0">
+                  <YouTubePlayer videoUrl={pacote.video_youtube} title={pacote.nome} />
+                </CardContent>
+              </Card>
+            </div>
+          </section>
+        )}
+
+        <Separator className="my-4" />
+
+        {/* Seção de Localização Premium */}
         {pacote.latitude && pacote.longitude && (
           <section className="py-12 bg-muted/30">
             <div className="container max-w-7xl mx-auto px-4">
-              <h2 className="text-3xl font-bold text-foreground mb-8 text-center">
-                Localização
-              </h2>
-              <PacoteMap
-                latitude={pacote.latitude}
-                longitude={pacote.longitude}
-                titulo={pacote.nome}
-                endereco={pacote.endereco_completo || 'Rio São Francisco'}
-              />
+              {/* Header com ícone gradiente */}
+              <div className="flex items-center gap-3 mb-8">
+                <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/25">
+                  <MapPin className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-2xl md:text-3xl font-bold text-foreground">Localização</h2>
+                  <p className="text-sm text-muted-foreground">Veja como chegar ao local da pescaria</p>
+                </div>
+              </div>
+
+              {/* Card de Endereço */}
+              {pacote.endereco_completo && (
+                <Card className="mb-6 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200/50 dark:border-blue-800/50">
+                  <CardContent className="p-4">
+                    <div className="flex items-start gap-3">
+                      <Navigation className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-1 flex-shrink-0" />
+                      <div className="flex-1">
+                        <p className="font-medium text-foreground">{pacote.endereco_completo}</p>
+                        <div className="flex flex-wrap gap-2 mt-3">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            className="border-blue-300 dark:border-blue-700 hover:bg-blue-100 dark:hover:bg-blue-900/30"
+                            onClick={() => {
+                              const mapsUrl = `https://www.google.com/maps?q=${pacote.latitude},${pacote.longitude}`;
+                              window.open(mapsUrl, '_blank');
+                            }}
+                          >
+                            <ExternalLink className="h-4 w-4 mr-2" />
+                            Abrir no Maps
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            className="border-blue-300 dark:border-blue-700 hover:bg-blue-100 dark:hover:bg-blue-900/30"
+                            onClick={() => {
+                              navigator.clipboard.writeText(pacote.endereco_completo || '');
+                              toast.success('Endereço copiado!');
+                            }}
+                          >
+                            <Copy className="h-4 w-4 mr-2" />
+                            Copiar
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Mapa com Visual Premium */}
+              <Card className="overflow-hidden shadow-xl border-0">
+                <div className="bg-gradient-to-r from-blue-500 to-indigo-600 px-4 py-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-white text-sm font-medium flex items-center gap-2">
+                      <Compass className="h-4 w-4" />
+                      {Math.abs(pacote.latitude).toFixed(4)}°S, {Math.abs(pacote.longitude).toFixed(4)}°W
+                    </span>
+                    <Badge className="bg-white/20 text-white border-0 hover:bg-white/30 animate-pulse">
+                      📍 Localização exata
+                    </Badge>
+                  </div>
+                </div>
+                <div className="relative w-full h-[400px]">
+                  <iframe
+                    src={`https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d3000!2d${pacote.longitude}!3d${pacote.latitude}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1spt-BR!2sbr!4v1`}
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title={`Mapa - ${pacote.nome}`}
+                    className="absolute inset-0"
+                  />
+                </div>
+              </Card>
             </div>
           </section>
         )}
