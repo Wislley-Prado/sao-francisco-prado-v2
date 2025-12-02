@@ -21,7 +21,8 @@ import {
 import { ImageUploader, ImageFile } from './ImageUploader';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Loader2 } from 'lucide-react';
+import { Loader2, X, Plus } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 const COMODIDADES_PADRAO = [
   'WiFi',
@@ -138,9 +139,9 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
     setIsSubmitting(true);
 
     try {
-      // Adicionar comodidade customizada se existir
+      // Adicionar comodidade customizada se existir (e não estiver duplicada)
       const comodidadesFinal = [...data.comodidades];
-      if (data.comodidadeCustom?.trim()) {
+      if (data.comodidadeCustom?.trim() && !comodidadesFinal.includes(data.comodidadeCustom.trim())) {
         comodidadesFinal.push(data.comodidadeCustom.trim());
       }
 
@@ -538,16 +539,71 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
               )}
             />
 
+            {/* Comodidades personalizadas já adicionadas */}
+            {(() => {
+              const comodidadesPersonalizadas = (form.watch('comodidades') || []).filter(
+                (c) => !COMODIDADES_PADRAO.includes(c)
+              );
+              
+              if (comodidadesPersonalizadas.length === 0) return null;
+              
+              return (
+                <div className="space-y-2">
+                  <Label>Comodidades Personalizadas Adicionadas</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {comodidadesPersonalizadas.map((comodidade) => (
+                      <Badge 
+                        key={comodidade} 
+                        variant="secondary" 
+                        className="flex items-center gap-1 pr-1"
+                      >
+                        {comodidade}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const current = form.getValues('comodidades') || [];
+                            form.setValue('comodidades', current.filter((c) => c !== comodidade));
+                          }}
+                          className="ml-1 rounded-full p-0.5 hover:bg-destructive/20 transition-colors"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+
             <FormField
               control={form.control}
               name="comodidadeCustom"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Comodidade Personalizada</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Ex: Freezer para iscas" />
-                  </FormControl>
-                  <FormDescription>Adicione uma comodidade não listada acima</FormDescription>
+                  <FormLabel>Adicionar Nova Comodidade</FormLabel>
+                  <div className="flex gap-2">
+                    <FormControl>
+                      <Input {...field} placeholder="Ex: Freezer para iscas" />
+                    </FormControl>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => {
+                        const value = field.value?.trim();
+                        if (value) {
+                          const current = form.getValues('comodidades') || [];
+                          if (!current.includes(value)) {
+                            form.setValue('comodidades', [...current, value]);
+                          }
+                          form.setValue('comodidadeCustom', '');
+                        }
+                      }}
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <FormDescription>Digite e clique no + para adicionar</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
