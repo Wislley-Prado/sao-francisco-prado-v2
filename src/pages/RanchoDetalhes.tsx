@@ -453,17 +453,10 @@ const RanchoDetalhes = () => {
                             <span className="text-sm text-foreground font-medium">Reservado</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 rounded bg-emerald-500 shadow-sm"></div>
+                            <div className="w-4 h-4 rounded bg-white border border-gray-300 shadow-sm"></div>
                             <span className="text-sm text-foreground font-medium">Disponível</span>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 rounded bg-amber-500 shadow-sm"></div>
-                            <span className="text-sm text-foreground font-medium">Consulte</span>
-                          </div>
                         </div>
-                        <p className="text-xs text-muted-foreground text-center mt-3">
-                          Para verificar disponibilidade exata, entre em contato via WhatsApp
-                        </p>
                       </div>
                     </Card>
                   </div>
