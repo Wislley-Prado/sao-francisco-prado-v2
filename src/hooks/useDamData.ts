@@ -113,18 +113,15 @@ const mapNewApiDataToDamData = (apiData: NewApiResponseItem[]): DamData => {
 
 const fetchDamData = async (): Promise<DamData> => {
   const timestamp = new Date().toISOString();
-  console.log(`🚀 [FETCH] ${timestamp} - Buscando dados da API...`);
+  console.log(`🚀 [FETCH] ${timestamp} - Buscando dados da API via Edge Function...`);
   
   try {
-    const response = await fetch('https://webhook.v1.vendopro.com.br/webhook/v1.represa.online', {
+    const response = await fetch('https://zeqloqlhnbdeivnyghkx.supabase.co/functions/v1/dam-data-proxy', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({}),
-      mode: 'cors',
-      cache: 'no-cache',
     });
     
     console.log(`📡 [FETCH] Status da resposta: ${response.status}`);
