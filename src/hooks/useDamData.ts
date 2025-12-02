@@ -116,7 +116,7 @@ const fetchDamData = async (): Promise<DamData> => {
   console.log(`🚀 [FETCH] ${timestamp} - Buscando dados da API...`);
   
   try {
-    const response = await fetch('https://n8n.prado.vendopro.com.br/webhook/v1.represa.online', {
+    const response = await fetch('https://n8n.vendopro.com.br/webhook-test/v1.represa.online', {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
