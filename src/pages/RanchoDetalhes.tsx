@@ -403,7 +403,7 @@ const RanchoDetalhes = () => {
                   <Separator />
                   <div id="calendar-section">
                     <div className="flex items-center gap-3 mb-6">
-                      <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg">
+                      <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg shadow-emerald-500/25">
                         <CalendarDays className="h-6 w-6 text-white" />
                       </div>
                       <div>
@@ -411,29 +411,45 @@ const RanchoDetalhes = () => {
                         <p className="text-sm text-muted-foreground">Confira as datas disponíveis para reserva</p>
                       </div>
                     </div>
-                    <Card className="overflow-hidden shadow-xl border-0">
-                      <div className="bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 p-4">
-                        <div className="flex items-center justify-between">
+                    <Card className="overflow-hidden shadow-2xl border border-border/50 rounded-2xl">
+                      <div className="bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 p-5">
+                        <div className="flex items-center justify-between flex-wrap gap-3">
                           <h3 className="text-white font-semibold text-lg flex items-center gap-2">
                             <Calendar className="h-5 w-5" />
                             Calendário de Reservas
                           </h3>
-                          <Badge className="bg-white/20 text-white border-white/30 hover:bg-white/30">
-                            Atualizado em tempo real
-                          </Badge>
+                          <div className="flex items-center gap-2">
+                            <Badge className="bg-white/20 text-white border-white/30 hover:bg-white/30">
+                              <span className="relative flex h-2 w-2 mr-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                              </span>
+                              Tempo real
+                            </Badge>
+                          </div>
                         </div>
+                        <p className="text-white/80 text-sm mt-2">
+                          Datas marcadas indicam reservas confirmadas
+                        </p>
                       </div>
                       <CardContent className="p-0">
-                        <div className="relative w-full h-[600px] bg-background">
+                        {/* Container com overflow hidden para esconder o rodapé do Google Calendar */}
+                        <div className="relative w-full h-[550px] overflow-hidden bg-background">
                           <iframe
                             src={`${rancho.google_calendar_url}&showTitle=0&showPrint=0&showTabs=0&showCalendars=0&showTz=0&mode=MONTH&wkst=1&bgcolor=%23ffffff&ctz=America/Sao_Paulo`}
-                            className="w-full h-full border-0"
+                            className="w-full border-0"
+                            style={{ height: '620px', marginBottom: '-70px' }}
                             frameBorder="0"
-                            scrolling="yes"
+                            scrolling="no"
                             title={`Calendário de disponibilidade ${rancho.nome}`}
                           />
                         </div>
                       </CardContent>
+                      <div className="bg-gradient-to-r from-muted/50 to-muted/30 px-5 py-3 border-t border-border/50">
+                        <p className="text-xs text-muted-foreground text-center">
+                          🟦 Datas em azul = reservado • Datas livres = disponível para reserva
+                        </p>
+                      </div>
                     </Card>
                   </div>
                 </>
