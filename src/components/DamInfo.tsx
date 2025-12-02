@@ -11,6 +11,7 @@ import DamHeader from './dam/DamHeader';
 import ConditionsGrid from './dam/ConditionsGrid';
 import HistoryTable from './dam/HistoryTable';
 import DamDashboard from './dam/DamDashboard';
+import DamHistoryChart from './dam/DamHistoryChart';
 
 const DamInfo = () => {
   const { data: damData, isLoading, error, refetch, dataUpdatedAt } = useDamData();
@@ -125,6 +126,11 @@ const DamInfo = () => {
           renderCount={renderCount.current}
           onRefresh={handleRefetch}
         />
+
+        {/* Gráfico de Evolução Histórica */}
+        <div className="mb-8">
+          <DamHistoryChart damData={damData} />
+        </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Info Card */}
