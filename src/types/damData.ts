@@ -21,6 +21,8 @@ export interface DamData {
   // Novos campos da API de produção
   tendencia_represa?: string;
   timestamp_atualizacao?: string;
+  // Indicador de dados em tempo real indisponíveis
+  usando_dados_historicos?: boolean;
 }
 
 export interface StatusInfo {
