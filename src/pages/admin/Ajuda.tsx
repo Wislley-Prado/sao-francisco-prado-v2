@@ -752,6 +752,121 @@ const Ajuda = () => {
           <Badge variant="secondary">Proteção e Conformidade</Badge>
         </div>
       )
+    },
+    {
+      id: 'imagens',
+      icon: Image,
+      title: 'Especificações de Imagens',
+      color: 'text-emerald-500',
+      content: (
+        <div className="space-y-4">
+          <p className="text-muted-foreground">
+            Guia de tamanhos ideais para upload de imagens em cada área do sistema.
+          </p>
+          
+          <div className="bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-lg space-y-3">
+            <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">
+              📐 Regras Gerais de Compressão Automática:
+            </p>
+            <ul className="list-disc list-inside space-y-1 text-xs text-emerald-700 dark:text-emerald-400">
+              <li>Dimensão máxima: 1920px (largura ou altura)</li>
+              <li>Tamanho máximo: 2MB por imagem</li>
+              <li>Formatos aceitos: JPG, PNG, WEBP</li>
+              <li>Imagens maiores serão comprimidas automaticamente</li>
+            </ul>
+          </div>
+
+          <div className="space-y-2">
+            <h4 className="font-semibold flex items-center gap-2">
+              <Home className="w-4 h-4" /> Imagens de Ranchos:
+            </h4>
+            <div className="bg-muted/50 p-3 rounded-lg">
+              <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+                <li><strong>Tamanho ideal:</strong> 1920 x 1080px (16:9)</li>
+                <li><strong>Tamanho mínimo:</strong> 800 x 600px</li>
+                <li><strong>Orientação:</strong> Paisagem (horizontal)</li>
+                <li><strong>Uso:</strong> Cards na listagem e galeria de detalhes</li>
+                <li><strong>Dica:</strong> A primeira imagem (principal) aparece no card</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <h4 className="font-semibold flex items-center gap-2">
+              <Package className="w-4 h-4" /> Imagens de Pacotes:
+            </h4>
+            <div className="bg-muted/50 p-3 rounded-lg">
+              <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+                <li><strong>Tamanho ideal:</strong> 1920 x 1080px (16:9)</li>
+                <li><strong>Tamanho mínimo:</strong> 800 x 600px</li>
+                <li><strong>Orientação:</strong> Paisagem (horizontal)</li>
+                <li><strong>Uso:</strong> Hero do pacote e galeria</li>
+                <li><strong>Dica:</strong> Use fotos de alta qualidade que mostrem a experiência</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <h4 className="font-semibold flex items-center gap-2">
+              <FileText className="w-4 h-4" /> Imagem de Destaque do Blog:
+            </h4>
+            <div className="bg-muted/50 p-3 rounded-lg">
+              <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+                <li><strong>Tamanho ideal:</strong> 1200 x 630px (proporção 1.91:1)</li>
+                <li><strong>Tamanho mínimo:</strong> 600 x 400px</li>
+                <li><strong>Orientação:</strong> Paisagem (horizontal)</li>
+                <li><strong>Uso:</strong> Capa do post, compartilhamento em redes sociais</li>
+                <li><strong>Dica:</strong> Evite muito texto na imagem (corte em redes sociais)</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <h4 className="font-semibold flex items-center gap-2">
+              <MessageSquare className="w-4 h-4" /> Fotos de Depoimentos:
+            </h4>
+            <div className="bg-muted/50 p-3 rounded-lg">
+              <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+                <li><strong>Tamanho ideal:</strong> 400 x 400px (1:1 quadrado)</li>
+                <li><strong>Tamanho mínimo:</strong> 150 x 150px</li>
+                <li><strong>Orientação:</strong> Quadrado</li>
+                <li><strong>Uso:</strong> Avatar do cliente no depoimento</li>
+                <li><strong>Dica:</strong> Use fotos de rosto bem enquadrado</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <h4 className="font-semibold flex items-center gap-2">
+              <Building2 className="w-4 h-4" /> Imagens de Anúncios:
+            </h4>
+            <div className="bg-muted/50 p-3 rounded-lg">
+              <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+                <li><strong>Banner Principal:</strong> 1200 x 400px (3:1)</li>
+                <li><strong>Card Secundário:</strong> 600 x 400px (3:2)</li>
+                <li><strong>Full Width:</strong> 1920 x 500px</li>
+                <li><strong>Dica:</strong> Mantenha elementos importantes no centro</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="bg-yellow-500/10 border border-yellow-500/20 p-3 rounded-lg space-y-2">
+            <p className="text-sm font-semibold text-yellow-700 dark:text-yellow-500">
+              💡 Dicas para Melhores Resultados:
+            </p>
+            <ul className="list-disc list-inside space-y-1 text-xs text-yellow-700 dark:text-yellow-500">
+              <li>Use iluminação natural para fotos de ranchos e pescarias</li>
+              <li>Evite filtros pesados que distorcem cores</li>
+              <li>Prefira JPG para fotos e PNG para logos/gráficos</li>
+              <li>Comprima imagens antes de subir usando ferramentas como TinyPNG</li>
+              <li>Teste como a imagem aparece em dispositivos móveis</li>
+              <li>Preencha sempre o texto alternativo (alt) para acessibilidade e SEO</li>
+            </ul>
+          </div>
+
+          <Badge variant="secondary">Otimização Visual</Badge>
+        </div>
+      )
     }
   ];
 
@@ -784,7 +899,7 @@ const Ajuda = () => {
         <Card>
           <CardHeader className="pb-3">
             <CardDescription>Funcionalidades</CardDescription>
-            <CardTitle className="text-3xl">14</CardTitle>
+            <CardTitle className="text-3xl">15</CardTitle>
           </CardHeader>
         </Card>
         <Card>
