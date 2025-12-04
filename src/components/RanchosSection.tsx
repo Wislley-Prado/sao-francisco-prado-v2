@@ -31,7 +31,6 @@ interface FilterState {
   maxPrice: number;
   amenities: string[];
   location: string;
-  locationType: string;
   available: boolean;
 }
 
@@ -42,7 +41,6 @@ const RanchosSection = () => {
     maxPrice: 9999,
     amenities: [],
     location: '',
-    locationType: '',
     available: false,
   });
 
@@ -113,18 +111,6 @@ const RanchosSection = () => {
     fetchRanchos();
   }, []);
 
-  // Função para detectar tipo de localização (mesma lógica do RanchCard)
-  const getLocationType = (location: string): 'rio' | 'represa' | null => {
-    const loc = location.toLowerCase();
-    if (loc.includes('represa') || loc.includes('três marias')) {
-      return 'represa';
-    }
-    if (loc.includes('rio') || loc.includes('são francisco')) {
-      return 'rio';
-    }
-    return null;
-  };
-
   const filteredRanchos = useMemo(() => {
     return ranchos.filter(rancho => {
       // Capacity filter
@@ -132,12 +118,6 @@ const RanchosSection = () => {
       
       // Price filter
       if (rancho.price < filters.minPrice || rancho.price > filters.maxPrice) return false;
-      
-      // Location type filter
-      if (filters.locationType) {
-        const ranchoLocationType = getLocationType(rancho.location);
-        if (ranchoLocationType !== filters.locationType) return false;
-      }
       
       // Availability filter
       if (filters.available && !rancho.available) return false;
@@ -165,7 +145,6 @@ const RanchosSection = () => {
       maxPrice: 9999,
       amenities: [],
       location: '',
-      locationType: '',
       available: false,
     });
   };
