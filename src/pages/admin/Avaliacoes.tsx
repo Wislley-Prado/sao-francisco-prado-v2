@@ -15,7 +15,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Star, Check, X, MessageSquare, Trash2 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+} from "@/components/ui/dialog";
+import { Star, Check, X, MessageSquare, Trash2, Image } from "lucide-react";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -28,6 +32,7 @@ export default function Avaliacoes() {
     open: false,
     avaliacao: null,
   });
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const { data: avaliacoes, isLoading } = useQuery({
     queryKey: ["admin-avaliacoes"],
@@ -123,6 +128,32 @@ export default function Avaliacoes() {
   const pendentes = avaliacoes?.filter((a) => !a.verificado) || [];
   const verificadas = avaliacoes?.filter((a) => a.verificado) || [];
 
+  const ImageGallery = ({ images }: { images: string[] }) => {
+    if (!images || images.length === 0) return null;
+    
+    return (
+      <div className="flex gap-2 flex-wrap mt-2">
+        {images.map((img, i) => (
+          <button
+            key={i}
+            onClick={() => setSelectedImage(img)}
+            className="relative h-14 w-14 rounded-lg overflow-hidden hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary"
+          >
+            <img
+              src={img}
+              alt={`Foto ${i + 1}`}
+              className="h-full w-full object-cover"
+            />
+          </button>
+        ))}
+        <Badge variant="outline" className="self-center">
+          <Image className="h-3 w-3 mr-1" />
+          {images.length} foto(s)
+        </Badge>
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -165,6 +196,7 @@ export default function Avaliacoes() {
               </CardHeader>
               <CardContent className="space-y-3">
                 <p className="text-sm">{avaliacao.comentario}</p>
+                <ImageGallery images={avaliacao.imagens} />
                 <p className="text-xs text-muted-foreground">Email: {avaliacao.email}</p>
                 <div className="flex gap-2">
                   <Button
@@ -240,6 +272,7 @@ export default function Avaliacoes() {
               </CardHeader>
               <CardContent className="space-y-3">
                 <p className="text-sm">{avaliacao.comentario}</p>
+                <ImageGallery images={avaliacao.imagens} />
 
                 {avaliacao.resposta_admin ? (
                   <div className="bg-muted p-3 rounded-lg">
@@ -360,6 +393,19 @@ export default function Avaliacoes() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Modal para visualização de imagem */}
+      <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
+        <DialogContent className="max-w-3xl p-0 overflow-hidden">
+          {selectedImage && (
+            <img
+              src={selectedImage}
+              alt="Foto da avaliação"
+              className="w-full h-auto max-h-[80vh] object-contain"
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
