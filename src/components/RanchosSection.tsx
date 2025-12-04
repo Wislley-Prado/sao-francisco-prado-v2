@@ -1,9 +1,9 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import RanchCard from './RanchCard';
 import { MapPin, Star, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
 
 interface Ranch {
   id: string | number;
@@ -28,85 +28,67 @@ interface Ranch {
 }
 
 const RanchosSection = () => {
-  const [ranchos, setRanchos] = useState<Ranch[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Query otimizada: busca ranchos, imagens e contagem de avaliações em uma única chamada
+  const { data: ranchos = [], isLoading } = useQuery({
+    queryKey: ['ranchos-disponiveis'],
+    queryFn: async () => {
+      // Query única com joins
+      const { data: ranchosData, error } = await supabase
+        .from('ranchos')
+        .select(`
+          *,
+          rancho_imagens (url, alt_text, principal, ordem),
+          avaliacoes (id)
+        `)
+        .eq('disponivel', true)
+        .order('destaque', { ascending: false })
+        .order('created_at', { ascending: false });
 
-  useEffect(() => {
-    const fetchRanchos = async () => {
-      try {
-        setLoading(true);
-        
-        // Buscar ranchos disponíveis
-        const { data: ranchosData, error: ranchosError } = await supabase
-          .from('ranchos')
-          .select('*')
-          .eq('disponivel', true)
-          .order('destaque', { ascending: false })
-          .order('created_at', { ascending: false });
+      if (error) throw error;
 
-        if (ranchosError) throw ranchosError;
+      // Transformar dados
+      return (ranchosData || []).map((rancho) => {
+        // Ordenar imagens: principal primeiro, depois por ordem
+        const sortedImages = (rancho.rancho_imagens || [])
+          .sort((a: any, b: any) => {
+            if (a.principal && !b.principal) return -1;
+            if (!a.principal && b.principal) return 1;
+            return (a.ordem ?? 0) - (b.ordem ?? 0);
+          });
 
-        // Buscar imagens e avaliações para cada rancho
-        const ranchosWithData = await Promise.all(
-          (ranchosData || []).map(async (rancho) => {
-            // Buscar imagens
-            const { data: imagesData } = await supabase
-              .from('rancho_imagens')
-              .select('url, alt_text, principal, ordem')
-              .eq('rancho_id', rancho.id)
-              .order('ordem', { ascending: true });
+        return {
+          id: rancho.id,
+          name: rancho.nome,
+          slug: rancho.slug,
+          description: rancho.descricao || '',
+          location: rancho.localizacao,
+          capacity: rancho.capacidade,
+          price: Number(rancho.preco),
+          rating: Number(rancho.rating),
+          images: sortedImages.map((img: any) => img.url),
+          amenities: rancho.comodidades || [],
+          available: rancho.disponivel,
+          features: {
+            bedrooms: rancho.quartos,
+            bathrooms: rancho.banheiros,
+            area: rancho.area ? `${rancho.area}m²` : '0m²'
+          },
+          destaque: rancho.destaque,
+          totalAvaliacoes: rancho.avaliacoes?.length || 0,
+          hasVideo: !!rancho.video_youtube
+        } as Ranch;
+      });
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutos de cache
+  });
 
-            // Buscar contagem de avaliações verificadas
-            const { count: avaliacoesCount } = await supabase
-              .from('avaliacoes')
-              .select('*', { count: 'exact', head: true })
-              .eq('rancho_id', rancho.id)
-              .eq('verificado', true);
+  // Memoizar cálculo da média
+  const avgRating = useMemo(() => {
+    if (ranchos.length === 0) return '0.0';
+    return (ranchos.reduce((sum, r) => sum + r.rating, 0) / ranchos.length).toFixed(1);
+  }, [ranchos]);
 
-            // Ordenar imagens para que a principal venha primeiro
-            const sortedImages = (imagesData || []).sort((a, b) => {
-              if (a.principal && !b.principal) return -1;
-              if (!a.principal && b.principal) return 1;
-              return (a.ordem ?? 0) - (b.ordem ?? 0);
-            });
-
-            return {
-              id: rancho.id,
-              name: rancho.nome,
-              slug: rancho.slug,
-              description: rancho.descricao || '',
-              location: rancho.localizacao,
-              capacity: rancho.capacidade,
-              price: Number(rancho.preco),
-              rating: Number(rancho.rating),
-              images: sortedImages.map(img => img.url),
-              amenities: rancho.comodidades || [],
-              available: rancho.disponivel,
-              features: {
-                bedrooms: rancho.quartos,
-                bathrooms: rancho.banheiros,
-                area: rancho.area ? `${rancho.area}m²` : '0m²'
-              },
-              destaque: rancho.destaque,
-              totalAvaliacoes: avaliacoesCount || 0,
-              hasVideo: !!rancho.video_youtube
-            };
-          })
-        );
-
-        setRanchos(ranchosWithData);
-      } catch (error) {
-        console.error('Erro ao buscar ranchos:', error);
-        toast.error('Erro ao carregar ranchos');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchRanchos();
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <section id="ranchos" className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -118,11 +100,6 @@ const RanchosSection = () => {
       </section>
     );
   }
-
-  // Calcular média de rating
-  const avgRating = ranchos.length > 0 
-    ? (ranchos.reduce((sum, r) => sum + r.rating, 0) / ranchos.length).toFixed(1)
-    : '0.0';
 
   return (
     <section id="ranchos" className="py-20 bg-gray-50">
