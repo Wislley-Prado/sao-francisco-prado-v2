@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Phone, Calendar, Fish, Compass, RefreshCw } from 'lucide-react';
+import { Menu, X, Phone, Calendar, Fish, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useToast } from '@/hooks/use-toast';
@@ -67,10 +67,7 @@ const Header = () => {
         <div className="flex justify-between items-center py-4">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <div className="flex items-center -space-x-1">
-              <Fish className="h-8 w-8 text-white" />
-              <Compass className="h-6 w-6 text-white" />
-            </div>
+            <Fish className="h-8 w-8 text-white" />
             <div className="text-white">
               <h1 className="text-2xl font-bold">PradoAqui</h1>
               <p className="text-xs text-blue-200">Rio São Francisco</p>
