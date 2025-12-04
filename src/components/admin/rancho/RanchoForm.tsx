@@ -132,8 +132,11 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
   };
 
   const onSubmit = async (data: RanchoFormData) => {
+    console.log('Form submitted with data:', data);
+    console.log('Images:', images);
+    
     if (images.length === 0) {
-      toast.error('Adicione pelo menos uma imagem');
+      toast.error('Adicione pelo menos uma imagem na aba "Imagens"');
       return;
     }
 
@@ -265,17 +268,30 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
       }
 
       onSuccess();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving rancho:', error);
-      toast.error('Erro ao salvar rancho');
+      const errorMessage = error?.message || error?.details || 'Erro desconhecido';
+      toast.error(`Erro ao salvar rancho: ${errorMessage}`);
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  // Log form errors for debugging
+  const formErrors = form.formState.errors;
+  if (Object.keys(formErrors).length > 0) {
+    console.log('Form validation errors:', formErrors);
+  }
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit, (errors) => {
+        console.log('Form validation failed:', errors);
+        const firstError = Object.values(errors)[0];
+        if (firstError?.message) {
+          toast.error(`Erro de validação: ${firstError.message}`);
+        }
+      })} className="space-y-6">
         <Tabs defaultValue="basico" className="w-full">
           <TabsList className="grid w-full grid-cols-5 h-auto">
             <TabsTrigger value="basico">Básico</TabsTrigger>
