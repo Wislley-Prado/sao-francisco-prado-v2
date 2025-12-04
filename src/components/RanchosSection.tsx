@@ -1,7 +1,6 @@
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import RanchCard from './RanchCard';
-import RanchFilters from './RanchFilters';
 import { MapPin, Star, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -25,25 +24,7 @@ interface Ranch {
   };
 }
 
-interface FilterState {
-  capacity: number;
-  minPrice: number;
-  maxPrice: number;
-  amenities: string[];
-  location: string;
-  available: boolean;
-}
-
 const RanchosSection = () => {
-  const [filters, setFilters] = useState<FilterState>({
-    capacity: 1,
-    minPrice: 0,
-    maxPrice: 9999,
-    amenities: [],
-    location: '',
-    available: false,
-  });
-
   const [ranchos, setRanchos] = useState<Ranch[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -111,43 +92,18 @@ const RanchosSection = () => {
     fetchRanchos();
   }, []);
 
-  const filteredRanchos = useMemo(() => {
-    return ranchos.filter(rancho => {
-      // Capacity filter
-      if (rancho.capacity < filters.capacity) return false;
-      
-      // Price filter
-      if (rancho.price < filters.minPrice || rancho.price > filters.maxPrice) return false;
-      
-      // Availability filter
-      if (filters.available && !rancho.available) return false;
-      
-      // Amenities filter
-      if (filters.amenities.length > 0) {
-        const hasAllAmenities = filters.amenities.every(amenity => 
-          rancho.amenities.includes(amenity)
-        );
-        if (!hasAllAmenities) return false;
-      }
-      
-      return true;
-    });
-  }, [filters, ranchos]);
-
-  const handleFiltersChange = (newFilters: FilterState) => {
-    setFilters(newFilters);
-  };
-
-  const handleClearFilters = () => {
-    setFilters({
-      capacity: 1,
-      minPrice: 0,
-      maxPrice: 9999,
-      amenities: [],
-      location: '',
-      available: false,
-    });
-  };
+  if (loading) {
+    return (
+      <section id="ranchos" className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-center py-16">
+            <Loader2 className="h-8 w-8 animate-spin text-rio-blue" />
+            <span className="ml-2 text-gray-600">Carregando ranchos...</span>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="ranchos" className="py-20 bg-gray-50">
@@ -163,44 +119,24 @@ const RanchosSection = () => {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-4 gap-8">
-          {/* Filters Sidebar */}
-          <div className="lg:col-span-1">
-            <RanchFilters
-              filters={filters}
-              onFiltersChange={handleFiltersChange}
-              onClearFilters={handleClearFilters}
-              resultsCount={filteredRanchos.length}
-            />
+        {/* Ranchos Grid */}
+        {ranchos.length > 0 ? (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {ranchos.map((rancho) => (
+              <RanchCard key={rancho.id} ranch={rancho} />
+            ))}
           </div>
-
-          {/* Ranchos Grid */}
-          <div className="lg:col-span-3">
-            {filteredRanchos.length > 0 ? (
-              <div className="grid md:grid-cols-2 gap-6">
-                {filteredRanchos.map((rancho) => (
-                  <RanchCard key={rancho.id} ranch={rancho} />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-16">
-                <MapPin className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-600 mb-2">
-                  Nenhum rancho encontrado
-                </h3>
-                <p className="text-gray-500 mb-6">
-                  Tente ajustar os filtros para encontrar mais opções.
-                </p>
-                <button
-                  onClick={handleClearFilters}
-                  className="text-rio-blue hover:text-blue-600 font-medium"
-                >
-                  Limpar todos os filtros
-                </button>
-              </div>
-            )}
+        ) : (
+          <div className="text-center py-16">
+            <MapPin className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-600 mb-2">
+              Nenhum rancho disponível no momento
+            </h3>
+            <p className="text-gray-500">
+              Volte em breve para conferir novas opções.
+            </p>
           </div>
-        </div>
+        )}
 
         {/* Stats Section */}
         <div className="mt-16 bg-white rounded-xl p-8 shadow-lg">
