@@ -22,6 +22,9 @@ interface Ranch {
     bathrooms: number;
     area: string;
   };
+  destaque?: boolean;
+  totalAvaliacoes?: number;
+  hasVideo?: boolean;
 }
 
 const RanchosSection = () => {
@@ -43,14 +46,22 @@ const RanchosSection = () => {
 
         if (ranchosError) throw ranchosError;
 
-        // Buscar imagens para cada rancho
-        const ranchosWithImages = await Promise.all(
+        // Buscar imagens e avaliações para cada rancho
+        const ranchosWithData = await Promise.all(
           (ranchosData || []).map(async (rancho) => {
+            // Buscar imagens
             const { data: imagesData } = await supabase
               .from('rancho_imagens')
               .select('url, alt_text, principal, ordem')
               .eq('rancho_id', rancho.id)
               .order('ordem', { ascending: true });
+
+            // Buscar contagem de avaliações verificadas
+            const { count: avaliacoesCount } = await supabase
+              .from('avaliacoes')
+              .select('*', { count: 'exact', head: true })
+              .eq('rancho_id', rancho.id)
+              .eq('verificado', true);
 
             // Ordenar imagens para que a principal venha primeiro
             const sortedImages = (imagesData || []).sort((a, b) => {
@@ -75,12 +86,15 @@ const RanchosSection = () => {
                 bedrooms: rancho.quartos,
                 bathrooms: rancho.banheiros,
                 area: rancho.area ? `${rancho.area}m²` : '0m²'
-              }
+              },
+              destaque: rancho.destaque,
+              totalAvaliacoes: avaliacoesCount || 0,
+              hasVideo: !!rancho.video_youtube
             };
           })
         );
 
-        setRanchos(ranchosWithImages);
+        setRanchos(ranchosWithData);
       } catch (error) {
         console.error('Erro ao buscar ranchos:', error);
         toast.error('Erro ao carregar ranchos');
@@ -104,6 +118,11 @@ const RanchosSection = () => {
       </section>
     );
   }
+
+  // Calcular média de rating
+  const avgRating = ranchos.length > 0 
+    ? (ranchos.reduce((sum, r) => sum + r.rating, 0) / ranchos.length).toFixed(1)
+    : '0.0';
 
   return (
     <section id="ranchos" className="py-20 bg-gray-50">
@@ -139,25 +158,27 @@ const RanchosSection = () => {
         )}
 
         {/* Stats Section */}
-        <div className="mt-16 bg-white rounded-xl p-8 shadow-lg">
-          <div className="grid md:grid-cols-3 gap-8 text-center">
-            <div>
-              <div className="text-3xl font-bold text-rio-blue mb-2">{ranchos.length}</div>
-              <div className="text-gray-600">Ranchos Disponíveis</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-water-green mb-2">4.7</div>
-              <div className="text-gray-600 flex items-center justify-center">
-                <Star className="h-4 w-4 text-yellow-400 mr-1" />
-                Avaliação Média
+        {ranchos.length > 0 && (
+          <div className="mt-16 bg-white rounded-xl p-8 shadow-lg">
+            <div className="grid md:grid-cols-3 gap-8 text-center">
+              <div>
+                <div className="text-3xl font-bold text-rio-blue mb-2">{ranchos.length}</div>
+                <div className="text-gray-600">Ranchos Disponíveis</div>
+              </div>
+              <div>
+                <div className="text-3xl font-bold text-water-green mb-2">{avgRating}</div>
+                <div className="text-gray-600 flex items-center justify-center">
+                  <Star className="h-4 w-4 text-yellow-400 mr-1" />
+                  Avaliação Média
+                </div>
+              </div>
+              <div>
+                <div className="text-3xl font-bold text-sunset-orange mb-2">98%</div>
+                <div className="text-gray-600">Taxa de Satisfação</div>
               </div>
             </div>
-            <div>
-              <div className="text-3xl font-bold text-sunset-orange mb-2">98%</div>
-              <div className="text-gray-600">Taxa de Satisfação</div>
-            </div>
           </div>
-        </div>
+        )}
       </div>
     </section>
   );
