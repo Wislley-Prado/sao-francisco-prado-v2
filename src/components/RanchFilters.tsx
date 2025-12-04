@@ -19,9 +19,10 @@ interface RanchFiltersProps {
   onFiltersChange: (filters: FilterState) => void;
   onClearFilters: () => void;
   resultsCount: number;
+  availableLocations?: string[];
 }
 
-const RanchFilters = ({ filters, onFiltersChange, onClearFilters, resultsCount }: RanchFiltersProps) => {
+const RanchFilters = ({ filters, onFiltersChange, onClearFilters, resultsCount, availableLocations = [] }: RanchFiltersProps) => {
   const amenitiesList = [
     'Wi-Fi',
     'Estacionamento',
@@ -32,6 +33,26 @@ const RanchFilters = ({ filters, onFiltersChange, onClearFilters, resultsCount }
     'Cozinha Completa',
     'TV a Cabo'
   ];
+
+  // Opções de região predefinidas para busca parcial
+  const regionOptions = [
+    { value: '', label: 'Todas as localizações' },
+    { value: 'Rio São Francisco', label: 'Rio São Francisco' },
+    { value: 'Represa', label: 'Represa de Três Marias' },
+    { value: 'Três Marias', label: 'Três Marias' },
+  ];
+
+  // Adicionar localizações únicas dos ranchos que não estão nas opções predefinidas
+  const allLocationOptions = React.useMemo(() => {
+    const uniqueLocations = availableLocations.filter(loc => 
+      !regionOptions.some(opt => opt.value && loc.toLowerCase().includes(opt.value.toLowerCase()))
+    );
+    
+    return [
+      ...regionOptions,
+      ...uniqueLocations.map(loc => ({ value: loc, label: loc }))
+    ];
+  }, [availableLocations]);
 
   const updateFilter = (key: keyof FilterState, value: any) => {
     onFiltersChange({ ...filters, [key]: value });
@@ -115,11 +136,11 @@ const RanchFilters = ({ filters, onFiltersChange, onClearFilters, resultsCount }
             onChange={(e) => updateFilter('location', e.target.value)}
             className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-rio-blue focus:border-transparent"
           >
-            <option value="">Todas as localizações</option>
-            <option value="Margem Norte">Margem Norte</option>
-            <option value="Margem Sul">Margem Sul</option>
-            <option value="Ilha Particular">Ilha Particular</option>
-            <option value="Beira Rio">Beira Rio</option>
+            {allLocationOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
           </select>
         </div>
 
