@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, DollarSign, MapPin, Filter, X } from 'lucide-react';
+import { Users, DollarSign, Filter, X } from 'lucide-react';
 
 interface FilterState {
   capacity: number;
@@ -19,10 +19,9 @@ interface RanchFiltersProps {
   onFiltersChange: (filters: FilterState) => void;
   onClearFilters: () => void;
   resultsCount: number;
-  availableLocations?: string[];
 }
 
-const RanchFilters = ({ filters, onFiltersChange, onClearFilters, resultsCount, availableLocations = [] }: RanchFiltersProps) => {
+const RanchFilters = ({ filters, onFiltersChange, onClearFilters, resultsCount }: RanchFiltersProps) => {
   const amenitiesList = [
     'Wi-Fi',
     'Estacionamento',
@@ -33,26 +32,6 @@ const RanchFilters = ({ filters, onFiltersChange, onClearFilters, resultsCount, 
     'Cozinha Completa',
     'TV a Cabo'
   ];
-
-  // Opções de região predefinidas para busca parcial
-  const regionOptions = [
-    { value: '', label: 'Todas as localizações' },
-    { value: 'Rio São Francisco', label: 'Rio São Francisco' },
-    { value: 'Represa', label: 'Represa de Três Marias' },
-    { value: 'Três Marias', label: 'Três Marias' },
-  ];
-
-  // Adicionar localizações únicas dos ranchos que não estão nas opções predefinidas
-  const allLocationOptions = React.useMemo(() => {
-    const uniqueLocations = availableLocations.filter(loc => 
-      !regionOptions.some(opt => opt.value && loc.toLowerCase().includes(opt.value.toLowerCase()))
-    );
-    
-    return [
-      ...regionOptions,
-      ...uniqueLocations.map(loc => ({ value: loc, label: loc }))
-    ];
-  }, [availableLocations]);
 
   const updateFilter = (key: keyof FilterState, value: any) => {
     onFiltersChange({ ...filters, [key]: value });
@@ -123,25 +102,6 @@ const RanchFilters = ({ filters, onFiltersChange, onClearFilters, resultsCount, 
               onChange={(e) => updateFilter('maxPrice', parseInt(e.target.value) || 9999)}
             />
           </div>
-        </div>
-
-        {/* Location Filter */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            <MapPin className="h-4 w-4 inline mr-1" />
-            Localização
-          </label>
-          <select
-            value={filters.location}
-            onChange={(e) => updateFilter('location', e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-rio-blue focus:border-transparent"
-          >
-            {allLocationOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
         </div>
 
         {/* Amenities Filter */}

@@ -111,12 +111,6 @@ const RanchosSection = () => {
     fetchRanchos();
   }, []);
 
-  // Extrair localizações únicas dos ranchos
-  const availableLocations = useMemo(() => {
-    const locations = ranchos.map(r => r.location).filter(Boolean);
-    return [...new Set(locations)];
-  }, [ranchos]);
-
   const filteredRanchos = useMemo(() => {
     return ranchos.filter(rancho => {
       // Capacity filter
@@ -124,9 +118,6 @@ const RanchosSection = () => {
       
       // Price filter
       if (rancho.price < filters.minPrice || rancho.price > filters.maxPrice) return false;
-      
-      // Location filter - busca parcial (includes)
-      if (filters.location && !rancho.location.toLowerCase().includes(filters.location.toLowerCase())) return false;
       
       // Availability filter
       if (filters.available && !rancho.available) return false;
@@ -180,7 +171,6 @@ const RanchosSection = () => {
               onFiltersChange={handleFiltersChange}
               onClearFilters={handleClearFilters}
               resultsCount={filteredRanchos.length}
-              availableLocations={availableLocations}
             />
           </div>
 
