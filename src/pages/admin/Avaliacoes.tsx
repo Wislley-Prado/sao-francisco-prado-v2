@@ -1,10 +1,17 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,7 +26,7 @@ import {
   Dialog,
   DialogContent,
 } from "@/components/ui/dialog";
-import { Star, Check, X, MessageSquare, Trash2, Image } from "lucide-react";
+import { Star, Check, X, MessageSquare, Trash2, Image, Filter } from "lucide-react";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -33,6 +40,10 @@ export default function Avaliacoes() {
     avaliacao: null,
   });
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  
+  // Filtros
+  const [filtroRancho, setFiltroRancho] = useState<string>("todos");
+  const [filtroNota, setFiltroNota] = useState<string>("todas");
 
   const { data: avaliacoes, isLoading } = useQuery({
     queryKey: ["admin-avaliacoes"],
@@ -41,7 +52,7 @@ export default function Avaliacoes() {
         .from("avaliacoes")
         .select(`
           *,
-          ranchos!inner (nome)
+          ranchos!inner (id, nome)
         `)
         .order("created_at", { ascending: false });
 
@@ -50,6 +61,27 @@ export default function Avaliacoes() {
     },
   });
 
+  // Lista de ranchos únicos para o filtro
+  const ranchosUnicos = useMemo(() => {
+    if (!avaliacoes) return [];
+    const ranchosMap = new Map();
+    avaliacoes.forEach((av) => {
+      if (av.ranchos && !ranchosMap.has(av.ranchos.id)) {
+        ranchosMap.set(av.ranchos.id, av.ranchos.nome);
+      }
+    });
+    return Array.from(ranchosMap.entries()).map(([id, nome]) => ({ id, nome }));
+  }, [avaliacoes]);
+
+  // Avaliações filtradas
+  const avaliacoesFiltradas = useMemo(() => {
+    if (!avaliacoes) return [];
+    return avaliacoes.filter((av) => {
+      const matchRancho = filtroRancho === "todos" || av.ranchos?.id === filtroRancho;
+      const matchNota = filtroNota === "todas" || av.nota === parseInt(filtroNota);
+      return matchRancho && matchNota;
+    });
+  }, [avaliacoes, filtroRancho, filtroNota]);
   const updateMutation = useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: any }) => {
       const { error } = await supabase
@@ -125,8 +157,11 @@ export default function Avaliacoes() {
     return <div>Carregando...</div>;
   }
 
-  const pendentes = avaliacoes?.filter((a) => !a.verificado) || [];
-  const verificadas = avaliacoes?.filter((a) => a.verificado) || [];
+  const pendentes = avaliacoesFiltradas.filter((a) => !a.verificado);
+  const verificadas = avaliacoesFiltradas.filter((a) => a.verificado);
+
+  const totalPendentes = avaliacoes?.filter((a) => !a.verificado).length || 0;
+  const totalVerificadas = avaliacoes?.filter((a) => a.verificado).length || 0;
 
   const ImageGallery = ({ images }: { images: string[] }) => {
     if (!images || images.length === 0) return null;
@@ -154,16 +189,103 @@ export default function Avaliacoes() {
     );
   };
 
+  const limparFiltros = () => {
+    setFiltroRancho("todos");
+    setFiltroNota("todas");
+  };
+
+  const temFiltrosAtivos = filtroRancho !== "todos" || filtroNota !== "todas";
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Avaliações</h1>
-        <p className="text-muted-foreground">Gerencie as avaliações dos ranchos</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold">Avaliações</h1>
+          <p className="text-muted-foreground">
+            Gerencie as avaliações dos ranchos
+            <span className="ml-2">
+              ({totalPendentes} pendente{totalPendentes !== 1 ? "s" : ""}, {totalVerificadas} aprovada{totalVerificadas !== 1 ? "s" : ""})
+            </span>
+          </p>
+        </div>
       </div>
+
+      {/* Filtros */}
+      <Card>
+        <CardContent className="pt-4">
+          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-end">
+            <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+              <Filter className="h-4 w-4" />
+              Filtros
+            </div>
+            
+            <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium">Rancho</label>
+                <Select value={filtroRancho} onValueChange={setFiltroRancho}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Todos os ranchos" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos os ranchos</SelectItem>
+                    {ranchosUnicos.map((rancho) => (
+                      <SelectItem key={rancho.id} value={rancho.id}>
+                        {rancho.nome}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium">Nota</label>
+                <Select value={filtroNota} onValueChange={setFiltroNota}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Todas as notas" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todas">Todas as notas</SelectItem>
+                    {[5, 4, 3, 2, 1].map((nota) => (
+                      <SelectItem key={nota} value={nota.toString()}>
+                        <div className="flex items-center gap-1">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`h-3 w-3 ${
+                                i < nota ? "fill-yellow-400 text-yellow-400" : "text-muted"
+                              }`}
+                            />
+                          ))}
+                          <span className="ml-1">({nota})</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {temFiltrosAtivos && (
+              <Button variant="ghost" size="sm" onClick={limparFiltros}>
+                Limpar filtros
+              </Button>
+            )}
+          </div>
+
+          {temFiltrosAtivos && (
+            <p className="text-sm text-muted-foreground mt-3">
+              Mostrando {avaliacoesFiltradas.length} de {avaliacoes?.length || 0} avaliações
+            </p>
+          )}
+        </CardContent>
+      </Card>
 
       {pendentes.length > 0 && (
         <div className="space-y-4">
-          <h2 className="text-xl font-semibold">Pendentes de aprovação</h2>
+          <h2 className="text-xl font-semibold">
+            Pendentes de aprovação
+            <Badge variant="secondary" className="ml-2">{pendentes.length}</Badge>
+          </h2>
           {pendentes.map((avaliacao) => (
             <Card key={avaliacao.id}>
               <CardHeader>
@@ -233,9 +355,16 @@ export default function Avaliacoes() {
       )}
 
       <div className="space-y-4">
-        <h2 className="text-xl font-semibold">Avaliações aprovadas</h2>
+        <h2 className="text-xl font-semibold">
+          Avaliações aprovadas
+          <Badge variant="secondary" className="ml-2">{verificadas.length}</Badge>
+        </h2>
         {verificadas.length === 0 ? (
-          <p className="text-muted-foreground">Nenhuma avaliação aprovada ainda.</p>
+          <p className="text-muted-foreground">
+            {temFiltrosAtivos 
+              ? "Nenhuma avaliação encontrada com os filtros selecionados." 
+              : "Nenhuma avaliação aprovada ainda."}
+          </p>
         ) : (
           verificadas.map((avaliacao) => (
             <Card key={avaliacao.id}>
