@@ -30,6 +30,20 @@ interface RanchCardProps {
 }
 
 const RanchCard = ({ ranch }: RanchCardProps) => {
+  // Detectar tipo de localização para exibir tag
+  const getLocationType = (location: string) => {
+    const loc = location.toLowerCase();
+    if (loc.includes('represa') || loc.includes('três marias')) {
+      return { label: 'Represa', className: 'bg-blue-500 text-white' };
+    }
+    if (loc.includes('rio') || loc.includes('são francisco')) {
+      return { label: 'Rio', className: 'bg-emerald-500 text-white' };
+    }
+    return null;
+  };
+
+  const locationType = getLocationType(ranch.location);
+
   const amenityIcons: { [key: string]: React.ReactNode } = {
     'Wi-Fi': <Wifi className="h-4 w-4" />,
     'Estacionamento': <Car className="h-4 w-4" />,
@@ -53,6 +67,13 @@ const RanchCard = ({ ranch }: RanchCardProps) => {
             <div className="h-48 bg-gradient-to-br from-rio-blue to-water-green" />
           )}
           <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+          {/* Tag de localização (Rio/Represa) */}
+          {locationType && (
+            <div className="absolute top-4 left-4">
+              <Badge className={locationType.className}>{locationType.label}</Badge>
+            </div>
+          )}
+          {/* Tag de disponibilidade */}
           <div className="absolute top-4 right-4">
             {ranch.available ? (
               <Badge className="bg-green-500 text-white">Disponível</Badge>
