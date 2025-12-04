@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, DollarSign, Filter, X } from 'lucide-react';
+import { Users, DollarSign, Filter, X, MapPin } from 'lucide-react';
 
 interface FilterState {
   capacity: number;
@@ -11,6 +11,7 @@ interface FilterState {
   maxPrice: number;
   amenities: string[];
   location: string;
+  locationType: string;
   available: boolean;
 }
 
@@ -102,6 +103,23 @@ const RanchFilters = ({ filters, onFiltersChange, onClearFilters, resultsCount }
               onChange={(e) => updateFilter('maxPrice', parseInt(e.target.value) || 9999)}
             />
           </div>
+        </div>
+
+        {/* Location Type Filter */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            <MapPin className="h-4 w-4 inline mr-1" />
+            Tipo de Localização
+          </label>
+          <select
+            value={filters.locationType}
+            onChange={(e) => updateFilter('locationType', e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-rio-blue focus:border-transparent"
+          >
+            <option value="">Todos</option>
+            <option value="rio">🟢 Rio São Francisco</option>
+            <option value="represa">🔵 Represa de Três Marias</option>
+          </select>
         </div>
 
         {/* Amenities Filter */}
