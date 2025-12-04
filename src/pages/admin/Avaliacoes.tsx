@@ -5,7 +5,17 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { Star, Check, X, MessageSquare } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Star, Check, X, MessageSquare, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -14,6 +24,10 @@ export default function Avaliacoes() {
   const queryClient = useQueryClient();
   const [respostas, setRespostas] = useState<Record<string, string>>({});
   const [showResponseForm, setShowResponseForm] = useState<Record<string, boolean>>({});
+  const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; avaliacao: any | null }>({
+    open: false,
+    avaliacao: null,
+  });
 
   const { data: avaliacoes, isLoading } = useQuery({
     queryKey: ["admin-avaliacoes"],
@@ -49,6 +63,25 @@ export default function Avaliacoes() {
     },
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("avaliacoes")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-avaliacoes"] });
+      toast.success("Avaliação excluída com sucesso!");
+      setDeleteDialog({ open: false, avaliacao: null });
+    },
+    onError: () => {
+      toast.error("Erro ao excluir avaliação");
+    },
+  });
+
   const handleVerificar = (id: string) => {
     updateMutation.mutate({ id, updates: { verificado: true } });
   };
@@ -75,6 +108,12 @@ export default function Avaliacoes() {
         },
       }
     );
+  };
+
+  const handleDelete = () => {
+    if (deleteDialog.avaliacao) {
+      deleteMutation.mutate(deleteDialog.avaliacao.id);
+    }
   };
 
   if (isLoading) {
@@ -131,7 +170,7 @@ export default function Avaliacoes() {
                   <Button
                     size="sm"
                     onClick={() => handleVerificar(avaliacao.id)}
-                    disabled={updateMutation.isPending}
+                    disabled={updateMutation.isPending || deleteMutation.isPending}
                   >
                     <Check className="h-4 w-4 mr-1" />
                     Aprovar
@@ -140,10 +179,19 @@ export default function Avaliacoes() {
                     size="sm"
                     variant="destructive"
                     onClick={() => handleRejeitar(avaliacao.id)}
-                    disabled={updateMutation.isPending}
+                    disabled={updateMutation.isPending || deleteMutation.isPending}
                   >
                     <X className="h-4 w-4 mr-1" />
                     Rejeitar
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setDeleteDialog({ open: true, avaliacao })}
+                    disabled={deleteMutation.isPending}
+                  >
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    Excluir
                   </Button>
                 </div>
               </CardContent>
@@ -203,16 +251,28 @@ export default function Avaliacoes() {
                 ) : (
                   <>
                     {!showResponseForm[avaliacao.id] ? (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() =>
-                          setShowResponseForm((prev) => ({ ...prev, [avaliacao.id]: true }))
-                        }
-                      >
-                        <MessageSquare className="h-4 w-4 mr-1" />
-                        Responder
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() =>
+                            setShowResponseForm((prev) => ({ ...prev, [avaliacao.id]: true }))
+                          }
+                        >
+                          <MessageSquare className="h-4 w-4 mr-1" />
+                          Responder
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setDeleteDialog({ open: true, avaliacao })}
+                          disabled={deleteMutation.isPending}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4 mr-1" />
+                          Excluir
+                        </Button>
+                      </div>
                     ) : (
                       <div className="space-y-2">
                         <Textarea
@@ -251,11 +311,55 @@ export default function Avaliacoes() {
                     )}
                   </>
                 )}
+
+                {/* Botão excluir para avaliações com resposta */}
+                {avaliacao.resposta_admin && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setDeleteDialog({ open: true, avaliacao })}
+                    disabled={deleteMutation.isPending}
+                    className="text-destructive hover:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    Excluir avaliação
+                  </Button>
+                )}
               </CardContent>
             </Card>
           ))
         )}
       </div>
+
+      {/* Dialog de confirmação de exclusão */}
+      <AlertDialog
+        open={deleteDialog.open}
+        onOpenChange={(open) => setDeleteDialog({ open, avaliacao: open ? deleteDialog.avaliacao : null })}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir avaliação</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir a avaliação de{" "}
+              <strong>{deleteDialog.avaliacao?.nome_usuario}</strong> sobre o rancho{" "}
+              <strong>{deleteDialog.avaliacao?.ranchos?.nome}</strong>?
+              <br />
+              <br />
+              Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteMutation.isPending}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={deleteMutation.isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleteMutation.isPending ? "Excluindo..." : "Excluir"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
