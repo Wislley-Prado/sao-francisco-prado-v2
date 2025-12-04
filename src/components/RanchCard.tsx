@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -32,52 +32,62 @@ interface RanchCardProps {
   ranch: Ranch;
 }
 
-const RanchCard = ({ ranch }: RanchCardProps) => {
+// Ícones de comodidades extraídos para fora do componente (evita recriação)
+const amenityIconMap: { [key: string]: string } = {
+  'wi-fi': 'wifi',
+  'wifi': 'wifi',
+  'internet': 'wifi',
+  'estacionamento': 'car',
+  'garagem': 'car',
+  'piscina': 'waves',
+  'churrasqueira': 'utensils',
+  'churrasco': 'utensils',
+  'deck de pesca': 'anchor',
+  'deck': 'anchor',
+  'ar condicionado': 'snowflake',
+  'ar-condicionado': 'snowflake',
+  'cozinha': 'coffee',
+  'cozinha completa': 'coffee',
+  'tv': 'tv',
+  'smart tv': 'tv',
+};
+
+const iconComponents: { [key: string]: React.ReactNode } = {
+  wifi: <Wifi className="h-3.5 w-3.5" />,
+  car: <Car className="h-3.5 w-3.5" />,
+  waves: <Waves className="h-3.5 w-3.5" />,
+  utensils: <Utensils className="h-3.5 w-3.5" />,
+  anchor: <Anchor className="h-3.5 w-3.5" />,
+  snowflake: <Snowflake className="h-3.5 w-3.5" />,
+  coffee: <Coffee className="h-3.5 w-3.5" />,
+  tv: <Tv className="h-3.5 w-3.5" />,
+};
+
+const getAmenityIcon = (amenity: string): React.ReactNode => {
+  const lowerAmenity = amenity.toLowerCase();
+  for (const [key, iconType] of Object.entries(amenityIconMap)) {
+    if (lowerAmenity.includes(key)) {
+      return iconComponents[iconType];
+    }
+  }
+  return iconComponents.wifi;
+};
+
+const getLocationType = (location: string) => {
+  const loc = location.toLowerCase();
+  if (loc.includes('represa') || loc.includes('três marias')) {
+    return { label: 'Represa', className: 'bg-blue-500 text-white' };
+  }
+  if (loc.includes('rio') || loc.includes('são francisco')) {
+    return { label: 'Rio', className: 'bg-emerald-500 text-white' };
+  }
+  return null;
+};
+
+const RanchCard = memo(({ ranch }: RanchCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   
-  // Detectar tipo de localização para exibir tag
-  const getLocationType = (location: string) => {
-    const loc = location.toLowerCase();
-    if (loc.includes('represa') || loc.includes('três marias')) {
-      return { label: 'Represa', className: 'bg-blue-500 text-white' };
-    }
-    if (loc.includes('rio') || loc.includes('são francisco')) {
-      return { label: 'Rio', className: 'bg-emerald-500 text-white' };
-    }
-    return null;
-  };
-
   const locationType = getLocationType(ranch.location);
-
-  const amenityIcons: { [key: string]: React.ReactNode } = {
-    'Wi-Fi': <Wifi className="h-3.5 w-3.5" />,
-    'WiFi': <Wifi className="h-3.5 w-3.5" />,
-    'Internet': <Wifi className="h-3.5 w-3.5" />,
-    'Estacionamento': <Car className="h-3.5 w-3.5" />,
-    'Garagem': <Car className="h-3.5 w-3.5" />,
-    'Piscina': <Waves className="h-3.5 w-3.5" />,
-    'Churrasqueira': <Utensils className="h-3.5 w-3.5" />,
-    'Churrasco': <Utensils className="h-3.5 w-3.5" />,
-    'Deck de Pesca': <Anchor className="h-3.5 w-3.5" />,
-    'Deck': <Anchor className="h-3.5 w-3.5" />,
-    'Ar Condicionado': <Snowflake className="h-3.5 w-3.5" />,
-    'Ar-condicionado': <Snowflake className="h-3.5 w-3.5" />,
-    'Cozinha': <Coffee className="h-3.5 w-3.5" />,
-    'Cozinha Completa': <Coffee className="h-3.5 w-3.5" />,
-    'TV': <Tv className="h-3.5 w-3.5" />,
-    'Smart TV': <Tv className="h-3.5 w-3.5" />,
-  };
-
-  const getAmenityIcon = (amenity: string) => {
-    // Procurar correspondência parcial
-    for (const [key, icon] of Object.entries(amenityIcons)) {
-      if (amenity.toLowerCase().includes(key.toLowerCase())) {
-        return icon;
-      }
-    }
-    return <Wifi className="h-3.5 w-3.5" />;
-  };
-
   const totalImages = ranch.images?.length || 0;
   const hasMultipleImages = totalImages > 1;
 
@@ -89,12 +99,13 @@ const RanchCard = ({ ranch }: RanchCardProps) => {
     >
       <CardHeader className="p-0">
         <div className="relative overflow-hidden">
-          {/* Image with hover effect */}
+          {/* Image with hover effect and lazy loading */}
           {ranch.images && ranch.images.length > 0 ? (
             <div className="relative h-52">
               <img 
                 src={isHovered && hasMultipleImages ? ranch.images[1] : ranch.images[0]} 
                 alt={ranch.name}
+                loading="lazy"
                 className="h-full w-full object-cover transition-all duration-500"
               />
               {/* Gradient overlay */}
@@ -230,6 +241,8 @@ const RanchCard = ({ ranch }: RanchCardProps) => {
       </CardContent>
     </Card>
   );
-};
+});
+
+RanchCard.displayName = 'RanchCard';
 
 export default RanchCard;
