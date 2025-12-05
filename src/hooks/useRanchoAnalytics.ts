@@ -3,11 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 
 type AnalyticsEvent = "visualizacao" | "clique_whatsapp" | "clique_reserva";
 
-export const useRanchoAnalytics = (ranchoId: string | null | undefined, evento: AnalyticsEvent) => {
+export const useRanchoAnalytics = (ranchoId: string, evento: AnalyticsEvent) => {
   useEffect(() => {
-    // Não registrar se não há rancho válido
-    if (!ranchoId) return;
-
     const registrarEvento = async () => {
       try {
         const { error } = await supabase.from("rancho_analytics").insert([{
@@ -29,9 +26,6 @@ export const useRanchoAnalytics = (ranchoId: string | null | undefined, evento: 
 };
 
 export const registrarEvento = async (ranchoId: string, evento: AnalyticsEvent) => {
-  // Não registrar se não há rancho válido
-  if (!ranchoId) return;
-
   try {
     const { error } = await supabase.from("rancho_analytics").insert([{
       rancho_id: ranchoId,

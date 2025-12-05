@@ -8,7 +8,6 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   isAdmin: boolean;
-  isSuperAdmin: boolean;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string) => Promise<{ error: any }>;
@@ -21,95 +20,64 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [rolesChecked, setRolesChecked] = useState(false);
   const navigate = useNavigate();
 
-  const checkRoles = async (userId: string) => {
+  const checkAdminRole = async (userId: string) => {
     try {
-      console.log('Checking roles for user:', userId);
       const { data, error } = await supabase
         .from('user_roles')
         .select('role')
-        .eq('user_id', userId);
+        .eq('user_id', userId)
+        .eq('role', 'admin')
+        .maybeSingle();
 
       if (error) {
-        console.error('Error checking roles:', error);
-        return { isAdmin: false, isSuperAdmin: false };
+        console.error('Error checking admin role:', error);
+        return false;
       }
 
-      const roles = data?.map(r => r.role) || [];
-      console.log('User roles found:', roles);
-      return {
-        isAdmin: roles.includes('admin') || roles.includes('super_admin'),
-        isSuperAdmin: roles.includes('super_admin')
-      };
+      return !!data;
     } catch (error) {
-      console.error('Error in checkRoles:', error);
-      return { isAdmin: false, isSuperAdmin: false };
+      console.error('Error in checkAdminRole:', error);
+      return false;
     }
   };
 
-  // useEffect 1: Auth listener - SÍNCRONO, sem chamadas Supabase dentro
   useEffect(() => {
-    // Set up auth state listener PRIMEIRO
+    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, currentSession) => {
-        console.log('Auth state changed:', event);
-        // APENAS atualizações síncronas - NÃO fazer chamadas async aqui
+      async (event, currentSession) => {
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
-        
-        // Se não houver sessão, resetar roles
-        if (!currentSession?.user) {
+
+        // Check admin role when session changes
+        if (currentSession?.user) {
+          setTimeout(async () => {
+            const adminStatus = await checkAdminRole(currentSession.user.id);
+            setIsAdmin(adminStatus);
+          }, 0);
+        } else {
           setIsAdmin(false);
-          setIsSuperAdmin(false);
-          setRolesChecked(true);
         }
       }
     );
 
-    // DEPOIS verificar sessão existente
-    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
-      console.log('Initial session check:', currentSession?.user?.email);
+    // Check for existing session
+    supabase.auth.getSession().then(async ({ data: { session: currentSession } }) => {
       setSession(currentSession);
       setUser(currentSession?.user ?? null);
+
+      if (currentSession?.user) {
+        const adminStatus = await checkAdminRole(currentSession.user.id);
+        setIsAdmin(adminStatus);
+      }
+
       setLoading(false);
     });
 
     return () => subscription.unsubscribe();
   }, []);
-
-  // useEffect 2: Verificar roles SEPARADO do listener (evita deadlock)
-  useEffect(() => {
-    // Não fazer nada se ainda estamos carregando a sessão inicial
-    if (loading) return;
-
-    const fetchRoles = async () => {
-      if (user) {
-        console.log('Fetching roles for user:', user.id);
-        setRolesChecked(false); // Reset para garantir que loading seja true enquanto busca
-        const roles = await checkRoles(user.id);
-        console.log('Setting roles:', roles);
-        setIsAdmin(roles.isAdmin);
-        setIsSuperAdmin(roles.isSuperAdmin);
-        setRolesChecked(true);
-      } else {
-        // Sem usuário = roles já verificadas (nenhuma)
-        setIsAdmin(false);
-        setIsSuperAdmin(false);
-        setRolesChecked(true);
-      }
-    };
-
-    fetchRoles();
-  }, [user, loading]);
-
-  // Loading é true se:
-  // 1. Ainda verificando sessão inicial, OU
-  // 2. Tem usuário MAS as roles ainda não foram verificadas
-  const isLoading = loading || (!!user && !rolesChecked);
 
   const signIn = async (email: string, password: string) => {
     try {
@@ -160,7 +128,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       await supabase.auth.signOut();
       setIsAdmin(false);
-      setIsSuperAdmin(false);
       toast.success('Logout realizado com sucesso!');
       navigate('/admin/login');
     } catch (error) {
@@ -174,8 +141,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         user,
         session,
         isAdmin,
-        isSuperAdmin,
-        loading: isLoading,
+        loading,
         signIn,
         signUp,
         signOut,

@@ -38,35 +38,6 @@ const COMODIDADES_PADRAO = [
   'Guia de Pesca',
 ];
 
-// Função para extrair URL limpa do YouTube (aceita iframe ou URL direta)
-const extractYouTubeUrl = (input: string): string => {
-  if (!input) return '';
-  
-  // Se contém 'src="', extrair do iframe
-  const srcMatch = input.match(/src="([^"]+)"/);
-  if (srcMatch) {
-    // Converter URL de embed para URL normal
-    const embedMatch = srcMatch[1].match(/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/);
-    if (embedMatch) return `https://www.youtube.com/shorts/${embedMatch[1]}`;
-    return srcMatch[1];
-  }
-  
-  return input.trim();
-};
-
-// Função para extrair URL limpa do Google Calendar (aceita iframe ou URL direta)
-const extractCalendarUrl = (input: string): string => {
-  if (!input) return '';
-  
-  // Se contém 'src="', extrair a URL do atributo src do iframe
-  const srcMatch = input.match(/src="([^"]+)"/);
-  if (srcMatch) return srcMatch[1];
-  
-  // Remover caracteres extras como " style="border: 0"
-  const cleanUrl = input.split('"')[0].trim();
-  return cleanUrl;
-};
-
 const ranchoSchema = z.object({
   nome: z.string().min(3, 'Nome deve ter no mínimo 3 caracteres'),
   slug: z.string().min(3, 'Slug deve ter no mínimo 3 caracteres'),
@@ -87,31 +58,18 @@ const ranchoSchema = z.object({
     .string()
     .optional()
     .or(z.literal(''))
-    .transform((val) => val ? extractYouTubeUrl(val) : val)
     .refine(
       (val) => {
         if (!val || val === '') return true;
-        // Aceitar qualquer URL do YouTube
-        return val.includes('youtube.com') || val.includes('youtu.be');
+        // Validate YouTube URLs (Shorts, regular videos, youtu.be)
+        const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(shorts\/|watch\?v=)|youtu\.be\/)[a-zA-Z0-9_-]{11}.*$/;
+        return youtubeRegex.test(val);
       },
       {
-        message: 'Use um link válido do YouTube (Shorts, vídeo normal ou youtu.be)',
+        message: 'URL inválida. Use um link válido do YouTube (Shorts, vídeo normal ou youtu.be)',
       }
     ),
-  google_calendar_url: z
-    .string()
-    .optional()
-    .or(z.literal(''))
-    .transform((val) => val ? extractCalendarUrl(val) : val)
-    .refine(
-      (val) => {
-        if (!val || val === '') return true;
-        return val.includes('calendar.google.com');
-      },
-      {
-        message: 'Use uma URL válida do Google Calendar',
-      }
-    ),
+  google_calendar_url: z.string().url('URL inválida do Google Calendar').optional().or(z.literal('')),
   tracking_code: z.string().optional(),
   latitude: z.string().optional().or(z.literal('')),
   longitude: z.string().optional().or(z.literal('')),

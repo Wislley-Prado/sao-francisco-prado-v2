@@ -145,8 +145,8 @@ const RanchoDetalhes = () => {
     }
   }, [slug, navigate]);
 
-  // Registrar visualização da página (usa null se rancho não existe)
-  useRanchoAnalytics(rancho?.id, "visualizacao");
+  // Registrar visualização da página
+  useRanchoAnalytics(rancho?.id || "", "visualizacao");
 
   // Injetar tracking code específico do rancho (sanitizado)
   useEffect(() => {
