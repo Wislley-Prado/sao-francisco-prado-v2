@@ -91,14 +91,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setIsAdmin(roles.isAdmin);
         setIsSuperAdmin(roles.isSuperAdmin);
         setRolesChecked(true);
+      } else {
+        // Sem usuário = roles já verificadas (nenhuma)
+        setRolesChecked(true);
       }
     };
 
     fetchRoles();
   }, [user]);
 
-  // Considera loading enquanto não verificar as roles
-  const isReady = !loading && rolesChecked;
+  // Loading é true se:
+  // 1. Ainda verificando sessão inicial, OU
+  // 2. Tem usuário MAS as roles ainda não foram verificadas
+  const isLoading = loading || (!!user && !rolesChecked);
 
   const signIn = async (email: string, password: string) => {
     try {
@@ -164,7 +169,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         session,
         isAdmin,
         isSuperAdmin,
-        loading: !isReady,
+        loading: isLoading,
         signIn,
         signUp,
         signOut,
