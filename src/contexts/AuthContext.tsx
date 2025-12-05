@@ -23,10 +23,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [rolesChecked, setRolesChecked] = useState(false);
   const navigate = useNavigate();
 
   const checkRoles = async (userId: string) => {
     try {
+      console.log('Checking roles for user:', userId);
       const { data, error } = await supabase
         .from('user_roles')
         .select('role')
@@ -38,6 +40,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
 
       const roles = data?.map(r => r.role) || [];
+      console.log('User roles found:', roles);
       return {
         isAdmin: roles.includes('admin') || roles.includes('super_admin'),
         isSuperAdmin: roles.includes('super_admin')
@@ -49,42 +52,64 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
+    let isMounted = true;
+
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, currentSession) => {
+        console.log('Auth state changed:', event);
+        
+        if (!isMounted) return;
+
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
 
-        // Check roles when session changes
+        // Check roles when session changes - SEM setTimeout para evitar race condition
         if (currentSession?.user) {
-          setTimeout(async () => {
-            const roles = await checkRoles(currentSession.user.id);
+          const roles = await checkRoles(currentSession.user.id);
+          if (isMounted) {
+            console.log('Setting roles after auth change:', roles);
             setIsAdmin(roles.isAdmin);
             setIsSuperAdmin(roles.isSuperAdmin);
-          }, 0);
+            setRolesChecked(true);
+          }
         } else {
           setIsAdmin(false);
           setIsSuperAdmin(false);
+          setRolesChecked(true);
         }
       }
     );
 
     // Check for existing session
     supabase.auth.getSession().then(async ({ data: { session: currentSession } }) => {
+      if (!isMounted) return;
+
+      console.log('Initial session check:', currentSession?.user?.email);
       setSession(currentSession);
       setUser(currentSession?.user ?? null);
 
       if (currentSession?.user) {
         const roles = await checkRoles(currentSession.user.id);
-        setIsAdmin(roles.isAdmin);
-        setIsSuperAdmin(roles.isSuperAdmin);
+        if (isMounted) {
+          console.log('Setting initial roles:', roles);
+          setIsAdmin(roles.isAdmin);
+          setIsSuperAdmin(roles.isSuperAdmin);
+        }
       }
 
+      setRolesChecked(true);
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
+
+  // Considera loading enquanto não verificar as roles
+  const isReady = !loading && rolesChecked;
 
   const signIn = async (email: string, password: string) => {
     try {
@@ -150,7 +175,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         session,
         isAdmin,
         isSuperAdmin,
-        loading,
+        loading: !isReady,
         signIn,
         signUp,
         signOut,
