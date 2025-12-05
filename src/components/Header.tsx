@@ -4,18 +4,19 @@ import { Menu, X, Phone, Calendar, Fish, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useToast } from '@/hooks/use-toast';
+
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
+
   const handleUpdateApp = async () => {
     setIsUpdating(true);
     toast({
       title: "Atualizando aplicativo...",
-      description: "Limpando cache e recarregando"
+      description: "Limpando cache e recarregando",
     });
+
     try {
       // Unregister all service workers
       if ('serviceWorker' in navigator) {
@@ -38,31 +39,23 @@ const Header = () => {
       toast({
         title: "Erro ao atualizar",
         description: "Tente recarregar a página manualmente",
-        variant: "destructive"
+        variant: "destructive",
       });
       setIsUpdating(false);
     }
   };
-  const navItems = [{
-    name: 'Início',
-    href: '#home'
-  }, {
-    name: 'Ranchos',
-    href: '#ranchos'
-  }, {
-    name: 'Pacotes',
-    href: '#pacotes'
-  }, {
-    name: 'Blog',
-    href: '#blog'
-  }, {
-    name: 'Transmissão',
-    href: '/live'
-  }, {
-    name: 'Represa',
-    href: '#represa'
-  }];
-  return <header className="bg-rio-blue shadow-lg sticky top-0 z-50">
+
+  const navItems = [
+    { name: 'Início', href: '#home' },
+    { name: 'Ranchos', href: '#ranchos' },
+    { name: 'Pacotes', href: '#pacotes' },
+    { name: 'Blog', href: '#blog' },
+    { name: 'Transmissão', href: '/live' },
+    { name: 'Represa', href: '#represa' },
+  ];
+
+  return (
+    <header className="bg-rio-blue shadow-lg sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
           {/* Logo */}
@@ -76,58 +69,131 @@ const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            {navItems.map(item => item.href.startsWith('/') ? <Link key={item.name} to={item.href} className="text-white hover:text-sand-beige transition-colors duration-200">
+            {navItems.map((item) => (
+              item.href.startsWith('/') ? (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className="text-white hover:text-sand-beige transition-colors duration-200"
+                >
                   {item.name}
-                </Link> : <a key={item.name} href={item.href} className="text-white hover:text-sand-beige transition-colors duration-200">
+                </Link>
+              ) : (
+                <a
+                  key={item.name}
+                  href={item.href}
+                  className="text-white hover:text-sand-beige transition-colors duration-200"
+                >
                   {item.name}
-                </a>)}
+                </a>
+              )
+            ))}
           </nav>
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="ghost" size="sm" onClick={handleUpdateApp} disabled={isUpdating} className="text-white hover:bg-white hover:bg-opacity-10" title="Atualizar aplicativo">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleUpdateApp}
+              disabled={isUpdating}
+              className="text-white hover:bg-white hover:bg-opacity-10"
+              title="Atualizar aplicativo"
+            >
               <RefreshCw className={`h-4 w-4 ${isUpdating ? 'animate-spin' : ''}`} />
             </Button>
             <ThemeToggle />
-            
-            
+            <Button
+              variant="outline"
+              size="sm"
+              className="bg-transparent border-white text-white hover:bg-white hover:text-rio-blue"
+            >
+              <Calendar className="h-4 w-4 mr-2" />
+              Reservar
+            </Button>
+            <Button
+              size="sm"
+              className="bg-sunset-orange hover:bg-orange-600 text-white"
+            >
+              <Phone className="h-4 w-4 mr-2" />
+              WhatsApp
+            </Button>
           </div>
 
           {/* Mobile menu button */}
           <div className="md:hidden">
-            <Button variant="ghost" size="sm" onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-white hover:bg-white hover:bg-opacity-10">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="text-white hover:bg-white hover:bg-opacity-10"
+            >
               {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>
           </div>
         </div>
 
         {/* Mobile Navigation */}
-        {isMenuOpen && <div className="md:hidden pb-4">
+        {isMenuOpen && (
+          <div className="md:hidden pb-4">
             <nav className="flex flex-col space-y-4">
-              {navItems.map(item => item.href.startsWith('/') ? <Link key={item.name} to={item.href} className="text-white hover:text-sand-beige transition-colors duration-200 py-2" onClick={() => setIsMenuOpen(false)}>
+              {navItems.map((item) => (
+                item.href.startsWith('/') ? (
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    className="text-white hover:text-sand-beige transition-colors duration-200 py-2"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
                     {item.name}
-                  </Link> : <a key={item.name} href={item.href} className="text-white hover:text-sand-beige transition-colors duration-200 py-2" onClick={() => setIsMenuOpen(false)}>
+                  </Link>
+                ) : (
+                  <a
+                    key={item.name}
+                    href={item.href}
+                    className="text-white hover:text-sand-beige transition-colors duration-200 py-2"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
                     {item.name}
-                  </a>)}
+                  </a>
+                )
+              ))}
               <div className="flex flex-col space-y-2 pt-4">
                 <div className="flex justify-center gap-2 mb-2">
-                  <Button variant="ghost" size="sm" onClick={handleUpdateApp} disabled={isUpdating} className="text-white hover:bg-white hover:bg-opacity-10" title="Atualizar aplicativo">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleUpdateApp}
+                    disabled={isUpdating}
+                    className="text-white hover:bg-white hover:bg-opacity-10"
+                    title="Atualizar aplicativo"
+                  >
                     <RefreshCw className={`h-4 w-4 ${isUpdating ? 'animate-spin' : ''}`} />
                   </Button>
                   <ThemeToggle />
                 </div>
-                <Button variant="outline" size="sm" className="bg-transparent border-white text-white hover:bg-white hover:text-rio-blue">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="bg-transparent border-white text-white hover:bg-white hover:text-rio-blue"
+                >
                   <Calendar className="h-4 w-4 mr-2" />
                   Reservar
                 </Button>
-                <Button size="sm" className="bg-sunset-orange hover:bg-orange-600 text-white">
+                <Button
+                  size="sm"
+                  className="bg-sunset-orange hover:bg-orange-600 text-white"
+                >
                   <Phone className="h-4 w-4 mr-2" />
                   WhatsApp
                 </Button>
               </div>
             </nav>
-          </div>}
+          </div>
+        )}
       </div>
-    </header>;
+    </header>
+  );
 };
+
 export default Header;

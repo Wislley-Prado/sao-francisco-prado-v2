@@ -19,7 +19,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { ImageUploader, ImageFile } from './ImageUploader';
-import { CoordenadasHelper } from '../pacote/CoordenadasHelper';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Loader2, X, Plus } from 'lucide-react';
@@ -132,11 +131,8 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
   };
 
   const onSubmit = async (data: RanchoFormData) => {
-    console.log('Form submitted with data:', data);
-    console.log('Images:', images);
-    
     if (images.length === 0) {
-      toast.error('Adicione pelo menos uma imagem na aba "Imagens"');
+      toast.error('Adicione pelo menos uma imagem');
       return;
     }
 
@@ -268,30 +264,17 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
       }
 
       onSuccess();
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error saving rancho:', error);
-      const errorMessage = error?.message || error?.details || 'Erro desconhecido';
-      toast.error(`Erro ao salvar rancho: ${errorMessage}`);
+      toast.error('Erro ao salvar rancho');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Log form errors for debugging
-  const formErrors = form.formState.errors;
-  if (Object.keys(formErrors).length > 0) {
-    console.log('Form validation errors:', formErrors);
-  }
-
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit, (errors) => {
-        console.log('Form validation failed:', errors);
-        const firstError = Object.values(errors)[0];
-        if (firstError?.message) {
-          toast.error(`Erro de validação: ${firstError.message}`);
-        }
-      })} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <Tabs defaultValue="basico" className="w-full">
           <TabsList className="grid w-full grid-cols-5 h-auto">
             <TabsTrigger value="basico">Básico</TabsTrigger>
@@ -679,52 +662,34 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
               )}
             />
 
-            {/* Seção de Localização */}
-            <div className="space-y-4 rounded-lg border p-4 bg-muted/50">
-              <div>
-                <h3 className="text-sm font-medium mb-1">📍 Localização do Rancho</h3>
-                <p className="text-xs text-muted-foreground">
-                  Adicione as coordenadas para exibir a localização no mapa do site.
-                </p>
-              </div>
-
-              {/* Helper para extrair coordenadas do Google Maps */}
-              <CoordenadasHelper 
-                onCoordenadasExtraidas={(latitude, longitude) => {
-                  form.setValue('latitude', latitude.toString());
-                  form.setValue('longitude', longitude.toString());
-                }}
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="latitude"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Latitude</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="-16.12345" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
 
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="latitude"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Latitude</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="-16.12345" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="longitude"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Longitude</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="-45.67890" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+              <FormField
+                control={form.control}
+                name="longitude"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Longitude</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="-45.67890" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
 
             <FormField

@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 
 interface UseParallaxOptions {
   speed?: number;
@@ -7,31 +7,15 @@ interface UseParallaxOptions {
 export const useParallax = (options: UseParallaxOptions = {}) => {
   const { speed = 0.5 } = options;
   const [offset, setOffset] = useState(0);
-  const rafRef = useRef<number | null>(null);
-  const lastScrollRef = useRef(0);
-
-  const handleScroll = useCallback(() => {
-    if (rafRef.current) return;
-    
-    rafRef.current = requestAnimationFrame(() => {
-      const currentScroll = window.pageYOffset;
-      if (currentScroll !== lastScrollRef.current) {
-        lastScrollRef.current = currentScroll;
-        setOffset(currentScroll * speed);
-      }
-      rafRef.current = null;
-    });
-  }, [speed]);
 
   useEffect(() => {
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      if (rafRef.current) {
-        cancelAnimationFrame(rafRef.current);
-      }
+    const handleScroll = () => {
+      setOffset(window.pageYOffset * speed);
     };
-  }, [handleScroll]);
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [speed]);
 
   return offset;
 };

@@ -292,35 +292,35 @@ const PacoteDetalhes = () => {
 
         {/* Seção de Vídeo Premium */}
         {pacote.video_youtube && (
-          <section className="py-16">
+          <section className="py-12">
             <div className="container max-w-7xl mx-auto px-4">
-              {/* Header cinematográfico */}
-              <div className="flex items-center gap-4 mb-10">
-                <div className="relative">
-                  <div className="absolute inset-0 bg-red-500 blur-xl opacity-50 animate-pulse" />
-                  <div className="relative p-4 rounded-2xl bg-gradient-to-br from-red-500 via-red-600 to-red-700 shadow-2xl shadow-red-500/30">
-                    <Play className="h-8 w-8 text-white fill-white" />
-                  </div>
+              {/* Header com ícone gradiente */}
+              <div className="flex items-center gap-3 mb-8">
+                <div className="p-3 rounded-xl bg-gradient-to-br from-red-500 to-red-600 shadow-lg shadow-red-500/25">
+                  <Play className="h-6 w-6 text-white fill-white" />
                 </div>
                 <div>
-                  <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
-                    Conheça o Pacote
-                  </h2>
-                  <p className="text-muted-foreground mt-1">Assista ao vídeo e veja tudo que te espera</p>
+                  <h2 className="text-2xl md:text-3xl font-bold text-foreground">Conheça o Pacote</h2>
+                  <p className="text-sm text-muted-foreground">Assista ao vídeo e veja tudo que te espera</p>
                 </div>
               </div>
               
-              {/* Card com glow effect */}
-              <div className="relative group">
-                {/* Glow effect atrás do card */}
-                <div className="absolute -inset-1 bg-gradient-to-r from-red-500 via-orange-500 to-red-600 rounded-2xl blur-lg opacity-30 group-hover:opacity-50 transition-opacity duration-500" />
-                
-                <Card className="relative overflow-hidden shadow-2xl border-0 rounded-xl bg-card transition-transform duration-300 group-hover:scale-[1.01]">
-                  <CardContent className="p-0">
-                    <YouTubePlayer videoUrl={pacote.video_youtube} title={pacote.nome} />
-                  </CardContent>
-                </Card>
-              </div>
+              <Card className="overflow-hidden shadow-xl border-0">
+                <div className="bg-gradient-to-r from-red-500 to-red-600 px-4 py-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-white text-sm font-medium flex items-center gap-2">
+                      <Play className="h-4 w-4 fill-white" />
+                      Vídeo do Pacote
+                    </span>
+                    <Badge className="bg-white/20 text-white border-0 hover:bg-white/30">
+                      🎬 Exclusivo
+                    </Badge>
+                  </div>
+                </div>
+                <CardContent className="p-0">
+                  <YouTubePlayer videoUrl={pacote.video_youtube} title={pacote.nome} />
+                </CardContent>
+              </Card>
             </div>
           </section>
         )}

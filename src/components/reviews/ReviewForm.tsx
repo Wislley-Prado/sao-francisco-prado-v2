@@ -17,7 +17,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ReviewImageUploader } from "./ReviewImageUploader";
 
 const reviewSchema = z.object({
   nome_usuario: z.string().trim().min(2, "Nome deve ter pelo menos 2 caracteres").max(100),
@@ -36,7 +35,6 @@ interface ReviewFormProps {
 export const ReviewForm = ({ ranchoId, onSuccess }: ReviewFormProps) => {
   const [hoveredStar, setHoveredStar] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [images, setImages] = useState<string[]>([]);
 
   const form = useForm<ReviewFormValues>({
     resolver: zodResolver(reviewSchema),
@@ -57,14 +55,12 @@ export const ReviewForm = ({ ranchoId, onSuccess }: ReviewFormProps) => {
         email: values.email,
         nota: values.nota,
         comentario: values.comentario,
-        imagens: images,
       }]);
 
       if (error) throw error;
 
       toast.success("Avaliação enviada com sucesso! Será publicada após verificação.");
       form.reset();
-      setImages([]);
       onSuccess?.();
     } catch (error) {
       console.error("Erro ao enviar avaliação:", error);
@@ -167,17 +163,6 @@ export const ReviewForm = ({ ranchoId, onSuccess }: ReviewFormProps) => {
                 </FormItem>
               )}
             />
-
-            <div>
-              <FormLabel>Fotos da sua experiência (opcional)</FormLabel>
-              <div className="mt-2">
-                <ReviewImageUploader
-                  images={images}
-                  onChange={setImages}
-                  maxImages={5}
-                />
-              </div>
-            </div>
 
             <Button type="submit" disabled={isSubmitting} className="w-full">
               {isSubmitting ? "Enviando..." : "Enviar avaliação"}
