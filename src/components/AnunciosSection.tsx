@@ -118,8 +118,8 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
     }
   };
 
-  const handleClick = async (anuncio: Anuncio) => {
-    // Registrar clique
+  // Registra clique sem abrir link (para uso com tag <a>)
+  const registerClick = async (anuncio: Anuncio) => {
     try {
       await supabase
         .from('anuncios')
@@ -127,11 +127,6 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
         .eq('id', anuncio.id);
     } catch (error) {
       console.error('Erro ao registrar clique:', error);
-    }
-
-    // Abrir link
-    if (anuncio.link_url) {
-      window.open(anuncio.link_url, '_blank');
     }
   };
 
@@ -165,6 +160,28 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
 
   const currentAnuncio = anuncios[currentIndex];
   const hasMultiple = anuncios.length > 1;
+
+  // Tag "Anúncio" clicável com link nativo
+  const renderAnuncioTag = (anuncio: Anuncio, position: 'top-right' | 'top-left' = 'top-right') => {
+    if (!anuncio.link_url) return null;
+    
+    const positionClasses = position === 'top-right' 
+      ? 'top-4 right-4' 
+      : 'top-4 left-4';
+    
+    return (
+      <a
+        href={anuncio.link_url}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={() => registerClick(anuncio)}
+        className={`absolute ${positionClasses} bg-amber-500 text-white px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-1.5 hover:bg-amber-600 transition-colors z-20 shadow-lg touch-manipulation`}
+      >
+        <ExternalLink className="w-3.5 h-3.5" />
+        Anúncio
+      </a>
+    );
+  };
 
   // Helper para renderizar informações de imóvel
   const renderImovelInfo = (anuncio: Anuncio, variant: 'overlay' | 'card' = 'card') => {
@@ -228,18 +245,10 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
     // Banner Principal (Hero Style)
     if (anuncio.tipo === 'banner_principal') {
       return (
-        <div
-          className="relative h-[400px] rounded-xl overflow-hidden cursor-pointer group"
-          onClick={(e) => {
-            if ((e.target as HTMLElement).closest('button')) return;
-            handleClick(anuncio);
-          }}
-          onTouchEnd={(e) => {
-            if ((e.target as HTMLElement).closest('button')) return;
-            e.preventDefault();
-            handleClick(anuncio);
-          }}
-        >
+        <div className="relative h-[400px] rounded-xl overflow-hidden group">
+          {/* Tag Anúncio clicável */}
+          {renderAnuncioTag(anuncio)}
+          
           <img
             src={anuncio.imagem_url}
             alt={anuncio.titulo}
@@ -260,18 +269,18 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
                 </p>
               )}
               {renderImovelInfo(anuncio, 'overlay')}
-              <Button 
-                size="lg" 
-                className="group/btn touch-manipulation min-h-[44px]"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  e.preventDefault();
-                  handleClick(anuncio);
-                }}
-              >
-                {anuncio.texto_botao}
-                <ExternalLink className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
-              </Button>
+              {anuncio.link_url && (
+                <a
+                  href={anuncio.link_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => registerClick(anuncio)}
+                  className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8 rounded-md text-base font-medium transition-colors touch-manipulation"
+                >
+                  {anuncio.texto_botao}
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+              )}
             </div>
           </div>
         </div>
@@ -283,27 +292,19 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
       const hasImovelInfo = anuncio.imovel_area || anuncio.imovel_preco || anuncio.imovel_localizacao;
       
       return (
-        <Card
-          className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
-          onClick={(e) => {
-            if ((e.target as HTMLElement).closest('button')) return;
-            handleClick(anuncio);
-          }}
-          onTouchEnd={(e) => {
-            if ((e.target as HTMLElement).closest('button')) return;
-            e.preventDefault();
-            handleClick(anuncio);
-          }}
-        >
+        <Card className="overflow-hidden hover:shadow-lg transition-shadow">
           <div className="grid md:grid-cols-2 gap-0">
             <div className="relative h-64 md:h-auto">
+              {/* Tag Anúncio clicável na imagem */}
+              {renderAnuncioTag(anuncio, 'top-left')}
+              
               <img
                 src={anuncio.imagem_url}
                 alt={anuncio.titulo}
                 className="w-full h-full object-cover"
               />
               {hasImovelInfo && (
-                <div className="absolute top-4 left-4">
+                <div className="absolute bottom-4 left-4">
                   <Badge className="bg-green-600 hover:bg-green-700">
                     Imóvel
                   </Badge>
@@ -322,17 +323,18 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
               {/* Informações de imóvel */}
               {renderImovelInfo(anuncio, 'card')}
               
-              <Button 
-                className="w-fit touch-manipulation min-h-[44px]"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  e.preventDefault();
-                  handleClick(anuncio);
-                }}
-              >
-                {anuncio.texto_botao}
-                <ExternalLink className="w-4 h-4 ml-2" />
-              </Button>
+              {anuncio.link_url && (
+                <a
+                  href={anuncio.link_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => registerClick(anuncio)}
+                  className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 rounded-md text-sm font-medium transition-colors w-fit touch-manipulation"
+                >
+                  {anuncio.texto_botao}
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+              )}
             </CardContent>
           </div>
         </Card>
@@ -342,18 +344,10 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
     // Full Width
     if (anuncio.tipo === 'full_width') {
       return (
-        <div
-          className="relative h-[300px] rounded-xl overflow-hidden cursor-pointer group"
-          onClick={(e) => {
-            if ((e.target as HTMLElement).closest('button')) return;
-            handleClick(anuncio);
-          }}
-          onTouchEnd={(e) => {
-            if ((e.target as HTMLElement).closest('button')) return;
-            e.preventDefault();
-            handleClick(anuncio);
-          }}
-        >
+        <div className="relative h-[300px] rounded-xl overflow-hidden group">
+          {/* Tag Anúncio clicável */}
+          {renderAnuncioTag(anuncio)}
+          
           <img
             src={anuncio.imagem_url}
             alt={anuncio.titulo}
@@ -370,18 +364,18 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
                 <p className="text-white/90 mb-4">{anuncio.descricao}</p>
               )}
               {renderImovelInfo(anuncio, 'overlay')}
-              <Button 
-                variant="secondary"
-                className="touch-manipulation min-h-[44px]"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  e.preventDefault();
-                  handleClick(anuncio);
-                }}
-              >
-                {anuncio.texto_botao}
-                <ExternalLink className="w-4 h-4 ml-2" />
-              </Button>
+              {anuncio.link_url && (
+                <a
+                  href={anuncio.link_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => registerClick(anuncio)}
+                  className="inline-flex items-center justify-center gap-2 bg-secondary text-secondary-foreground hover:bg-secondary/80 h-10 px-4 rounded-md text-sm font-medium transition-colors touch-manipulation"
+                >
+                  {anuncio.texto_botao}
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+              )}
             </div>
           </div>
         </div>
@@ -485,7 +479,7 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
             </div>
 
             {/* Contador de anúncios */}
-            <div className="absolute top-4 right-4 bg-black/50 text-white px-3 py-1 rounded-full text-sm z-10">
+            <div className="absolute top-4 right-20 bg-black/50 text-white px-3 py-1 rounded-full text-sm z-10">
               {currentIndex + 1} / {anuncios.length}
               <span className="ml-2 text-white/70">({currentAnuncio.duracao_exibicao}s)</span>
             </div>
