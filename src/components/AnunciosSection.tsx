@@ -234,6 +234,11 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
             if ((e.target as HTMLElement).closest('button')) return;
             handleClick(anuncio);
           }}
+          onTouchEnd={(e) => {
+            if ((e.target as HTMLElement).closest('button')) return;
+            e.preventDefault();
+            handleClick(anuncio);
+          }}
         >
           <img
             src={anuncio.imagem_url}
@@ -282,6 +287,11 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
           className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
           onClick={(e) => {
             if ((e.target as HTMLElement).closest('button')) return;
+            handleClick(anuncio);
+          }}
+          onTouchEnd={(e) => {
+            if ((e.target as HTMLElement).closest('button')) return;
+            e.preventDefault();
             handleClick(anuncio);
           }}
         >
@@ -336,6 +346,11 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
           className="relative h-[300px] rounded-xl overflow-hidden cursor-pointer group"
           onClick={(e) => {
             if ((e.target as HTMLElement).closest('button')) return;
+            handleClick(anuncio);
+          }}
+          onTouchEnd={(e) => {
+            if ((e.target as HTMLElement).closest('button')) return;
+            e.preventDefault();
             handleClick(anuncio);
           }}
         >
