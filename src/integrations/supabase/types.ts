@@ -98,6 +98,7 @@ export type Database = {
           created_at: string
           email: string
           id: string
+          imagens: string[] | null
           nome_usuario: string
           nota: number
           rancho_id: string
@@ -110,6 +111,7 @@ export type Database = {
           created_at?: string
           email: string
           id?: string
+          imagens?: string[] | null
           nome_usuario: string
           nota: number
           rancho_id: string
@@ -122,6 +124,7 @@ export type Database = {
           created_at?: string
           email?: string
           id?: string
+          imagens?: string[] | null
           nome_usuario?: string
           nota?: number
           rancho_id?: string
@@ -1112,9 +1115,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_super_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      app_role: "admin" | "user"
+      app_role: "admin" | "user" | "super_admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1242,7 +1246,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "user"],
+      app_role: ["admin", "user", "super_admin"],
     },
   },
 } as const
