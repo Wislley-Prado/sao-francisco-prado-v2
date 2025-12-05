@@ -8,6 +8,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   isAdmin: boolean;
+  isSuperAdmin: boolean;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string) => Promise<{ error: any }>;
@@ -20,27 +21,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  const checkAdminRole = async (userId: string) => {
+  const checkRoles = async (userId: string) => {
     try {
       const { data, error } = await supabase
         .from('user_roles')
         .select('role')
-        .eq('user_id', userId)
-        .eq('role', 'admin')
-        .maybeSingle();
+        .eq('user_id', userId);
 
       if (error) {
-        console.error('Error checking admin role:', error);
-        return false;
+        console.error('Error checking roles:', error);
+        return { isAdmin: false, isSuperAdmin: false };
       }
 
-      return !!data;
+      const roles = data?.map(r => r.role) || [];
+      return {
+        isAdmin: roles.includes('admin') || roles.includes('super_admin'),
+        isSuperAdmin: roles.includes('super_admin')
+      };
     } catch (error) {
-      console.error('Error in checkAdminRole:', error);
-      return false;
+      console.error('Error in checkRoles:', error);
+      return { isAdmin: false, isSuperAdmin: false };
     }
   };
 
@@ -51,14 +55,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
 
-        // Check admin role when session changes
+        // Check roles when session changes
         if (currentSession?.user) {
           setTimeout(async () => {
-            const adminStatus = await checkAdminRole(currentSession.user.id);
-            setIsAdmin(adminStatus);
+            const roles = await checkRoles(currentSession.user.id);
+            setIsAdmin(roles.isAdmin);
+            setIsSuperAdmin(roles.isSuperAdmin);
           }, 0);
         } else {
           setIsAdmin(false);
+          setIsSuperAdmin(false);
         }
       }
     );
@@ -69,8 +75,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(currentSession?.user ?? null);
 
       if (currentSession?.user) {
-        const adminStatus = await checkAdminRole(currentSession.user.id);
-        setIsAdmin(adminStatus);
+        const roles = await checkRoles(currentSession.user.id);
+        setIsAdmin(roles.isAdmin);
+        setIsSuperAdmin(roles.isSuperAdmin);
       }
 
       setLoading(false);
@@ -128,6 +135,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       await supabase.auth.signOut();
       setIsAdmin(false);
+      setIsSuperAdmin(false);
       toast.success('Logout realizado com sucesso!');
       navigate('/admin/login');
     } catch (error) {
@@ -141,6 +149,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         user,
         session,
         isAdmin,
+        isSuperAdmin,
         loading,
         signIn,
         signUp,

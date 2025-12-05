@@ -53,6 +53,7 @@ import FAQEditar from "./pages/admin/FAQEditar";
 import Depoimentos from "./pages/admin/Depoimentos";
 import DepoimentoNovo from "./pages/admin/DepoimentoNovo";
 import DepoimentoEditar from "./pages/admin/DepoimentoEditar";
+import Administradores from "./pages/admin/Administradores";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -135,6 +136,7 @@ const App = () => {
                   <Route path="whatsapp-analytics" element={<WhatsAppAnalytics />} />
                   <Route path="videos" element={<ConfiguracoesVideos />} />
                   <Route path="ajuda" element={<Ajuda />} />
+                  <Route path="administradores" element={<Administradores />} />
                 </Route>
                 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
