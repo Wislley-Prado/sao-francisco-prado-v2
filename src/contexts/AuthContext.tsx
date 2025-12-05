@@ -51,29 +51,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  // useEffect 1: Auth listener - SÍNCRONO, sem chamadas Supabase dentro
   useEffect(() => {
-    let isMounted = true;
-
-    // Set up auth state listener
+    // Set up auth state listener PRIMEIRO
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, currentSession) => {
+      (event, currentSession) => {
         console.log('Auth state changed:', event);
-        
-        if (!isMounted) return;
-
+        // APENAS atualizações síncronas - NÃO fazer chamadas async aqui
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
-
-        // Check roles when session changes - SEM setTimeout para evitar race condition
-        if (currentSession?.user) {
-          const roles = await checkRoles(currentSession.user.id);
-          if (isMounted) {
-            console.log('Setting roles after auth change:', roles);
-            setIsAdmin(roles.isAdmin);
-            setIsSuperAdmin(roles.isSuperAdmin);
-            setRolesChecked(true);
-          }
-        } else {
+        
+        // Se não houver sessão, resetar roles
+        if (!currentSession?.user) {
           setIsAdmin(false);
           setIsSuperAdmin(false);
           setRolesChecked(true);
@@ -81,32 +70,32 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     );
 
-    // Check for existing session
-    supabase.auth.getSession().then(async ({ data: { session: currentSession } }) => {
-      if (!isMounted) return;
-
+    // DEPOIS verificar sessão existente
+    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
       console.log('Initial session check:', currentSession?.user?.email);
       setSession(currentSession);
       setUser(currentSession?.user ?? null);
-
-      if (currentSession?.user) {
-        const roles = await checkRoles(currentSession.user.id);
-        if (isMounted) {
-          console.log('Setting initial roles:', roles);
-          setIsAdmin(roles.isAdmin);
-          setIsSuperAdmin(roles.isSuperAdmin);
-        }
-      }
-
-      setRolesChecked(true);
       setLoading(false);
     });
 
-    return () => {
-      isMounted = false;
-      subscription.unsubscribe();
-    };
+    return () => subscription.unsubscribe();
   }, []);
+
+  // useEffect 2: Verificar roles SEPARADO do listener (evita deadlock)
+  useEffect(() => {
+    const fetchRoles = async () => {
+      if (user) {
+        console.log('Fetching roles for user:', user.id);
+        const roles = await checkRoles(user.id);
+        console.log('Setting roles:', roles);
+        setIsAdmin(roles.isAdmin);
+        setIsSuperAdmin(roles.isSuperAdmin);
+        setRolesChecked(true);
+      }
+    };
+
+    fetchRoles();
+  }, [user]);
 
   // Considera loading enquanto não verificar as roles
   const isReady = !loading && rolesChecked;
