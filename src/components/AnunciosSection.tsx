@@ -230,7 +230,10 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
       return (
         <div
           className="relative h-[400px] rounded-xl overflow-hidden cursor-pointer group"
-          onClick={() => handleClick(anuncio)}
+          onClick={(e) => {
+            if ((e.target as HTMLElement).closest('button')) return;
+            handleClick(anuncio);
+          }}
         >
           <img
             src={anuncio.imagem_url}
@@ -254,9 +257,10 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
               {renderImovelInfo(anuncio, 'overlay')}
               <Button 
                 size="lg" 
-                className="group/btn"
+                className="group/btn touch-manipulation min-h-[44px]"
                 onClick={(e) => {
                   e.stopPropagation();
+                  e.preventDefault();
                   handleClick(anuncio);
                 }}
               >
@@ -276,7 +280,10 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
       return (
         <Card
           className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
-          onClick={() => handleClick(anuncio)}
+          onClick={(e) => {
+            if ((e.target as HTMLElement).closest('button')) return;
+            handleClick(anuncio);
+          }}
         >
           <div className="grid md:grid-cols-2 gap-0">
             <div className="relative h-64 md:h-auto">
@@ -306,9 +313,10 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
               {renderImovelInfo(anuncio, 'card')}
               
               <Button 
-                className="w-fit"
+                className="w-fit touch-manipulation min-h-[44px]"
                 onClick={(e) => {
                   e.stopPropagation();
+                  e.preventDefault();
                   handleClick(anuncio);
                 }}
               >
@@ -326,7 +334,10 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
       return (
         <div
           className="relative h-[300px] rounded-xl overflow-hidden cursor-pointer group"
-          onClick={() => handleClick(anuncio)}
+          onClick={(e) => {
+            if ((e.target as HTMLElement).closest('button')) return;
+            handleClick(anuncio);
+          }}
         >
           <img
             src={anuncio.imagem_url}
@@ -346,8 +357,10 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
               {renderImovelInfo(anuncio, 'overlay')}
               <Button 
                 variant="secondary"
+                className="touch-manipulation min-h-[44px]"
                 onClick={(e) => {
                   e.stopPropagation();
+                  e.preventDefault();
                   handleClick(anuncio);
                 }}
               >
@@ -381,13 +394,14 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
         {/* Controles de navegação (apenas se houver múltiplos anúncios) */}
         {hasMultiple && (
           <>
-            {/* Botões Prev/Next */}
+            {/* Botões Prev/Next - visíveis em mobile, hover em desktop */}
             <Button
               variant="secondary"
               size="icon"
-              className="absolute left-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-background/90"
+              className="absolute left-4 top-1/2 -translate-y-1/2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity z-10 hover:bg-background/90 touch-manipulation min-h-[44px] min-w-[44px]"
               onClick={(e) => {
                 e.stopPropagation();
+                e.preventDefault();
                 handlePrev();
               }}
             >
@@ -397,9 +411,10 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
             <Button
               variant="secondary"
               size="icon"
-              className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-background/90"
+              className="absolute right-4 top-1/2 -translate-y-1/2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity z-10 hover:bg-background/90 touch-manipulation min-h-[44px] min-w-[44px]"
               onClick={(e) => {
                 e.stopPropagation();
+                e.preventDefault();
                 handleNext();
               }}
             >
