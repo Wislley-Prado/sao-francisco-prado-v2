@@ -166,6 +166,64 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
   const currentAnuncio = anuncios[currentIndex];
   const hasMultiple = anuncios.length > 1;
 
+  // Helper para renderizar informações de imóvel
+  const renderImovelInfo = (anuncio: Anuncio, variant: 'overlay' | 'card' = 'card') => {
+    const hasInfo = anuncio.imovel_area || anuncio.imovel_preco || anuncio.imovel_localizacao;
+    if (!hasInfo) return null;
+
+    if (variant === 'overlay') {
+      return (
+        <div className="flex flex-wrap gap-2 mb-4">
+          {anuncio.imovel_preco && (
+            <Badge className="bg-green-600 hover:bg-green-700 text-white">
+              <DollarSign className="w-3 h-3 mr-1" />
+              R$ {anuncio.imovel_preco.toLocaleString('pt-BR')}
+            </Badge>
+          )}
+          {anuncio.imovel_area && (
+            <Badge className="bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm">
+              <Ruler className="w-3 h-3 mr-1" />
+              {anuncio.imovel_area.toLocaleString('pt-BR')} {anuncio.imovel_unidade_area === 'm2' ? 'm²' : anuncio.imovel_unidade_area}
+            </Badge>
+          )}
+          {anuncio.imovel_localizacao && (
+            <Badge className="bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm">
+              <MapPin className="w-3 h-3 mr-1" />
+              {anuncio.imovel_localizacao}
+            </Badge>
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <div className="grid grid-cols-1 gap-2 mb-4 p-4 bg-muted/50 rounded-lg">
+        {anuncio.imovel_area && (
+          <div className="flex items-center gap-2 text-sm">
+            <Ruler className="w-4 h-4 text-primary" />
+            <span className="font-medium">
+              {anuncio.imovel_area.toLocaleString('pt-BR')} {anuncio.imovel_unidade_area === 'm2' ? 'm²' : anuncio.imovel_unidade_area}
+            </span>
+          </div>
+        )}
+        {anuncio.imovel_preco && (
+          <div className="flex items-center gap-2 text-sm">
+            <DollarSign className="w-4 h-4 text-primary" />
+            <span className="font-bold text-lg">
+              R$ {anuncio.imovel_preco.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            </span>
+          </div>
+        )}
+        {anuncio.imovel_localizacao && (
+          <div className="flex items-center gap-2 text-sm">
+            <MapPin className="w-4 h-4 text-primary" />
+            <span>{anuncio.imovel_localizacao}</span>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const renderAnuncio = (anuncio: Anuncio) => {
     // Banner Principal (Hero Style)
     if (anuncio.tipo === 'banner_principal') {
@@ -193,7 +251,15 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
                   {anuncio.descricao}
                 </p>
               )}
-              <Button size="lg" className="group/btn">
+              {renderImovelInfo(anuncio, 'overlay')}
+              <Button 
+                size="lg" 
+                className="group/btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleClick(anuncio);
+                }}
+              >
                 {anuncio.texto_botao}
                 <ExternalLink className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
               </Button>
@@ -237,34 +303,15 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
               )}
               
               {/* Informações de imóvel */}
-              {hasImovelInfo && (
-                <div className="grid grid-cols-1 gap-2 mb-4 p-4 bg-muted/50 rounded-lg">
-                  {anuncio.imovel_area && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <Ruler className="w-4 h-4 text-primary" />
-                      <span className="font-medium">
-                        {anuncio.imovel_area.toLocaleString('pt-BR')} {anuncio.imovel_unidade_area === 'm2' ? 'm²' : anuncio.imovel_unidade_area}
-                      </span>
-                    </div>
-                  )}
-                  {anuncio.imovel_preco && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <DollarSign className="w-4 h-4 text-primary" />
-                      <span className="font-bold text-lg">
-                        R$ {anuncio.imovel_preco.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                      </span>
-                    </div>
-                  )}
-                  {anuncio.imovel_localizacao && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <MapPin className="w-4 h-4 text-primary" />
-                      <span>{anuncio.imovel_localizacao}</span>
-                    </div>
-                  )}
-                </div>
-              )}
+              {renderImovelInfo(anuncio, 'card')}
               
-              <Button className="w-fit">
+              <Button 
+                className="w-fit"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleClick(anuncio);
+                }}
+              >
                 {anuncio.texto_botao}
                 <ExternalLink className="w-4 h-4 ml-2" />
               </Button>
@@ -296,7 +343,14 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
               {anuncio.descricao && (
                 <p className="text-white/90 mb-4">{anuncio.descricao}</p>
               )}
-              <Button variant="secondary">
+              {renderImovelInfo(anuncio, 'overlay')}
+              <Button 
+                variant="secondary"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleClick(anuncio);
+                }}
+              >
                 {anuncio.texto_botao}
                 <ExternalLink className="w-4 h-4 ml-2" />
               </Button>
