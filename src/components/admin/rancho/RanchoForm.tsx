@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useState, useMemo, useCallback, memo } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
@@ -82,6 +82,91 @@ interface RanchoFormProps {
   rancho?: any;
   onSuccess: () => void;
 }
+
+// Componente otimizado para campo de localização com tags
+const LocationFieldWithTags = memo(({ control }: { control: any }) => {
+  const localizacao = useWatch({ control, name: 'localizacao' }) || '';
+  const destaque = useWatch({ control, name: 'destaque' });
+  
+  const tags = useMemo(() => {
+    const loc = localizacao.toLowerCase();
+    return {
+      isRepresa: loc.includes('represa'),
+      isRio: loc.includes('rio'),
+      isDestaque: destaque,
+    };
+  }, [localizacao, destaque]);
+
+  return (
+    <FormField
+      control={control}
+      name="localizacao"
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>Localização *</FormLabel>
+          <FormControl>
+            <Input {...field} placeholder="Ex: Rio São Francisco, Prado, MG" />
+          </FormControl>
+          <FormDescription>
+            Use "Rio" ou "Represa" para exibir tags automáticas
+          </FormDescription>
+          {(tags.isRio || tags.isRepresa || tags.isDestaque) && (
+            <div className="flex flex-wrap gap-2 pt-2">
+              <span className="text-xs text-muted-foreground">Tags:</span>
+              {tags.isDestaque && (
+                <Badge className="bg-amber-500 text-white text-xs">Destaque</Badge>
+              )}
+              {tags.isRepresa && (
+                <Badge className="bg-blue-500 text-white text-xs">Represa</Badge>
+              )}
+              {tags.isRio && (
+                <Badge className="bg-green-500 text-white text-xs">Rio</Badge>
+              )}
+            </div>
+          )}
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
+});
+LocationFieldWithTags.displayName = 'LocationFieldWithTags';
+
+// Componente otimizado para comodidades personalizadas
+const ComodidadesPersonalizadasSection = memo(({ form }: { form: any }) => {
+  const comodidades = useWatch({ control: form.control, name: 'comodidades' }) || [];
+  
+  const personalizadas = useMemo(() => 
+    comodidades.filter((c: string) => !COMODIDADES_PADRAO.includes(c)),
+    [comodidades]
+  );
+
+  if (personalizadas.length === 0) return null;
+
+  return (
+    <div className="space-y-2">
+      <Label>Comodidades Personalizadas</Label>
+      <div className="flex flex-wrap gap-2">
+        {personalizadas.map((comodidade: string) => (
+          <Badge key={comodidade} variant="secondary" className="flex items-center gap-1 pr-1">
+            {comodidade}
+            <button
+              type="button"
+              onClick={() => {
+                const current = form.getValues('comodidades') || [];
+                form.setValue('comodidades', current.filter((c: string) => c !== comodidade));
+              }}
+              className="ml-1 rounded-full p-0.5 hover:bg-destructive/20 transition-colors"
+            >
+              <X className="h-3 w-3" />
+            </button>
+          </Badge>
+        ))}
+      </div>
+    </div>
+  );
+});
+ComodidadesPersonalizadasSection.displayName = 'ComodidadesPersonalizadasSection';
 
 export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -277,12 +362,12 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <Tabs defaultValue="basico" className="w-full">
-          <TabsList className="grid w-full grid-cols-5 h-auto">
-            <TabsTrigger value="basico">Básico</TabsTrigger>
-            <TabsTrigger value="estrutura">Estrutura</TabsTrigger>
-            <TabsTrigger value="comodidades">Comodidades</TabsTrigger>
-            <TabsTrigger value="midia">Mídia e Contato</TabsTrigger>
-            <TabsTrigger value="imagens">Imagens</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 sm:grid-cols-5 h-auto gap-1">
+            <TabsTrigger value="basico" className="text-xs sm:text-sm">Básico</TabsTrigger>
+            <TabsTrigger value="estrutura" className="text-xs sm:text-sm">Estrutura</TabsTrigger>
+            <TabsTrigger value="comodidades" className="text-xs sm:text-sm">Comodidades</TabsTrigger>
+            <TabsTrigger value="midia" className="text-xs sm:text-sm">Mídia</TabsTrigger>
+            <TabsTrigger value="imagens" className="text-xs sm:text-sm">Imagens</TabsTrigger>
           </TabsList>
 
           <TabsContent value="basico" className="space-y-4 mt-6">
@@ -337,53 +422,11 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="localizacao"
-              render={({ field }) => {
-                const localizacao = field.value?.toLowerCase() || '';
-                const isRepresa = localizacao.includes('represa');
-                const isRio = localizacao.includes('rio');
-                const isDestaque = form.watch('destaque');
-                
-                return (
-                  <FormItem>
-                    <FormLabel>Localização *</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Ex: Rio São Francisco, Prado, MG" />
-                    </FormControl>
-                    <FormDescription>
-                      Use "Rio" ou "Represa" na localização para exibir tags automáticas nos cards
-                    </FormDescription>
-                    {(isRio || isRepresa || isDestaque) && (
-                      <div className="flex flex-wrap gap-2 pt-2">
-                        <span className="text-xs text-muted-foreground">Tags que aparecerão:</span>
-                        {isDestaque && (
-                          <Badge variant="default" className="bg-amber-500 text-white text-xs">
-                            Destaque
-                          </Badge>
-                        )}
-                        {isRepresa && (
-                          <Badge variant="secondary" className="bg-blue-500 text-white text-xs">
-                            Represa
-                          </Badge>
-                        )}
-                        {isRio && (
-                          <Badge variant="secondary" className="bg-green-500 text-white text-xs">
-                            Rio
-                          </Badge>
-                        )}
-                      </div>
-                    )}
-                    <FormMessage />
-                  </FormItem>
-                );
-              }}
-            />
+            <LocationFieldWithTags control={form.control} />
           </TabsContent>
 
           <TabsContent value="estrutura" className="space-y-4 mt-6">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="capacidade"
@@ -536,7 +579,7 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
               render={() => (
                 <FormItem>
                   <FormLabel>Comodidades Disponíveis</FormLabel>
-                  <div className="grid grid-cols-2 gap-3 mt-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
                     {COMODIDADES_PADRAO.map((comodidade) => (
                       <FormField
                         key={comodidade}
@@ -570,41 +613,7 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
               )}
             />
 
-            {/* Comodidades personalizadas já adicionadas */}
-            {(() => {
-              const comodidadesPersonalizadas = (form.watch('comodidades') || []).filter(
-                (c) => !COMODIDADES_PADRAO.includes(c)
-              );
-              
-              if (comodidadesPersonalizadas.length === 0) return null;
-              
-              return (
-                <div className="space-y-2">
-                  <Label>Comodidades Personalizadas Adicionadas</Label>
-                  <div className="flex flex-wrap gap-2">
-                    {comodidadesPersonalizadas.map((comodidade) => (
-                      <Badge 
-                        key={comodidade} 
-                        variant="secondary" 
-                        className="flex items-center gap-1 pr-1"
-                      >
-                        {comodidade}
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const current = form.getValues('comodidades') || [];
-                            form.setValue('comodidades', current.filter((c) => c !== comodidade));
-                          }}
-                          className="ml-1 rounded-full p-0.5 hover:bg-destructive/20 transition-colors"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              );
-            })()}
+            <ComodidadesPersonalizadasSection form={form} />
 
             <FormField
               control={form.control}
@@ -700,7 +709,7 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
               }}
             />
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="latitude"
