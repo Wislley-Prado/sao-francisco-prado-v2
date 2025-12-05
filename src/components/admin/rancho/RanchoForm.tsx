@@ -340,15 +340,45 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
             <FormField
               control={form.control}
               name="localizacao"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Localização *</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Ex: Prado, MG" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              render={({ field }) => {
+                const localizacao = field.value?.toLowerCase() || '';
+                const isRepresa = localizacao.includes('represa');
+                const isRio = localizacao.includes('rio');
+                const isDestaque = form.watch('destaque');
+                
+                return (
+                  <FormItem>
+                    <FormLabel>Localização *</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Ex: Rio São Francisco, Prado, MG" />
+                    </FormControl>
+                    <FormDescription>
+                      Use "Rio" ou "Represa" na localização para exibir tags automáticas nos cards
+                    </FormDescription>
+                    {(isRio || isRepresa || isDestaque) && (
+                      <div className="flex flex-wrap gap-2 pt-2">
+                        <span className="text-xs text-muted-foreground">Tags que aparecerão:</span>
+                        {isDestaque && (
+                          <Badge variant="default" className="bg-amber-500 text-white text-xs">
+                            Destaque
+                          </Badge>
+                        )}
+                        {isRepresa && (
+                          <Badge variant="secondary" className="bg-blue-500 text-white text-xs">
+                            Represa
+                          </Badge>
+                        )}
+                        {isRio && (
+                          <Badge variant="secondary" className="bg-green-500 text-white text-xs">
+                            Rio
+                          </Badge>
+                        )}
+                      </div>
+                    )}
+                    <FormMessage />
+                  </FormItem>
+                );
+              }}
             />
           </TabsContent>
 
