@@ -2,7 +2,7 @@ import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { Star, Upload, X, ImagePlus } from "lucide-react";
+import { Star, X, ImagePlus, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -17,6 +17,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { compressImage } from "@/utils/imageCompression";
 
 const MAX_IMAGES = 5;
 const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
@@ -52,7 +53,7 @@ export const ReviewForm = ({ ranchoId, onSuccess }: ReviewFormProps) => {
     },
   });
 
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
 
@@ -64,13 +65,27 @@ export const ReviewForm = ({ ranchoId, onSuccess }: ReviewFormProps) => {
         toast.error(`Formato não suportado: ${file.name}. Use JPG, PNG ou WEBP.`);
         continue;
       }
-      if (file.size > MAX_FILE_SIZE) {
-        toast.error(`Arquivo muito grande: ${file.name}. Máximo 2MB.`);
-        continue;
-      }
 
-      const preview = URL.createObjectURL(file);
-      setImages(prev => [...prev, { file, preview }]);
+      try {
+        // Compress image before adding (max 1200px, quality 0.8)
+        const compressedFile = await compressImage(file, {
+          maxWidth: 1200,
+          maxHeight: 1200,
+          quality: 0.8,
+          maxSizeMB: 1,
+        });
+
+        if (compressedFile.size > MAX_FILE_SIZE) {
+          toast.error(`Arquivo muito grande após compressão: ${file.name}`);
+          continue;
+        }
+
+        const preview = URL.createObjectURL(compressedFile);
+        setImages(prev => [...prev, { file: compressedFile, preview }]);
+      } catch (error) {
+        console.error("Erro ao comprimir imagem:", error);
+        toast.error(`Erro ao processar: ${file.name}`);
+      }
     }
 
     e.target.value = "";
