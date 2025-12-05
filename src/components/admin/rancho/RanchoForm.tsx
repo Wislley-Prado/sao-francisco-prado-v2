@@ -23,6 +23,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Loader2, X, Plus } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { CoordenadasHelper } from '@/components/admin/shared/CoordenadasHelper';
 
 const COMODIDADES_PADRAO = [
   'WiFi',
@@ -660,6 +661,13 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
                   <FormMessage />
                 </FormItem>
               )}
+            />
+
+            <CoordenadasHelper
+              onCoordenadasExtraidas={(latitude, longitude) => {
+                form.setValue('latitude', latitude.toString());
+                form.setValue('longitude', longitude.toString());
+              }}
             />
 
             <div className="grid grid-cols-2 gap-4">
