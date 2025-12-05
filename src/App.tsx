@@ -8,6 +8,7 @@ import { PWALifecycle } from "@/components/PWALifecycle";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import CookieConsent from "@/components/CookieConsent";
 import TrackingScripts from "@/components/TrackingScripts";
+import PageViewTracker from "@/components/PageViewTracker";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { PrivateRoute } from "@/components/admin/PrivateRoute";
 import { AdminLayout } from "@/components/admin/AdminLayout";
@@ -77,6 +78,7 @@ const App = () => {
           <TrackingScripts />
           <BrowserRouter>
             <ScrollToTop />
+            <PageViewTracker />
             <AuthProvider>
               <Routes>
                 {/* Public Routes */}
