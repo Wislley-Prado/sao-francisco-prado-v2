@@ -83,9 +83,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // useEffect 2: Verificar roles SEPARADO do listener (evita deadlock)
   useEffect(() => {
+    // Não fazer nada se ainda estamos carregando a sessão inicial
+    if (loading) return;
+
     const fetchRoles = async () => {
       if (user) {
         console.log('Fetching roles for user:', user.id);
+        setRolesChecked(false); // Reset para garantir que loading seja true enquanto busca
         const roles = await checkRoles(user.id);
         console.log('Setting roles:', roles);
         setIsAdmin(roles.isAdmin);
@@ -93,12 +97,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setRolesChecked(true);
       } else {
         // Sem usuário = roles já verificadas (nenhuma)
+        setIsAdmin(false);
+        setIsSuperAdmin(false);
         setRolesChecked(true);
       }
     };
 
     fetchRoles();
-  }, [user]);
+  }, [user, loading]);
 
   // Loading é true se:
   // 1. Ainda verificando sessão inicial, OU
