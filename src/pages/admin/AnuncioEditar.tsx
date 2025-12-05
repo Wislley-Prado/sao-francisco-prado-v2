@@ -17,6 +17,7 @@ export default function AnuncioEditar() {
   const { id } = useParams();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [showImovelFields, setShowImovelFields] = useState(false);
   
   const [formData, setFormData] = useState({
     titulo: '',
@@ -76,6 +77,8 @@ export default function AnuncioEditar() {
           imovel_preco: data.imovel_preco ? String(data.imovel_preco) : '',
           imovel_localizacao: data.imovel_localizacao || '',
         });
+        // Ativar campos de imóvel se já existirem dados
+        setShowImovelFields(!!data.imovel_area || !!data.imovel_preco || !!data.imovel_localizacao);
       }
     } catch (error) {
       console.error('Erro ao buscar anúncio:', error);
@@ -196,8 +199,9 @@ export default function AnuncioEditar() {
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
                   <Switch
-                    checked={!!formData.imovel_area || !!formData.imovel_preco}
+                    checked={showImovelFields}
                     onCheckedChange={(checked) => {
+                      setShowImovelFields(checked);
                       if (!checked) {
                         setFormData({
                           ...formData,
@@ -214,7 +218,7 @@ export default function AnuncioEditar() {
                   Adicione detalhes específicos se este anúncio for de uma propriedade ou terreno
                 </CardDescription>
               </CardHeader>
-              {(formData.imovel_area || formData.imovel_preco || formData.imovel_localizacao) && (
+              {showImovelFields && (
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-2">

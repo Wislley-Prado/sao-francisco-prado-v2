@@ -18,6 +18,7 @@ export default function AnuncioNovo() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<string | undefined>(undefined);
+  const [showImovelFields, setShowImovelFields] = useState(false);
   
   const [formData, setFormData] = useState({
     titulo: '',
@@ -246,8 +247,9 @@ export default function AnuncioNovo() {
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
                   <Switch
-                    checked={!!formData.imovel_area || !!formData.imovel_preco}
+                    checked={showImovelFields}
                     onCheckedChange={(checked) => {
+                      setShowImovelFields(checked);
                       if (!checked) {
                         setFormData({
                           ...formData,
@@ -264,7 +266,7 @@ export default function AnuncioNovo() {
                   Adicione detalhes específicos se este anúncio for de uma propriedade ou terreno
                 </CardDescription>
               </CardHeader>
-              {(formData.imovel_area || formData.imovel_preco || formData.imovel_localizacao) && (
+              {showImovelFields && (
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-2">
