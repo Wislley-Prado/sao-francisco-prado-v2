@@ -6,7 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Save, Code2, TrendingUp } from 'lucide-react';
+import { Loader2, Save, Code2, TrendingUp, Webhook, AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const SETTINGS_ID = '00000000-0000-0000-0000-000000000001';
 
@@ -17,7 +18,8 @@ const Configuracoes = () => {
     facebook_pixel: '',
     google_analytics: '',
     google_tag_manager: '',
-    custom_head_scripts: ''
+    custom_head_scripts: '',
+    dam_webhook_url: ''
   });
 
   useEffect(() => {
@@ -39,7 +41,8 @@ const Configuracoes = () => {
           facebook_pixel: data.facebook_pixel || '',
           google_analytics: data.google_analytics || '',
           google_tag_manager: data.google_tag_manager || '',
-          custom_head_scripts: data.custom_head_scripts || ''
+          custom_head_scripts: data.custom_head_scripts || '',
+          dam_webhook_url: (data as any).dam_webhook_url || ''
         });
       }
     } catch (error) {
@@ -136,6 +139,41 @@ const Configuracoes = () => {
                 Container ID do Google Tag Manager
               </p>
             </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Webhook className="w-5 h-5" />
+              Integrações Externas
+            </CardTitle>
+            <CardDescription>
+              Configure URLs de webhooks e integrações com sistemas externos
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="dam_webhook_url">URL do Webhook da Represa (n8n)</Label>
+              <Input
+                id="dam_webhook_url"
+                placeholder="https://webhook.exemplo.com/webhook/represa"
+                value={settings.dam_webhook_url}
+                onChange={(e) => setSettings({ ...settings, dam_webhook_url: e.target.value })}
+                className="font-mono text-sm"
+              />
+              <p className="text-xs text-muted-foreground">
+                URL do webhook n8n que retorna os dados da represa de Três Marias
+              </p>
+            </div>
+            
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription className="text-xs">
+                <strong>Importante:</strong> O workflow no n8n deve estar <strong>ativo</strong> para funcionar. 
+                Ative usando o toggle no canto superior direito do editor do n8n.
+              </AlertDescription>
+            </Alert>
           </CardContent>
         </Card>
 
