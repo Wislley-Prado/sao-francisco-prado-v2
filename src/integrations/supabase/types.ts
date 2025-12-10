@@ -949,6 +949,7 @@ export type Database = {
         Row: {
           created_at: string
           custom_head_scripts: string | null
+          dam_webhook_url: string | null
           facebook_pixel: string | null
           google_analytics: string | null
           google_tag_manager: string | null
@@ -968,6 +969,7 @@ export type Database = {
         Insert: {
           created_at?: string
           custom_head_scripts?: string | null
+          dam_webhook_url?: string | null
           facebook_pixel?: string | null
           google_analytics?: string | null
           google_tag_manager?: string | null
@@ -987,6 +989,7 @@ export type Database = {
         Update: {
           created_at?: string
           custom_head_scripts?: string | null
+          dam_webhook_url?: string | null
           facebook_pixel?: string | null
           google_analytics?: string | null
           google_tag_manager?: string | null
