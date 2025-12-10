@@ -541,6 +541,7 @@ export type Database = {
           ativo: boolean
           caracteristicas: string[] | null
           created_at: string
+          desconto_avista: number | null
           descricao: string | null
           destaque: boolean
           duracao: string
@@ -550,6 +551,8 @@ export type Database = {
           latitude: number | null
           longitude: number | null
           nome: string
+          parcela_valor: number | null
+          parcelas_quantidade: number | null
           pessoas: number
           popular: boolean
           preco: number
@@ -559,12 +562,14 @@ export type Database = {
           tipo: string
           tracking_code: string | null
           updated_at: string
+          vagas_disponiveis: number | null
           video_youtube: string | null
         }
         Insert: {
           ativo?: boolean
           caracteristicas?: string[] | null
           created_at?: string
+          desconto_avista?: number | null
           descricao?: string | null
           destaque?: boolean
           duracao: string
@@ -574,6 +579,8 @@ export type Database = {
           latitude?: number | null
           longitude?: number | null
           nome: string
+          parcela_valor?: number | null
+          parcelas_quantidade?: number | null
           pessoas?: number
           popular?: boolean
           preco: number
@@ -583,12 +590,14 @@ export type Database = {
           tipo?: string
           tracking_code?: string | null
           updated_at?: string
+          vagas_disponiveis?: number | null
           video_youtube?: string | null
         }
         Update: {
           ativo?: boolean
           caracteristicas?: string[] | null
           created_at?: string
+          desconto_avista?: number | null
           descricao?: string | null
           destaque?: boolean
           duracao?: string
@@ -598,6 +607,8 @@ export type Database = {
           latitude?: number | null
           longitude?: number | null
           nome?: string
+          parcela_valor?: number | null
+          parcelas_quantidade?: number | null
           pessoas?: number
           popular?: boolean
           preco?: number
@@ -607,6 +618,7 @@ export type Database = {
           tipo?: string
           tracking_code?: string | null
           updated_at?: string
+          vagas_disponiveis?: number | null
           video_youtube?: string | null
         }
         Relationships: []

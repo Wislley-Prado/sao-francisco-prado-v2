@@ -36,6 +36,10 @@ interface PacoteDetalhes {
   ativo: boolean;
   popular: boolean;
   destaque: boolean;
+  parcelas_quantidade?: number;
+  parcela_valor?: number;
+  desconto_avista?: number;
+  vagas_disponiveis?: number;
   video_youtube?: string;
   tracking_code?: string;
   telefone_whatsapp?: string;
@@ -117,6 +121,10 @@ const PacoteDetalhes = () => {
           ativo: pacoteData.ativo,
           popular: pacoteData.popular,
           destaque: pacoteData.destaque,
+          parcelas_quantidade: pacoteData.parcelas_quantidade,
+          parcela_valor: pacoteData.parcela_valor ? Number(pacoteData.parcela_valor) : undefined,
+          desconto_avista: pacoteData.desconto_avista ? Number(pacoteData.desconto_avista) : undefined,
+          vagas_disponiveis: pacoteData.vagas_disponiveis,
           video_youtube: pacoteData.video_youtube,
           tracking_code: pacoteData.tracking_code,
           telefone_whatsapp: pacoteData.telefone_whatsapp,
@@ -240,6 +248,12 @@ const PacoteDetalhes = () => {
           <PackagePricing
             price={pacote.preco}
             tier={tier}
+            installments={pacote.parcela_valor || pacote.parcelas_quantidade ? {
+              count: pacote.parcelas_quantidade || 10,
+              value: pacote.parcela_valor || (pacote.preco / (pacote.parcelas_quantidade || 10))
+            } : undefined}
+            discount={pacote.desconto_avista}
+            spotsLeft={pacote.vagas_disponiveis}
             onReserveClick={handleReservarClick}
             onWhatsAppClick={handleWhatsAppClick}
           />
