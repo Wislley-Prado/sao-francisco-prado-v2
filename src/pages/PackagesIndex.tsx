@@ -29,6 +29,10 @@ interface Pacote {
   destaque: boolean;
   ativo: boolean;
   inclusos: string[];
+  parcelas_quantidade?: number;
+  parcela_valor?: number;
+  desconto_avista?: number;
+  vagas_disponiveis?: number;
   pacote_imagens: PacoteImage[];
 }
 
@@ -60,12 +64,23 @@ const PackagesIndex = () => {
           const mainImage = pacote.pacote_imagens.find(img => img.principal) || 
                            pacote.pacote_imagens.sort((a, b) => a.ordem - b.ordem)[0];
 
+          const parcelasQtd = pacote.parcelas_quantidade || 10;
+          const parcelaValor = pacote.parcela_valor || (pacote.preco / parcelasQtd);
+          const desconto = pacote.desconto_avista || 0;
+          const precoAvista = pacote.preco * (1 - desconto / 100);
+
           return {
             id: index + 1,
             slug: pacote.slug,
             title: pacote.nome,
             description: pacote.descricao || '',
-            price: `R$ ${pacote.preco.toFixed(2)}`,
+            price: pacote.preco,
+            priceFormatted: `R$ ${pacote.preco.toFixed(2).replace('.', ',')}`,
+            parcelasQtd,
+            parcelaValor,
+            desconto,
+            precoAvista,
+            vagasDisponiveis: pacote.vagas_disponiveis,
             duration: pacote.duracao,
             people: `${pacote.pessoas} pessoas`,
             rating: pacote.rating,
@@ -192,22 +207,46 @@ const PackagesIndex = () => {
                     </CardHeader>
 
                     <CardContent className="p-6">
-                      <p className="text-gray-600 mb-4">{pkg.description}</p>
+                      <p className="text-gray-600 mb-4 line-clamp-2">{pkg.description}</p>
 
-                      {/* Package Info */}
-                      <div className="flex justify-between items-center mb-4">
-                        <div className="text-left">
-                          <div className="text-3xl font-bold text-rio-blue">{pkg.price}</div>
+                      {/* Badge de Vagas */}
+                      {pkg.vagasDisponiveis && pkg.vagasDisponiveis <= 5 && (
+                        <div className="mb-3">
+                          <Badge variant="destructive" className="w-full justify-center py-1.5 animate-pulse">
+                            🔥 Últimas {pkg.vagasDisponiveis} vagas!
+                          </Badge>
                         </div>
-                        <div className="text-right text-sm text-gray-500">
-                          <div className="flex items-center justify-end">
-                            <Clock className="h-4 w-4 mr-1" />
-                            {pkg.duration}
+                      )}
+
+                      {/* Preço em Destaque */}
+                      <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl p-4 mb-4 text-white text-center shadow-lg">
+                        <div className="text-xs font-medium opacity-90">em até</div>
+                        <div className="text-2xl font-extrabold">
+                          {pkg.parcelasQtd}x de R$ {pkg.parcelaValor.toFixed(2).replace('.', ',')}
+                        </div>
+                        <div className="text-xs opacity-80">sem juros</div>
+                        {pkg.desconto > 0 ? (
+                          <div className="mt-2 pt-2 border-t border-white/20">
+                            <span className="text-xs line-through opacity-70">R$ {pkg.price.toFixed(2).replace('.', ',')}</span>
+                            <span className="ml-2 font-semibold">R$ {pkg.precoAvista.toFixed(2).replace('.', ',')} à vista</span>
+                            <Badge className="ml-2 bg-white/20 text-white text-xs">{pkg.desconto}% OFF</Badge>
                           </div>
-                          <div className="flex items-center justify-end">
-                            <Users className="h-4 w-4 mr-1" />
-                            {pkg.people}
+                        ) : (
+                          <div className="text-xs mt-1 opacity-80">
+                            ou R$ {pkg.price.toFixed(2).replace('.', ',')} à vista
                           </div>
+                        )}
+                      </div>
+
+                      {/* Info */}
+                      <div className="flex justify-between text-sm text-gray-500 mb-4">
+                        <div className="flex items-center">
+                          <Clock className="h-4 w-4 mr-1" />
+                          {pkg.duration}
+                        </div>
+                        <div className="flex items-center">
+                          <Users className="h-4 w-4 mr-1" />
+                          {pkg.people}
                         </div>
                       </div>
 

@@ -39,6 +39,10 @@ const pacoteSchema = z.object({
   ativo: z.boolean(),
   popular: z.boolean(),
   destaque: z.boolean(),
+  parcelas_quantidade: z.number().min(1).max(12).optional(),
+  parcela_valor: z.number().min(0).optional(),
+  desconto_avista: z.number().min(0).max(100).optional(),
+  vagas_disponiveis: z.number().min(0).optional(),
   tracking_code: z.string().optional(),
   telefone_whatsapp: z
     .string()
@@ -116,6 +120,10 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
       ativo: pacote?.ativo ?? true,
       popular: pacote?.popular ?? false,
       destaque: pacote?.destaque ?? false,
+      parcelas_quantidade: pacote?.parcelas_quantidade || 10,
+      parcela_valor: pacote?.parcela_valor ? Number(pacote.parcela_valor) : undefined,
+      desconto_avista: pacote?.desconto_avista ? Number(pacote.desconto_avista) : 0,
+      vagas_disponiveis: pacote?.vagas_disponiveis || undefined,
       tracking_code: pacote?.tracking_code || '',
       telefone_whatsapp: pacote?.telefone_whatsapp || '',
       endereco_completo: pacote?.endereco_completo || '',
@@ -260,6 +268,10 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
         ativo: data.ativo,
         popular: data.popular,
         destaque: data.destaque,
+        parcelas_quantidade: data.parcelas_quantidade || 10,
+        parcela_valor: data.parcela_valor || null,
+        desconto_avista: data.desconto_avista || 0,
+        vagas_disponiveis: data.vagas_disponiveis || null,
         tracking_code: data.tracking_code || null,
         video_youtube: data.video_youtube || null,
         telefone_whatsapp: data.telefone_whatsapp || null,
@@ -370,26 +382,155 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
               )}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Seção de Preços e Parcelamento */}
+            <div className="rounded-lg border p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 border-green-200 dark:border-green-800">
+              <h3 className="text-lg font-semibold mb-4 text-green-800 dark:text-green-200">💰 Preços e Parcelamento</h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <FormField
+                  control={form.control}
+                  name="preco"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Preço Total (R$)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          {...field}
+                          onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="parcelas_quantidade"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Número de Parcelas</FormLabel>
+                      <Select 
+                        onValueChange={(val) => field.onChange(parseInt(val))} 
+                        defaultValue={String(field.value || 10)}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((n) => (
+                            <SelectItem key={n} value={String(n)}>{n}x</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <FormField
+                  control={form.control}
+                  name="parcela_valor"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Valor da Parcela (R$)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          placeholder="Deixe vazio para calcular automaticamente"
+                          value={field.value || ''}
+                          onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                        />
+                      </FormControl>
+                      <FormDescription className="text-xs">
+                        Se vazio, será calculado: Preço ÷ Parcelas
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="desconto_avista"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Desconto à Vista (%)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="0"
+                          max="100"
+                          step="1"
+                          {...field}
+                          value={field.value || 0}
+                          onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
               <FormField
                 control={form.control}
-                name="preco"
+                name="vagas_disponiveis"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Preço (R$)</FormLabel>
+                    <FormLabel>Vagas Disponíveis (Opcional)</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
-                        step="0.01"
-                        {...field}
-                        onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                        min="0"
+                        placeholder="Deixe vazio se não quiser mostrar"
+                        value={field.value || ''}
+                        onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
                       />
                     </FormControl>
+                    <FormDescription className="text-xs">
+                      Mostra badge de urgência quando ≤ 5 vagas
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
+              {/* Preview do Preço */}
+              {form.watch('preco') > 0 && (
+                <div className="mt-4 p-4 bg-white dark:bg-gray-900 rounded-lg border">
+                  <p className="text-xs text-muted-foreground mb-2">Preview do preço:</p>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                      {form.watch('parcelas_quantidade') || 10}x de R$ {(
+                        form.watch('parcela_valor') || 
+                        (form.watch('preco') / (form.watch('parcelas_quantidade') || 10))
+                      ).toFixed(2)}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {form.watch('desconto_avista') > 0 && (
+                        <span className="line-through mr-2">R$ {form.watch('preco').toFixed(2)}</span>
+                      )}
+                      <span className="font-medium">
+                        R$ {(form.watch('preco') * (1 - (form.watch('desconto_avista') || 0) / 100)).toFixed(2)} à vista
+                      </span>
+                      {form.watch('desconto_avista') > 0 && (
+                        <span className="ml-2 text-green-600">({form.watch('desconto_avista')}% off)</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="duracao"
