@@ -14,7 +14,7 @@ export const ReviewsList = ({ ranchoId }: ReviewsListProps) => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("avaliacoes")
-        .select("*")
+        .select("id, nome_usuario, nota, comentario, resposta_admin, created_at, verificado, imagens")
         .eq("rancho_id", ranchoId)
         .eq("verificado", true)
         .order("created_at", { ascending: false });
