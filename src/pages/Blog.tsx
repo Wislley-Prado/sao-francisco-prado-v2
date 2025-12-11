@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Helmet } from 'react-helmet-async';
 import { supabase } from '@/integrations/supabase/client';
 import { Link } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -61,6 +62,17 @@ const Blog = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <Helmet>
+        <title>Blog PradoAqui | Dicas de Pesca no Rio São Francisco</title>
+        <meta name="description" content="Dicas, novidades e informações sobre pesca no Rio São Francisco. Aprenda técnicas, conheça os melhores pontos e fique por dentro das novidades." />
+        <meta property="og:title" content="Blog PradoAqui | Dicas de Pesca" />
+        <meta property="og:description" content="Dicas, novidades e informações sobre pesca no Rio São Francisco." />
+        <meta property="og:image" content="/og-image.png" />
+        <meta property="og:url" content="https://pradoaqui.com/blog" />
+        <meta name="twitter:title" content="Blog PradoAqui | Dicas de Pesca" />
+        <meta name="twitter:image" content="/og-image.png" />
+      </Helmet>
+      
       <Header />
       
       <main className="flex-1 bg-gradient-to-br from-background to-muted/20">

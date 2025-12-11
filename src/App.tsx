@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { PWALifecycle } from "@/components/PWALifecycle";
 import { ScrollToTop } from "@/components/ScrollToTop";
@@ -69,14 +70,15 @@ const App = () => {
   console.log('🚀 App: Starting with PWA support');
   
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="system" storageKey="ui-theme">
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <PWALifecycle />
-          <TrackingScripts />
-          <BrowserRouter>
+    <HelmetProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider defaultTheme="system" storageKey="ui-theme">
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <PWALifecycle />
+            <TrackingScripts />
+            <BrowserRouter>
             <ScrollToTop />
             <PageViewTracker />
             <AuthProvider>
@@ -148,7 +150,8 @@ const App = () => {
         </TooltipProvider>
       </ThemeProvider>
     </QueryClientProvider>
-);
+    </HelmetProvider>
+  );
 };
 
 export default App;
