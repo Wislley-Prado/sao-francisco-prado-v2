@@ -6,14 +6,17 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Save, Code2, TrendingUp, Webhook, AlertCircle } from 'lucide-react';
+import { Loader2, Save, Code2, TrendingUp, Webhook, AlertCircle, RefreshCw, Database, Clock } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 
 const SETTINGS_ID = '00000000-0000-0000-0000-000000000001';
 
 const Configuracoes = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [lastUpdate, setLastUpdate] = useState<string | null>(null);
   const [settings, setSettings] = useState({
     facebook_pixel: '',
     google_analytics: '',
@@ -24,6 +27,7 @@ const Configuracoes = () => {
 
   useEffect(() => {
     fetchSettings();
+    fetchLastDamUpdate();
   }, []);
 
   const fetchSettings = async () => {
@@ -53,6 +57,22 @@ const Configuracoes = () => {
     }
   };
 
+  const fetchLastDamUpdate = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('dam_data')
+        .select('updated_at')
+        .eq('id', 1)
+        .single();
+
+      if (!error && data?.updated_at) {
+        setLastUpdate(data.updated_at);
+      }
+    } catch (error) {
+      console.log('Sem dados da represa ainda');
+    }
+  };
+
   const handleSave = async () => {
     setSaving(true);
     try {
@@ -70,6 +90,48 @@ const Configuracoes = () => {
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleRefreshDamData = async () => {
+    setRefreshing(true);
+    try {
+      const response = await fetch('https://zeqloqlhnbdeivnyghkx.supabase.co/functions/v1/dam-data-proxy', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erro ao atualizar dados');
+      }
+
+      const data = await response.json();
+      
+      if (data.saved_to_db) {
+        toast.success('Dados da represa atualizados com sucesso!');
+        setLastUpdate(new Date().toISOString());
+      } else {
+        toast.warning('Dados recebidos mas não salvos no banco');
+      }
+    } catch (error) {
+      console.error('Erro ao atualizar dados da represa:', error);
+      toast.error('Erro ao atualizar dados da represa. Verifique se o workflow n8n está ativo.');
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  const formatLastUpdate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return date.toLocaleString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   if (loading) {
@@ -174,6 +236,54 @@ const Configuracoes = () => {
                 Ative usando o toggle no canto superior direito do editor do n8n.
               </AlertDescription>
             </Alert>
+
+            {/* Seção de Dados da Represa */}
+            <div className="mt-6 pt-4 border-t border-border">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Database className="w-4 h-4 text-muted-foreground" />
+                  <span className="font-medium text-sm">Dados da Represa no Banco</span>
+                </div>
+                {lastUpdate && (
+                  <Badge variant="outline" className="text-xs">
+                    <Clock className="w-3 h-3 mr-1" />
+                    Atualizado: {formatLastUpdate(lastUpdate)}
+                  </Badge>
+                )}
+              </div>
+
+              <div className="flex items-center gap-3">
+                <Button 
+                  variant="outline" 
+                  onClick={handleRefreshDamData}
+                  disabled={refreshing}
+                  className="flex items-center gap-2"
+                >
+                  {refreshing ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Atualizando...
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw className="w-4 h-4" />
+                      Atualizar Agora
+                    </>
+                  )}
+                </Button>
+                <span className="text-xs text-muted-foreground">
+                  Força uma atualização imediata dos dados da represa
+                </span>
+              </div>
+
+              <Alert className="mt-4">
+                <Database className="h-4 w-4" />
+                <AlertDescription className="text-xs">
+                  Os dados são atualizados automaticamente <strong>4x ao dia</strong> (06h, 12h, 18h, 00h).
+                  Use o botão acima apenas para atualizações emergenciais.
+                </AlertDescription>
+              </Alert>
+            </div>
           </CardContent>
         </Card>
 
