@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { supabase } from '@/integrations/supabase/client';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -93,8 +94,25 @@ const BlogPost = () => {
     );
   }
 
+  const pageUrl = `https://pradoaqui.com/blog/${post.slug}`;
+
   return (
     <div className="min-h-screen flex flex-col">
+      <Helmet>
+        <title>{post.titulo} | Blog PradoAqui</title>
+        <meta name="description" content={post.resumo || post.titulo} />
+        <meta property="og:title" content={post.titulo} />
+        <meta property="og:description" content={post.resumo || post.titulo} />
+        <meta property="og:image" content={post.imagem_destaque || '/og-image.png'} />
+        <meta property="og:url" content={pageUrl} />
+        <meta property="og:type" content="article" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={post.titulo} />
+        <meta name="twitter:description" content={post.resumo || post.titulo} />
+        <meta name="twitter:image" content={post.imagem_destaque || '/og-image.png'} />
+        <link rel="canonical" href={pageUrl} />
+      </Helmet>
+      
       <Header />
       
       <main className="flex-1 bg-background">

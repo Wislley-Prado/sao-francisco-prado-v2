@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import Header from '@/components/Header';
@@ -240,8 +241,24 @@ const PacoteDetalhes = () => {
   const tier = getTier();
   const badge = pacote.popular ? 'popular' : pacote.destaque ? 'destaque' : undefined;
 
+  const heroImage = pacote.imagens.find(img => img.principal)?.url || pacote.imagens[0]?.url || '/og-image.png';
+  const pageUrl = `https://pradoaqui.com/pacote/${pacote.slug}`;
+
   return (
     <>
+      <Helmet>
+        <title>{pacote.nome} | Pacote de Pesca - PradoAqui</title>
+        <meta name="description" content={pacote.descricao?.substring(0, 160) || `Pacote ${pacote.nome}. ${pacote.duracao} para ${pacote.pessoas} pessoas.`} />
+        <meta property="og:title" content={`${pacote.nome} | PradoAqui`} />
+        <meta property="og:description" content={pacote.descricao?.substring(0, 160) || `Pacote de pesca: ${pacote.duracao}`} />
+        <meta property="og:image" content={heroImage} />
+        <meta property="og:url" content={pageUrl} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${pacote.nome} | PradoAqui`} />
+        <meta name="twitter:image" content={heroImage} />
+        <link rel="canonical" href={pageUrl} />
+      </Helmet>
+      
       <Header />
       <PackagePageLayout
         sidebar={

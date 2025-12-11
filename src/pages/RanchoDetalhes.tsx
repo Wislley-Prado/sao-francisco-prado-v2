@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import DOMPurify from 'dompurify';
@@ -214,8 +215,24 @@ const RanchoDetalhes = () => {
     return null;
   }
 
+  const mainImage = rancho.imagens.find(img => img.principal)?.url || rancho.imagens[0]?.url || '/og-image.png';
+  const pageUrl = `https://pradoaqui.com/rancho/${slug}`;
+
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>{rancho.nome} | Rancho em {rancho.localizacao} - PradoAqui</title>
+        <meta name="description" content={rancho.descricao?.substring(0, 160) || `Rancho ${rancho.nome} em ${rancho.localizacao}. Capacidade para ${rancho.capacidade} pessoas.`} />
+        <meta property="og:title" content={`${rancho.nome} | PradoAqui`} />
+        <meta property="og:description" content={rancho.descricao?.substring(0, 160) || `Rancho para pesca em ${rancho.localizacao}`} />
+        <meta property="og:image" content={mainImage} />
+        <meta property="og:url" content={pageUrl} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${rancho.nome} | PradoAqui`} />
+        <meta name="twitter:image" content={mainImage} />
+        <link rel="canonical" href={pageUrl} />
+      </Helmet>
+      
       <Header />
       
       <main className="pt-20">
