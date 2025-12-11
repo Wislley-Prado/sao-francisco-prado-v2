@@ -18,11 +18,11 @@ serve(async (req) => {
   console.log('🚀 [PROXY] Iniciando requisição para webhook da represa...');
 
   try {
-    // Buscar URL do webhook das configurações do site
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    // Buscar URL do webhook das configurações do site
     let webhookUrl = DEFAULT_WEBHOOK_URL;
 
     const { data: settings, error: settingsError } = await supabase
@@ -40,6 +40,7 @@ serve(async (req) => {
       console.log('📌 [PROXY] Usando URL padrão do webhook');
     }
 
+    // Chamar o webhook do n8n
     const response = await fetch(webhookUrl, {
       method: 'POST',
       headers: {
@@ -70,7 +71,26 @@ serve(async (req) => {
     const data = await response.json();
     console.log(`✅ [PROXY] Dados recebidos:`, JSON.stringify(data).substring(0, 200));
 
-    return new Response(JSON.stringify(data), {
+    // Salvar dados na tabela dam_data
+    const { error: upsertError } = await supabase
+      .from('dam_data')
+      .upsert({
+        id: 1,
+        data: data,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'id' });
+
+    if (upsertError) {
+      console.error('❌ [PROXY] Erro ao salvar dados no banco:', upsertError.message);
+    } else {
+      console.log('💾 [PROXY] Dados salvos no banco com sucesso!');
+    }
+
+    return new Response(JSON.stringify({ 
+      ...data, 
+      saved_to_db: !upsertError,
+      updated_at: new Date().toISOString()
+    }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
