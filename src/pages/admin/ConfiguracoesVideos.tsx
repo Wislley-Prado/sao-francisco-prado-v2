@@ -118,7 +118,7 @@ const ConfiguracoesVideos = () => {
                 <p className="text-sm text-destructive">{liveUrlError}</p>
               )}
               <p className="text-sm text-muted-foreground">
-                Formatos aceitos: youtube.com/watch?v=..., youtu.be/..., youtube.com/shorts/...
+                Formatos aceitos: youtube.com/watch?v=..., youtu.be/..., youtube.com/live/..., youtube.com/shorts/...
               </p>
             </div>
 
