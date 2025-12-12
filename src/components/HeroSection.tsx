@@ -13,12 +13,10 @@ const HeroSection = () => {
   const { data: damData } = useDamData();
   const { settings } = useVideoSettings();
 
-  // Prioriza live, fallback para vídeo gravado, depois default
-  const videoId = settings?.youtube_live_url 
-    ? extractYouTubeId(settings.youtube_live_url)
-    : settings?.youtube_video_url 
-      ? extractYouTubeId(settings.youtube_video_url)
-      : 'cN_BspPR2gg';
+  // Usa vídeo gravado na home, live fica na página de transmissão
+  const videoId = settings?.youtube_video_url 
+    ? extractYouTubeId(settings.youtube_video_url)
+    : 'cN_BspPR2gg';
   const temperature = weatherData?.current.temperature || 24;
   const damLevel = damData?.volume_util_percentual ? parseFloat(damData.volume_util_percentual).toFixed(1) : '86.0';
   const windSpeed = weatherData?.current.wind_speed || 12;
