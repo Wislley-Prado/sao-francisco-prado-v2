@@ -93,9 +93,9 @@ const HeroSection = () => {
                     </div>
                   </div>
                   
-                  {/* Live Stream */}
+                  {/* Vídeo de Vendas */}
                   <div className="aspect-video bg-black rounded-lg overflow-hidden relative">
-                    <iframe src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&modestbranding=1`} title="Rio São Francisco - Transmissão Ao Vivo" className="w-full h-full" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
+                    <iframe src={`https://www.youtube.com/embed/${videoId}?autoplay=0&mute=0&controls=1&showinfo=0&rel=0&modestbranding=1`} title="Vídeo do Rio São Francisco" className="w-full h-full" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
                   </div>
                   
                   {/* Button to Full Stream */}
