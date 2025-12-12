@@ -5,14 +5,20 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Play, Calendar, MapPin, Waves } from 'lucide-react';
 import { useWeatherData } from '@/hooks/useWeatherData';
 import { useDamData } from '@/hooks/useDamData';
+import { useVideoSettings, extractYouTubeId } from '@/hooks/useVideoSettings';
+
 const HeroSection = () => {
   const navigate = useNavigate();
-  const {
-    data: weatherData
-  } = useWeatherData();
-  const {
-    data: damData
-  } = useDamData();
+  const { data: weatherData } = useWeatherData();
+  const { data: damData } = useDamData();
+  const { settings } = useVideoSettings();
+
+  // Prioriza live, fallback para vídeo gravado, depois default
+  const videoId = settings?.youtube_live_url 
+    ? extractYouTubeId(settings.youtube_live_url)
+    : settings?.youtube_video_url 
+      ? extractYouTubeId(settings.youtube_video_url)
+      : 'cN_BspPR2gg';
   const temperature = weatherData?.current.temperature || 24;
   const damLevel = damData?.volume_util_percentual ? parseFloat(damData.volume_util_percentual).toFixed(1) : '86.0';
   const windSpeed = weatherData?.current.wind_speed || 12;
@@ -91,7 +97,7 @@ const HeroSection = () => {
                   
                   {/* Live Stream */}
                   <div className="aspect-video bg-black rounded-lg overflow-hidden relative">
-                    <iframe src="https://www.youtube.com/embed/cN_BspPR2gg?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&modestbranding=1" title="Rio São Francisco - Transmissão Ao Vivo" className="w-full h-full" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
+                    <iframe src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&modestbranding=1`} title="Rio São Francisco - Transmissão Ao Vivo" className="w-full h-full" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
                   </div>
                   
                   {/* Button to Full Stream */}
