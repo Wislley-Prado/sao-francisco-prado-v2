@@ -22,6 +22,10 @@ export const YouTubePlayer = ({ videoUrl, title = 'Vídeo', className = '' }: Yo
     const shortsMatch = url.match(/(?:youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/);
     if (shortsMatch) return shortsMatch[1];
 
+    // youtube.com/live/VIDEO_ID
+    const liveMatch = url.match(/(?:youtube\.com\/live\/)([a-zA-Z0-9_-]{11})/);
+    if (liveMatch) return liveMatch[1];
+
     // youtu.be/VIDEO_ID
     const youtuBeMatch = url.match(/(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/);
     if (youtuBeMatch) return youtuBeMatch[1];
@@ -124,6 +128,8 @@ export const YouTubePreview = ({ videoUrl, className = '' }: { videoUrl: string;
     if (watchMatch) return watchMatch[1];
     const shortsMatch = url.match(/(?:youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/);
     if (shortsMatch) return shortsMatch[1];
+    const liveMatch = url.match(/(?:youtube\.com\/live\/)([a-zA-Z0-9_-]{11})/);
+    if (liveMatch) return liveMatch[1];
     const youtuBeMatch = url.match(/(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/);
     if (youtuBeMatch) return youtuBeMatch[1];
     return null;
