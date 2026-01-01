@@ -54,6 +54,7 @@ const ranchoSchema = z.object({
   comodidades: z.array(z.string()),
   comodidadeCustom: z.string().optional(),
   telefone_whatsapp: z.string().regex(/^\d+$/, 'Apenas números').min(10, 'Mínimo 10 dígitos').optional().or(z.literal('')),
+  mensagem_whatsapp: z.string().optional(),
   video_youtube: z
     .string()
     .optional()
@@ -198,6 +199,7 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
       comodidades: rancho?.comodidades || [],
       comodidadeCustom: '',
       telefone_whatsapp: rancho?.telefone_whatsapp || '',
+      mensagem_whatsapp: rancho?.mensagem_whatsapp || '',
       video_youtube: rancho?.video_youtube || '',
       google_calendar_url: rancho?.google_calendar_url || '',
       tracking_code: rancho?.tracking_code || '',
@@ -246,6 +248,7 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
         destaque: data.destaque,
         comodidades: comodidadesFinal,
         telefone_whatsapp: data.telefone_whatsapp || null,
+        mensagem_whatsapp: data.mensagem_whatsapp || null,
         video_youtube: data.video_youtube || null,
         google_calendar_url: data.google_calendar_url || null,
         tracking_code: data.tracking_code || null,
@@ -662,6 +665,28 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
                   </FormControl>
                   <FormDescription>
                     Apenas números, com DDI e DDD (Ex: 5531999999999)
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="mensagem_whatsapp"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Mensagem Personalizada do WhatsApp</FormLabel>
+                  <FormControl>
+                    <Textarea 
+                      {...field} 
+                      rows={3}
+                      placeholder="Olá! Gostaria de fazer uma reserva no {nome} ({localizacao})."
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Use <code className="bg-muted px-1 rounded">{'{nome}'}</code> e <code className="bg-muted px-1 rounded">{'{localizacao}'}</code> como variáveis dinâmicas.
+                    Se vazio, usa mensagem padrão.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
