@@ -911,6 +911,7 @@ export type Database = {
           latitude: number | null
           localizacao: string
           longitude: number | null
+          mensagem_whatsapp: string | null
           nome: string
           preco: number
           quartos: number
@@ -937,6 +938,7 @@ export type Database = {
           latitude?: number | null
           localizacao: string
           longitude?: number | null
+          mensagem_whatsapp?: string | null
           nome: string
           preco: number
           quartos?: number
@@ -963,6 +965,7 @@ export type Database = {
           latitude?: number | null
           localizacao?: string
           longitude?: number | null
+          mensagem_whatsapp?: string | null
           nome?: string
           preco?: number
           quartos?: number

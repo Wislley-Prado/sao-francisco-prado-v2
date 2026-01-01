@@ -37,6 +37,7 @@ interface RanchoDetalhes {
   comodidades: string[];
   disponivel: boolean;
   telefone_whatsapp?: string;
+  mensagem_whatsapp?: string;
   video_youtube?: string;
   google_calendar_url?: string;
   tracking_code?: string;
@@ -110,6 +111,7 @@ const RanchoDetalhes = () => {
           comodidades: ranchoData.comodidades || [],
           disponivel: ranchoData.disponivel,
           telefone_whatsapp: ranchoData.telefone_whatsapp,
+          mensagem_whatsapp: ranchoData.mensagem_whatsapp,
           video_youtube: ranchoData.video_youtube,
           google_calendar_url: ranchoData.google_calendar_url,
           tracking_code: ranchoData.tracking_code,
@@ -180,7 +182,17 @@ const RanchoDetalhes = () => {
     registrarEvento(rancho.id, "clique_whatsapp");
     
     const phone = rancho.telefone_whatsapp || "5531999999999";
-    const message = `Olá! Gostaria de fazer uma reserva no ${rancho.nome} (${rancho.localizacao}). Pode me passar mais informações sobre disponibilidade e valores?`;
+    
+    // Usar mensagem personalizada se existir, senão usa padrão
+    let message: string;
+    if (rancho.mensagem_whatsapp) {
+      message = rancho.mensagem_whatsapp
+        .replace(/{nome}/g, rancho.nome)
+        .replace(/{localizacao}/g, rancho.localizacao);
+    } else {
+      message = `Olá! Gostaria de fazer uma reserva no ${rancho.nome} (${rancho.localizacao}). Pode me passar mais informações sobre disponibilidade e valores?`;
+    }
+    
     const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
   };
