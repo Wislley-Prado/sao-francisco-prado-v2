@@ -1,11 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { FAQTable } from "@/components/admin/faq/FAQTable";
 import { FAQFilters } from "@/components/admin/faq/FAQFilters";
 import { FAQStats } from "@/components/admin/faq/FAQStats";
+import { useFAQEstatisticas, useInvalidateCache } from "@/hooks/useOptimizedData";
+import { toast } from "sonner";
 
 interface FAQ {
   id: string;
@@ -28,31 +31,15 @@ interface FAQ {
 
 export default function FAQs() {
   const navigate = useNavigate();
-  const [faqs, setFaqs] = useState<FAQ[]>([]);
-  const [filteredFaqs, setFilteredFaqs] = useState<FAQ[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("todos");
-  const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState<any>(null);
+  const { invalidateAdminStats } = useInvalidateCache();
 
-  useEffect(() => {
-    fetchFaqs();
-  }, []);
-
-  useEffect(() => {
-    if (faqs.length > 0) {
-      fetchStats();
-    }
-  }, [faqs]);
-
-  useEffect(() => {
-    filterFaqs();
-  }, [faqs, searchTerm, statusFilter]);
-
-  const fetchFaqs = async () => {
-    try {
-      // Buscar FAQs
-      const { data: faqsData, error: faqsError } = await supabase
+  // Buscar FAQs
+  const { data: faqsData, isLoading: loadingFaqs, refetch: refetchFaqs } = useQuery({
+    queryKey: ["admin-faqs"],
+    queryFn: async () => {
+      const { data, error } = await supabase
         .from("faqs")
         .select(`
           *,
@@ -61,74 +48,63 @@ export default function FAQs() {
         `)
         .order("ordem", { ascending: true });
 
-      if (faqsError) throw faqsError;
-
-      // Buscar estatísticas de votos
-      const { data: statsData, error: statsError } = await supabase
-        .from("faq_estatisticas")
-        .select("*");
-
-      if (statsError) throw statsError;
-
-      // Combinar FAQs com suas estatísticas
-      const faqsComStats = faqsData?.map(faq => {
-        const stats = statsData?.find(s => s.id === faq.id);
-        return {
-          ...faq,
-          votos_stats: stats ? {
-            total_votos: stats.total_votos || 0,
-            votos_uteis: stats.votos_uteis || 0,
-            votos_nao_uteis: stats.votos_nao_uteis || 0,
-            taxa_utilidade: stats.taxa_utilidade || 0,
-          } : undefined,
-        };
-      }) || [];
-
-      setFaqs(faqsComStats);
-    } catch (error) {
-      console.error("Erro ao buscar FAQs:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchStats = async () => {
-    try {
-      const { data: estatisticas, error } = await supabase
-        .from("faq_estatisticas")
-        .select("*");
-
       if (error) throw error;
+      return data;
+    },
+  });
 
-      const totalFaqs = faqs.length;
-      const totalVotos = estatisticas?.reduce((acc, curr) => acc + (curr.total_votos || 0), 0) || 0;
-      const taxaUtilidade = estatisticas?.length > 0
-        ? estatisticas.reduce((acc, curr) => acc + (curr.taxa_utilidade || 0), 0) / estatisticas.length
-        : 0;
+  // Buscar estatísticas com cache de 1 hora
+  const { data: statsData, isLoading: loadingStats, refetch: refetchStats, isFetching } = useFAQEstatisticas();
 
-      const maisUteis = estatisticas
-        ?.filter(e => e.total_votos >= 5)
-        ?.sort((a, b) => b.taxa_utilidade - a.taxa_utilidade)
-        ?.slice(0, 3) || [];
+  // Combinar FAQs com estatísticas
+  const faqs = useMemo(() => {
+    if (!faqsData) return [];
+    
+    return faqsData.map(faq => {
+      const stats = statsData?.find(s => s.id === faq.id);
+      return {
+        ...faq,
+        votos_stats: stats ? {
+          total_votos: stats.total_votos || 0,
+          votos_uteis: stats.votos_uteis || 0,
+          votos_nao_uteis: stats.votos_nao_uteis || 0,
+          taxa_utilidade: stats.taxa_utilidade || 0,
+        } : undefined,
+      };
+    }) as FAQ[];
+  }, [faqsData, statsData]);
 
-      const menosUteis = estatisticas
-        ?.filter(e => e.total_votos >= 5 && e.taxa_utilidade < 70)
-        ?.sort((a, b) => a.taxa_utilidade - b.taxa_utilidade)
-        ?.slice(0, 3) || [];
+  // Calcular stats gerais
+  const stats = useMemo(() => {
+    if (!statsData || !faqs.length) return null;
 
-      setStats({
-        totalFaqs,
-        totalVotos,
-        taxaUtilidade,
-        maisUteis,
-        menosUteis,
-      });
-    } catch (error) {
-      console.error("Erro ao buscar estatísticas:", error);
-    }
-  };
+    const totalFaqs = faqs.length;
+    const totalVotos = statsData.reduce((acc, curr) => acc + (curr.total_votos || 0), 0);
+    const taxaUtilidade = statsData.length > 0
+      ? statsData.reduce((acc, curr) => acc + (curr.taxa_utilidade || 0), 0) / statsData.length
+      : 0;
 
-  const filterFaqs = () => {
+    const maisUteis = statsData
+      .filter(e => e.total_votos >= 5)
+      .sort((a, b) => b.taxa_utilidade - a.taxa_utilidade)
+      .slice(0, 3);
+
+    const menosUteis = statsData
+      .filter(e => e.total_votos >= 5 && e.taxa_utilidade < 70)
+      .sort((a, b) => a.taxa_utilidade - b.taxa_utilidade)
+      .slice(0, 3);
+
+    return {
+      totalFaqs,
+      totalVotos,
+      taxaUtilidade,
+      maisUteis,
+      menosUteis,
+    };
+  }, [statsData, faqs]);
+
+  // Filtrar FAQs
+  const filteredFaqs = useMemo(() => {
     let filtered = [...faqs];
 
     if (searchTerm) {
@@ -144,10 +120,21 @@ export default function FAQs() {
       filtered = filtered.filter((faq) => faq.ativo === isActive);
     }
 
-    setFilteredFaqs(filtered);
+    return filtered;
+  }, [faqs, searchTerm, statusFilter]);
+
+  const handleRefresh = async () => {
+    invalidateAdminStats();
+    await Promise.all([refetchFaqs(), refetchStats()]);
+    toast.success("Dados atualizados!");
   };
 
-  if (loading) {
+  const handleUpdate = () => {
+    refetchFaqs();
+    refetchStats();
+  };
+
+  if (loadingFaqs || loadingStats) {
     return <div className="p-8">Carregando...</div>;
   }
 
@@ -160,10 +147,20 @@ export default function FAQs() {
             Gerencie as perguntas e respostas do seu site
           </p>
         </div>
-        <Button onClick={() => navigate("/admin/faqs/novo")}>
-          <Plus className="mr-2 h-4 w-4" />
-          Novo FAQ
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            onClick={handleRefresh}
+            disabled={isFetching}
+          >
+            <RefreshCw className={`mr-2 h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
+            Atualizar
+          </Button>
+          <Button onClick={() => navigate("/admin/faqs/novo")}>
+            <Plus className="mr-2 h-4 w-4" />
+            Novo FAQ
+          </Button>
+        </div>
       </div>
 
       {stats && <FAQStats stats={stats} />}
@@ -175,7 +172,7 @@ export default function FAQs() {
         onStatusChange={setStatusFilter}
       />
 
-      <FAQTable faqs={filteredFaqs} onUpdate={() => { fetchFaqs(); fetchStats(); }} />
+      <FAQTable faqs={filteredFaqs} onUpdate={handleUpdate} />
     </div>
   );
 }

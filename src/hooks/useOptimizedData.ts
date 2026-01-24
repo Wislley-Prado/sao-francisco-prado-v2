@@ -661,6 +661,83 @@ export const useSiteSettings = () => {
   );
 };
 
+// ============= ADMIN STATISTICS (1 hora de cache) =============
+
+export interface FAQEstatistica {
+  id: string;
+  pergunta: string;
+  ordem: number;
+  ativo: boolean;
+  pacote_id?: string | null;
+  rancho_id?: string | null;
+  total_votos: number;
+  votos_uteis: number;
+  votos_nao_uteis: number;
+  taxa_utilidade: number;
+}
+
+export interface RanchoEstatistica {
+  id: string;
+  nome: string;
+  slug: string;
+  total_visualizacoes: number;
+  total_cliques_whatsapp: number;
+  total_cliques_reserva: number;
+  taxa_conversao: number;
+  visualizacoes_7_dias: number;
+  visualizacoes_30_dias: number;
+}
+
+export const useFAQEstatisticas = () => {
+  return useQuery(
+    ['faq-estatisticas'],
+    () => cachedQuery<FAQEstatistica[]>(
+      'faq_estatisticas',
+      TTL.ADMIN_STATS,
+      async () => {
+        const { data, error } = await supabase
+          .from('faq_estatisticas')
+          .select('*');
+        if (error) throw error;
+        return data || [];
+      }
+    ),
+    {
+      staleTime: TTL.ADMIN_STATS,
+      cacheTime: TTL.STATIC,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchOnMount: false,
+      retry: 1,
+    }
+  );
+};
+
+export const useRanchoEstatisticas = () => {
+  return useQuery(
+    ['rancho-estatisticas'],
+    () => cachedQuery<RanchoEstatistica[]>(
+      'rancho_estatisticas',
+      TTL.ADMIN_STATS,
+      async () => {
+        const { data, error } = await supabase
+          .from('rancho_estatisticas')
+          .select('*');
+        if (error) throw error;
+        return data || [];
+      }
+    ),
+    {
+      staleTime: TTL.ADMIN_STATS,
+      cacheTime: TTL.STATIC,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchOnMount: false,
+      retry: 1,
+    }
+  );
+};
+
 // ============= CACHE INVALIDATION HELPERS =============
 
 export const useInvalidateCache = () => {
@@ -687,6 +764,12 @@ export const useInvalidateCache = () => {
     invalidateAnuncios: () => {
       invalidateCacheByPrefix('anuncios');
       queryClient.invalidateQueries(['anuncios']);
+    },
+    invalidateAdminStats: () => {
+      invalidateCacheByPrefix('faq_estatisticas');
+      invalidateCacheByPrefix('rancho_estatisticas');
+      queryClient.invalidateQueries(['faq-estatisticas']);
+      queryClient.invalidateQueries(['rancho-estatisticas']);
     },
     invalidateAll: () => {
       invalidateCacheByPrefix('');
