@@ -981,6 +981,7 @@ export type Database = {
       site_settings: {
         Row: {
           autor_avatar_url: string | null
+          copyright_text: string | null
           created_at: string
           custom_head_scripts: string | null
           dam_webhook_url: string | null
@@ -991,6 +992,7 @@ export type Database = {
           google_tag_manager: string | null
           id: string
           instagram_url: string | null
+          reserva_button_link: string | null
           telefone_contato: string | null
           tiktok_url: string | null
           twitter_url: string | null
@@ -1009,6 +1011,7 @@ export type Database = {
         }
         Insert: {
           autor_avatar_url?: string | null
+          copyright_text?: string | null
           created_at?: string
           custom_head_scripts?: string | null
           dam_webhook_url?: string | null
@@ -1019,6 +1022,7 @@ export type Database = {
           google_tag_manager?: string | null
           id?: string
           instagram_url?: string | null
+          reserva_button_link?: string | null
           telefone_contato?: string | null
           tiktok_url?: string | null
           twitter_url?: string | null
@@ -1037,6 +1041,7 @@ export type Database = {
         }
         Update: {
           autor_avatar_url?: string | null
+          copyright_text?: string | null
           created_at?: string
           custom_head_scripts?: string | null
           dam_webhook_url?: string | null
@@ -1047,6 +1052,7 @@ export type Database = {
           google_tag_manager?: string | null
           id?: string
           instagram_url?: string | null
+          reserva_button_link?: string | null
           telefone_contato?: string | null
           tiktok_url?: string | null
           twitter_url?: string | null
@@ -1223,11 +1229,13 @@ export type Database = {
       site_settings_public: {
         Row: {
           autor_avatar_url: string | null
+          copyright_text: string | null
           created_at: string | null
           email_contato: string | null
           facebook_url: string | null
           id: string | null
           instagram_url: string | null
+          reserva_button_link: string | null
           telefone_contato: string | null
           tiktok_url: string | null
           twitter_url: string | null
@@ -1246,11 +1254,13 @@ export type Database = {
         }
         Insert: {
           autor_avatar_url?: string | null
+          copyright_text?: string | null
           created_at?: string | null
           email_contato?: string | null
           facebook_url?: string | null
           id?: string | null
           instagram_url?: string | null
+          reserva_button_link?: string | null
           telefone_contato?: string | null
           tiktok_url?: string | null
           twitter_url?: string | null
@@ -1269,11 +1279,13 @@ export type Database = {
         }
         Update: {
           autor_avatar_url?: string | null
+          copyright_text?: string | null
           created_at?: string | null
           email_contato?: string | null
           facebook_url?: string | null
           id?: string | null
           instagram_url?: string | null
+          reserva_button_link?: string | null
           telefone_contato?: string | null
           tiktok_url?: string | null
           twitter_url?: string | null
