@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Facebook, Twitter, Linkedin, Copy, MessageCircle } from 'lucide-react';
+import { Facebook, Twitter, Linkedin, Copy, MessageCircle, Instagram, Check } from 'lucide-react';
 import { useBlogAnalytics } from '@/hooks/useBlogAnalytics';
 import { toast } from 'sonner';
 
@@ -13,6 +13,7 @@ interface AutoShareButtonsProps {
 
 export const AutoShareButtons = ({ postId, titulo, url, resumo }: AutoShareButtonsProps) => {
   const { trackEvent } = useBlogAnalytics();
+  const [copied, setCopied] = React.useState(false);
 
   const shareText = resumo ? `${titulo} - ${resumo}` : titulo;
 
@@ -32,17 +33,50 @@ export const AutoShareButtons = ({ postId, titulo, url, resumo }: AutoShareButto
     window.open(link, '_blank', 'noopener,noreferrer,width=600,height=400');
   };
 
+  const handleInstagramShare = () => {
+    // Instagram doesn't have a direct share URL, so we copy the link and notify user
+    handleCopyLink();
+    toast.info('Link copiado! Cole no Instagram para compartilhar.');
+    trackEvent({
+      postId,
+      evento: 'click_social',
+      tipo: 'instagram',
+    });
+  };
+
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(url);
+      setCopied(true);
       toast.success('Link copiado para a área de transferência!');
       trackEvent({
         postId,
         evento: 'click_social',
         tipo: 'copy_link',
       });
+      setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      toast.error('Não foi possível copiar o link');
+      // Fallback for browsers that don't support clipboard API
+      const textArea = document.createElement('textarea');
+      textArea.value = url;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-9999px';
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        setCopied(true);
+        toast.success('Link copiado para a área de transferência!');
+        trackEvent({
+          postId,
+          evento: 'click_social',
+          tipo: 'copy_link',
+        });
+        setTimeout(() => setCopied(false), 2000);
+      } catch (e) {
+        toast.error('Não foi possível copiar o link');
+      }
+      document.body.removeChild(textArea);
     }
   };
 
@@ -59,6 +93,17 @@ export const AutoShareButtons = ({ postId, titulo, url, resumo }: AutoShareButto
         >
           <Facebook className="h-4 w-4" />
           Facebook
+        </Button>
+
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-2 hover:bg-gradient-to-r hover:from-[#833AB4] hover:via-[#FD1D1D] hover:to-[#F77737] hover:text-white hover:border-transparent transition-colors"
+          onClick={handleInstagramShare}
+          aria-label="Compartilhar no Instagram"
+        >
+          <Instagram className="h-4 w-4" />
+          Instagram
         </Button>
 
         <Button
@@ -97,12 +142,12 @@ export const AutoShareButtons = ({ postId, titulo, url, resumo }: AutoShareButto
         <Button
           variant="outline"
           size="sm"
-          className="gap-2 hover:bg-primary hover:text-primary-foreground transition-colors"
+          className={`gap-2 transition-colors ${copied ? 'bg-green-500 text-white border-green-500' : 'hover:bg-primary hover:text-primary-foreground'}`}
           onClick={handleCopyLink}
           aria-label="Copiar link"
         >
-          <Copy className="h-4 w-4" />
-          Copiar Link
+          {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+          {copied ? 'Copiado!' : 'Copiar Link'}
         </Button>
       </div>
     </div>
