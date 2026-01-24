@@ -6,10 +6,11 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Save, Code2, TrendingUp, Webhook, AlertCircle, RefreshCw, Database, Clock, User, Share2, Phone, Mail, Facebook, Instagram, Youtube, Calendar, FileText, Link2 } from 'lucide-react';
+import { Loader2, Save, Code2, TrendingUp, Webhook, AlertCircle, RefreshCw, Database, Clock, User, Share2, Phone, Mail, Facebook, Instagram, Youtube, Calendar, FileText, Link2, Trash2, HardDrive } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { clearAllCache, getCacheStats, resetCacheStats, invalidateCacheByPrefix } from '@/lib/cacheService';
 
 const SETTINGS_ID = '00000000-0000-0000-0000-000000000001';
 
@@ -566,6 +567,141 @@ const Configuracoes = () => {
                 Cole scripts completos incluindo as tags &lt;script&gt;
               </p>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Card de Gerenciamento de Cache */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <HardDrive className="w-5 h-5" />
+              Gerenciamento de Cache
+            </CardTitle>
+            <CardDescription>
+              Limpe o cache do site para forçar atualização dos dados
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Estatísticas de Cache */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {(() => {
+                const stats = getCacheStats();
+                return (
+                  <>
+                    <div className="bg-green-50 dark:bg-green-950 rounded-lg p-3 text-center">
+                      <div className="text-2xl font-bold text-green-700 dark:text-green-300">{stats.hits}</div>
+                      <div className="text-xs text-green-600 dark:text-green-400">Cache Hits</div>
+                    </div>
+                    <div className="bg-red-50 dark:bg-red-950 rounded-lg p-3 text-center">
+                      <div className="text-2xl font-bold text-red-700 dark:text-red-300">{stats.misses}</div>
+                      <div className="text-xs text-red-600 dark:text-red-400">Cache Misses</div>
+                    </div>
+                    <div className="bg-blue-50 dark:bg-blue-950 rounded-lg p-3 text-center">
+                      <div className="text-2xl font-bold text-blue-700 dark:text-blue-300">{stats.supabaseCalls}</div>
+                      <div className="text-xs text-blue-600 dark:text-blue-400">API Calls</div>
+                    </div>
+                    <div className="bg-purple-50 dark:bg-purple-950 rounded-lg p-3 text-center">
+                      <div className="text-2xl font-bold text-purple-700 dark:text-purple-300">{stats.hitRate}</div>
+                      <div className="text-xs text-purple-600 dark:text-purple-400">Taxa de Cache</div>
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+
+            <Separator />
+
+            {/* Ações de Cache */}
+            <div className="space-y-3">
+              <h4 className="font-medium text-sm text-muted-foreground">Ações de Cache</h4>
+              
+              <div className="flex flex-wrap gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => {
+                    invalidateCacheByPrefix('ranchos');
+                    toast.success('Cache de ranchos limpo!');
+                  }}
+                >
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Limpar Ranchos
+                </Button>
+                
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => {
+                    invalidateCacheByPrefix('pacotes');
+                    toast.success('Cache de pacotes limpo!');
+                  }}
+                >
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Limpar Pacotes
+                </Button>
+                
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => {
+                    invalidateCacheByPrefix('depoimentos');
+                    toast.success('Cache de depoimentos limpo!');
+                  }}
+                >
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Limpar Depoimentos
+                </Button>
+                
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => {
+                    invalidateCacheByPrefix('blog');
+                    toast.success('Cache do blog limpo!');
+                  }}
+                >
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Limpar Blog
+                </Button>
+              </div>
+
+              <Separator />
+
+              <div className="flex flex-wrap gap-2">
+                <Button 
+                  variant="destructive" 
+                  size="sm"
+                  onClick={() => {
+                    clearAllCache();
+                    toast.success('Todo o cache foi limpo! A página será recarregada.');
+                    setTimeout(() => window.location.reload(), 1000);
+                  }}
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Limpar Todo Cache
+                </Button>
+                
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => {
+                    resetCacheStats();
+                    toast.success('Estatísticas de cache resetadas!');
+                  }}
+                >
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Resetar Estatísticas
+                </Button>
+              </div>
+            </div>
+
+            <Alert>
+              <Database className="h-4 w-4" />
+              <AlertDescription className="text-xs">
+                O cache é usado para reduzir chamadas ao banco de dados e melhorar a performance. 
+                Limpe apenas quando necessário forçar a atualização dos dados no site.
+              </AlertDescription>
+            </Alert>
           </CardContent>
         </Card>
 
