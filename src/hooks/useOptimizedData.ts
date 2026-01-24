@@ -642,13 +642,14 @@ export const useSiteSettings = () => {
       'site_settings',
       TTL.SETTINGS,
       async () => {
+        // Usar view pública que não expõe tracking codes sensíveis
         const { data, error } = await supabase
-          .from('site_settings')
+          .from('site_settings_public' as any)
           .select('*')
           .maybeSingle();
 
         if (error) throw error;
-        return data;
+        return data as unknown as SiteSettings | null;
       }
     ),
     {
