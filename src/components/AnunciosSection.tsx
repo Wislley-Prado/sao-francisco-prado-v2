@@ -30,6 +30,9 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
       if (progressIntervalRef.current) {
         clearInterval(progressIntervalRef.current);
       }
+      if (intervalRef.current) {
+        clearTimeout(intervalRef.current);
+      }
       return;
     }
 
@@ -48,9 +51,12 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
       });
     }, 100);
 
-    // Auto advance to next slide
+    // Auto advance to next slide - use functional update to avoid stale closure
     intervalRef.current = setTimeout(() => {
-      handleNext();
+      setIsTransitioning(true);
+      setProgress(0);
+      setCurrentIndex((prev) => (prev + 1) % anuncios.length);
+      setTimeout(() => setIsTransitioning(false), 500);
     }, duration);
 
     return () => {
@@ -96,29 +102,29 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
     }
   };
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     if (isTransitioning) return;
     setIsTransitioning(true);
     setProgress(0);
     setCurrentIndex((prev) => (prev + 1) % anuncios.length);
     setTimeout(() => setIsTransitioning(false), 500);
-  };
+  }, [isTransitioning, anuncios.length]);
 
-  const handlePrev = () => {
+  const handlePrev = useCallback(() => {
     if (isTransitioning) return;
     setIsTransitioning(true);
     setProgress(0);
     setCurrentIndex((prev) => (prev - 1 + anuncios.length) % anuncios.length);
     setTimeout(() => setIsTransitioning(false), 500);
-  };
+  }, [isTransitioning, anuncios.length]);
 
-  const goToSlide = (index: number) => {
+  const goToSlide = useCallback((index: number) => {
     if (isTransitioning || index === currentIndex) return;
     setIsTransitioning(true);
     setProgress(0);
     setCurrentIndex(index);
     setTimeout(() => setIsTransitioning(false), 500);
-  };
+  }, [isTransitioning, currentIndex]);
 
   if (isLoading || anuncios.length === 0) {
     return null;
