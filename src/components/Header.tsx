@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Phone, Calendar, Fish, RefreshCw } from 'lucide-react';
+import { Menu, X, Calendar, Fish, RefreshCw } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { ThemeToggle } from '@/components/ThemeToggle';
 import { useToast } from '@/hooks/use-toast';
 
 const Header = () => {
@@ -113,7 +112,6 @@ const Header = () => {
             >
               <RefreshCw className={`h-4 w-4 ${isUpdating ? 'animate-spin' : ''}`} />
             </Button>
-            <ThemeToggle />
             <Button
               variant="outline"
               size="sm"
@@ -121,13 +119,6 @@ const Header = () => {
             >
               <Calendar className="h-4 w-4 mr-2" />
               Reservar
-            </Button>
-            <Button
-              size="sm"
-              className="bg-sunset-orange hover:bg-orange-600 text-white"
-            >
-              <Phone className="h-4 w-4 mr-2" />
-              WhatsApp
             </Button>
           </div>
 
@@ -169,7 +160,6 @@ const Header = () => {
                   >
                     <RefreshCw className={`h-4 w-4 ${isUpdating ? 'animate-spin' : ''}`} />
                   </Button>
-                  <ThemeToggle />
                 </div>
                 <Button
                   variant="outline"
@@ -178,13 +168,6 @@ const Header = () => {
                 >
                   <Calendar className="h-4 w-4 mr-2" />
                   Reservar
-                </Button>
-                <Button
-                  size="sm"
-                  className="bg-sunset-orange hover:bg-orange-600 text-white"
-                >
-                  <Phone className="h-4 w-4 mr-2" />
-                  WhatsApp
                 </Button>
               </div>
             </nav>

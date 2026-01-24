@@ -76,7 +76,7 @@ const App = () => {
   return (
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider defaultTheme="system" storageKey="ui-theme">
+        <ThemeProvider>
           <TooltipProvider>
             <Toaster />
             <Sonner />
