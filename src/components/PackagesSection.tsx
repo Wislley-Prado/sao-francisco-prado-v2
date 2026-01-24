@@ -1,84 +1,32 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import PackageCard from './PackageCard';
 import PackageFeatures from './PackageFeatures';
-import { supabase } from '@/integrations/supabase/client';
+import { usePacotes } from '@/hooks/useOptimizedData';
 import { Skeleton } from './ui/skeleton';
 
-interface PacoteImage {
-  id: string;
-  url: string;
-  principal: boolean;
-  ordem: number;
-}
-
-interface Pacote {
-  id: string;
-  slug: string;
-  nome: string;
-  descricao: string;
-  preco: number;
-  duracao: string;
-  pessoas: number;
-  rating: number;
-  popular: boolean;
-  ativo: boolean;
-  inclusos: string[];
-  pacote_imagens: PacoteImage[];
-}
-
 const PackagesSection = () => {
-  const [packages, setPackages] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: pacotesData, isLoading } = usePacotes(true);
 
-  useEffect(() => {
-    const fetchPackages = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('pacotes')
-          .select(`
-            *,
-            pacote_imagens (
-              id,
-              url,
-              principal,
-              ordem
-            )
-          `)
-          .eq('ativo', true)
-          .order('popular', { ascending: false })
-          .order('preco', { ascending: true });
-
-        if (error) throw error;
-
-        const formattedPackages = data?.map((pacote: Pacote, index: number) => {
-          const mainImage = pacote.pacote_imagens.find(img => img.principal) || 
-                           pacote.pacote_imagens.sort((a, b) => a.ordem - b.ordem)[0];
-
-          return {
-            id: index + 1, // Simple numeric id for key
-            slug: pacote.slug || '', // Pass slug for routing
-            title: pacote.nome,
-            description: pacote.descricao || '',
-            price: `R$ ${pacote.preco.toFixed(2)}`,
-            duration: pacote.duracao,
-            people: `${pacote.pessoas} pessoas`,
-            rating: pacote.rating,
-            features: pacote.inclusos || [],
-            image: mainImage?.url || '',
-            popular: pacote.popular
-          };
-        }) || [];
-
-        setPackages(formattedPackages);
-      } catch (error) {
-        console.error('Erro ao carregar pacotes:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPackages();
-  }, []);
+  // Transform data to expected format
+  const packages = React.useMemo(() => {
+    if (!pacotesData) return [];
+    return pacotesData.map((pacote, index) => {
+      const mainImage = pacote.imagens.find(img => img.principal) || pacote.imagens[0];
+      return {
+        id: index + 1,
+        slug: pacote.slug || '',
+        title: pacote.nome,
+        description: pacote.descricao || '',
+        price: `R$ ${pacote.preco.toFixed(2)}`,
+        duration: pacote.duracao,
+        people: `${pacote.pessoas} pessoas`,
+        rating: pacote.rating,
+        features: pacote.inclusos || [],
+        image: mainImage?.url || '',
+        popular: pacote.popular
+      };
+    });
+  }, [pacotesData]);
 
   return (
     <section id="pacotes" className="py-20 bg-sand-beige">
@@ -96,7 +44,7 @@ const PackagesSection = () => {
 
         {/* Packages Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {loading ? (
+          {isLoading ? (
             <>
               <Skeleton className="h-[500px] w-full" />
               <Skeleton className="h-[500px] w-full" />

@@ -1,47 +1,28 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ExternalLink, ChevronLeft, ChevronRight, Pause, Play, MapPin, Ruler, DollarSign } from 'lucide-react';
-
-interface Anuncio {
-  id: string;
-  titulo: string;
-  subtitulo: string | null;
-  descricao: string | null;
-  imagem_url: string;
-  link_url: string | null;
-  texto_botao: string;
-  tipo: string;
-  posicao: string;
-  cliques: number;
-  visualizacoes: number;
-  duracao_exibicao: number;
-  // Campos de imóveis
-  imovel_area: number | null;
-  imovel_unidade_area: string | null;
-  imovel_preco: number | null;
-  imovel_localizacao: string | null;
-}
+import { useAnuncios, Anuncio } from '@/hooks/useOptimizedData';
 
 interface AnunciosSectionProps {
   posicao: 'topo' | 'meio' | 'rodape' | 'sidebar';
 }
 
+// Track which ads have been viewed in this session to avoid duplicate view counts
+const viewedAdsSession = new Set<string>();
+
 export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
-  const [anuncios, setAnuncios] = useState<Anuncio[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: anunciosData, isLoading } = useAnuncios(posicao);
+  const anuncios = anunciosData || [];
+  
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [progress, setProgress] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    fetchAnuncios();
-  }, [posicao]);
 
   // Auto-rotation effect with individual timing
   useEffect(() => {
@@ -82,42 +63,27 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
     };
   }, [anuncios.length, currentIndex, isPaused]);
 
-  // Register view when anuncio changes
-  useEffect(() => {
-    if (anuncios.length > 0 && !loading) {
-      registerView(anuncios[currentIndex]);
-    }
-  }, [currentIndex, anuncios, loading]);
-
-  const fetchAnuncios = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('anuncios')
-        .select('*')
-        .eq('posicao', posicao)
-        .eq('ativo', true)
-        .order('ordem', { ascending: true });
-
-      if (error) throw error;
-      setAnuncios(data || []);
-    } catch (error) {
-      console.error('Erro ao buscar anúncios:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const registerView = async (anuncio: Anuncio) => {
+  // Register view when anuncio changes - DEBOUNCED to reduce API calls
+  const registerView = useCallback(async (anuncio: Anuncio) => {
+    // Skip if already viewed in this session
+    if (viewedAdsSession.has(anuncio.id)) return;
+    viewedAdsSession.add(anuncio.id);
+    
     try {
       await supabase
         .from('anuncios')
-        .update({ visualizacoes: anuncio.visualizacoes + 1 })
+        .update({ visualizacoes: (anuncio.visualizacoes || 0) + 1 })
         .eq('id', anuncio.id);
     } catch (error) {
       console.error('Erro ao registrar visualização:', error);
     }
-  };
+  }, []);
 
+  useEffect(() => {
+    if (anuncios.length > 0 && !isLoading) {
+      registerView(anuncios[currentIndex]);
+    }
+  }, [currentIndex, anuncios, isLoading, registerView]);
   // Registra clique sem abrir link (para uso com tag <a>)
   const registerClick = async (anuncio: Anuncio) => {
     try {
@@ -154,7 +120,7 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
     setTimeout(() => setIsTransitioning(false), 500);
   };
 
-  if (loading || anuncios.length === 0) {
+  if (isLoading || anuncios.length === 0) {
     return null;
   }
 

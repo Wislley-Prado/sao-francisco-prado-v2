@@ -1,8 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Loader2, Fish, Home, Map, Utensils, Wifi, Car, Shield, Play, MapPin, Navigation, Compass, ExternalLink, Copy } from 'lucide-react';
@@ -21,44 +19,51 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-
-interface PacoteDetalhes {
-  id: string;
-  nome: string;
-  slug: string;
-  descricao: string;
-  preco: number;
-  duracao: string;
-  pessoas: number;
-  rating: number;
-  tipo: string;
-  caracteristicas: string[];
-  inclusos: string[];
-  ativo: boolean;
-  popular: boolean;
-  destaque: boolean;
-  parcelas_quantidade?: number;
-  parcela_valor?: number;
-  desconto_avista?: number;
-  vagas_disponiveis?: number;
-  video_youtube?: string;
-  tracking_code?: string;
-  telefone_whatsapp?: string;
-  endereco_completo?: string;
-  latitude?: number;
-  longitude?: number;
-  imagens: {
-    url: string;
-    alt_text: string;
-    principal: boolean;
-  }[];
-}
+import { toast } from 'sonner';
+import { usePacoteBySlug } from '@/hooks/useOptimizedData';
 
 const PacoteDetalhes = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const [pacote, setPacote] = useState<PacoteDetalhes | null>(null);
-  const [loading, setLoading] = useState(true);
+  
+  // Use optimized hook with cache
+  const { data: pacoteData, isLoading: loading } = usePacoteBySlug(slug);
+  
+  // Transform to expected format
+  const pacote = useMemo(() => {
+    if (!pacoteData) return null;
+    return {
+      id: pacoteData.id,
+      nome: pacoteData.nome,
+      slug: pacoteData.slug,
+      descricao: pacoteData.descricao,
+      preco: pacoteData.preco,
+      duracao: pacoteData.duracao,
+      pessoas: pacoteData.pessoas,
+      rating: pacoteData.rating,
+      tipo: pacoteData.tipo || '',
+      caracteristicas: pacoteData.caracteristicas,
+      inclusos: pacoteData.inclusos,
+      ativo: pacoteData.ativo,
+      popular: pacoteData.popular,
+      destaque: pacoteData.destaque,
+      parcelas_quantidade: pacoteData.parcelas_quantidade,
+      parcela_valor: pacoteData.parcela_valor,
+      desconto_avista: pacoteData.desconto_avista,
+      vagas_disponiveis: pacoteData.vagas_disponiveis,
+      video_youtube: pacoteData.video_youtube,
+      tracking_code: pacoteData.tracking_code,
+      telefone_whatsapp: pacoteData.telefone_whatsapp,
+      endereco_completo: pacoteData.endereco_completo,
+      latitude: pacoteData.latitude,
+      longitude: pacoteData.longitude,
+      imagens: pacoteData.imagens.map(img => ({
+        url: img.url,
+        alt_text: img.alt_text || '',
+        principal: img.principal,
+      })),
+    };
+  }, [pacoteData]);
 
   // WhatsApp padrão do site, usado se o pacote não tiver um específico
   const whatsappPadrao = "5538999755886";
@@ -82,73 +87,14 @@ const PacoteDetalhes = () => {
     }
   }, [pacote]);
 
+  // Redirect if pacote not found
   useEffect(() => {
-    const fetchPacote = async () => {
-      try {
-        setLoading(true);
-
-        const { data: pacoteData, error: pacoteError } = await supabase
-          .from('pacotes')
-          .select('*')
-          .eq('slug', slug)
-          .eq('ativo', true)
-          .maybeSingle();
-
-        if (pacoteError) throw pacoteError;
-        if (!pacoteData) {
-          toast.error('Pacote não encontrado');
-          navigate('/pacotes');
-          return;
-        }
-
-        const { data: imagesData } = await supabase
-          .from('pacote_imagens')
-          .select('url, alt_text, principal, ordem')
-          .eq('pacote_id', pacoteData.id)
-          .order('ordem', { ascending: true });
-
-        const pacoteCompleto = {
-          id: pacoteData.id,
-          nome: pacoteData.nome,
-          slug: pacoteData.slug,
-          descricao: pacoteData.descricao || '',
-          preco: Number(pacoteData.preco),
-          duracao: pacoteData.duracao,
-          pessoas: pacoteData.pessoas,
-          rating: Number(pacoteData.rating),
-          tipo: pacoteData.tipo,
-          caracteristicas: pacoteData.caracteristicas || [],
-          inclusos: pacoteData.inclusos || [],
-          ativo: pacoteData.ativo,
-          popular: pacoteData.popular,
-          destaque: pacoteData.destaque,
-          parcelas_quantidade: pacoteData.parcelas_quantidade,
-          parcela_valor: pacoteData.parcela_valor ? Number(pacoteData.parcela_valor) : undefined,
-          desconto_avista: pacoteData.desconto_avista ? Number(pacoteData.desconto_avista) : undefined,
-          vagas_disponiveis: pacoteData.vagas_disponiveis,
-          video_youtube: pacoteData.video_youtube,
-          tracking_code: pacoteData.tracking_code,
-          telefone_whatsapp: pacoteData.telefone_whatsapp,
-          endereco_completo: pacoteData.endereco_completo,
-          latitude: pacoteData.latitude,
-          longitude: pacoteData.longitude,
-          imagens: imagesData || [],
-        };
-
-        setPacote(pacoteCompleto);
-      } catch (error) {
-        console.error('Erro ao carregar pacote:', error);
-        toast.error('Erro ao carregar informações do pacote');
-        navigate('/pacotes');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (slug) {
-      fetchPacote();
+    if (!loading && !pacote) {
+      toast.error('Pacote não encontrado');
+      navigate('/pacotes');
     }
-  }, [slug, navigate]);
+  }, [loading, pacote, navigate]);
+
 
   const handleWhatsAppClick = () => {
     if (pacote) {

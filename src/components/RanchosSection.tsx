@@ -1,87 +1,33 @@
-
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import RanchCard from './RanchCard';
 import { MapPin, Star, Loader2 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
-
-interface Ranch {
-  id: string | number;
-  name: string;
-  slug?: string;
-  description: string;
-  location: string;
-  capacity: number;
-  price: number;
-  rating: number;
-  images: string[];
-  amenities: string[];
-  available: boolean;
-  features: {
-    bedrooms: number;
-    bathrooms: number;
-    area: string;
-  };
-}
+import { useRanchos } from '@/hooks/useOptimizedData';
 
 const RanchosSection = () => {
-  const [ranchos, setRanchos] = useState<Ranch[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: ranchosData, isLoading } = useRanchos(true);
 
-  useEffect(() => {
-    const fetchRanchos = async () => {
-      try {
-        setLoading(true);
-        
-        const { data: ranchosData, error: ranchosError } = await supabase
-          .from('ranchos')
-          .select('*')
-          .eq('disponivel', true)
-          .order('destaque', { ascending: false })
-          .order('created_at', { ascending: false });
-
-        if (ranchosError) throw ranchosError;
-
-        const ranchosWithImages = await Promise.all(
-          (ranchosData || []).map(async (rancho) => {
-            const { data: imagesData } = await supabase
-              .from('rancho_imagens')
-              .select('url, alt_text, principal, ordem')
-              .eq('rancho_id', rancho.id)
-              .order('ordem', { ascending: true });
-
-            return {
-              id: rancho.id,
-              name: rancho.nome,
-              slug: rancho.slug,
-              description: rancho.descricao || '',
-              location: rancho.localizacao,
-              capacity: rancho.capacidade,
-              price: Number(rancho.preco),
-              rating: Number(rancho.rating),
-              images: (imagesData || []).map(img => img.url),
-              amenities: rancho.comodidades || [],
-              available: rancho.disponivel,
-              features: {
-                bedrooms: rancho.quartos,
-                bathrooms: rancho.banheiros,
-                area: rancho.area ? `${rancho.area}m²` : '0m²'
-              }
-            };
-          })
-        );
-
-        setRanchos(ranchosWithImages);
-      } catch (error) {
-        console.error('Erro ao buscar ranchos:', error);
-        toast.error('Erro ao carregar ranchos');
-      } finally {
-        setLoading(false);
+  // Transform data to expected format
+  const ranchos = React.useMemo(() => {
+    if (!ranchosData) return [];
+    return ranchosData.map(rancho => ({
+      id: rancho.id,
+      name: rancho.nome,
+      slug: rancho.slug,
+      description: rancho.descricao,
+      location: rancho.localizacao,
+      capacity: rancho.capacidade,
+      price: rancho.preco,
+      rating: rancho.rating,
+      images: rancho.imagens.map(img => img.url),
+      amenities: rancho.comodidades,
+      available: rancho.disponivel,
+      features: {
+        bedrooms: rancho.quartos,
+        bathrooms: rancho.banheiros,
+        area: rancho.area ? `${rancho.area}m²` : '0m²'
       }
-    };
-
-    fetchRanchos();
-  }, []);
+    }));
+  }, [ranchosData]);
 
   return (
     <section id="ranchos" className="py-20 bg-gray-50">
@@ -98,7 +44,7 @@ const RanchosSection = () => {
         </div>
 
         {/* Ranchos Grid */}
-        {loading ? (
+        {isLoading ? (
           <div className="flex justify-center py-16">
             <Loader2 className="h-12 w-12 animate-spin text-rio-blue" />
           </div>

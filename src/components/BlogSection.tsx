@@ -1,33 +1,18 @@
 import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { Link } from 'react-router-dom';
-import { Card, CardContent } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, CarouselApi } from '@/components/ui/carousel';
 import BlogCard from './BlogCard';
 import { BookOpen, TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useBlogPosts } from '@/hooks/useOptimizedData';
 
 const BlogSection = () => {
   const [api, setApi] = React.useState<CarouselApi>();
   const [current, setCurrent] = React.useState(0);
   const [count, setCount] = React.useState(0);
 
-  // Fetch recent published posts
-  const { data: recentPosts, isLoading } = useQuery({
-    queryKey: ['recent-blog-posts'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('blog_posts')
-        .select('*')
-        .eq('publicado', true)
-        .order('data_publicacao', { ascending: false })
-        .limit(6);
-
-      if (error) throw error;
-      return data;
-    },
-  });
+  // Fetch recent published posts with cache
+  const { data: recentPosts, isLoading } = useBlogPosts(6);
 
   React.useEffect(() => {
     if (!api) {

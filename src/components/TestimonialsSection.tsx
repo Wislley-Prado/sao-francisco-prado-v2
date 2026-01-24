@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Star, Quote } from "lucide-react";
@@ -10,46 +8,16 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-
-interface Depoimento {
-  id: string;
-  nome: string;
-  cargo: string | null;
-  foto_url: string | null;
-  depoimento: string;
-  rating: number;
-}
+import { useDepoimentos } from "@/hooks/useOptimizedData";
 
 export const TestimonialsSection = () => {
-  const [depoimentos, setDepoimentos] = useState<Depoimento[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: depoimentos, isLoading } = useDepoimentos();
 
-  useEffect(() => {
-    fetchDepoimentos();
-  }, []);
-
-  const fetchDepoimentos = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("depoimentos")
-        .select("*")
-        .eq("ativo", true)
-        .order("ordem", { ascending: true });
-
-      if (error) throw error;
-      setDepoimentos(data || []);
-    } catch (error) {
-      console.error("Erro ao buscar depoimentos:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
+  if (isLoading) {
     return null;
   }
 
-  if (depoimentos.length === 0) {
+  if (!depoimentos || depoimentos.length === 0) {
     return null;
   }
 
