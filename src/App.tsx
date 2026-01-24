@@ -60,8 +60,12 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      cacheTime: 10 * 60 * 1000, // 10 minutes
+      staleTime: 15 * 60 * 1000, // 15 minutes - dados considerados frescos por mais tempo
+      cacheTime: 60 * 60 * 1000, // 1 hour - mantém cache por mais tempo
+      refetchOnWindowFocus: false, // Desabilita refetch ao focar janela
+      refetchOnReconnect: false, // Desabilita refetch ao reconectar
+      refetchOnMount: false, // Desabilita refetch ao montar componente
+      retry: 1, // Apenas 1 retry
     },
   },
 });

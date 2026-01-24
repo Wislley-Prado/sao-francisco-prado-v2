@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import {
   Accordion,
   AccordionContent,
@@ -8,46 +6,16 @@ import {
 } from "@/components/ui/accordion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FAQVoteButtons } from "@/components/FAQVoteButtons";
-
-interface FAQ {
-  id: string;
-  pergunta: string;
-  resposta: string;
-  ordem: number;
-}
+import { useFAQs } from "@/hooks/useOptimizedData";
 
 export const FAQSection = () => {
-  const [faqs, setFaqs] = useState<FAQ[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: faqs, isLoading } = useFAQs();
 
-  useEffect(() => {
-    fetchFaqs();
-  }, []);
-
-  const fetchFaqs = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("faqs")
-        .select("*")
-        .eq("ativo", true)
-        .is("pacote_id", null)
-        .is("rancho_id", null)
-        .order("ordem", { ascending: true });
-
-      if (error) throw error;
-      setFaqs(data || []);
-    } catch (error) {
-      console.error("Erro ao buscar FAQs:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
+  if (isLoading) {
     return null;
   }
 
-  if (faqs.length === 0) {
+  if (!faqs || faqs.length === 0) {
     return null;
   }
 

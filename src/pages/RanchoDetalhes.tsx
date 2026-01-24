@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
 import DOMPurify from 'dompurify';
+import { toast } from 'sonner';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { ImageGallery } from '@/components/ImageGallery';
@@ -22,34 +21,7 @@ import { ReviewsList } from "@/components/reviews/ReviewsList";
 import { ReviewForm } from "@/components/reviews/ReviewForm";
 import { useRanchoAnalytics, registrarEvento } from "@/hooks/useRanchoAnalytics";
 import { RanchoFAQs } from '@/components/RanchoFAQs';
-
-interface RanchoDetalhes {
-  id: string;
-  nome: string;
-  descricao: string;
-  localizacao: string;
-  capacidade: number;
-  preco: number;
-  rating: number;
-  quartos: number;
-  banheiros: number;
-  area: number;
-  comodidades: string[];
-  disponivel: boolean;
-  telefone_whatsapp?: string;
-  mensagem_whatsapp?: string;
-  video_youtube?: string;
-  google_calendar_url?: string;
-  tracking_code?: string;
-  latitude?: number;
-  longitude?: number;
-  endereco_completo?: string;
-  imagens: {
-    url: string;
-    alt_text: string;
-    principal: boolean;
-  }[];
-}
+import { useRanchoBySlug } from '@/hooks/useOptimizedData';
 
 const amenityIcons: { [key: string]: React.ReactNode } = {
   'Wi-Fi': <Wifi className="h-5 w-5" />,
@@ -65,81 +37,50 @@ const amenityIcons: { [key: string]: React.ReactNode } = {
 const RanchoDetalhes = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const [rancho, setRancho] = useState<RanchoDetalhes | null>(null);
-  const [loading, setLoading] = useState(true);
+  
+  // Use optimized hook with cache
+  const { data: ranchoData, isLoading: loading } = useRanchoBySlug(slug);
+  
+  // Transform to expected format
+  const rancho = React.useMemo(() => {
+    if (!ranchoData) return null;
+    return {
+      id: ranchoData.id,
+      nome: ranchoData.nome,
+      descricao: ranchoData.descricao,
+      localizacao: ranchoData.localizacao,
+      capacidade: ranchoData.capacidade,
+      preco: ranchoData.preco,
+      rating: ranchoData.rating,
+      quartos: ranchoData.quartos,
+      banheiros: ranchoData.banheiros,
+      area: ranchoData.area || 0,
+      comodidades: ranchoData.comodidades,
+      disponivel: ranchoData.disponivel,
+      telefone_whatsapp: ranchoData.telefone_whatsapp,
+      mensagem_whatsapp: ranchoData.mensagem_whatsapp,
+      video_youtube: ranchoData.video_youtube,
+      google_calendar_url: ranchoData.google_calendar_url,
+      tracking_code: ranchoData.tracking_code,
+      latitude: ranchoData.latitude,
+      longitude: ranchoData.longitude,
+      endereco_completo: ranchoData.endereco_completo,
+      imagens: ranchoData.imagens.map(img => ({
+        url: img.url,
+        alt_text: img.alt_text || '',
+        principal: img.principal,
+      })),
+    };
+  }, [ranchoData]);
 
   const whatsappNumber = rancho?.telefone_whatsapp || "5531999999999";
 
+  // Redirect if rancho not found
   useEffect(() => {
-    const fetchRancho = async () => {
-      try {
-        setLoading(true);
-
-        // Buscar rancho pelo slug
-        const { data: ranchoData, error: ranchoError } = await supabase
-          .from('ranchos')
-          .select('*')
-          .eq('slug', slug)
-          .eq('disponivel', true)
-          .maybeSingle();
-
-        if (ranchoError) throw ranchoError;
-        if (!ranchoData) {
-          toast.error('Rancho não encontrado');
-          navigate('/');
-          return;
-        }
-
-        // Buscar imagens do rancho
-        const { data: imagesData } = await supabase
-          .from('rancho_imagens')
-          .select('url, alt_text, principal, ordem')
-          .eq('rancho_id', ranchoData.id)
-          .order('ordem', { ascending: true });
-
-        const ranchoCompleto = {
-          id: ranchoData.id,
-          nome: ranchoData.nome,
-          descricao: ranchoData.descricao || '',
-          localizacao: ranchoData.localizacao,
-          capacidade: ranchoData.capacidade,
-          preco: Number(ranchoData.preco),
-          rating: Number(ranchoData.rating),
-          quartos: ranchoData.quartos,
-          banheiros: ranchoData.banheiros,
-          area: ranchoData.area,
-          comodidades: ranchoData.comodidades || [],
-          disponivel: ranchoData.disponivel,
-          telefone_whatsapp: ranchoData.telefone_whatsapp,
-          mensagem_whatsapp: ranchoData.mensagem_whatsapp,
-          video_youtube: ranchoData.video_youtube,
-          google_calendar_url: ranchoData.google_calendar_url,
-          tracking_code: ranchoData.tracking_code,
-          latitude: ranchoData.latitude,
-          longitude: ranchoData.longitude,
-          endereco_completo: ranchoData.endereco_completo,
-          imagens: imagesData || []
-        };
-
-        // Debug logs
-        console.log('Video YouTube:', ranchoCompleto.video_youtube);
-        console.log('Google Calendar:', ranchoCompleto.google_calendar_url);
-        console.log('Coordenadas:', { lat: ranchoCompleto.latitude, lng: ranchoCompleto.longitude });
-        
-        setRancho(ranchoCompleto);
-      } catch (error) {
-        console.error('Erro ao buscar rancho:', error);
-        toast.error('Erro ao carregar detalhes do rancho');
-        navigate('/');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (slug) {
-      fetchRancho();
+    if (!loading && !rancho) {
+      navigate('/');
     }
-  }, [slug, navigate]);
+  }, [loading, rancho, navigate]);
 
   // Registrar visualização da página
   useRanchoAnalytics(rancho?.id || "", "visualizacao");
