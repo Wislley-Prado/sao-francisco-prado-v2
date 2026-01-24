@@ -1,9 +1,11 @@
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Fish, Phone, Mail, MapPin, Facebook, Instagram, Youtube } from 'lucide-react';
+import { useSiteSettings } from '@/hooks/useOptimizedData';
 
 const Footer = () => {
   const navigate = useNavigate();
+  const { data: settings } = useSiteSettings();
   const location = useLocation();
 
   const handleNavClick = (href: string, hash: string) => {
@@ -94,11 +96,11 @@ const Footer = () => {
             <div className="space-y-3 text-sm">
               <div className="flex items-center space-x-2">
                 <Phone className="h-4 w-4 text-rio-blue" />
-                <span className="text-gray-300">(38) 98832-0108</span>
+                <span className="text-gray-300">{settings?.telefone_contato || '(38) 98832-0108'}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Mail className="h-4 w-4 text-rio-blue" />
-                <span className="text-gray-300">contato@pradoaqui.com.br</span>
+                <span className="text-gray-300">{settings?.email_contato || 'contato@pradoaqui.com.br'}</span>
               </div>
               <div className="flex items-start space-x-2">
                 <MapPin className="h-4 w-4 text-rio-blue mt-0.5" />
@@ -114,15 +116,39 @@ const Footer = () => {
           <div className="space-y-4">
             <h4 className="text-lg font-semibold">Redes Sociais</h4>
             <div className="flex space-x-4">
-              <a href="#" className="text-gray-300 hover:text-rio-blue transition-colors" aria-label="Facebook">
-                <Facebook className="h-6 w-6" />
-              </a>
-              <a href="#" className="text-gray-300 hover:text-rio-blue transition-colors" aria-label="Instagram">
-                <Instagram className="h-6 w-6" />
-              </a>
-              <a href="#" className="text-gray-300 hover:text-rio-blue transition-colors" aria-label="YouTube">
-                <Youtube className="h-6 w-6" />
-              </a>
+              {settings?.facebook_url && (
+                <a href={settings.facebook_url} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-rio-blue transition-colors" aria-label="Facebook">
+                  <Facebook className="h-6 w-6" />
+                </a>
+              )}
+              {settings?.instagram_url && (
+                <a href={settings.instagram_url} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-rio-blue transition-colors" aria-label="Instagram">
+                  <Instagram className="h-6 w-6" />
+                </a>
+              )}
+              {settings?.youtube_url && (
+                <a href={settings.youtube_url} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-rio-blue transition-colors" aria-label="YouTube">
+                  <Youtube className="h-6 w-6" />
+                </a>
+              )}
+              {settings?.tiktok_url && (
+                <a href={settings.tiktok_url} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-rio-blue transition-colors" aria-label="TikTok">
+                  <svg className="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z"/>
+                  </svg>
+                </a>
+              )}
+              {settings?.twitter_url && (
+                <a href={settings.twitter_url} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-rio-blue transition-colors" aria-label="X (Twitter)">
+                  <svg className="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                  </svg>
+                </a>
+              )}
+              {/* Fallback se nenhuma rede estiver configurada */}
+              {!settings?.facebook_url && !settings?.instagram_url && !settings?.youtube_url && !settings?.tiktok_url && !settings?.twitter_url && (
+                <span className="text-gray-500 text-sm">Nenhuma rede social configurada</span>
+              )}
             </div>
           </div>
         </div>

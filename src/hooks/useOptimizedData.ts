@@ -130,6 +130,15 @@ export interface SiteSettings {
   whatsapp_horario?: string;
   whatsapp_mensagens_rapidas?: Array<{ text: string; message: string }>;
   autor_avatar_url?: string;
+  // Redes sociais
+  facebook_url?: string;
+  instagram_url?: string;
+  youtube_url?: string;
+  tiktok_url?: string;
+  twitter_url?: string;
+  // Contato
+  telefone_contato?: string;
+  email_contato?: string;
 }
 
 export interface Depoimento {

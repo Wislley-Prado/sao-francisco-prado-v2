@@ -984,10 +984,16 @@ export type Database = {
           created_at: string
           custom_head_scripts: string | null
           dam_webhook_url: string | null
+          email_contato: string | null
           facebook_pixel: string | null
+          facebook_url: string | null
           google_analytics: string | null
           google_tag_manager: string | null
           id: string
+          instagram_url: string | null
+          telefone_contato: string | null
+          tiktok_url: string | null
+          twitter_url: string | null
           updated_at: string
           whatsapp_horario: string | null
           whatsapp_instrucao: string | null
@@ -998,6 +1004,7 @@ export type Database = {
           whatsapp_titulo: string | null
           youtube_institucional_url: string | null
           youtube_live_url: string | null
+          youtube_url: string | null
           youtube_video_url: string | null
         }
         Insert: {
@@ -1005,10 +1012,16 @@ export type Database = {
           created_at?: string
           custom_head_scripts?: string | null
           dam_webhook_url?: string | null
+          email_contato?: string | null
           facebook_pixel?: string | null
+          facebook_url?: string | null
           google_analytics?: string | null
           google_tag_manager?: string | null
           id?: string
+          instagram_url?: string | null
+          telefone_contato?: string | null
+          tiktok_url?: string | null
+          twitter_url?: string | null
           updated_at?: string
           whatsapp_horario?: string | null
           whatsapp_instrucao?: string | null
@@ -1019,6 +1032,7 @@ export type Database = {
           whatsapp_titulo?: string | null
           youtube_institucional_url?: string | null
           youtube_live_url?: string | null
+          youtube_url?: string | null
           youtube_video_url?: string | null
         }
         Update: {
@@ -1026,10 +1040,16 @@ export type Database = {
           created_at?: string
           custom_head_scripts?: string | null
           dam_webhook_url?: string | null
+          email_contato?: string | null
           facebook_pixel?: string | null
+          facebook_url?: string | null
           google_analytics?: string | null
           google_tag_manager?: string | null
           id?: string
+          instagram_url?: string | null
+          telefone_contato?: string | null
+          tiktok_url?: string | null
+          twitter_url?: string | null
           updated_at?: string
           whatsapp_horario?: string | null
           whatsapp_instrucao?: string | null
@@ -1040,6 +1060,7 @@ export type Database = {
           whatsapp_titulo?: string | null
           youtube_institucional_url?: string | null
           youtube_live_url?: string | null
+          youtube_url?: string | null
           youtube_video_url?: string | null
         }
         Relationships: []
@@ -1203,7 +1224,13 @@ export type Database = {
         Row: {
           autor_avatar_url: string | null
           created_at: string | null
+          email_contato: string | null
+          facebook_url: string | null
           id: string | null
+          instagram_url: string | null
+          telefone_contato: string | null
+          tiktok_url: string | null
+          twitter_url: string | null
           updated_at: string | null
           whatsapp_horario: string | null
           whatsapp_instrucao: string | null
@@ -1214,12 +1241,19 @@ export type Database = {
           whatsapp_titulo: string | null
           youtube_institucional_url: string | null
           youtube_live_url: string | null
+          youtube_url: string | null
           youtube_video_url: string | null
         }
         Insert: {
           autor_avatar_url?: string | null
           created_at?: string | null
+          email_contato?: string | null
+          facebook_url?: string | null
           id?: string | null
+          instagram_url?: string | null
+          telefone_contato?: string | null
+          tiktok_url?: string | null
+          twitter_url?: string | null
           updated_at?: string | null
           whatsapp_horario?: string | null
           whatsapp_instrucao?: string | null
@@ -1230,12 +1264,19 @@ export type Database = {
           whatsapp_titulo?: string | null
           youtube_institucional_url?: string | null
           youtube_live_url?: string | null
+          youtube_url?: string | null
           youtube_video_url?: string | null
         }
         Update: {
           autor_avatar_url?: string | null
           created_at?: string | null
+          email_contato?: string | null
+          facebook_url?: string | null
           id?: string | null
+          instagram_url?: string | null
+          telefone_contato?: string | null
+          tiktok_url?: string | null
+          twitter_url?: string | null
           updated_at?: string | null
           whatsapp_horario?: string | null
           whatsapp_instrucao?: string | null
@@ -1246,6 +1287,7 @@ export type Database = {
           whatsapp_titulo?: string | null
           youtube_institucional_url?: string | null
           youtube_live_url?: string | null
+          youtube_url?: string | null
           youtube_video_url?: string | null
         }
         Relationships: []
