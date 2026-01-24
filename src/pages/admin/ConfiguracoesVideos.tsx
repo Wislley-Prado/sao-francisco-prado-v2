@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Loader2, Video, Radio, Film } from 'lucide-react';
+import { Loader2, Video, Radio, Film, X } from 'lucide-react';
 import { useVideoSettings, extractYouTubeId, isValidYouTubeUrl } from '@/hooks/useVideoSettings';
 import { YouTubePreview } from '@/components/YouTubePlayer';
 
@@ -103,17 +103,33 @@ const ConfiguracoesVideos = () => {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="live-url">URL da Live no YouTube</Label>
-              <Input
-                id="live-url"
-                type="url"
-                placeholder="https://www.youtube.com/watch?v=..."
-                value={liveUrl}
-                onChange={(e) => {
-                  setLiveUrl(e.target.value);
-                  validateLiveUrl(e.target.value);
-                }}
-                className={liveUrlError ? 'border-destructive' : ''}
-              />
+              <div className="relative">
+                <Input
+                  id="live-url"
+                  type="url"
+                  placeholder="https://www.youtube.com/watch?v=..."
+                  value={liveUrl}
+                  onChange={(e) => {
+                    setLiveUrl(e.target.value);
+                    validateLiveUrl(e.target.value);
+                  }}
+                  onFocus={(e) => e.target.select()}
+                  className={`pr-10 ${liveUrlError ? 'border-destructive' : ''}`}
+                />
+                {liveUrl && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLiveUrl('');
+                      setLiveUrlError('');
+                    }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    title="Limpar URL"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
               {liveUrlError && (
                 <p className="text-sm text-destructive">{liveUrlError}</p>
               )}
@@ -154,17 +170,33 @@ const ConfiguracoesVideos = () => {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="video-url">URL do Vídeo Gravado</Label>
-              <Input
-                id="video-url"
-                type="url"
-                placeholder="https://www.youtube.com/watch?v=..."
-                value={videoUrl}
-                onChange={(e) => {
-                  setVideoUrl(e.target.value);
-                  validateVideoUrl(e.target.value);
-                }}
-                className={videoUrlError ? 'border-destructive' : ''}
-              />
+              <div className="relative">
+                <Input
+                  id="video-url"
+                  type="url"
+                  placeholder="https://www.youtube.com/watch?v=..."
+                  value={videoUrl}
+                  onChange={(e) => {
+                    setVideoUrl(e.target.value);
+                    validateVideoUrl(e.target.value);
+                  }}
+                  onFocus={(e) => e.target.select()}
+                  className={`pr-10 ${videoUrlError ? 'border-destructive' : ''}`}
+                />
+                {videoUrl && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setVideoUrl('');
+                      setVideoUrlError('');
+                    }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    title="Limpar URL"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
               {videoUrlError && (
                 <p className="text-sm text-destructive">{videoUrlError}</p>
               )}
@@ -196,17 +228,33 @@ const ConfiguracoesVideos = () => {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="institucional-url">URL do Vídeo Institucional</Label>
-              <Input
-                id="institucional-url"
-                type="url"
-                placeholder="https://www.youtube.com/watch?v=..."
-                value={institucionalUrl}
-                onChange={(e) => {
-                  setInstitucionalUrl(e.target.value);
-                  validateInstitucionalUrl(e.target.value);
-                }}
-                className={institucionalUrlError ? 'border-destructive' : ''}
-              />
+              <div className="relative">
+                <Input
+                  id="institucional-url"
+                  type="url"
+                  placeholder="https://www.youtube.com/watch?v=..."
+                  value={institucionalUrl}
+                  onChange={(e) => {
+                    setInstitucionalUrl(e.target.value);
+                    validateInstitucionalUrl(e.target.value);
+                  }}
+                  onFocus={(e) => e.target.select()}
+                  className={`pr-10 ${institucionalUrlError ? 'border-destructive' : ''}`}
+                />
+                {institucionalUrl && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setInstitucionalUrl('');
+                      setInstitucionalUrlError('');
+                    }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    title="Limpar URL"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
               {institucionalUrlError && (
                 <p className="text-sm text-destructive">{institucionalUrlError}</p>
               )}
