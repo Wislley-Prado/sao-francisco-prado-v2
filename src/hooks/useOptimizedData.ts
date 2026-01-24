@@ -204,7 +204,13 @@ export const useRanchos = (onlyAvailable = true) => {
           longitude: rancho.longitude,
           endereco_completo: rancho.endereco_completo,
           imagens: (rancho.rancho_imagens || [])
-            .sort((a: { ordem: number }, b: { ordem: number }) => a.ordem - b.ordem)
+            .sort((a: { ordem: number; principal: boolean }, b: { ordem: number; principal: boolean }) => {
+              // Principal image always comes first
+              if (a.principal && !b.principal) return -1;
+              if (!a.principal && b.principal) return 1;
+              // Then sort by ordem
+              return a.ordem - b.ordem;
+            })
             .map((img: { id: string; url: string; alt_text?: string; principal: boolean; ordem: number }) => ({
               id: img.id,
               url: img.url,
@@ -280,7 +286,13 @@ export const useRanchoBySlug = (slug: string | undefined) => {
           longitude: data.longitude,
           endereco_completo: data.endereco_completo,
           imagens: (data.rancho_imagens || [])
-            .sort((a: { ordem: number }, b: { ordem: number }) => a.ordem - b.ordem)
+            .sort((a: { ordem: number; principal: boolean }, b: { ordem: number; principal: boolean }) => {
+              // Principal image always comes first
+              if (a.principal && !b.principal) return -1;
+              if (!a.principal && b.principal) return 1;
+              // Then sort by ordem
+              return a.ordem - b.ordem;
+            })
             .map((img: { id: string; url: string; alt_text?: string; principal: boolean; ordem: number }) => ({
               id: img.id,
               url: img.url,

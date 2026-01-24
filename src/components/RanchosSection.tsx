@@ -18,7 +18,13 @@ const RanchosSection = () => {
       capacity: rancho.capacidade,
       price: rancho.preco,
       rating: rancho.rating,
-      images: rancho.imagens.map(img => img.url),
+      images: [...rancho.imagens]
+        .sort((a, b) => {
+          if (a.principal && !b.principal) return -1;
+          if (!a.principal && b.principal) return 1;
+          return a.ordem - b.ordem;
+        })
+        .map(img => img.url),
       amenities: rancho.comodidades,
       available: rancho.disponivel,
       features: {
