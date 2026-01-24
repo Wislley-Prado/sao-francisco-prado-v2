@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Save, Code2, TrendingUp, Webhook, AlertCircle, RefreshCw, Database, Clock } from 'lucide-react';
+import { Loader2, Save, Code2, TrendingUp, Webhook, AlertCircle, RefreshCw, Database, Clock, User } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 
@@ -22,7 +22,8 @@ const Configuracoes = () => {
     google_analytics: '',
     google_tag_manager: '',
     custom_head_scripts: '',
-    dam_webhook_url: ''
+    dam_webhook_url: '',
+    autor_avatar_url: ''
   });
 
   useEffect(() => {
@@ -46,7 +47,8 @@ const Configuracoes = () => {
           google_analytics: data.google_analytics || '',
           google_tag_manager: data.google_tag_manager || '',
           custom_head_scripts: data.custom_head_scripts || '',
-          dam_webhook_url: (data as any).dam_webhook_url || ''
+          dam_webhook_url: (data as any).dam_webhook_url || '',
+          autor_avatar_url: (data as any).autor_avatar_url || ''
         });
       }
     } catch (error) {
@@ -284,6 +286,42 @@ const Configuracoes = () => {
                 </AlertDescription>
               </Alert>
             </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <User className="w-5 h-5" />
+              Avatar do Autor (PradoAqui)
+            </CardTitle>
+            <CardDescription>
+              Configure a imagem do avatar que aparece nos posts do blog
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="autor_avatar_url">URL do Avatar</Label>
+              <Input
+                id="autor_avatar_url"
+                placeholder="https://exemplo.com/avatar.jpg"
+                value={settings.autor_avatar_url}
+                onChange={(e) => setSettings({ ...settings, autor_avatar_url: e.target.value })}
+              />
+              <p className="text-xs text-muted-foreground">
+                URL da imagem do avatar do PradoAqui (recomendado: 100x100px)
+              </p>
+            </div>
+            {settings.autor_avatar_url && (
+              <div className="flex items-center gap-3">
+                <img 
+                  src={settings.autor_avatar_url} 
+                  alt="Preview do avatar" 
+                  className="w-12 h-12 rounded-full object-cover border"
+                />
+                <span className="text-sm text-muted-foreground">Preview do avatar</span>
+              </div>
+            )}
           </CardContent>
         </Card>
 

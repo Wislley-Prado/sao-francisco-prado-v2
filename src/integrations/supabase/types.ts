@@ -980,6 +980,7 @@ export type Database = {
       }
       site_settings: {
         Row: {
+          autor_avatar_url: string | null
           created_at: string
           custom_head_scripts: string | null
           dam_webhook_url: string | null
@@ -1000,6 +1001,7 @@ export type Database = {
           youtube_video_url: string | null
         }
         Insert: {
+          autor_avatar_url?: string | null
           created_at?: string
           custom_head_scripts?: string | null
           dam_webhook_url?: string | null
@@ -1020,6 +1022,7 @@ export type Database = {
           youtube_video_url?: string | null
         }
         Update: {
+          autor_avatar_url?: string | null
           created_at?: string
           custom_head_scripts?: string | null
           dam_webhook_url?: string | null

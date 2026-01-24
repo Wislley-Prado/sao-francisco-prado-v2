@@ -129,6 +129,7 @@ export interface SiteSettings {
   whatsapp_instrucoes?: string;
   whatsapp_horario?: string;
   whatsapp_mensagens_rapidas?: Array<{ text: string; message: string }>;
+  autor_avatar_url?: string;
 }
 
 export interface Depoimento {

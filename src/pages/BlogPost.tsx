@@ -8,7 +8,9 @@ import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Calendar, User, ArrowLeft, Eye, Tag } from 'lucide-react';
+import { Calendar, ArrowLeft, Tag } from 'lucide-react';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { useSiteSettings } from '@/hooks/useOptimizedData';
 import { Skeleton } from '@/components/ui/skeleton';
 import DOMPurify from 'dompurify';
 import { SocialShareButtons } from '@/components/blog/SocialShareButtons';
@@ -18,6 +20,7 @@ import RecentPostsCarousel from '@/components/blog/RecentPostsCarousel';
 
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
+  const { data: siteSettings } = useSiteSettings();
 
   const { data: post, isLoading } = useQuery({
     queryKey: ['blog-post', slug],
@@ -35,16 +38,7 @@ const BlogPost = () => {
     enabled: !!slug,
   });
 
-  // Increment view count
-  useEffect(() => {
-    if (post?.id) {
-      supabase
-        .from('blog_posts')
-        .update({ visualizacoes: (post.visualizacoes || 0) + 1 })
-        .eq('id', post.id)
-        .then();
-    }
-  }, [post?.id]);
+  // View count removed - using Google Analytics for accurate tracking
 
   // Sanitize HTML content
   const sanitizedContent = React.useMemo(() => {
@@ -149,13 +143,12 @@ const BlogPost = () => {
                 })}
               </time>
             </div>
-            <div className="flex items-center gap-1">
-              <User className="h-4 w-4" />
+            <div className="flex items-center gap-2">
+              <Avatar className="h-6 w-6">
+                <AvatarImage src={siteSettings?.autor_avatar_url || undefined} alt="PradoAqui" />
+                <AvatarFallback className="text-xs">PA</AvatarFallback>
+              </Avatar>
               <span>PradoAqui</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Eye className="h-4 w-4" />
-              <span>{post.visualizacoes || 0} visualizações</span>
             </div>
           </div>
 
