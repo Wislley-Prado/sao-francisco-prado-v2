@@ -6,9 +6,10 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Save, Code2, TrendingUp, Webhook, AlertCircle, RefreshCw, Database, Clock, User } from 'lucide-react';
+import { Loader2, Save, Code2, TrendingUp, Webhook, AlertCircle, RefreshCw, Database, Clock, User, Share2, Phone, Mail, Facebook, Instagram, Youtube } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 
 const SETTINGS_ID = '00000000-0000-0000-0000-000000000001';
 
@@ -23,7 +24,16 @@ const Configuracoes = () => {
     google_tag_manager: '',
     custom_head_scripts: '',
     dam_webhook_url: '',
-    autor_avatar_url: ''
+    autor_avatar_url: '',
+    // Redes sociais
+    facebook_url: '',
+    instagram_url: '',
+    youtube_url: '',
+    tiktok_url: '',
+    twitter_url: '',
+    // Contato
+    telefone_contato: '',
+    email_contato: ''
   });
 
   useEffect(() => {
@@ -48,7 +58,16 @@ const Configuracoes = () => {
           google_tag_manager: data.google_tag_manager || '',
           custom_head_scripts: data.custom_head_scripts || '',
           dam_webhook_url: (data as any).dam_webhook_url || '',
-          autor_avatar_url: (data as any).autor_avatar_url || ''
+          autor_avatar_url: (data as any).autor_avatar_url || '',
+          // Redes sociais
+          facebook_url: (data as any).facebook_url || '',
+          instagram_url: (data as any).instagram_url || '',
+          youtube_url: (data as any).youtube_url || '',
+          tiktok_url: (data as any).tiktok_url || '',
+          twitter_url: (data as any).twitter_url || '',
+          // Contato
+          telefone_contato: (data as any).telefone_contato || '',
+          email_contato: (data as any).email_contato || ''
         });
       }
     } catch (error) {
@@ -322,6 +341,140 @@ const Configuracoes = () => {
                 <span className="text-sm text-muted-foreground">Preview do avatar</span>
               </div>
             )}
+          </CardContent>
+        </Card>
+
+        {/* Card de Redes Sociais e Contato */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Share2 className="w-5 h-5" />
+              Redes Sociais e Contato
+            </CardTitle>
+            <CardDescription>
+              Configure os links das redes sociais e informações de contato do footer
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Redes Sociais */}
+            <div className="space-y-4">
+              <h4 className="font-medium text-sm text-muted-foreground">Redes Sociais</h4>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="facebook_url" className="flex items-center gap-2">
+                    <Facebook className="w-4 h-4" />
+                    Facebook
+                  </Label>
+                  <Input
+                    id="facebook_url"
+                    placeholder="https://facebook.com/pradoaqui"
+                    value={settings.facebook_url}
+                    onChange={(e) => setSettings({ ...settings, facebook_url: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="instagram_url" className="flex items-center gap-2">
+                    <Instagram className="w-4 h-4" />
+                    Instagram
+                  </Label>
+                  <Input
+                    id="instagram_url"
+                    placeholder="https://instagram.com/pradoaqui"
+                    value={settings.instagram_url}
+                    onChange={(e) => setSettings({ ...settings, instagram_url: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="youtube_url" className="flex items-center gap-2">
+                    <Youtube className="w-4 h-4" />
+                    YouTube (Canal)
+                  </Label>
+                  <Input
+                    id="youtube_url"
+                    placeholder="https://youtube.com/@pradoaqui"
+                    value={settings.youtube_url}
+                    onChange={(e) => setSettings({ ...settings, youtube_url: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="tiktok_url" className="flex items-center gap-2">
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z"/>
+                    </svg>
+                    TikTok
+                  </Label>
+                  <Input
+                    id="tiktok_url"
+                    placeholder="https://tiktok.com/@pradoaqui"
+                    value={settings.tiktok_url}
+                    onChange={(e) => setSettings({ ...settings, tiktok_url: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="twitter_url" className="flex items-center gap-2">
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                    X (Twitter)
+                  </Label>
+                  <Input
+                    id="twitter_url"
+                    placeholder="https://x.com/pradoaqui"
+                    value={settings.twitter_url}
+                    onChange={(e) => setSettings({ ...settings, twitter_url: e.target.value })}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Informações de Contato */}
+            <div className="space-y-4">
+              <h4 className="font-medium text-sm text-muted-foreground">Informações de Contato</h4>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="telefone_contato" className="flex items-center gap-2">
+                    <Phone className="w-4 h-4" />
+                    Telefone
+                  </Label>
+                  <Input
+                    id="telefone_contato"
+                    placeholder="(38) 98832-0108"
+                    value={settings.telefone_contato}
+                    onChange={(e) => setSettings({ ...settings, telefone_contato: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="email_contato" className="flex items-center gap-2">
+                    <Mail className="w-4 h-4" />
+                    E-mail
+                  </Label>
+                  <Input
+                    id="email_contato"
+                    type="email"
+                    placeholder="contato@pradoaqui.com.br"
+                    value={settings.email_contato}
+                    onChange={(e) => setSettings({ ...settings, email_contato: e.target.value })}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <Alert>
+              <Share2 className="h-4 w-4" />
+              <AlertDescription className="text-xs">
+                Deixe em branco os campos de redes sociais que não deseja exibir no footer. 
+                Apenas as redes com URL preenchida serão mostradas.
+              </AlertDescription>
+            </Alert>
           </CardContent>
         </Card>
 
