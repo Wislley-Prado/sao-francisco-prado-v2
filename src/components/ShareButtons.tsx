@@ -2,7 +2,6 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Facebook, Twitter, Linkedin, Copy, MessageCircle, Instagram, Check, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { SITE_CONFIG } from '@/lib/constants';
 
 interface ShareButtonsProps {
   titulo: string;
@@ -11,32 +10,16 @@ interface ShareButtonsProps {
   onShare?: (platform: string) => void;
 }
 
-// Generate OG proxy URL for better social media previews using production domain
-const getOgProxyUrl = (url: string): string => {
-  try {
-    const urlObj = new URL(url);
-    const path = urlObj.pathname;
-    
-    // Always use production domain for OG proxy
-    return `https://zeqloqlhnbdeivnyghkx.supabase.co/functions/v1/og-proxy?path=${encodeURIComponent(path)}&baseUrl=${encodeURIComponent(SITE_CONFIG.PRODUCTION_DOMAIN)}`;
-  } catch {
-    return url;
-  }
-};
-
 export const ShareButtons = ({ titulo, url, descricao, onShare }: ShareButtonsProps) => {
   const [copied, setCopied] = React.useState(false);
 
   const shareText = descricao ? `${titulo} - ${descricao}` : titulo;
-  
-  // Use OG proxy URL for social platforms that need rich previews
-  const ogUrl = getOgProxyUrl(url);
 
   const shareLinks = {
-    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(ogUrl)}`,
+    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
     twitter: `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(titulo)}`,
-    whatsapp: `https://api.whatsapp.com/send?text=${encodeURIComponent(`${shareText} ${ogUrl}`)}`,
-    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(ogUrl)}`,
+    whatsapp: `https://api.whatsapp.com/send?text=${encodeURIComponent(`${shareText} ${url}`)}`,
+    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
   };
 
   const handleShare = (platform: string, link: string) => {

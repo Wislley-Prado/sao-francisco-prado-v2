@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { Facebook, Twitter, Linkedin, Copy, MessageCircle, Instagram, Check } from 'lucide-react';
 import { useBlogAnalytics } from '@/hooks/useBlogAnalytics';
 import { toast } from 'sonner';
-import { SITE_CONFIG } from '@/lib/constants';
 
 interface AutoShareButtonsProps {
   postId: string;
@@ -12,33 +11,18 @@ interface AutoShareButtonsProps {
   resumo?: string;
 }
 
-// Generate OG proxy URL for better social media previews using production domain
-const getOgProxyUrl = (url: string): string => {
-  try {
-    const urlObj = new URL(url);
-    const path = urlObj.pathname;
-    
-    // Always use production domain for OG proxy
-    return `https://zeqloqlhnbdeivnyghkx.supabase.co/functions/v1/og-proxy?path=${encodeURIComponent(path)}&baseUrl=${encodeURIComponent(SITE_CONFIG.PRODUCTION_DOMAIN)}`;
-  } catch {
-    return url;
-  }
-};
-
 export const AutoShareButtons = ({ postId, titulo, url, resumo }: AutoShareButtonsProps) => {
   const { trackEvent } = useBlogAnalytics();
   const [copied, setCopied] = React.useState(false);
 
   const shareText = resumo ? `${titulo} - ${resumo}` : titulo;
-  
-  // Use OG proxy URL for social platforms that need rich previews
-  const ogUrl = getOgProxyUrl(url);
 
+  // Use direct production URL for all sharing links
   const shareLinks = {
-    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(ogUrl)}`,
+    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
     twitter: `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(titulo)}`,
-    whatsapp: `https://api.whatsapp.com/send?text=${encodeURIComponent(`${shareText} ${ogUrl}`)}`,
-    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(ogUrl)}`,
+    whatsapp: `https://api.whatsapp.com/send?text=${encodeURIComponent(`${shareText} ${url}`)}`,
+    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
   };
 
   const handleShare = (platform: string, link: string) => {
