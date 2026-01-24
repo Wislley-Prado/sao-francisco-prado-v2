@@ -1,23 +1,21 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useRanchoEstatisticas, useInvalidateCache } from "@/hooks/useOptimizedData";
 import { AnalyticsCard } from "@/components/analytics/AnalyticsCard";
 import { RanchoPerformanceChart } from "@/components/analytics/RanchoPerformanceChart";
 import { RanchoAnalyticsTable } from "@/components/analytics/RanchoAnalyticsTable";
-import { Eye, MousePointer, TrendingUp, BarChart3 } from "lucide-react";
+import { Eye, MousePointer, TrendingUp, BarChart3, RefreshCw } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 export default function Analytics() {
-  const { data: estatisticas, isLoading } = useQuery({
-    queryKey: ["rancho-estatisticas"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("rancho_estatisticas")
-        .select("*");
+  const { data: estatisticas, isLoading, refetch, isFetching } = useRanchoEstatisticas();
+  const { invalidateAdminStats } = useInvalidateCache();
 
-      if (error) throw error;
-      return data;
-    },
-  });
+  const handleRefresh = async () => {
+    invalidateAdminStats();
+    await refetch();
+    toast.success("Estatísticas atualizadas!");
+  };
 
   if (isLoading) {
     return (
@@ -55,11 +53,21 @@ export default function Analytics() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Analytics</h1>
-        <p className="text-muted-foreground">
-          Acompanhe o desempenho dos seus ranchos
-        </p>
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold">Analytics</h1>
+          <p className="text-muted-foreground">
+            Acompanhe o desempenho dos seus ranchos
+          </p>
+        </div>
+        <Button 
+          variant="outline" 
+          onClick={handleRefresh}
+          disabled={isFetching}
+        >
+          <RefreshCw className={`mr-2 h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
+          Atualizar
+        </Button>
       </div>
 
       {/* Cards de Resumo */}

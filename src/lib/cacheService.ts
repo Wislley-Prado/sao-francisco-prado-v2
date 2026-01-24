@@ -15,6 +15,8 @@ export const TTL = {
   SETTINGS: 60 * 60 * 1000,
   // Listas principais - 15 minutos
   LISTS: 15 * 60 * 1000,
+  // Estatísticas admin - 1 hora (economia máxima)
+  ADMIN_STATS: 60 * 60 * 1000,
 } as const;
 
 interface CacheEntry<T> {
