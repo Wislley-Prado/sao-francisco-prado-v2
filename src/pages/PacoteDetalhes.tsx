@@ -21,6 +21,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import { usePacoteBySlug } from '@/hooks/useOptimizedData';
+import { ShareButtons } from '@/components/ShareButtons';
 
 const PacoteDetalhes = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -188,7 +189,10 @@ const PacoteDetalhes = () => {
   const badge = pacote.popular ? 'popular' : pacote.destaque ? 'destaque' : undefined;
 
   const heroImage = pacote.imagens.find(img => img.principal)?.url || pacote.imagens[0]?.url || '/og-image.png';
-  const pageUrl = `https://pradoaqui.com/pacote/${pacote.slug}`;
+  // Use window.location.origin to get the correct domain
+  const pageUrl = typeof window !== 'undefined' 
+    ? `${window.location.origin}/pacote/${pacote.slug}`
+    : `https://sao-francisco-prado-aqui.lovable.app/pacote/${pacote.slug}`;
 
   return (
     <>
@@ -405,6 +409,17 @@ const PacoteDetalhes = () => {
               pacoteId={pacote.id}
               tipoPacote={pacote.tipo as 'pescaria' | 'completo' | 'personalizado'}
               maxItems={4}
+            />
+          </div>
+        </section>
+
+        {/* Seção de Compartilhamento */}
+        <section className="py-8">
+          <div className="container max-w-4xl mx-auto px-4">
+            <ShareButtons
+              titulo={pacote.nome}
+              url={pageUrl}
+              descricao={`Pacote ${pacote.duracao} para ${pacote.pessoas} pessoas`}
             />
           </div>
         </section>

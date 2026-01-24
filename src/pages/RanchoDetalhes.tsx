@@ -22,6 +22,7 @@ import { ReviewForm } from "@/components/reviews/ReviewForm";
 import { useRanchoAnalytics, registrarEvento } from "@/hooks/useRanchoAnalytics";
 import { RanchoFAQs } from '@/components/RanchoFAQs';
 import { useRanchoBySlug } from '@/hooks/useOptimizedData';
+import { ShareButtons } from '@/components/ShareButtons';
 
 const amenityIcons: { [key: string]: React.ReactNode } = {
   'Wi-Fi': <Wifi className="h-5 w-5" />,
@@ -169,7 +170,10 @@ const RanchoDetalhes = () => {
   }
 
   const mainImage = rancho.imagens.find(img => img.principal)?.url || rancho.imagens[0]?.url || '/og-image.png';
-  const pageUrl = `https://pradoaqui.com/rancho/${slug}`;
+  // Use window.location.origin to get the correct domain
+  const pageUrl = typeof window !== 'undefined' 
+    ? `${window.location.origin}/rancho/${slug}`
+    : `https://sao-francisco-prado-aqui.lovable.app/rancho/${slug}`;
 
   return (
     <div className="min-h-screen bg-background">
@@ -562,6 +566,19 @@ const RanchoDetalhes = () => {
           </div>
         </div>
       </main>
+
+      {/* Seção de Compartilhamento */}
+      {rancho && (
+        <section className="py-8 bg-background">
+          <div className="container mx-auto px-4 max-w-4xl">
+            <ShareButtons
+              titulo={rancho.nome}
+              url={pageUrl}
+              descricao={`Rancho em ${rancho.localizacao} para ${rancho.capacidade} pessoas`}
+            />
+          </div>
+        </section>
+      )}
 
       {/* Seção de FAQs */}
       {rancho && (
