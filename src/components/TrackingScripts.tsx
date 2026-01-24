@@ -4,8 +4,15 @@ import DOMPurify from 'dompurify';
 
 const SETTINGS_ID = '00000000-0000-0000-0000-000000000001';
 
+interface TrackingSettings {
+  facebook_pixel: string;
+  google_analytics: string;
+  google_tag_manager: string;
+  custom_head_scripts: string;
+}
+
 const TrackingScripts = () => {
-  const [scripts, setScripts] = useState({
+  const [scripts, setScripts] = useState<TrackingSettings>({
     facebook_pixel: '',
     google_analytics: '',
     google_tag_manager: '',
@@ -15,11 +22,21 @@ const TrackingScripts = () => {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const { data } = await supabase
+        // Tentar acessar tabela original (funciona para admins)
+        // Se falhar, usa dados vazios (scripts não são carregados para visitantes anônimos via API)
+        // Nota: Os scripts são tipicamente visíveis no HTML de qualquer site público
+        const { data, error } = await supabase
           .from('site_settings')
           .select('facebook_pixel, google_analytics, google_tag_manager, custom_head_scripts')
           .eq('id', SETTINGS_ID)
           .single();
+
+        if (error) {
+          // RLS impede acesso - isso é esperado para visitantes
+          // Em produção, considerar pré-renderizar scripts no HTML ou usar SSR
+          console.warn('Tracking scripts não disponíveis via API (RLS)');
+          return;
+        }
 
         if (data) {
           setScripts({

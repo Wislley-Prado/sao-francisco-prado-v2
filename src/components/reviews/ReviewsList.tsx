@@ -8,19 +8,29 @@ interface ReviewsListProps {
   ranchoId: string;
 }
 
+interface AvaliacaoPublic {
+  id: string;
+  nome_usuario: string;
+  nota: number;
+  comentario: string;
+  resposta_admin: string | null;
+  created_at: string;
+  imagens: string[] | null;
+}
+
 export const ReviewsList = ({ ranchoId }: ReviewsListProps) => {
   const { data: avaliacoes, isLoading } = useQuery({
     queryKey: ["avaliacoes", ranchoId],
     queryFn: async () => {
+      // Usar view pública que não expõe emails
       const { data, error } = await supabase
-        .from("avaliacoes")
-        .select("id, nome_usuario, nota, comentario, resposta_admin, created_at, verificado, imagens")
+        .from("avaliacoes_public" as any)
+        .select("id, nome_usuario, nota, comentario, resposta_admin, created_at, imagens")
         .eq("rancho_id", ranchoId)
-        .eq("verificado", true)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data;
+      return data as unknown as AvaliacaoPublic[];
     },
   });
 
@@ -72,7 +82,16 @@ export const ReviewsList = ({ ranchoId }: ReviewsListProps) => {
 
       <div className="space-y-4">
         {avaliacoes.map((avaliacao) => (
-          <ReviewCard key={avaliacao.id} {...avaliacao} />
+          <ReviewCard 
+            key={avaliacao.id} 
+            nome_usuario={avaliacao.nome_usuario}
+            nota={avaliacao.nota}
+            comentario={avaliacao.comentario}
+            resposta_admin={avaliacao.resposta_admin || undefined}
+            created_at={avaliacao.created_at}
+            verificado={true}
+            imagens={avaliacao.imagens}
+          />
         ))}
       </div>
     </div>

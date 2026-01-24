@@ -1094,6 +1094,60 @@ export type Database = {
       }
     }
     Views: {
+      avaliacoes_public: {
+        Row: {
+          comentario: string | null
+          created_at: string | null
+          id: string | null
+          imagens: string[] | null
+          nome_usuario: string | null
+          nota: number | null
+          rancho_id: string | null
+          resposta_admin: string | null
+          updated_at: string | null
+          verificado: boolean | null
+        }
+        Insert: {
+          comentario?: string | null
+          created_at?: string | null
+          id?: string | null
+          imagens?: string[] | null
+          nome_usuario?: string | null
+          nota?: number | null
+          rancho_id?: string | null
+          resposta_admin?: string | null
+          updated_at?: string | null
+          verificado?: boolean | null
+        }
+        Update: {
+          comentario?: string | null
+          created_at?: string | null
+          id?: string | null
+          imagens?: string[] | null
+          nome_usuario?: string | null
+          nota?: number | null
+          rancho_id?: string | null
+          resposta_admin?: string | null
+          updated_at?: string | null
+          verificado?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "avaliacoes_rancho_id_fkey"
+            columns: ["rancho_id"]
+            isOneToOne: false
+            referencedRelation: "rancho_estatisticas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "avaliacoes_rancho_id_fkey"
+            columns: ["rancho_id"]
+            isOneToOne: false
+            referencedRelation: "ranchos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       faq_estatisticas: {
         Row: {
           ativo: boolean | null
@@ -1142,6 +1196,57 @@ export type Database = {
           total_visualizacoes: number | null
           visualizacoes_30_dias: number | null
           visualizacoes_7_dias: number | null
+        }
+        Relationships: []
+      }
+      site_settings_public: {
+        Row: {
+          autor_avatar_url: string | null
+          created_at: string | null
+          id: string | null
+          updated_at: string | null
+          whatsapp_horario: string | null
+          whatsapp_instrucao: string | null
+          whatsapp_mensagem_padrao: string | null
+          whatsapp_numero: string | null
+          whatsapp_opcoes: Json | null
+          whatsapp_saudacao: string | null
+          whatsapp_titulo: string | null
+          youtube_institucional_url: string | null
+          youtube_live_url: string | null
+          youtube_video_url: string | null
+        }
+        Insert: {
+          autor_avatar_url?: string | null
+          created_at?: string | null
+          id?: string | null
+          updated_at?: string | null
+          whatsapp_horario?: string | null
+          whatsapp_instrucao?: string | null
+          whatsapp_mensagem_padrao?: string | null
+          whatsapp_numero?: string | null
+          whatsapp_opcoes?: Json | null
+          whatsapp_saudacao?: string | null
+          whatsapp_titulo?: string | null
+          youtube_institucional_url?: string | null
+          youtube_live_url?: string | null
+          youtube_video_url?: string | null
+        }
+        Update: {
+          autor_avatar_url?: string | null
+          created_at?: string | null
+          id?: string | null
+          updated_at?: string | null
+          whatsapp_horario?: string | null
+          whatsapp_instrucao?: string | null
+          whatsapp_mensagem_padrao?: string | null
+          whatsapp_numero?: string | null
+          whatsapp_opcoes?: Json | null
+          whatsapp_saudacao?: string | null
+          whatsapp_titulo?: string | null
+          youtube_institucional_url?: string | null
+          youtube_live_url?: string | null
+          youtube_video_url?: string | null
         }
         Relationships: []
       }

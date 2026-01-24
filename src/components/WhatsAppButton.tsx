@@ -52,26 +52,38 @@ const WhatsAppButton = () => {
     ]
   });
 
+  interface SiteSettingsPublic {
+    whatsapp_numero?: string;
+    whatsapp_titulo?: string;
+    whatsapp_mensagem_padrao?: string;
+    whatsapp_saudacao?: string;
+    whatsapp_instrucao?: string;
+    whatsapp_horario?: string;
+    whatsapp_opcoes?: QuickMessage[];
+  }
+
   useEffect(() => {
     const fetchSettings = async () => {
       try {
+        // Usar view pública que não expõe tracking codes
         const { data, error } = await supabase
-          .from("site_settings")
+          .from("site_settings_public" as any)
           .select("*")
           .eq("id", SETTINGS_ID)
           .single();
 
         if (error) throw error;
 
-        if (data) {
+        const settingsData = data as unknown as SiteSettingsPublic;
+        if (settingsData) {
           setSettings({
-            whatsapp_numero: data.whatsapp_numero || settings.whatsapp_numero,
-            whatsapp_titulo: data.whatsapp_titulo || settings.whatsapp_titulo,
-            whatsapp_mensagem_padrao: data.whatsapp_mensagem_padrao || settings.whatsapp_mensagem_padrao,
-            whatsapp_saudacao: data.whatsapp_saudacao || settings.whatsapp_saudacao,
-            whatsapp_instrucao: data.whatsapp_instrucao || settings.whatsapp_instrucao,
-            whatsapp_horario: data.whatsapp_horario || settings.whatsapp_horario,
-            whatsapp_opcoes: (data.whatsapp_opcoes as unknown as QuickMessage[]) || settings.whatsapp_opcoes,
+            whatsapp_numero: settingsData.whatsapp_numero || settings.whatsapp_numero,
+            whatsapp_titulo: settingsData.whatsapp_titulo || settings.whatsapp_titulo,
+            whatsapp_mensagem_padrao: settingsData.whatsapp_mensagem_padrao || settings.whatsapp_mensagem_padrao,
+            whatsapp_saudacao: settingsData.whatsapp_saudacao || settings.whatsapp_saudacao,
+            whatsapp_instrucao: settingsData.whatsapp_instrucao || settings.whatsapp_instrucao,
+            whatsapp_horario: settingsData.whatsapp_horario || settings.whatsapp_horario,
+            whatsapp_opcoes: settingsData.whatsapp_opcoes || settings.whatsapp_opcoes,
           });
         }
       } catch (error) {
