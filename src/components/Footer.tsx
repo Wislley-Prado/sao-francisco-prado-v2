@@ -157,7 +157,7 @@ const Footer = () => {
         <div className="border-t border-gray-800 mt-8 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="text-sm text-gray-400">
-              © 2025 PradoAqui. Todos os direitos reservados.
+              {settings?.copyright_text || '© 2025 PradoAqui. Todos os direitos reservados.'}
             </div>
             <div className="flex flex-wrap justify-center md:justify-end space-x-6 text-sm">
               <Link to="/politica-privacidade" className="text-gray-300 hover:text-rio-blue transition-colors">

@@ -139,6 +139,9 @@ export interface SiteSettings {
   // Contato
   telefone_contato?: string;
   email_contato?: string;
+  // Footer e Header
+  copyright_text?: string;
+  reserva_button_link?: string;
 }
 
 export interface Depoimento {

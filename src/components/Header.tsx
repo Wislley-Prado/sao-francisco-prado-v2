@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Menu, X, Calendar, Fish, RefreshCw } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
+import { useSiteSettings } from '@/hooks/useOptimizedData';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -10,6 +11,7 @@ const Header = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
+  const { data: settings } = useSiteSettings();
 
   const handleUpdateApp = async () => {
     setIsUpdating(true);
@@ -116,6 +118,10 @@ const Header = () => {
               variant="outline"
               size="sm"
               className="bg-transparent border-white text-white hover:bg-white hover:text-rio-blue"
+              onClick={() => {
+                const link = settings?.reserva_button_link || 'https://wa.me/5538988320108';
+                window.open(link, '_blank', 'noopener,noreferrer');
+              }}
             >
               <Calendar className="h-4 w-4 mr-2" />
               Reservar
@@ -165,6 +171,10 @@ const Header = () => {
                   variant="outline"
                   size="sm"
                   className="bg-transparent border-white text-white hover:bg-white hover:text-rio-blue"
+                  onClick={() => {
+                    const link = settings?.reserva_button_link || 'https://wa.me/5538988320108';
+                    window.open(link, '_blank', 'noopener,noreferrer');
+                  }}
                 >
                   <Calendar className="h-4 w-4 mr-2" />
                   Reservar

@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Save, Code2, TrendingUp, Webhook, AlertCircle, RefreshCw, Database, Clock, User, Share2, Phone, Mail, Facebook, Instagram, Youtube } from 'lucide-react';
+import { Loader2, Save, Code2, TrendingUp, Webhook, AlertCircle, RefreshCw, Database, Clock, User, Share2, Phone, Mail, Facebook, Instagram, Youtube, Calendar, FileText, Link2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -33,7 +33,10 @@ const Configuracoes = () => {
     twitter_url: '',
     // Contato
     telefone_contato: '',
-    email_contato: ''
+    email_contato: '',
+    // Footer e Header
+    copyright_text: '',
+    reserva_button_link: ''
   });
 
   useEffect(() => {
@@ -67,7 +70,10 @@ const Configuracoes = () => {
           twitter_url: (data as any).twitter_url || '',
           // Contato
           telefone_contato: (data as any).telefone_contato || '',
-          email_contato: (data as any).email_contato || ''
+          email_contato: (data as any).email_contato || '',
+          // Footer e Header
+          copyright_text: (data as any).copyright_text || '',
+          reserva_button_link: (data as any).reserva_button_link || ''
         });
       }
     } catch (error) {
@@ -473,6 +479,63 @@ const Configuracoes = () => {
               <AlertDescription className="text-xs">
                 Deixe em branco os campos de redes sociais que não deseja exibir no footer. 
                 Apenas as redes com URL preenchida serão mostradas.
+              </AlertDescription>
+            </Alert>
+          </CardContent>
+        </Card>
+
+        {/* Card de Footer e Header */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="w-5 h-5" />
+              Footer e Cabeçalho
+            </CardTitle>
+            <CardDescription>
+              Configure textos do footer e links do cabeçalho
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="copyright_text" className="flex items-center gap-2">
+                  <FileText className="w-4 h-4" />
+                  Texto de Copyright (Footer)
+                </Label>
+                <Input
+                  id="copyright_text"
+                  placeholder="© 2025 PradoAqui. Todos os direitos reservados."
+                  value={settings.copyright_text}
+                  onChange={(e) => setSettings({ ...settings, copyright_text: e.target.value })}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Texto que aparece no rodapé do site
+                </p>
+              </div>
+
+              <Separator />
+
+              <div className="space-y-2">
+                <Label htmlFor="reserva_button_link" className="flex items-center gap-2">
+                  <Link2 className="w-4 h-4" />
+                  Link do Botão "Reservar" (Cabeçalho)
+                </Label>
+                <Input
+                  id="reserva_button_link"
+                  placeholder="https://wa.me/5538988320108"
+                  value={settings.reserva_button_link}
+                  onChange={(e) => setSettings({ ...settings, reserva_button_link: e.target.value })}
+                />
+                <p className="text-xs text-muted-foreground">
+                  URL de destino ao clicar no botão "Reservar" no cabeçalho. Pode ser WhatsApp, formulário, etc.
+                </p>
+              </div>
+            </div>
+
+            <Alert>
+              <Calendar className="h-4 w-4" />
+              <AlertDescription className="text-xs">
+                O botão "Reservar" pode apontar para qualquer link: WhatsApp, Google Forms, página de reservas, etc.
               </AlertDescription>
             </Alert>
           </CardContent>
