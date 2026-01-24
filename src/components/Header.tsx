@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Menu, X, Phone, Calendar, Fish, RefreshCw } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useToast } from '@/hooks/use-toast';
 
@@ -9,6 +9,8 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const handleUpdateApp = async () => {
     setIsUpdating(true);
@@ -46,13 +48,32 @@ const Header = () => {
   };
 
   const navItems = [
-    { name: 'Início', href: '#home' },
-    { name: 'Ranchos', href: '#ranchos' },
-    { name: 'Pacotes', href: '#pacotes' },
-    { name: 'Blog', href: '#blog' },
-    { name: 'Transmissão', href: '/live' },
-    { name: 'Represa', href: '#represa' },
+    { name: 'Início', href: '/', hash: '' },
+    { name: 'Ranchos', href: '/', hash: 'ranchos' },
+    { name: 'Pacotes', href: '/pacotes', hash: '' },
+    { name: 'Blog', href: '/blog', hash: '' },
+    { name: 'Transmissão', href: '/live', hash: '' },
+    { name: 'Represa', href: '/', hash: 'represa' },
   ];
+
+  const handleNavClick = (href: string, hash: string) => {
+    setIsMenuOpen(false);
+    
+    if (hash) {
+      if (location.pathname === '/') {
+        const element = document.getElementById(hash);
+        element?.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        navigate('/');
+        setTimeout(() => {
+          const element = document.getElementById(hash);
+          element?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      }
+    } else {
+      navigate(href);
+    }
+  };
 
   return (
     <header className="bg-rio-blue shadow-lg sticky top-0 z-50">
@@ -70,23 +91,13 @@ const Header = () => {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             {navItems.map((item) => (
-              item.href.startsWith('/') ? (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className="text-white hover:text-sand-beige transition-colors duration-200"
-                >
-                  {item.name}
-                </Link>
-              ) : (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  className="text-white hover:text-sand-beige transition-colors duration-200"
-                >
-                  {item.name}
-                </a>
-              )
+              <button
+                key={item.name}
+                onClick={() => handleNavClick(item.href, item.hash)}
+                className="text-white hover:text-sand-beige transition-colors duration-200 bg-transparent border-none cursor-pointer"
+              >
+                {item.name}
+              </button>
             ))}
           </nav>
 
@@ -138,25 +149,13 @@ const Header = () => {
           <div className="md:hidden pb-4">
             <nav className="flex flex-col space-y-4">
               {navItems.map((item) => (
-                item.href.startsWith('/') ? (
-                  <Link
-                    key={item.name}
-                    to={item.href}
-                    className="text-white hover:text-sand-beige transition-colors duration-200 py-2"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {item.name}
-                  </Link>
-                ) : (
-                  <a
-                    key={item.name}
-                    href={item.href}
-                    className="text-white hover:text-sand-beige transition-colors duration-200 py-2"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {item.name}
-                  </a>
-                )
+                <button
+                  key={item.name}
+                  onClick={() => handleNavClick(item.href, item.hash)}
+                  className="text-white hover:text-sand-beige transition-colors duration-200 py-2 bg-transparent border-none cursor-pointer text-left"
+                >
+                  {item.name}
+                </button>
               ))}
               <div className="flex flex-col space-y-2 pt-4">
                 <div className="flex justify-center gap-2 mb-2">
