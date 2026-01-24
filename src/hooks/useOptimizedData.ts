@@ -860,6 +860,55 @@ export const useAdminPacotes = () => {
   );
 };
 
+// ============= DASHBOARD STATS =============
+
+export interface DashboardStats {
+  totalRanchos: number;
+  ranchosDisponiveis: number;
+  totalPacotes: number;
+  pacotesAtivos: number;
+  totalBlogPosts: number;
+  postsPublicados: number;
+  totalDepoimentos: number;
+  depoimentosAtivos: number;
+}
+
+export const useDashboardStats = () => {
+  return useQuery(
+    ['dashboard-stats'],
+    () => cachedQuery<DashboardStats>(
+      'dashboard_stats',
+      TTL.ADMIN_STATS,
+      async () => {
+        const [ranchos, pacotes, blog, depoimentos] = await Promise.all([
+          supabase.from('ranchos').select('disponivel'),
+          supabase.from('pacotes').select('ativo'),
+          supabase.from('blog_posts').select('publicado'),
+          supabase.from('depoimentos').select('ativo'),
+        ]);
+        
+        return {
+          totalRanchos: ranchos.data?.length || 0,
+          ranchosDisponiveis: ranchos.data?.filter(r => r.disponivel).length || 0,
+          totalPacotes: pacotes.data?.length || 0,
+          pacotesAtivos: pacotes.data?.filter(p => p.ativo).length || 0,
+          totalBlogPosts: blog.data?.length || 0,
+          postsPublicados: blog.data?.filter(b => b.publicado).length || 0,
+          totalDepoimentos: depoimentos.data?.length || 0,
+          depoimentosAtivos: depoimentos.data?.filter(d => d.ativo).length || 0,
+        };
+      }
+    ),
+    {
+      staleTime: TTL.ADMIN_STATS,
+      cacheTime: TTL.STATIC,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchOnMount: false,
+    }
+  );
+};
+
 // ============= CACHE INVALIDATION HELPERS =============
 
 export const useInvalidateCache = () => {
@@ -901,9 +950,13 @@ export const useInvalidateCache = () => {
       invalidateCacheByPrefix('admin_blog_posts');
       queryClient.invalidateQueries(['admin-blog-posts-cached']);
     },
-    invalidateAdminPacotes: () => {
+invalidateAdminPacotes: () => {
       invalidateCacheByPrefix('admin_pacotes');
       queryClient.invalidateQueries(['admin-pacotes-cached']);
+    },
+    invalidateDashboard: () => {
+      invalidateCacheByPrefix('dashboard_stats');
+      queryClient.invalidateQueries(['dashboard-stats']);
     },
     invalidateAll: () => {
       invalidateCacheByPrefix('');
