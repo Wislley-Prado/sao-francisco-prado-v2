@@ -12,7 +12,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
-import { Calendar, Eye, ArrowRight } from 'lucide-react';
+import { Calendar, ArrowRight } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface RecentPostsCarouselProps {
@@ -93,10 +93,6 @@ const RecentPostsCarousel = ({ currentPostId }: RecentPostsCarouselProps) => {
                         {post.categoria && (
                           <Badge variant="secondary">{post.categoria}</Badge>
                         )}
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                          <Eye className="h-3 w-3" />
-                          <span>{post.visualizacoes || 0}</span>
-                        </div>
                       </div>
                       
                       <h3 className="font-bold text-xl mb-2 line-clamp-2 group-hover:text-primary transition-colors">
