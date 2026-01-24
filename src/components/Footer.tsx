@@ -1,7 +1,28 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Fish, Phone, Mail, MapPin, Facebook, Instagram, Youtube } from 'lucide-react';
+
 const Footer = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleNavClick = (href: string, hash: string) => {
+    if (hash) {
+      if (location.pathname === '/') {
+        const element = document.getElementById(hash);
+        element?.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        navigate('/');
+        setTimeout(() => {
+          const element = document.getElementById(hash);
+          element?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      }
+    } else {
+      navigate(href);
+    }
+  };
+
   return <footer className="bg-gray-900 text-white mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -25,29 +46,44 @@ const Footer = () => {
             <h4 className="text-lg font-semibold">Navegação</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link to="/" className="text-gray-300 hover:text-rio-blue transition-colors">
+                <button 
+                  onClick={() => handleNavClick('/', '')}
+                  className="text-gray-300 hover:text-rio-blue transition-colors bg-transparent border-none cursor-pointer"
+                >
                   Início
-                </Link>
+                </button>
               </li>
               <li>
-                <a href="#ranchos" className="text-gray-300 hover:text-rio-blue transition-colors">
+                <button 
+                  onClick={() => handleNavClick('/', 'ranchos')}
+                  className="text-gray-300 hover:text-rio-blue transition-colors bg-transparent border-none cursor-pointer"
+                >
                   Ranchos
-                </a>
+                </button>
               </li>
               <li>
-                <Link to="/pacotes" className="text-gray-300 hover:text-rio-blue transition-colors">
+                <button 
+                  onClick={() => handleNavClick('/pacotes', '')}
+                  className="text-gray-300 hover:text-rio-blue transition-colors bg-transparent border-none cursor-pointer"
+                >
                   Pacotes
-                </Link>
+                </button>
               </li>
               <li>
-                <a href="#blog" className="text-gray-300 hover:text-rio-blue transition-colors">
+                <button 
+                  onClick={() => handleNavClick('/blog', '')}
+                  className="text-gray-300 hover:text-rio-blue transition-colors bg-transparent border-none cursor-pointer"
+                >
                   Blog
-                </a>
+                </button>
               </li>
               <li>
-                <Link to="/live" className="text-gray-300 hover:text-rio-blue transition-colors">
+                <button 
+                  onClick={() => handleNavClick('/live', '')}
+                  className="text-gray-300 hover:text-rio-blue transition-colors bg-transparent border-none cursor-pointer"
+                >
                   Transmissão Ao Vivo
-                </Link>
+                </button>
               </li>
             </ul>
           </div>
