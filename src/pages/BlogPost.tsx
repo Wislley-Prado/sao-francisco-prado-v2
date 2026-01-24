@@ -14,6 +14,7 @@ import { useSiteSettings } from '@/hooks/useOptimizedData';
 import { Skeleton } from '@/components/ui/skeleton';
 import DOMPurify from 'dompurify';
 import { SocialShareButtons } from '@/components/blog/SocialShareButtons';
+import { AutoShareButtons } from '@/components/blog/AutoShareButtons';
 import { PaidMediaBannerDisplay } from '@/components/blog/PaidMediaBannerDisplay';
 import RelatedPosts from '@/components/blog/RelatedPosts';
 import RecentPostsCarousel from '@/components/blog/RecentPostsCarousel';
@@ -184,14 +185,20 @@ const BlogPost = () => {
             banner_midia_paga={post.banner_midia_paga as any} 
           />
 
-          {/* Social Media Links */}
+          {/* Auto Share Buttons - Always visible */}
+          <AutoShareButtons 
+            postId={post.id}
+            titulo={post.titulo}
+            url={pageUrl}
+            resumo={post.resumo || undefined}
+          />
+
+          {/* Manual Social Media Links - Only if configured */}
           {post.redes_sociais && (
-            <div className="my-8">
-              <SocialShareButtons 
-                postId={post.id}
-                redes_sociais={post.redes_sociais as any} 
-              />
-            </div>
+            <SocialShareButtons 
+              postId={post.id}
+              redes_sociais={post.redes_sociais as any} 
+            />
           )}
 
           {/* Tags */}
