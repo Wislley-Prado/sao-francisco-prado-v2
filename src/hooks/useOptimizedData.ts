@@ -739,6 +739,127 @@ export const useRanchoEstatisticas = () => {
   );
 };
 
+// ============= ADMIN HOOKS (1-HOUR CACHE) =============
+
+export interface AdminDepoimento {
+  id: string;
+  nome: string;
+  cargo: string | null;
+  foto_url: string | null;
+  depoimento: string;
+  rating: number;
+  ordem: number;
+  ativo: boolean;
+  created_at: string;
+}
+
+export const useAdminDepoimentos = () => {
+  return useQuery(
+    ['admin-depoimentos'],
+    () => cachedQuery<AdminDepoimento[]>(
+      'admin_depoimentos',
+      TTL.ADMIN_STATS,
+      async () => {
+        const { data, error } = await supabase
+          .from('depoimentos')
+          .select('*')
+          .order('ordem', { ascending: true });
+        if (error) throw error;
+        return data || [];
+      }
+    ),
+    {
+      staleTime: TTL.ADMIN_STATS,
+      cacheTime: TTL.STATIC,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchOnMount: false,
+      retry: 1,
+    }
+  );
+};
+
+// Use the Supabase type directly for admin blog posts
+import type { Tables, Json } from '@/integrations/supabase/types';
+export type AdminBlogPost = Tables<'blog_posts'>;
+
+export const useAdminBlogPosts = () => {
+  return useQuery(
+    ['admin-blog-posts-cached'],
+    () => cachedQuery<AdminBlogPost[]>(
+      'admin_blog_posts',
+      TTL.ADMIN_STATS,
+      async () => {
+        const { data, error } = await supabase
+          .from('blog_posts')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+        return data || [];
+      }
+    ),
+    {
+      staleTime: TTL.ADMIN_STATS,
+      cacheTime: TTL.STATIC,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchOnMount: false,
+      retry: 1,
+    }
+  );
+};
+
+export interface AdminPacote {
+  id: string;
+  nome: string;
+  slug: string;
+  descricao: string | null;
+  preco: number;
+  duracao: string;
+  pessoas: number;
+  rating: number;
+  tipo: string | null;
+  caracteristicas: string[] | null;
+  inclusos: string[] | null;
+  ativo: boolean;
+  popular: boolean;
+  destaque: boolean;
+  created_at: string;
+  pacote_imagens: Array<{
+    id: string;
+    url: string;
+    alt_text: string | null;
+    principal: boolean;
+    ordem: number;
+  }>;
+}
+
+export const useAdminPacotes = () => {
+  return useQuery(
+    ['admin-pacotes-cached'],
+    () => cachedQuery<AdminPacote[]>(
+      'admin_pacotes',
+      TTL.ADMIN_STATS,
+      async () => {
+        const { data, error } = await supabase
+          .from('pacotes')
+          .select('*, pacote_imagens(*)')
+          .order('nome', { ascending: true });
+        if (error) throw error;
+        return data || [];
+      }
+    ),
+    {
+      staleTime: TTL.ADMIN_STATS,
+      cacheTime: TTL.STATIC,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchOnMount: false,
+      retry: 1,
+    }
+  );
+};
+
 // ============= CACHE INVALIDATION HELPERS =============
 
 export const useInvalidateCache = () => {
@@ -771,6 +892,18 @@ export const useInvalidateCache = () => {
       invalidateCacheByPrefix('rancho_estatisticas');
       queryClient.invalidateQueries(['faq-estatisticas']);
       queryClient.invalidateQueries(['rancho-estatisticas']);
+    },
+    invalidateDepoimentos: () => {
+      invalidateCacheByPrefix('admin_depoimentos');
+      queryClient.invalidateQueries(['admin-depoimentos']);
+    },
+    invalidateAdminBlog: () => {
+      invalidateCacheByPrefix('admin_blog_posts');
+      queryClient.invalidateQueries(['admin-blog-posts-cached']);
+    },
+    invalidateAdminPacotes: () => {
+      invalidateCacheByPrefix('admin_pacotes');
+      queryClient.invalidateQueries(['admin-pacotes-cached']);
     },
     invalidateAll: () => {
       invalidateCacheByPrefix('');

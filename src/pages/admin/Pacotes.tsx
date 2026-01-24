@@ -1,13 +1,13 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus, TrendingUp } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { Plus, TrendingUp, RefreshCw } from 'lucide-react';
 import { PacoteTable } from '@/components/admin/pacote/PacoteTable';
 import { PacoteStats } from '@/components/admin/pacote/PacoteStats';
 import { PacoteFilters } from '@/components/admin/pacote/PacoteFilters';
+import { useAdminPacotes, useInvalidateCache } from '@/hooks/useOptimizedData';
+import { toast } from 'sonner';
 
 const AdminPacotes = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -15,59 +15,73 @@ const AdminPacotes = () => {
   const [statusFilter, setStatusFilter] = useState('todos');
   const [orderBy, setOrderBy] = useState('nome');
 
-  const { data: pacotes = [], isLoading, refetch } = useQuery({
-    queryKey: ['admin-pacotes', searchTerm, tipoFilter, statusFilter, orderBy],
-    queryFn: async () => {
-      let query = supabase
-        .from('pacotes')
-        .select('*, pacote_imagens(*)');
+  const { data: pacotes = [], isLoading, refetch } = useAdminPacotes();
+  const { invalidateAdminPacotes } = useInvalidateCache();
 
-      // Search filter
-      if (searchTerm) {
-        query = query.or(`nome.ilike.%${searchTerm}%,slug.ilike.%${searchTerm}%`);
-      }
+  // Filtrar e ordenar pacotes no frontend
+  const filteredPacotes = useMemo(() => {
+    let filtered = [...pacotes];
 
-      // Tipo filter
-      if (tipoFilter !== 'todos') {
-        query = query.eq('tipo', tipoFilter);
-      }
+    // Search filter
+    if (searchTerm) {
+      const search = searchTerm.toLowerCase();
+      filtered = filtered.filter(
+        (p) =>
+          p.nome.toLowerCase().includes(search) ||
+          p.slug.toLowerCase().includes(search)
+      );
+    }
 
-      // Status filter
-      if (statusFilter === 'ativo') {
-        query = query.eq('ativo', true);
-      } else if (statusFilter === 'inativo') {
-        query = query.eq('ativo', false);
-      } else if (statusFilter === 'popular') {
-        query = query.eq('popular', true);
-      } else if (statusFilter === 'destaque') {
-        query = query.eq('destaque', true);
-      }
+    // Tipo filter
+    if (tipoFilter !== 'todos') {
+      filtered = filtered.filter((p) => p.tipo === tipoFilter);
+    }
 
-      // Order by
+    // Status filter
+    if (statusFilter === 'ativo') {
+      filtered = filtered.filter((p) => p.ativo);
+    } else if (statusFilter === 'inativo') {
+      filtered = filtered.filter((p) => !p.ativo);
+    } else if (statusFilter === 'popular') {
+      filtered = filtered.filter((p) => p.popular);
+    } else if (statusFilter === 'destaque') {
+      filtered = filtered.filter((p) => p.destaque);
+    }
+
+    // Order by
+    filtered.sort((a, b) => {
       if (orderBy === 'preco_asc') {
-        query = query.order('preco', { ascending: true });
+        return a.preco - b.preco;
       } else if (orderBy === 'preco_desc') {
-        query = query.order('preco', { ascending: false });
+        return b.preco - a.preco;
       } else if (orderBy === 'rating') {
-        query = query.order('rating', { ascending: false });
+        return b.rating - a.rating;
       } else if (orderBy === 'created_at') {
-        query = query.order('created_at', { ascending: false });
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       } else {
-        query = query.order('nome', { ascending: true });
+        return a.nome.localeCompare(b.nome);
       }
+    });
 
-      const { data, error } = await query;
+    return filtered;
+  }, [pacotes, searchTerm, tipoFilter, statusFilter, orderBy]);
 
-      if (error) throw error;
-      return data || [];
-    },
-  });
-
-  const stats = {
+  const stats = useMemo(() => ({
     total: pacotes.length,
-    ativos: pacotes.filter((p: any) => p.ativo).length,
-    inativos: pacotes.filter((p: any) => !p.ativo).length,
-    populares: pacotes.filter((p: any) => p.popular).length,
+    ativos: pacotes.filter((p) => p.ativo).length,
+    inativos: pacotes.filter((p) => !p.ativo).length,
+    populares: pacotes.filter((p) => p.popular).length,
+  }), [pacotes]);
+
+  const handleRefresh = () => {
+    invalidateAdminPacotes();
+    refetch();
+    toast.success("Dados atualizados!");
+  };
+
+  const handleUpdate = () => {
+    invalidateAdminPacotes();
+    refetch();
   };
 
   return (
@@ -80,6 +94,10 @@ const AdminPacotes = () => {
           </p>
         </div>
         <div className="flex gap-2">
+          <Button variant="outline" onClick={handleRefresh}>
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Atualizar
+          </Button>
           <Button asChild variant="outline">
             <Link to="/admin/pacotes/analytics">
               <TrendingUp className="w-4 h-4 mr-2" />
@@ -116,9 +134,9 @@ const AdminPacotes = () => {
             onOrderByChange={setOrderBy}
           />
           <PacoteTable
-            pacotes={pacotes}
+            pacotes={filteredPacotes}
             isLoading={isLoading}
-            onUpdate={refetch}
+            onUpdate={handleUpdate}
           />
         </CardContent>
       </Card>

@@ -1,56 +1,21 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { Plus, RefreshCw } from "lucide-react";
 import { DepoimentoTable } from "@/components/admin/depoimento/DepoimentoTable";
 import { DepoimentoFilters } from "@/components/admin/depoimento/DepoimentoFilters";
-
-interface Depoimento {
-  id: string;
-  nome: string;
-  cargo: string | null;
-  foto_url: string | null;
-  depoimento: string;
-  rating: number;
-  ordem: number;
-  ativo: boolean;
-  created_at: string;
-}
+import { useAdminDepoimentos, useInvalidateCache } from "@/hooks/useOptimizedData";
+import { toast } from "sonner";
 
 export default function Depoimentos() {
   const navigate = useNavigate();
-  const [depoimentos, setDepoimentos] = useState<Depoimento[]>([]);
-  const [filteredDepoimentos, setFilteredDepoimentos] = useState<Depoimento[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("todos");
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchDepoimentos();
-  }, []);
+  const { data: depoimentos = [], isLoading, refetch } = useAdminDepoimentos();
+  const { invalidateDepoimentos } = useInvalidateCache();
 
-  useEffect(() => {
-    filterDepoimentos();
-  }, [depoimentos, searchTerm, statusFilter]);
-
-  const fetchDepoimentos = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("depoimentos")
-        .select("*")
-        .order("ordem", { ascending: true });
-
-      if (error) throw error;
-      setDepoimentos(data || []);
-    } catch (error) {
-      console.error("Erro ao buscar depoimentos:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const filterDepoimentos = () => {
+  const filteredDepoimentos = useMemo(() => {
     let filtered = [...depoimentos];
 
     if (searchTerm) {
@@ -66,10 +31,21 @@ export default function Depoimentos() {
       filtered = filtered.filter((dep) => dep.ativo === isActive);
     }
 
-    setFilteredDepoimentos(filtered);
+    return filtered;
+  }, [depoimentos, searchTerm, statusFilter]);
+
+  const handleRefresh = () => {
+    invalidateDepoimentos();
+    refetch();
+    toast.success("Dados atualizados!");
   };
 
-  if (loading) {
+  const handleUpdate = () => {
+    invalidateDepoimentos();
+    refetch();
+  };
+
+  if (isLoading) {
     return <div className="p-8">Carregando...</div>;
   }
 
@@ -82,10 +58,16 @@ export default function Depoimentos() {
             Gerencie os depoimentos dos seus clientes
           </p>
         </div>
-        <Button onClick={() => navigate("/admin/depoimentos/novo")}>
-          <Plus className="mr-2 h-4 w-4" />
-          Novo Depoimento
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleRefresh}>
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Atualizar
+          </Button>
+          <Button onClick={() => navigate("/admin/depoimentos/novo")}>
+            <Plus className="mr-2 h-4 w-4" />
+            Novo Depoimento
+          </Button>
+        </div>
       </div>
 
       <DepoimentoFilters
@@ -95,7 +77,7 @@ export default function Depoimentos() {
         onStatusChange={setStatusFilter}
       />
 
-      <DepoimentoTable depoimentos={filteredDepoimentos} onUpdate={fetchDepoimentos} />
+      <DepoimentoTable depoimentos={filteredDepoimentos} onUpdate={handleUpdate} />
     </div>
   );
 }

@@ -1,13 +1,13 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus, BarChart3 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { Plus, BarChart3, RefreshCw } from 'lucide-react';
 import { BlogStats } from '@/components/admin/blog/BlogStats';
 import { BlogFilters } from '@/components/admin/blog/BlogFilters';
 import { BlogTable } from '@/components/admin/blog/BlogTable';
+import { useAdminBlogPosts, useInvalidateCache } from '@/hooks/useOptimizedData';
+import { toast } from 'sonner';
 
 const AdminBlog = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -15,51 +15,82 @@ const AdminBlog = () => {
   const [categoriaFilter, setCategoriaFilter] = useState('all');
   const [sortBy, setSortBy] = useState('created_at_desc');
 
-  const { data: posts, isLoading, refetch } = useQuery({
-    queryKey: ['admin-blog-posts', searchTerm, statusFilter, categoriaFilter, sortBy],
-    queryFn: async () => {
-      let query = supabase
-        .from('blog_posts')
-        .select('*');
+  const { data: posts = [], isLoading, refetch } = useAdminBlogPosts();
+  const { invalidateAdminBlog } = useInvalidateCache();
 
-      // Filtro de busca
-      if (searchTerm) {
-        query = query.or(`titulo.ilike.%${searchTerm}%,conteudo.ilike.%${searchTerm}%`);
-      }
+  // Filtrar e ordenar posts no frontend
+  const filteredPosts = useMemo(() => {
+    let filtered = [...posts];
 
-      // Filtro de status
-      if (statusFilter === 'published') {
-        query = query.eq('publicado', true);
-      } else if (statusFilter === 'draft') {
-        query = query.eq('publicado', false);
-      }
-
-      // Filtro de categoria
-      if (categoriaFilter !== 'all') {
-        query = query.eq('categoria', categoriaFilter);
-      }
-
-      // Ordenação
-      const [field, direction] = sortBy.split('_');
-      if (field === 'created' || field === 'titulo' || field === 'visualizacoes') {
-        const orderField = field === 'created' ? 'created_at' : field;
-        query = query.order(orderField, { ascending: direction === 'asc' });
-      }
-
-      const { data, error } = await query;
-
-      if (error) throw error;
-      return data;
+    // Filtro de busca
+    if (searchTerm) {
+      const search = searchTerm.toLowerCase();
+      filtered = filtered.filter(
+        (p) =>
+          p.titulo.toLowerCase().includes(search) ||
+          p.conteudo.toLowerCase().includes(search)
+      );
     }
-  });
 
-  // Calcular estatísticas com useMemo
+    // Filtro de status
+    if (statusFilter === 'published') {
+      filtered = filtered.filter((p) => p.publicado);
+    } else if (statusFilter === 'draft') {
+      filtered = filtered.filter((p) => !p.publicado);
+    }
+
+    // Filtro de categoria
+    if (categoriaFilter !== 'all') {
+      filtered = filtered.filter((p) => p.categoria === categoriaFilter);
+    }
+
+    // Ordenação
+    const [field, direction] = sortBy.split('_');
+    filtered.sort((a, b) => {
+      let aVal: string | number;
+      let bVal: string | number;
+
+      if (field === 'created') {
+        aVal = new Date(a.created_at).getTime();
+        bVal = new Date(b.created_at).getTime();
+      } else if (field === 'titulo') {
+        aVal = a.titulo.toLowerCase();
+        bVal = b.titulo.toLowerCase();
+      } else if (field === 'visualizacoes') {
+        aVal = a.visualizacoes;
+        bVal = b.visualizacoes;
+      } else {
+        aVal = new Date(a.created_at).getTime();
+        bVal = new Date(b.created_at).getTime();
+      }
+
+      if (direction === 'asc') {
+        return aVal > bVal ? 1 : -1;
+      }
+      return aVal < bVal ? 1 : -1;
+    });
+
+    return filtered;
+  }, [posts, searchTerm, statusFilter, categoriaFilter, sortBy]);
+
+  // Calcular estatísticas
   const stats = useMemo(() => ({
-    totalPosts: posts?.length || 0,
-    publicados: posts?.filter(p => p.publicado).length || 0,
-    rascunhos: posts?.filter(p => !p.publicado).length || 0,
-    totalVisualizacoes: posts?.reduce((acc, p) => acc + p.visualizacoes, 0) || 0,
+    totalPosts: posts.length,
+    publicados: posts.filter(p => p.publicado).length,
+    rascunhos: posts.filter(p => !p.publicado).length,
+    totalVisualizacoes: posts.reduce((acc, p) => acc + p.visualizacoes, 0),
   }), [posts]);
+
+  const handleRefresh = () => {
+    invalidateAdminBlog();
+    refetch();
+    toast.success("Dados atualizados!");
+  };
+
+  const handleDelete = () => {
+    invalidateAdminBlog();
+    refetch();
+  };
 
   return (
     <div className="space-y-6">
@@ -71,6 +102,10 @@ const AdminBlog = () => {
           </p>
         </div>
         <div className="flex gap-2">
+          <Button variant="outline" onClick={handleRefresh}>
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Atualizar
+          </Button>
           <Button asChild variant="outline">
             <Link to="/admin/blog/analytics">
               <BarChart3 className="w-4 h-4 mr-2" />
@@ -113,9 +148,9 @@ const AdminBlog = () => {
             onSortByChange={setSortBy}
           />
           <BlogTable
-            posts={posts || []}
+            posts={filteredPosts}
             isLoading={isLoading}
-            onDelete={refetch}
+            onDelete={handleDelete}
           />
         </CardContent>
       </Card>
