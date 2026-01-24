@@ -89,7 +89,10 @@ const BlogPost = () => {
     );
   }
 
-  const pageUrl = `https://pradoaqui.com/blog/${post.slug}`;
+  // Use window.location.origin to get the correct domain (works in preview, published, or custom domain)
+  const pageUrl = typeof window !== 'undefined' 
+    ? `${window.location.origin}/blog/${post.slug}`
+    : `https://sao-francisco-prado-aqui.lovable.app/blog/${post.slug}`;
 
   return (
     <div className="min-h-screen flex flex-col">
