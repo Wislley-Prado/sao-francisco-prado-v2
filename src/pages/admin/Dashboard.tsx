@@ -1,9 +1,19 @@
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Package, Home, FileText, Plus, TrendingUp } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Package, Home, FileText, Plus, TrendingUp, Star, RefreshCw } from 'lucide-react';
+import { useDashboardStats, useInvalidateCache } from '@/hooks/useOptimizedData';
 
 const AdminDashboard = () => {
+  const { data: stats, isLoading, refetch } = useDashboardStats();
+  const { invalidateDashboard } = useInvalidateCache();
+
+  const handleRefresh = () => {
+    invalidateDashboard();
+    refetch();
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -13,19 +23,31 @@ const AdminDashboard = () => {
             Visão geral do sistema de gerenciamento
           </p>
         </div>
+        <Button variant="outline" onClick={handleRefresh} disabled={isLoading}>
+          <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+          Atualizar
+        </Button>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total de Ranchos</CardTitle>
             <Home className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">3</div>
+            {isLoading ? (
+              <Skeleton className="h-8 w-12" />
+            ) : (
+              <div className="text-2xl font-bold">{stats?.totalRanchos || 0}</div>
+            )}
             <p className="text-xs text-muted-foreground">
-              Propriedades cadastradas
+              {isLoading ? (
+                <Skeleton className="h-3 w-24 mt-1" />
+              ) : (
+                `${stats?.ranchosDisponiveis || 0} disponíveis`
+              )}
             </p>
           </CardContent>
         </Card>
@@ -36,9 +58,17 @@ const AdminDashboard = () => {
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">3</div>
+            {isLoading ? (
+              <Skeleton className="h-8 w-12" />
+            ) : (
+              <div className="text-2xl font-bold">{stats?.totalPacotes || 0}</div>
+            )}
             <p className="text-xs text-muted-foreground">
-              Pacotes de pescaria
+              {isLoading ? (
+                <Skeleton className="h-3 w-24 mt-1" />
+              ) : (
+                `${stats?.pacotesAtivos || 0} ativos`
+              )}
             </p>
           </CardContent>
         </Card>
@@ -49,9 +79,38 @@ const AdminDashboard = () => {
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">4</div>
+            {isLoading ? (
+              <Skeleton className="h-8 w-12" />
+            ) : (
+              <div className="text-2xl font-bold">{stats?.totalBlogPosts || 0}</div>
+            )}
             <p className="text-xs text-muted-foreground">
-              Artigos publicados
+              {isLoading ? (
+                <Skeleton className="h-3 w-24 mt-1" />
+              ) : (
+                `${stats?.postsPublicados || 0} publicados`
+              )}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Depoimentos</CardTitle>
+            <Star className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <Skeleton className="h-8 w-12" />
+            ) : (
+              <div className="text-2xl font-bold">{stats?.totalDepoimentos || 0}</div>
+            )}
+            <p className="text-xs text-muted-foreground">
+              {isLoading ? (
+                <Skeleton className="h-3 w-24 mt-1" />
+              ) : (
+                `${stats?.depoimentosAtivos || 0} ativos`
+              )}
             </p>
           </CardContent>
         </Card>
