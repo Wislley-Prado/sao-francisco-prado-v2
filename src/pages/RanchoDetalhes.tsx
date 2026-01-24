@@ -23,6 +23,7 @@ import { useRanchoAnalytics, registrarEvento } from "@/hooks/useRanchoAnalytics"
 import { RanchoFAQs } from '@/components/RanchoFAQs';
 import { useRanchoBySlug } from '@/hooks/useOptimizedData';
 import { ShareButtons } from '@/components/ShareButtons';
+import { SITE_CONFIG } from '@/lib/constants';
 
 const amenityIcons: { [key: string]: React.ReactNode } = {
   'Wi-Fi': <Wifi className="h-5 w-5" />,
@@ -170,10 +171,8 @@ const RanchoDetalhes = () => {
   }
 
   const mainImage = rancho.imagens.find(img => img.principal)?.url || rancho.imagens[0]?.url || '/og-image.png';
-  // Use window.location.origin to get the correct domain
-  const pageUrl = typeof window !== 'undefined' 
-    ? `${window.location.origin}/rancho/${slug}`
-    : `https://sao-francisco-prado-aqui.lovable.app/rancho/${slug}`;
+  // Always use production domain for sharing URLs
+  const pageUrl = `${SITE_CONFIG.PRODUCTION_DOMAIN}/rancho/${slug}`;
 
   return (
     <div className="min-h-screen bg-background">

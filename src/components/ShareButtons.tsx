@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Facebook, Twitter, Linkedin, Copy, MessageCircle, Instagram, Check, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { SITE_CONFIG } from '@/lib/constants';
 
 interface ShareButtonsProps {
   titulo: string;
@@ -10,15 +11,14 @@ interface ShareButtonsProps {
   onShare?: (platform: string) => void;
 }
 
-// Generate OG proxy URL for better social media previews
+// Generate OG proxy URL for better social media previews using production domain
 const getOgProxyUrl = (url: string): string => {
   try {
     const urlObj = new URL(url);
     const path = urlObj.pathname;
-    const baseUrl = urlObj.origin;
     
-    // Use the Edge Function to generate proper OG tags
-    return `https://zeqloqlhnbdeivnyghkx.supabase.co/functions/v1/og-proxy?path=${encodeURIComponent(path)}&baseUrl=${encodeURIComponent(baseUrl)}`;
+    // Always use production domain for OG proxy
+    return `https://zeqloqlhnbdeivnyghkx.supabase.co/functions/v1/og-proxy?path=${encodeURIComponent(path)}&baseUrl=${encodeURIComponent(SITE_CONFIG.PRODUCTION_DOMAIN)}`;
   } catch {
     return url;
   }

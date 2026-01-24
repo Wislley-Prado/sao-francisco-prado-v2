@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Facebook, Twitter, Linkedin, Copy, MessageCircle, Instagram, Check } from 'lucide-react';
 import { useBlogAnalytics } from '@/hooks/useBlogAnalytics';
 import { toast } from 'sonner';
+import { SITE_CONFIG } from '@/lib/constants';
 
 interface AutoShareButtonsProps {
   postId: string;
@@ -11,15 +12,14 @@ interface AutoShareButtonsProps {
   resumo?: string;
 }
 
-// Generate OG proxy URL for better social media previews
+// Generate OG proxy URL for better social media previews using production domain
 const getOgProxyUrl = (url: string): string => {
   try {
     const urlObj = new URL(url);
     const path = urlObj.pathname;
-    const baseUrl = urlObj.origin;
     
-    // Use the Edge Function to generate proper OG tags
-    return `https://zeqloqlhnbdeivnyghkx.supabase.co/functions/v1/og-proxy?path=${encodeURIComponent(path)}&baseUrl=${encodeURIComponent(baseUrl)}`;
+    // Always use production domain for OG proxy
+    return `https://zeqloqlhnbdeivnyghkx.supabase.co/functions/v1/og-proxy?path=${encodeURIComponent(path)}&baseUrl=${encodeURIComponent(SITE_CONFIG.PRODUCTION_DOMAIN)}`;
   } catch {
     return url;
   }

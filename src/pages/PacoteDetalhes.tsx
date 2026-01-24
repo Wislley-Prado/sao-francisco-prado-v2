@@ -22,6 +22,7 @@ import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import { usePacoteBySlug } from '@/hooks/useOptimizedData';
 import { ShareButtons } from '@/components/ShareButtons';
+import { SITE_CONFIG } from '@/lib/constants';
 
 const PacoteDetalhes = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -189,10 +190,8 @@ const PacoteDetalhes = () => {
   const badge = pacote.popular ? 'popular' : pacote.destaque ? 'destaque' : undefined;
 
   const heroImage = pacote.imagens.find(img => img.principal)?.url || pacote.imagens[0]?.url || '/og-image.png';
-  // Use window.location.origin to get the correct domain
-  const pageUrl = typeof window !== 'undefined' 
-    ? `${window.location.origin}/pacote/${pacote.slug}`
-    : `https://sao-francisco-prado-aqui.lovable.app/pacote/${pacote.slug}`;
+  // Always use production domain for sharing URLs
+  const pageUrl = `${SITE_CONFIG.PRODUCTION_DOMAIN}/pacote/${pacote.slug}`;
 
   return (
     <>
