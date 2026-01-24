@@ -18,6 +18,7 @@ import { AutoShareButtons } from '@/components/blog/AutoShareButtons';
 import { PaidMediaBannerDisplay } from '@/components/blog/PaidMediaBannerDisplay';
 import RelatedPosts from '@/components/blog/RelatedPosts';
 import RecentPostsCarousel from '@/components/blog/RecentPostsCarousel';
+import { SITE_CONFIG } from '@/lib/constants';
 
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -89,10 +90,8 @@ const BlogPost = () => {
     );
   }
 
-  // Use window.location.origin to get the correct domain (works in preview, published, or custom domain)
-  const pageUrl = typeof window !== 'undefined' 
-    ? `${window.location.origin}/blog/${post.slug}`
-    : `https://sao-francisco-prado-aqui.lovable.app/blog/${post.slug}`;
+  // Always use production domain for sharing URLs
+  const pageUrl = `${SITE_CONFIG.PRODUCTION_DOMAIN}/blog/${post.slug}`;
 
   return (
     <div className="min-h-screen flex flex-col">

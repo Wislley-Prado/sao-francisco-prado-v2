@@ -14,7 +14,7 @@ serve(async (req) => {
   try {
     const url = new URL(req.url);
     const path = url.searchParams.get("path") || "";
-    const baseUrl = url.searchParams.get("baseUrl") || "https://sao-francisco-prado-aqui.lovable.app";
+    const baseUrl = url.searchParams.get("baseUrl") || "https://pradoaqui.com.br";
 
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get("SUPABASE_URL") || "https://zeqloqlhnbdeivnyghkx.supabase.co";
