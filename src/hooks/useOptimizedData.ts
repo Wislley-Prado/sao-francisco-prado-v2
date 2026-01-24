@@ -368,7 +368,13 @@ export const usePacotes = (onlyActive = true) => {
           latitude: pacote.latitude,
           longitude: pacote.longitude,
           imagens: (pacote.pacote_imagens || [])
-            .sort((a: { ordem: number }, b: { ordem: number }) => a.ordem - b.ordem)
+            .sort((a: { ordem: number; principal: boolean }, b: { ordem: number; principal: boolean }) => {
+              // Principal image always comes first
+              if (a.principal && !b.principal) return -1;
+              if (!a.principal && b.principal) return 1;
+              // Then sort by ordem
+              return a.ordem - b.ordem;
+            })
             .map((img: { id: string; url: string; alt_text?: string; principal: boolean; ordem: number }) => ({
               id: img.id,
               url: img.url,
@@ -446,7 +452,13 @@ export const usePacoteBySlug = (slug: string | undefined) => {
           latitude: data.latitude,
           longitude: data.longitude,
           imagens: (data.pacote_imagens || [])
-            .sort((a: { ordem: number }, b: { ordem: number }) => a.ordem - b.ordem)
+            .sort((a: { ordem: number; principal: boolean }, b: { ordem: number; principal: boolean }) => {
+              // Principal image always comes first
+              if (a.principal && !b.principal) return -1;
+              if (!a.principal && b.principal) return 1;
+              // Then sort by ordem
+              return a.ordem - b.ordem;
+            })
             .map((img: { id: string; url: string; alt_text?: string; principal: boolean; ordem: number }) => ({
               id: img.id,
               url: img.url,
