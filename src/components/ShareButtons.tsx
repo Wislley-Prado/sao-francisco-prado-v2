@@ -10,16 +10,33 @@ interface ShareButtonsProps {
   onShare?: (platform: string) => void;
 }
 
+// Generate OG proxy URL for better social media previews
+const getOgProxyUrl = (url: string): string => {
+  try {
+    const urlObj = new URL(url);
+    const path = urlObj.pathname;
+    const baseUrl = urlObj.origin;
+    
+    // Use the Edge Function to generate proper OG tags
+    return `https://zeqloqlhnbdeivnyghkx.supabase.co/functions/v1/og-proxy?path=${encodeURIComponent(path)}&baseUrl=${encodeURIComponent(baseUrl)}`;
+  } catch {
+    return url;
+  }
+};
+
 export const ShareButtons = ({ titulo, url, descricao, onShare }: ShareButtonsProps) => {
   const [copied, setCopied] = React.useState(false);
 
   const shareText = descricao ? `${titulo} - ${descricao}` : titulo;
+  
+  // Use OG proxy URL for social platforms that need rich previews
+  const ogUrl = getOgProxyUrl(url);
 
   const shareLinks = {
-    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
+    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(ogUrl)}`,
     twitter: `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(titulo)}`,
-    whatsapp: `https://api.whatsapp.com/send?text=${encodeURIComponent(`${shareText} ${url}`)}`,
-    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
+    whatsapp: `https://api.whatsapp.com/send?text=${encodeURIComponent(`${shareText} ${ogUrl}`)}`,
+    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(ogUrl)}`,
   };
 
   const handleShare = (platform: string, link: string) => {
