@@ -596,7 +596,7 @@ export const useDepoimentos = () => {
     ['depoimentos'],
     () => cachedQuery<Depoimento[]>(
       'depoimentos_active',
-      TTL.STATIC,
+      TTL.LISTS,
       async () => {
         const { data, error } = await supabase
           .from('depoimentos')
@@ -618,12 +618,12 @@ export const useDepoimentos = () => {
       }
     ),
     {
-      staleTime: TTL.STATIC,
-      cacheTime: TTL.STATIC,
+      staleTime: TTL.LISTS,
+      cacheTime: TTL.LISTS,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
-      refetchOnMount: false,
-      retry: 1,
+      refetchOnMount: true, // Permitir refetch ao montar
+      retry: 2,
     }
   );
 };

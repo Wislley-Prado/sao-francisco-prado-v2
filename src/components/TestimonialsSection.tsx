@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Star, Quote } from "lucide-react";
@@ -9,9 +10,19 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { useDepoimentos } from "@/hooks/useOptimizedData";
+import { invalidateCache } from "@/lib/cacheService";
 
 export const TestimonialsSection = () => {
-  const { data: depoimentos, isLoading } = useDepoimentos();
+  const { data: depoimentos, isLoading, refetch } = useDepoimentos();
+
+  // Se não tiver dados e não estiver carregando, tenta invalidar cache e recarregar
+  useEffect(() => {
+    if (!isLoading && (!depoimentos || depoimentos.length === 0)) {
+      // Limpa cache antigo e tenta novamente
+      invalidateCache('depoimentos_active');
+      refetch();
+    }
+  }, [isLoading, depoimentos, refetch]);
 
   if (isLoading) {
     return null;
