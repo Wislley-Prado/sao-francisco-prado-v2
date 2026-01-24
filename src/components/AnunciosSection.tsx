@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ExternalLink, ChevronLeft, ChevronRight, Pause, Play, MapPin, Ruler, DollarSign } from 'lucide-react';
 import { useAnuncios, Anuncio } from '@/hooks/useOptimizedData';
 
@@ -126,7 +127,30 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
     setTimeout(() => setIsTransitioning(false), 500);
   }, [isTransitioning, currentIndex]);
 
-  if (isLoading || anuncios.length === 0) {
+  // Loading skeleton
+  if (isLoading) {
+    return (
+      <section className="py-8 container mx-auto px-4">
+        <div className="relative rounded-xl overflow-hidden">
+          <Skeleton className="w-full h-[300px] md:h-[400px]" />
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-8 gap-4">
+            <Skeleton className="h-6 w-32 bg-muted/30" />
+            <Skeleton className="h-10 w-3/4 max-w-lg bg-muted/30" />
+            <Skeleton className="h-4 w-1/2 max-w-md bg-muted/30" />
+            <Skeleton className="h-10 w-36 rounded-md bg-muted/30 mt-4" />
+          </div>
+          {/* Indicadores de slide skeleton */}
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2">
+            <Skeleton className="h-2 w-8 rounded-full bg-muted/30" />
+            <Skeleton className="h-2 w-2 rounded-full bg-muted/30" />
+            <Skeleton className="h-2 w-2 rounded-full bg-muted/30" />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (anuncios.length === 0) {
     return null;
   }
 
