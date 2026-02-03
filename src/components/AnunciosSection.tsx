@@ -269,10 +269,10 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
       const hasImovelInfo = anuncio.imovel_area || anuncio.imovel_preco || anuncio.imovel_localizacao;
       
       return (
-        <Card className="h-full min-h-[380px] md:min-h-[420px] overflow-hidden hover:shadow-2xl transition-all duration-300 border-0 shadow-xl rounded-2xl bg-card">
+        <Card className="h-full min-h-[360px] md:min-h-[420px] overflow-hidden hover:shadow-2xl transition-all duration-300 border-0 shadow-xl rounded-2xl bg-card">
           <div className="flex flex-col md:grid md:grid-cols-2 gap-0 h-full">
-            {/* Imagem - altura fixa menor no mobile */}
-            <div className="relative h-32 md:h-full flex-shrink-0 overflow-hidden">
+            {/* Imagem - altura reduzida no mobile para priorizar conteúdo */}
+            <div className="relative h-28 md:h-full flex-shrink-0 overflow-hidden">
               {/* Tag Patrocinado na imagem */}
               {renderAnuncioTag(anuncio, 'top-left')}
               
@@ -283,8 +283,8 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
               />
               
               {hasImovelInfo && (
-                <div className="absolute bottom-2 left-2">
-                  <Badge className="bg-green-600 hover:bg-green-700 text-xs font-semibold px-2 py-0.5 shadow-md">
+                <div className="absolute bottom-1.5 left-1.5">
+                  <Badge className="bg-green-600 hover:bg-green-700 text-[10px] font-semibold px-1.5 py-0.5 shadow-md">
                     Imóvel
                   </Badge>
                 </div>
