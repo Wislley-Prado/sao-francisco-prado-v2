@@ -133,13 +133,13 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
   const currentAnuncio = anuncios[currentIndex];
   const hasMultiple = anuncios.length > 1;
 
-  // Tag "Anúncio" clicável com link nativo
+  // Tag discreta "Patrocinado" - menos intrusiva
   const renderAnuncioTag = (anuncio: Anuncio, position: 'top-right' | 'top-left' = 'top-right') => {
     if (!anuncio.link_url) return null;
     
     const positionClasses = position === 'top-right' 
-      ? 'top-4 right-4' 
-      : 'top-4 left-4';
+      ? 'top-3 right-3' 
+      : 'top-3 left-3';
     
     return (
       <a
@@ -147,10 +147,10 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
         target="_blank"
         rel="noopener noreferrer"
         onClick={() => registerClick(anuncio)}
-        className={`absolute ${positionClasses} bg-amber-500 text-white px-3 py-1.5 rounded-full text-sm font-medium flex items-center gap-1.5 hover:bg-amber-600 transition-colors z-20 shadow-lg touch-manipulation`}
+        className={`absolute ${positionClasses} bg-black/40 backdrop-blur-sm text-white/80 px-2 py-0.5 rounded text-[10px] font-normal flex items-center gap-1 hover:bg-black/60 transition-colors z-20`}
       >
-        <ExternalLink className="w-3.5 h-3.5" />
-        Anúncio
+        <ExternalLink className="w-2.5 h-2.5" />
+        Patrocinado
       </a>
     );
   };
@@ -423,11 +423,11 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
         {/* Controles de navegação (apenas se houver múltiplos anúncios) */}
         {hasMultiple && (
           <>
-            {/* Botões Prev/Next - visíveis em mobile, hover em desktop */}
+            {/* Botões Prev/Next - apenas no hover em desktop, escondidos no mobile */}
             <Button
-              variant="secondary"
+              variant="ghost"
               size="icon"
-              className="absolute left-4 top-1/2 -translate-y-1/2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity z-10 hover:bg-background/90 touch-manipulation min-h-[44px] min-w-[44px]"
+              className="absolute left-2 top-1/2 -translate-y-1/2 hidden md:flex opacity-0 group-hover:opacity-70 hover:opacity-100 transition-opacity z-10 bg-black/20 hover:bg-black/40 text-white h-10 w-10"
               onClick={(e) => {
                 e.stopPropagation();
                 e.preventDefault();
@@ -438,9 +438,9 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
             </Button>
             
             <Button
-              variant="secondary"
+              variant="ghost"
               size="icon"
-              className="absolute right-4 top-1/2 -translate-y-1/2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity z-10 hover:bg-background/90 touch-manipulation min-h-[44px] min-w-[44px]"
+              className="absolute right-2 top-1/2 -translate-y-1/2 hidden md:flex opacity-0 group-hover:opacity-70 hover:opacity-100 transition-opacity z-10 bg-black/20 hover:bg-black/40 text-white h-10 w-10"
               onClick={(e) => {
                 e.stopPropagation();
                 e.preventDefault();
@@ -450,8 +450,8 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
               <ChevronRight className="w-5 h-5" />
             </Button>
 
-            {/* Indicadores de slide (pontos) */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-10">
+            {/* Indicadores de slide (pontos) - mais discretos */}
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-10">
               {anuncios.map((_, index) => (
                 <button
                   key={index}
@@ -459,10 +459,10 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
                     e.stopPropagation();
                     goToSlide(index);
                   }}
-                  className={`h-2 rounded-full transition-all ${
+                  className={`rounded-full transition-all ${
                     index === currentIndex 
-                      ? 'w-6 bg-primary' 
-                      : 'w-2 bg-white/50 hover:bg-white/80'
+                      ? 'w-4 h-1.5 bg-white/80' 
+                      : 'w-1.5 h-1.5 bg-white/40 hover:bg-white/60'
                   }`}
                   aria-label={`Ir para anúncio ${index + 1}`}
                 />
