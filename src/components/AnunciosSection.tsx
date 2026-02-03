@@ -230,7 +230,7 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10" />
           
           {/* Container de conteúdo com melhor espaçamento */}
-          <div className="absolute bottom-0 left-0 right-0 p-5 md:p-10 lg:p-12">
+          <div className="absolute bottom-0 left-0 right-0 p-5 pb-14 md:p-10 lg:p-12">
             <div className="max-w-3xl space-y-3 md:space-y-4">
               {anuncio.subtitulo && (
                 <span className="inline-block bg-amber-500/90 text-white font-semibold text-xs md:text-sm px-3 py-1.5 rounded-full uppercase tracking-wider shadow-md">
@@ -269,10 +269,10 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
       const hasImovelInfo = anuncio.imovel_area || anuncio.imovel_preco || anuncio.imovel_localizacao;
       
       return (
-        <Card className="h-full min-h-[320px] md:min-h-[420px] overflow-hidden hover:shadow-2xl transition-all duration-300 border-0 shadow-xl rounded-2xl bg-card">
+        <Card className="h-full min-h-[420px] md:min-h-[420px] overflow-hidden hover:shadow-2xl transition-all duration-300 border-0 shadow-xl rounded-2xl bg-card">
           <div className="flex flex-col md:grid md:grid-cols-2 gap-0 h-full">
             {/* Imagem com altura maior no mobile */}
-            <div className="relative h-[200px] md:h-full flex-shrink-0 overflow-hidden">
+            <div className="relative h-[140px] md:h-full flex-shrink-0 overflow-hidden">
               {/* Tag Anúncio clicável na imagem */}
               {renderAnuncioTag(anuncio, 'top-left')}
               
@@ -294,7 +294,7 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
             </div>
             
             {/* Conteúdo - melhor organizado com espaçamento consistente */}
-            <CardContent className="p-5 md:p-6 lg:p-8 flex flex-col justify-center flex-1 space-y-3 md:space-y-4">
+            <CardContent className="p-4 md:p-6 lg:p-8 flex flex-col justify-start flex-1 space-y-2 md:space-y-4 pb-8">
               {anuncio.subtitulo && (
                 <span className="inline-block w-fit bg-primary/10 text-primary font-semibold text-xs md:text-sm px-3 py-1 rounded-full uppercase tracking-wide">
                   {anuncio.subtitulo}
@@ -367,7 +367,7 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
           <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent" />
           
           {/* Container de conteúdo centralizado verticalmente */}
-          <div className="absolute inset-0 flex items-center p-5 md:p-10 lg:p-12">
+          <div className="absolute inset-0 flex items-center p-5 pb-14 md:p-10 lg:p-12">
             <div className="max-w-xl space-y-3 md:space-y-4">
               {anuncio.subtitulo && (
                 <span className="inline-block bg-amber-500/90 text-white font-semibold text-xs md:text-sm px-3 py-1.5 rounded-full uppercase tracking-wider shadow-md">
@@ -412,7 +412,7 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
       onMouseLeave={() => hasMultiple && setIsPaused(false)}
     >
       {/* Container com altura fixa para evitar layout shift */}
-      <div className="relative min-h-[300px] md:min-h-[400px] group">
+      <div className="relative min-h-[380px] md:min-h-[400px] group">
         {/* Anúncio atual com animação de fade - posição absoluta */}
         <div 
           className={`absolute inset-0 transition-opacity duration-500 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}
