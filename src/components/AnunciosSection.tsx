@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ExternalLink, ChevronLeft, ChevronRight, MapPin, Ruler, DollarSign } from 'lucide-react';
 import { useAnuncios, Anuncio } from '@/hooks/useOptimizedData';
+import useEmblaCarousel from 'embla-carousel-react';
 
 interface AnunciosSectionProps {
   posicao: 'topo' | 'meio' | 'rodape' | 'sidebar';
@@ -20,12 +21,32 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
   
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const [isTransitioning, setIsTransitioning] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Embla Carousel para swipe no mobile
+  const [emblaRef, emblaApi] = useEmblaCarousel({ 
+    loop: true,
+    dragFree: false,
+    containScroll: 'trimSnaps'
+  });
 
-  // Auto-rotation effect with individual timing
+  // Sincroniza o índice do Embla com o estado
   useEffect(() => {
-    if (anuncios.length <= 1 || isPaused) {
+    if (!emblaApi) return;
+    
+    const onSelect = () => {
+      setCurrentIndex(emblaApi.selectedScrollSnap());
+    };
+    
+    emblaApi.on('select', onSelect);
+    return () => {
+      emblaApi.off('select', onSelect);
+    };
+  }, [emblaApi]);
+
+  // Auto-rotação com timing individual
+  useEffect(() => {
+    if (anuncios.length <= 1 || isPaused || !emblaApi) {
       if (intervalRef.current) {
         clearTimeout(intervalRef.current);
       }
@@ -35,11 +56,8 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
     const currentAnuncio = anuncios[currentIndex];
     const duration = (currentAnuncio?.duracao_exibicao || 8) * 1000;
 
-    // Auto advance to next slide
     intervalRef.current = setTimeout(() => {
-      setIsTransitioning(true);
-      setCurrentIndex((prev) => (prev + 1) % anuncios.length);
-      setTimeout(() => setIsTransitioning(false), 500);
+      emblaApi.scrollNext();
     }, duration);
 
     return () => {
@@ -47,7 +65,7 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
         clearTimeout(intervalRef.current);
       }
     };
-  }, [anuncios.length, currentIndex, isPaused]);
+  }, [anuncios.length, currentIndex, isPaused, emblaApi, anuncios]);
 
   // Register view when anuncio changes - DEBOUNCED to reduce API calls
   const registerView = useCallback(async (anuncio: Anuncio) => {
@@ -83,44 +101,23 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
   };
 
   const handleNext = useCallback(() => {
-    if (isTransitioning) return;
-    setIsTransitioning(true);
-    setCurrentIndex((prev) => (prev + 1) % anuncios.length);
-    setTimeout(() => setIsTransitioning(false), 500);
-  }, [isTransitioning, anuncios.length]);
+    if (emblaApi) emblaApi.scrollNext();
+  }, [emblaApi]);
 
   const handlePrev = useCallback(() => {
-    if (isTransitioning) return;
-    setIsTransitioning(true);
-    setCurrentIndex((prev) => (prev - 1 + anuncios.length) % anuncios.length);
-    setTimeout(() => setIsTransitioning(false), 500);
-  }, [isTransitioning, anuncios.length]);
+    if (emblaApi) emblaApi.scrollPrev();
+  }, [emblaApi]);
 
   const goToSlide = useCallback((index: number) => {
-    if (isTransitioning || index === currentIndex) return;
-    setIsTransitioning(true);
-    setCurrentIndex(index);
-    setTimeout(() => setIsTransitioning(false), 500);
-  }, [isTransitioning, currentIndex]);
+    if (emblaApi) emblaApi.scrollTo(index);
+  }, [emblaApi]);
 
   // Loading skeleton
   if (isLoading) {
     return (
-      <section className="py-8 container mx-auto px-4">
+      <section className="py-6 container mx-auto px-4">
         <div className="relative rounded-xl overflow-hidden">
-          <Skeleton className="w-full h-[300px] md:h-[400px]" />
-          <div className="absolute inset-0 flex flex-col items-center justify-center p-8 gap-4">
-            <Skeleton className="h-6 w-32 bg-muted/30" />
-            <Skeleton className="h-10 w-3/4 max-w-lg bg-muted/30" />
-            <Skeleton className="h-4 w-1/2 max-w-md bg-muted/30" />
-            <Skeleton className="h-10 w-36 rounded-md bg-muted/30 mt-4" />
-          </div>
-          {/* Indicadores de slide skeleton */}
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2">
-            <Skeleton className="h-2 w-8 rounded-full bg-muted/30" />
-            <Skeleton className="h-2 w-2 rounded-full bg-muted/30" />
-            <Skeleton className="h-2 w-2 rounded-full bg-muted/30" />
-          </div>
+          <Skeleton className="w-full h-[320px] md:h-[400px]" />
         </div>
       </section>
     );
@@ -411,17 +408,20 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
   // Renderização baseada no tipo de anúncio
   return (
     <section 
-      className="py-8 container mx-auto px-4"
+      className="py-6 container mx-auto px-4"
       onMouseEnter={() => hasMultiple && setIsPaused(true)}
       onMouseLeave={() => hasMultiple && setIsPaused(false)}
     >
-      {/* Container com altura fixa para evitar layout shift */}
-      <div className="relative min-h-[380px] md:min-h-[400px] group">
-        {/* Anúncio atual com animação de fade - posição absoluta */}
-        <div 
-          className={`absolute inset-0 transition-opacity duration-500 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}
-        >
-          {renderAnuncio(currentAnuncio)}
+      {/* Container do carousel com swipe */}
+      <div className="relative group">
+        <div className="overflow-hidden rounded-2xl" ref={emblaRef}>
+          <div className="flex">
+            {anuncios.map((anuncio, index) => (
+              <div key={anuncio.id} className="flex-[0_0_100%] min-w-0">
+                {renderAnuncio(anuncio)}
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Controles de navegação (apenas se houver múltiplos anúncios) */}
