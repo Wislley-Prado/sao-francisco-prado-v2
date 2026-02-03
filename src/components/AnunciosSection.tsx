@@ -418,8 +418,10 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
         <div className="overflow-hidden rounded-2xl" ref={emblaRef}>
           <div className="flex">
             {anuncios.map((anuncio, index) => (
-              <div key={anuncio.id} className="flex-[0_0_100%] min-w-0">
-                {renderAnuncio(anuncio)}
+              <div key={anuncio.id} className="flex-[0_0_100%] min-w-0 flex justify-center">
+                <div className="w-full max-w-4xl">
+                  {renderAnuncio(anuncio)}
+                </div>
               </div>
             ))}
           </div>
