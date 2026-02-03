@@ -266,11 +266,11 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
       const hasImovelInfo = anuncio.imovel_area || anuncio.imovel_preco || anuncio.imovel_localizacao;
       
       return (
-        <Card className="h-full min-h-[280px] sm:min-h-[300px] lg:min-h-[280px] overflow-hidden hover:shadow-2xl transition-all duration-300 border-0 shadow-xl rounded-2xl bg-card">
-          {/* Layout: Coluna no mobile, Grid 2 colunas no desktop */}
-          <div className="flex flex-col lg:grid lg:grid-cols-[45%_55%] h-full">
-            {/* Imagem - aspect ratio no mobile, altura controlada no desktop */}
-            <div className="relative w-full aspect-[16/9] lg:aspect-[4/3] flex-shrink-0 overflow-hidden">
+        <Card className="h-full min-h-[280px] sm:min-h-[300px] md:min-h-[280px] overflow-hidden hover:shadow-2xl transition-all duration-300 border-0 shadow-xl rounded-2xl bg-card">
+          {/* Layout: Coluna no mobile, Grid 2 colunas no tablet+ */}
+          <div className="flex flex-col md:grid md:grid-cols-[45%_55%] h-full">
+            {/* Imagem - aspect ratio no mobile, altura controlada no tablet+ */}
+            <div className="relative w-full aspect-[16/9] md:aspect-[4/3] flex-shrink-0 overflow-hidden">
               {/* Tag Patrocinado na imagem */}
               {renderAnuncioTag(anuncio, 'top-left')}
               
@@ -290,7 +290,7 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
             </div>
             
             {/* Conteúdo - flex grow para preencher espaço */}
-            <CardContent className="p-4 sm:p-5 lg:p-6 flex flex-col flex-1 justify-center">
+            <CardContent className="p-4 sm:p-5 md:p-6 flex flex-col flex-1 justify-center">
               {/* Header */}
               <div className="space-y-1.5 mb-3">
                 {anuncio.subtitulo && (
@@ -298,35 +298,35 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
                     {anuncio.subtitulo}
                   </span>
                 )}
-                <h3 className="text-lg sm:text-xl lg:text-2xl font-bold leading-tight line-clamp-2 text-foreground">
+                <h3 className="text-lg sm:text-xl md:text-2xl font-bold leading-tight line-clamp-2 text-foreground">
                   {anuncio.titulo}
                 </h3>
               </div>
               
               {/* Descrição */}
               {anuncio.descricao && (
-                <p className="text-muted-foreground text-sm lg:text-base line-clamp-2 mb-3">
+                <p className="text-muted-foreground text-sm md:text-base line-clamp-2 mb-3">
                   {anuncio.descricao}
                 </p>
               )}
               
               {/* Informações de imóvel - compactas */}
               {hasImovelInfo && (
-                <div className="flex flex-wrap gap-1.5 lg:gap-2 mb-4">
+                <div className="flex flex-wrap gap-1.5 md:gap-2 mb-4">
                   {anuncio.imovel_preco && (
-                    <Badge className="bg-green-100 text-green-800 hover:bg-green-200 text-xs lg:text-sm font-bold py-1 px-2.5 border border-green-200">
+                    <Badge className="bg-green-100 text-green-800 hover:bg-green-200 text-xs md:text-sm font-bold py-1 px-2.5 border border-green-200">
                       <DollarSign className="w-3 h-3 mr-1" />
                       R$ {anuncio.imovel_preco.toLocaleString('pt-BR')}
                     </Badge>
                   )}
                   {anuncio.imovel_area && (
-                    <Badge variant="outline" className="text-xs lg:text-sm py-1 px-2 bg-muted/50">
+                    <Badge variant="outline" className="text-xs md:text-sm py-1 px-2 bg-muted/50">
                       <Ruler className="w-3 h-3 mr-1" />
                       {anuncio.imovel_area.toLocaleString('pt-BR')} {anuncio.imovel_unidade_area === 'm2' ? 'm²' : anuncio.imovel_unidade_area}
                     </Badge>
                   )}
                   {anuncio.imovel_localizacao && (
-                    <Badge variant="outline" className="text-xs lg:text-sm py-1 px-2 bg-muted/50">
+                    <Badge variant="outline" className="text-xs md:text-sm py-1 px-2 bg-muted/50">
                       <MapPin className="w-3 h-3 mr-1" />
                       {anuncio.imovel_localizacao}
                     </Badge>
@@ -341,7 +341,7 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => registerClick(anuncio)}
-                  className="mt-auto inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 h-10 lg:h-11 px-5 lg:px-6 rounded-lg text-sm font-bold transition-all duration-300 w-full lg:w-fit touch-manipulation shadow-md hover:shadow-lg active:scale-[0.98]"
+                  className="mt-auto inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 h-10 md:h-11 px-5 md:px-6 rounded-lg text-sm font-bold transition-all duration-300 w-full md:w-fit touch-manipulation shadow-md hover:shadow-lg active:scale-[0.98]"
                 >
                   {anuncio.texto_botao}
                   <ExternalLink className="w-4 h-4" />
