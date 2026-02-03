@@ -217,26 +217,31 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
     // Banner Principal (Hero Style)
     if (anuncio.tipo === 'banner_principal') {
       return (
-        <div className="relative h-full min-h-[300px] md:min-h-[400px] rounded-xl overflow-hidden group">
+        <div className="relative h-full min-h-[320px] md:min-h-[420px] rounded-2xl overflow-hidden group shadow-xl">
           {/* Tag Anúncio clicável */}
           {renderAnuncioTag(anuncio)}
           
           <img
             src={anuncio.imagem_url}
             alt={anuncio.titulo}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12 text-left">
-            <div className="max-w-3xl">
+          {/* Gradient overlay melhorado para legibilidade */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10" />
+          
+          {/* Container de conteúdo com melhor espaçamento */}
+          <div className="absolute bottom-0 left-0 right-0 p-5 md:p-10 lg:p-12">
+            <div className="max-w-3xl space-y-3 md:space-y-4">
               {anuncio.subtitulo && (
-                <p className="text-amber-400 font-medium text-sm md:text-base mb-2 uppercase tracking-wide">{anuncio.subtitulo}</p>
+                <span className="inline-block bg-amber-500/90 text-white font-semibold text-xs md:text-sm px-3 py-1.5 rounded-full uppercase tracking-wider shadow-md">
+                  {anuncio.subtitulo}
+                </span>
               )}
-              <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold text-white mb-3 md:mb-4 leading-tight drop-shadow-lg">
+              <h2 className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-bold text-white leading-tight tracking-tight" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
                 {anuncio.titulo}
               </h2>
               {anuncio.descricao && (
-                <p className="text-white/90 text-base md:text-lg mb-4 md:mb-6 max-w-2xl line-clamp-2 drop-shadow-md">
+                <p className="text-white/95 text-sm sm:text-base md:text-lg max-w-2xl line-clamp-2 leading-relaxed" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>
                   {anuncio.descricao}
                 </p>
               )}
@@ -247,10 +252,10 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => registerClick(anuncio)}
-                  className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 h-11 md:h-12 px-6 md:px-8 rounded-lg text-sm md:text-base font-semibold transition-colors touch-manipulation shadow-lg"
+                  className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 h-12 md:h-14 px-6 md:px-8 rounded-xl text-sm md:text-base font-bold transition-all duration-300 touch-manipulation shadow-lg hover:shadow-xl hover:scale-[1.02]"
                 >
                   {anuncio.texto_botao}
-                  <ExternalLink className="w-4 h-4" />
+                  <ExternalLink className="w-4 h-4 md:w-5 md:h-5" />
                 </a>
               )}
             </div>
@@ -264,54 +269,63 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
       const hasImovelInfo = anuncio.imovel_area || anuncio.imovel_preco || anuncio.imovel_localizacao;
       
       return (
-        <Card className="h-full min-h-[300px] md:min-h-[400px] overflow-hidden hover:shadow-xl transition-shadow border-0 shadow-lg">
+        <Card className="h-full min-h-[320px] md:min-h-[420px] overflow-hidden hover:shadow-2xl transition-all duration-300 border-0 shadow-xl rounded-2xl bg-card">
           <div className="flex flex-col md:grid md:grid-cols-2 gap-0 h-full">
-            {/* Imagem - ocupa mais espaço no mobile */}
-            <div className="relative h-[160px] md:h-full flex-shrink-0">
+            {/* Imagem com altura maior no mobile */}
+            <div className="relative h-[200px] md:h-full flex-shrink-0 overflow-hidden">
               {/* Tag Anúncio clicável na imagem */}
               {renderAnuncioTag(anuncio, 'top-left')}
               
               <img
                 src={anuncio.imagem_url}
                 alt={anuncio.titulo}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
               />
+              {/* Overlay sutil na imagem */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent md:hidden" />
+              
               {hasImovelInfo && (
                 <div className="absolute bottom-3 left-3">
-                  <Badge className="bg-green-600 hover:bg-green-700 text-sm font-medium">
+                  <Badge className="bg-green-600 hover:bg-green-700 text-sm font-semibold px-3 py-1 shadow-md">
                     Imóvel
                   </Badge>
                 </div>
               )}
             </div>
             
-            {/* Conteúdo - melhor organizado */}
-            <CardContent className="p-5 md:p-8 flex flex-col justify-center flex-1">
+            {/* Conteúdo - melhor organizado com espaçamento consistente */}
+            <CardContent className="p-5 md:p-6 lg:p-8 flex flex-col justify-center flex-1 space-y-3 md:space-y-4">
               {anuncio.subtitulo && (
-                <p className="text-primary font-semibold mb-1 text-sm uppercase tracking-wide">{anuncio.subtitulo}</p>
+                <span className="inline-block w-fit bg-primary/10 text-primary font-semibold text-xs md:text-sm px-3 py-1 rounded-full uppercase tracking-wide">
+                  {anuncio.subtitulo}
+                </span>
               )}
-              <h3 className="text-xl md:text-2xl lg:text-3xl font-bold mb-3 leading-tight line-clamp-2">{anuncio.titulo}</h3>
+              <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold leading-tight line-clamp-2 text-foreground">
+                {anuncio.titulo}
+              </h3>
               {anuncio.descricao && (
-                <p className="text-muted-foreground mb-4 text-sm md:text-base line-clamp-2">{anuncio.descricao}</p>
+                <p className="text-muted-foreground text-sm md:text-base line-clamp-2 leading-relaxed">
+                  {anuncio.descricao}
+                </p>
               )}
               
-              {/* Informações de imóvel - compacto e elegante */}
+              {/* Informações de imóvel - grid organizado */}
               {hasImovelInfo && (
-                <div className="flex flex-wrap gap-2 mb-4">
+                <div className="flex flex-wrap gap-2">
                   {anuncio.imovel_preco && (
-                    <Badge variant="secondary" className="text-base md:text-lg font-bold py-1.5 px-3">
-                      <DollarSign className="w-4 h-4 mr-1 text-green-600" />
+                    <Badge className="bg-green-100 text-green-800 hover:bg-green-200 text-sm md:text-base font-bold py-1.5 px-3 border border-green-200">
+                      <DollarSign className="w-4 h-4 mr-1" />
                       R$ {anuncio.imovel_preco.toLocaleString('pt-BR')}
                     </Badge>
                   )}
                   {anuncio.imovel_area && (
-                    <Badge variant="outline" className="text-sm py-1.5 px-3">
+                    <Badge variant="outline" className="text-xs md:text-sm py-1.5 px-3 bg-muted/50">
                       <Ruler className="w-3 h-3 mr-1" />
                       {anuncio.imovel_area.toLocaleString('pt-BR')} {anuncio.imovel_unidade_area === 'm2' ? 'm²' : anuncio.imovel_unidade_area}
                     </Badge>
                   )}
                   {anuncio.imovel_localizacao && (
-                    <Badge variant="outline" className="text-sm py-1.5 px-3">
+                    <Badge variant="outline" className="text-xs md:text-sm py-1.5 px-3 bg-muted/50">
                       <MapPin className="w-3 h-3 mr-1" />
                       {anuncio.imovel_localizacao}
                     </Badge>
@@ -325,7 +339,7 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => registerClick(anuncio)}
-                  className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 h-10 md:h-11 px-5 rounded-lg text-sm font-semibold transition-colors w-fit touch-manipulation"
+                  className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 h-11 md:h-12 px-6 rounded-xl text-sm md:text-base font-bold transition-all duration-300 w-fit touch-manipulation shadow-md hover:shadow-lg hover:scale-[1.02]"
                 >
                   {anuncio.texto_botao}
                   <ExternalLink className="w-4 h-4" />
@@ -340,24 +354,33 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
     // Full Width
     if (anuncio.tipo === 'full_width') {
       return (
-        <div className="relative h-full min-h-[300px] md:min-h-[400px] rounded-xl overflow-hidden group">
+        <div className="relative h-full min-h-[320px] md:min-h-[420px] rounded-2xl overflow-hidden group shadow-xl">
           {/* Tag Anúncio clicável */}
           {renderAnuncioTag(anuncio)}
           
           <img
             src={anuncio.imagem_url}
             alt={anuncio.titulo}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
-          <div className="absolute inset-0 flex items-center p-6 md:p-12">
-            <div className="max-w-xl">
+          {/* Gradient overlay melhorado */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent" />
+          
+          {/* Container de conteúdo centralizado verticalmente */}
+          <div className="absolute inset-0 flex items-center p-5 md:p-10 lg:p-12">
+            <div className="max-w-xl space-y-3 md:space-y-4">
               {anuncio.subtitulo && (
-                <p className="text-amber-400 font-medium text-sm md:text-base mb-2 uppercase tracking-wide">{anuncio.subtitulo}</p>
+                <span className="inline-block bg-amber-500/90 text-white font-semibold text-xs md:text-sm px-3 py-1.5 rounded-full uppercase tracking-wider shadow-md">
+                  {anuncio.subtitulo}
+                </span>
               )}
-              <h3 className="text-2xl md:text-4xl font-bold text-white mb-3 leading-tight drop-shadow-lg">{anuncio.titulo}</h3>
+              <h3 className="text-xl sm:text-2xl md:text-4xl font-bold text-white leading-tight tracking-tight" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
+                {anuncio.titulo}
+              </h3>
               {anuncio.descricao && (
-                <p className="text-white/90 text-sm md:text-base mb-4 line-clamp-2 drop-shadow-md">{anuncio.descricao}</p>
+                <p className="text-white/95 text-sm sm:text-base md:text-lg line-clamp-2 leading-relaxed" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}>
+                  {anuncio.descricao}
+                </p>
               )}
               {renderImovelInfo(anuncio, 'overlay')}
               {anuncio.link_url && (
@@ -366,10 +389,10 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => registerClick(anuncio)}
-                  className="inline-flex items-center justify-center gap-2 bg-secondary text-secondary-foreground hover:bg-secondary/80 h-10 md:h-11 px-5 rounded-lg text-sm font-semibold transition-colors touch-manipulation"
+                  className="inline-flex items-center justify-center gap-2 bg-white text-foreground hover:bg-white/90 h-12 md:h-14 px-6 md:px-8 rounded-xl text-sm md:text-base font-bold transition-all duration-300 touch-manipulation shadow-lg hover:shadow-xl hover:scale-[1.02]"
                 >
                   {anuncio.texto_botao}
-                  <ExternalLink className="w-4 h-4" />
+                  <ExternalLink className="w-4 h-4 md:w-5 md:h-5" />
                 </a>
               )}
             </div>
