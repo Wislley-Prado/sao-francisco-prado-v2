@@ -57,15 +57,17 @@ const normalizePhase = (phaseName: string): string => {
   return phaseMap[phaseName.toLowerCase()] || phaseName;
 };
 
-// Função para buscar dados da API FarmSense
+// Função para buscar dados da API via Edge Function proxy
 const fetchLunarDataFromAPI = async (): Promise<LunarData> => {
-  console.log('🌙 [LUNAR API] Buscando dados reais da FarmSense...');
+  console.log('🌙 [LUNAR API] Buscando dados via proxy...');
   
   try {
-    const response = await fetch('https://api.farmsense.net/v1/moonphases/?d=1');
+    // Usar edge function proxy para evitar CORS
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const response = await fetch(`${supabaseUrl}/functions/v1/lunar-proxy`);
     
     if (!response.ok) {
-      throw new Error(`API Error: ${response.status}`);
+      throw new Error(`Proxy Error: ${response.status}`);
     }
     
     const data: FarmSenseResponse[] = await response.json();
