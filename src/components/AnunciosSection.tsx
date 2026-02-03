@@ -413,8 +413,8 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
       onMouseEnter={() => hasMultiple && setIsPaused(true)}
       onMouseLeave={() => hasMultiple && setIsPaused(false)}
     >
-      {/* Container do carousel com swipe */}
-      <div className="relative group">
+      {/* Container do carousel com swipe - centralizado */}
+      <div className="relative group max-w-5xl mx-auto">
         <div className="overflow-hidden rounded-2xl" ref={emblaRef}>
           <div className="flex">
             {anuncios.map((anuncio, index) => (
