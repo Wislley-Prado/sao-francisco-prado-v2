@@ -266,11 +266,11 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
       const hasImovelInfo = anuncio.imovel_area || anuncio.imovel_preco || anuncio.imovel_localizacao;
       
       return (
-        <Card className="h-full min-h-[280px] sm:min-h-[300px] md:min-h-[280px] overflow-hidden hover:shadow-2xl transition-all duration-300 border-0 shadow-xl rounded-2xl bg-card">
-          {/* Layout: Coluna no mobile, Grid 2 colunas no tablet+ */}
-          <div className="flex flex-col md:grid md:grid-cols-[45%_55%] h-full">
-            {/* Imagem - aspect ratio no mobile, altura controlada no tablet+ */}
-            <div className="relative w-full aspect-[16/9] md:aspect-[4/3] flex-shrink-0 overflow-hidden">
+        <Card className="overflow-hidden hover:shadow-2xl transition-all duration-300 border-0 shadow-xl rounded-2xl bg-card">
+          {/* Layout: Coluna no mobile, Flex row no tablet+ */}
+          <div className="flex flex-col md:flex-row">
+            {/* Imagem - aspect ratio fixo em ambos */}
+            <div className="relative w-full md:w-[45%] aspect-[16/9] md:aspect-[4/3] flex-shrink-0 overflow-hidden">
               {/* Tag Patrocinado na imagem */}
               {renderAnuncioTag(anuncio, 'top-left')}
               
@@ -289,8 +289,8 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
               )}
             </div>
             
-            {/* Conteúdo - flex grow para preencher espaço */}
-            <CardContent className="p-4 sm:p-5 md:p-6 flex flex-col flex-1 justify-center">
+            {/* Conteúdo - ao lado da imagem no desktop */}
+            <CardContent className="p-4 sm:p-5 md:p-6 flex flex-col justify-center flex-1 md:w-[55%]">
               {/* Header */}
               <div className="space-y-1.5 mb-3">
                 {anuncio.subtitulo && (
@@ -334,14 +334,14 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
                 </div>
               )}
               
-              {/* Botão - largura total no mobile, auto no desktop */}
+              {/* Botão - alinhado à esquerda no desktop */}
               {anuncio.link_url && (
                 <a
                   href={anuncio.link_url}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => registerClick(anuncio)}
-                  className="mt-auto inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 h-10 md:h-11 px-5 md:px-6 rounded-lg text-sm font-bold transition-all duration-300 w-full md:w-fit touch-manipulation shadow-md hover:shadow-lg active:scale-[0.98]"
+                  className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 h-10 md:h-11 px-5 md:px-6 rounded-lg text-sm font-bold transition-all duration-300 w-full md:w-fit touch-manipulation shadow-md hover:shadow-lg active:scale-[0.98]"
                 >
                   {anuncio.texto_botao}
                   <ExternalLink className="w-4 h-4" />
