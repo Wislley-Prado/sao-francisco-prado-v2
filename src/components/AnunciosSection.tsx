@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ExternalLink, ChevronLeft, ChevronRight, Pause, Play, MapPin, Ruler, DollarSign } from 'lucide-react';
+import { ExternalLink, ChevronLeft, ChevronRight, MapPin, Ruler, DollarSign } from 'lucide-react';
 import { useAnuncios, Anuncio } from '@/hooks/useOptimizedData';
 
 interface AnunciosSectionProps {
@@ -21,16 +21,11 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [progress, setProgress] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Auto-rotation effect with individual timing
   useEffect(() => {
     if (anuncios.length <= 1 || isPaused) {
-      if (progressIntervalRef.current) {
-        clearInterval(progressIntervalRef.current);
-      }
       if (intervalRef.current) {
         clearTimeout(intervalRef.current);
       }
@@ -39,23 +34,10 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
 
     const currentAnuncio = anuncios[currentIndex];
     const duration = (currentAnuncio?.duracao_exibicao || 8) * 1000;
-    
-    // Reset progress
-    setProgress(0);
 
-    // Progress animation (update every 100ms)
-    const progressStep = 100 / (duration / 100);
-    progressIntervalRef.current = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) return 100;
-        return prev + progressStep;
-      });
-    }, 100);
-
-    // Auto advance to next slide - use functional update to avoid stale closure
+    // Auto advance to next slide
     intervalRef.current = setTimeout(() => {
       setIsTransitioning(true);
-      setProgress(0);
       setCurrentIndex((prev) => (prev + 1) % anuncios.length);
       setTimeout(() => setIsTransitioning(false), 500);
     }, duration);
@@ -63,9 +45,6 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
     return () => {
       if (intervalRef.current) {
         clearTimeout(intervalRef.current);
-      }
-      if (progressIntervalRef.current) {
-        clearInterval(progressIntervalRef.current);
       }
     };
   }, [anuncios.length, currentIndex, isPaused]);
@@ -106,7 +85,6 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
   const handleNext = useCallback(() => {
     if (isTransitioning) return;
     setIsTransitioning(true);
-    setProgress(0);
     setCurrentIndex((prev) => (prev + 1) % anuncios.length);
     setTimeout(() => setIsTransitioning(false), 500);
   }, [isTransitioning, anuncios.length]);
@@ -114,7 +92,6 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
   const handlePrev = useCallback(() => {
     if (isTransitioning) return;
     setIsTransitioning(true);
-    setProgress(0);
     setCurrentIndex((prev) => (prev - 1 + anuncios.length) % anuncios.length);
     setTimeout(() => setIsTransitioning(false), 500);
   }, [isTransitioning, anuncios.length]);
@@ -122,7 +99,6 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
   const goToSlide = useCallback((index: number) => {
     if (isTransitioning || index === currentIndex) return;
     setIsTransitioning(true);
-    setProgress(0);
     setCurrentIndex(index);
     setTimeout(() => setIsTransitioning(false), 500);
   }, [isTransitioning, currentIndex]);
@@ -453,56 +429,21 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
 
             {/* Indicadores de slide (pontos) */}
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-10">
-              {anuncios.map((anuncio, index) => (
+              {anuncios.map((_, index) => (
                 <button
                   key={index}
                   onClick={(e) => {
                     e.stopPropagation();
                     goToSlide(index);
                   }}
-                  className={`h-2 rounded-full transition-all relative overflow-hidden ${
+                  className={`h-2 rounded-full transition-all ${
                     index === currentIndex 
-                      ? 'w-8' 
+                      ? 'w-6 bg-primary' 
                       : 'w-2 bg-white/50 hover:bg-white/80'
                   }`}
                   aria-label={`Ir para anúncio ${index + 1}`}
-                  title={`${anuncio.titulo} (${anuncio.duracao_exibicao}s)`}
-                >
-                  {index === currentIndex && (
-                    <>
-                      <div className="absolute inset-0 bg-white/30" />
-                      <div 
-                        className="absolute inset-0 bg-primary transition-all ease-linear"
-                        style={{ width: `${progress}%` }}
-                      />
-                    </>
-                  )}
-                </button>
+                />
               ))}
-              
-              {/* Botão de Pause/Play */}
-              <Button
-                variant="secondary"
-                size="icon"
-                className="h-6 w-6 ml-2"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsPaused(!isPaused);
-                }}
-                title={isPaused ? 'Retomar rotação' : 'Pausar rotação'}
-              >
-                {isPaused ? (
-                  <Play className="w-3 h-3" />
-                ) : (
-                  <Pause className="w-3 h-3" />
-                )}
-              </Button>
-            </div>
-
-            {/* Contador de anúncios */}
-            <div className="absolute top-4 right-20 bg-black/50 text-white px-3 py-1 rounded-full text-sm z-10">
-              {currentIndex + 1} / {anuncios.length}
-              <span className="ml-2 text-white/70">({currentAnuncio.duracao_exibicao}s)</span>
             </div>
           </>
         )}
