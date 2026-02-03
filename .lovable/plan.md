@@ -1,85 +1,45 @@
 
-## Plano: Corrigir Movimentação da Página Durante Transições de Anúncios
+## Plano: Limpar Interface dos Anúncios
 
-### Problema Identificado
-A página está "pulando" para cima e para baixo no mobile durante as transições porque os diferentes tipos de anúncios têm **alturas diferentes**:
+### O que será removido
 
-- **banner_principal**: 400px fixo
-- **full_width**: 300px fixo  
-- **card_secundario**: altura variável (depende do conteúdo)
+Vou remover da interface visível:
 
-Quando o carousel muda de um anúncio para outro de tipo diferente, a altura do container muda, causando **layout shift** que empurra a página.
+1. **Botão Play/Pause** (linhas 484-499)
+2. **Contador de anúncios** "1 / 4" e "(8s)" (linhas 502-506)
+3. **Barra de progresso** dentro dos pontos (linhas 471-479)
+4. **Estado de progresso** - variável e interval não serão mais necessários
 
-### Solução Proposta
-Padronizar a altura do container de anúncios para evitar mudanças de layout durante transições.
+### O que será mantido
 
-### Arquivos a Modificar
+- Rotação automática dos anúncios
+- Pontos de navegação (dots) - agora simples, sem barra de progresso
+- Setas de navegação (prev/next)
+- Pausa automática ao passar o mouse
 
-#### `src/components/AnunciosSection.tsx`
+### Arquivo a modificar
 
-**Mudanças:**
+**`src/components/AnunciosSection.tsx`**
 
-1. **Criar wrapper com altura fixa** para o container de anúncios:
-   - Desktop: `min-h-[400px]`
-   - Mobile: `min-h-[350px]` ou `min-h-[300px]`
+### Mudanças técnicas
 
-2. **Padronizar alturas por tipo para mobile**:
-   - `banner_principal`: `h-[300px] md:h-[400px]`
-   - `card_secundario`: `min-h-[300px] md:min-h-[auto]`
-   - `full_width`: `h-[300px]` (já está)
+1. **Remover imports não usados**: `Pause`, `Play`
 
-3. **Usar posicionamento absoluto para slides**:
-   - Container pai com altura fixa e `position: relative`
-   - Cada anúncio com `position: absolute` e `inset-0`
-   - Transições sem afetar o layout da página
+2. **Remover estados de progresso**: 
+   - `const [progress, setProgress] = useState(0)`
+   - `progressIntervalRef`
+   - Todo o código de `progressIntervalRef.current`
 
-### Detalhes Técnicos
+3. **Simplificar pontos de navegação**: Remover a barra de progresso animada dentro do ponto ativo, deixando apenas o indicador visual simples
 
-```text
-┌─────────────────────────────────────────┐
-│  Container (altura fixa: 300px mobile)  │
-│  ┌───────────────────────────────────┐  │
-│  │  Slide Atual (position: absolute) │  │
-│  │  inset-0 (preenche o container)   │  │
-│  └───────────────────────────────────┘  │
-│  Indicadores/Controles (z-index: 10)    │
-└─────────────────────────────────────────┘
-```
+4. **Remover elementos da UI**:
+   - Bloco do botão Play/Pause (linhas 484-499)
+   - Bloco do contador "1 / 4 (8s)" (linhas 502-506)
 
-**Código proposto:**
+### Resultado esperado
 
-```tsx
-// Container com altura fixa
-<div className="relative min-h-[300px] md:min-h-[400px]">
-  {/* Anúncio atual - posição absoluta para não afetar layout */}
-  <div 
-    className={`absolute inset-0 transition-opacity duration-500 ${
-      isTransitioning ? 'opacity-0' : 'opacity-100'
-    }`}
-  >
-    {renderAnuncio(currentAnuncio)}
-  </div>
-</div>
-```
-
-**Ajustes nos tipos de anúncio:**
-
-```tsx
-// banner_principal - ajustar altura mobile
-<div className="relative h-[300px] md:h-[400px] rounded-xl overflow-hidden">
-
-// card_secundario - garantir altura mínima
-<Card className="h-full min-h-[300px] overflow-hidden">
-  <div className="grid md:grid-cols-2 gap-0 h-full">
-    <div className="relative h-[180px] md:h-auto">
-
-// full_width - manter como está (300px)
-<div className="relative h-[300px] rounded-xl overflow-hidden">
-```
-
-### Benefícios
-
-1. **Zero layout shift** - A página não vai mais "pular"
-2. **Melhor CLS** (Cumulative Layout Shift) - Métrica Core Web Vitals
-3. **Experiência mobile suave** - Transições apenas visuais, sem movimento de scroll
-4. **Compatível com todos os tipos** de anúncios
+Interface limpa com:
+- Apenas pontos simples na parte inferior
+- Setas de navegação nas laterais
+- Rotação automática funcionando normalmente
+- Sem controles de mídia ou contadores
