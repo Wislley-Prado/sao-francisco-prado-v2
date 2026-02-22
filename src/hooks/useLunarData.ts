@@ -46,304 +46,179 @@ const normalizePhase = (phaseName: string): string => {
   const phaseMap: { [key: string]: string } = {
     'new moon': 'Nova',
     'waxing crescent': 'Crescente',
-    'first quarter': 'Crescente',
+    'first quarter': 'Quarto Crescente',
     'waxing gibbous': 'Crescente Gibosa',
     'full moon': 'Cheia',
     'waning gibbous': 'Minguante Gibosa',
-    'last quarter': 'Minguante',
+    'last quarter': 'Quarto Minguante',
     'waning crescent': 'Minguante Crescente'
   };
   
   return phaseMap[phaseName.toLowerCase()] || phaseName;
 };
 
+// Constantes do ciclo lunar
+const LUNAR_CYCLE = 29.530588853;
+const REFERENCE_NEW_MOON = new Date('2026-01-29T12:36:00Z').getTime();
+
+// Dias desde Lua Nova para cada fase
+const PHASE_OFFSETS = {
+  'Quarto Crescente': 7.38,
+  'Cheia': 14.77,
+  'Quarto Minguante': 22.14,
+  'Nova': LUNAR_CYCLE,
+};
+
+const FISHING_QUALITIES: { [key: string]: string } = {
+  'Nova': 'Excelente',
+  'Crescente': 'Boa',
+  'Quarto Crescente': 'Boa',
+  'Crescente Gibosa': 'Regular',
+  'Cheia': 'Fraca',
+  'Minguante Gibosa': 'Regular',
+  'Quarto Minguante': 'Boa',
+  'Minguante': 'Boa',
+  'Minguante Crescente': 'Excelente'
+};
+
+const PHASE_COLORS: { [key: string]: string } = {
+  'Nova': 'bg-green-600',
+  'Crescente': 'bg-blue-500',
+  'Quarto Crescente': 'bg-blue-500',
+  'Crescente Gibosa': 'bg-yellow-500',
+  'Cheia': 'bg-orange-500',
+  'Minguante Gibosa': 'bg-yellow-600',
+  'Quarto Minguante': 'bg-blue-600',
+  'Minguante': 'bg-blue-600',
+  'Minguante Crescente': 'bg-green-600'
+};
+
+// Calcula idade da lua em dias
+const calculateMoonAge = (): number => {
+  const now = Date.now();
+  const daysSinceRef = (now - REFERENCE_NEW_MOON) / (24 * 60 * 60 * 1000);
+  const age = daysSinceRef % LUNAR_CYCLE;
+  return age < 0 ? age + LUNAR_CYCLE : age;
+};
+
+// Determina fase a partir da idade
+const getPhaseFromAge = (ageInDays: number): string => {
+  if (ageInDays < 1.85) return 'Nova';
+  if (ageInDays < 7.38) return 'Crescente';
+  if (ageInDays < 9.22) return 'Quarto Crescente';
+  if (ageInDays < 14.77) return 'Crescente Gibosa';
+  if (ageInDays < 16.61) return 'Cheia';
+  if (ageInDays < 22.14) return 'Minguante Gibosa';
+  if (ageInDays < 23.98) return 'Quarto Minguante';
+  if (ageInDays < 27.68) return 'Minguante Crescente';
+  return 'Nova';
+};
+
+// Calcula próximas 4 fases dinamicamente
+const calculateNextPhases = (ageInDays: number): LunarPhase[] => {
+  const now = Date.now();
+  const phases: LunarPhase[] = [];
+
+  for (const [phase, offset] of Object.entries(PHASE_OFFSETS)) {
+    const daysUntil = (offset - ageInDays + LUNAR_CYCLE) % LUNAR_CYCLE;
+    const timestamp = now + daysUntil * 24 * 60 * 60 * 1000;
+    const date = new Date(timestamp).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
+    
+    phases.push({
+      phase,
+      date,
+      timestamp,
+      illumination: phase === 'Nova' ? 0 : phase === 'Cheia' ? 100 : 50,
+      fishing: FISHING_QUALITIES[phase] || 'Regular',
+      color: PHASE_COLORS[phase] || 'bg-gray-500',
+    });
+  }
+
+  return phases.sort((a, b) => a.timestamp - b.timestamp);
+};
+
+// Gera melhores horários de pesca
+const getBestFishingTimes = (currentPhase: string) => [
+  { time: "05:30 - 07:00", activity: "Nascente do Sol", quality: 'excellent' as const },
+  { time: "17:30 - 19:00", activity: "Pôr do Sol", quality: 'excellent' as const },
+  { time: "22:00 - 00:30", activity: "Lua Alta", quality: (currentPhase === 'Cheia' ? 'excellent' : currentPhase === 'Nova' ? 'good' : 'fair') as 'excellent' | 'good' | 'fair' },
+  { time: "03:00 - 05:00", activity: "Madrugada", quality: (currentPhase === 'Nova' || currentPhase === 'Quarto Minguante' ? 'good' : 'fair') as 'excellent' | 'good' | 'fair' },
+];
+
 // Função para buscar dados da API via Edge Function proxy
 const fetchLunarDataFromAPI = async (): Promise<LunarData> => {
   console.log('🌙 [LUNAR API] Buscando dados via proxy...');
   
   try {
-    // Usar edge function proxy para evitar CORS
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
     const response = await fetch(`${supabaseUrl}/functions/v1/lunar-proxy`);
     
-    if (!response.ok) {
-      throw new Error(`Proxy Error: ${response.status}`);
-    }
+    if (!response.ok) throw new Error(`Proxy Error: ${response.status}`);
     
     const data: FarmSenseResponse[] = await response.json();
     const moonData = data[0]?.moon;
-    
-    if (!moonData) {
-      throw new Error('Invalid API response');
-    }
+    if (!moonData) throw new Error('Invalid API response');
     
     console.log('🌙 [LUNAR API] Dados recebidos:', moonData);
     
-    // Normalizar dados da API
     const currentPhase = normalizePhase(moonData.phase_name);
     const illumination = Math.round(moonData.illumination * 100);
     const age = Math.round(moonData.age);
     const distance = Math.round(moonData.distance);
     
-    console.log(`🌙 [LUNAR API] Fase: ${currentPhase}, Iluminação: ${illumination}%, Idade: ${age} dias`);
-    
-    // Mapear cores e qualidades de pesca
-    const phaseColors: { [key: string]: string } = {
-      'Nova': 'bg-gray-800',
-      'Crescente': 'bg-yellow-400',
-      'Crescente Gibosa': 'bg-yellow-500',
-      'Cheia': 'bg-orange-400',
-      'Minguante Gibosa': 'bg-orange-500',
-      'Minguante': 'bg-yellow-400',
-      'Minguante Crescente': 'bg-gray-600'
-    };
-    
-    const fishingQualities: { [key: string]: string } = {
-      'Nova': 'Excelente',
-      'Crescente': 'Bom',
-      'Crescente Gibosa': 'Regular',
-      'Cheia': 'Excelente',
-      'Minguante Gibosa': 'Bom',
-      'Minguante': 'Regular',
-      'Minguante Crescente': 'Bom'
-    };
-    
-    // Criar próximas fases usando dados da API
+    // Próximas fases usando dados da API
     const phases: LunarPhase[] = [
-      {
-        phase: 'Crescente',
-        date: new Date(moonData.next_first_quarter).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }),
-        timestamp: new Date(moonData.next_first_quarter).getTime(),
-        illumination: 50,
-        fishing: fishingQualities['Crescente'],
-        color: phaseColors['Crescente']
-      },
-      {
-        phase: 'Cheia',
-        date: new Date(moonData.next_full_moon).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }),
-        timestamp: new Date(moonData.next_full_moon).getTime(),
-        illumination: 100,
-        fishing: fishingQualities['Cheia'],
-        color: phaseColors['Cheia']
-      },
-      {
-        phase: 'Minguante',
-        date: new Date(moonData.next_last_quarter).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }),
-        timestamp: new Date(moonData.next_last_quarter).getTime(),
-        illumination: 50,
-        fishing: fishingQualities['Minguante'],
-        color: phaseColors['Minguante']
-      },
-      {
-        phase: 'Nova',
-        date: new Date(moonData.next_new_moon).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }),
-        timestamp: new Date(moonData.next_new_moon).getTime(),
-        illumination: 0,
-        fishing: fishingQualities['Nova'],
-        color: phaseColors['Nova']
-      }
+      { phase: 'Quarto Crescente', date: new Date(moonData.next_first_quarter).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }), timestamp: new Date(moonData.next_first_quarter).getTime(), illumination: 50, fishing: FISHING_QUALITIES['Quarto Crescente'], color: PHASE_COLORS['Quarto Crescente'] },
+      { phase: 'Cheia', date: new Date(moonData.next_full_moon).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }), timestamp: new Date(moonData.next_full_moon).getTime(), illumination: 100, fishing: FISHING_QUALITIES['Cheia'], color: PHASE_COLORS['Cheia'] },
+      { phase: 'Quarto Minguante', date: new Date(moonData.next_last_quarter).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }), timestamp: new Date(moonData.next_last_quarter).getTime(), illumination: 50, fishing: FISHING_QUALITIES['Quarto Minguante'], color: PHASE_COLORS['Quarto Minguante'] },
+      { phase: 'Nova', date: new Date(moonData.next_new_moon).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }), timestamp: new Date(moonData.next_new_moon).getTime(), illumination: 0, fishing: FISHING_QUALITIES['Nova'], color: PHASE_COLORS['Nova'] },
     ].sort((a, b) => a.timestamp - b.timestamp);
     
-    // Melhores horários para pesca baseados na fase atual
-    const bestFishingTimes = [
-      {
-        time: "05:30 - 07:00",
-        activity: "Nascente do Sol",
-        quality: 'excellent' as 'excellent' | 'good' | 'fair'
-      },
-      {
-        time: "17:30 - 19:00", 
-        activity: "Pôr do Sol",
-        quality: 'excellent' as 'excellent' | 'good' | 'fair'
-      },
-      {
-        time: "22:00 - 00:30",
-        activity: "Lua Alta",
-        quality: (currentPhase === 'Cheia' ? 'excellent' : currentPhase === 'Nova' ? 'good' : 'fair') as 'excellent' | 'good' | 'fair'
-      },
-      {
-        time: "03:00 - 05:00",
-        activity: "Madrugada",
-        quality: (currentPhase === 'Nova' || currentPhase === 'Minguante' ? 'good' : 'fair') as 'excellent' | 'good' | 'fair'
-      }
-    ];
-    
     return {
-      currentPhase: {
-        phase: currentPhase,
-        illumination,
-        age,
-        distance
-      },
+      currentPhase: { phase: currentPhase, illumination, age, distance },
       phases,
-      bestFishingTimes
+      bestFishingTimes: getBestFishingTimes(currentPhase),
     };
     
   } catch (error) {
     console.error('🌙 [LUNAR API] Erro ao buscar dados:', error);
     console.log('🌙 [LUNAR API] Usando fallback para cálculo local...');
-    
-    // Fallback: usar cálculo local simplificado
     return calculateLunarPhasesLocal();
   }
 };
 
-// Fallback: cálculo local simplificado
+// Fallback: cálculo local dinâmico
 const calculateLunarPhasesLocal = (): LunarData => {
   console.log('🌙 [LUNAR LOCAL] Usando cálculo astronômico local...');
   
-  const now = new Date();
-  
-  // Para 3 de agosto de 2025, forçar os dados corretos
-  const isToday = now.getFullYear() === 2025 && now.getMonth() === 7 && now.getDate() === 3;
-  
-  let currentPhase: string;
-  let illumination: number;
-  let ageInDays: number;
-  
-  if (isToday) {
-    // Forçar dados corretos para 3 de agosto de 2025
-    currentPhase = 'Crescente Gibosa';
-    illumination = 68;
-    ageInDays = 9;
-    console.log('🌙 [LUNAR LOCAL] Data específica detectada - 3 de agosto de 2025');
-  } else {
-    // Cálculo normal para outras datas
-    const currentTimestamp = now.getTime();
-    
-    // Data de referência: Lua Nova de 6 de julho de 2025
-    const referenceNewMoon = new Date('2025-07-06T00:00:00Z').getTime();
-    
-    // Ciclo lunar sinódico preciso
-    const lunarCycle = 29.530588853;
-    
-    // Calcular idade da lua
-    const daysSinceReference = (currentTimestamp - referenceNewMoon) / (24 * 60 * 60 * 1000);
-    const cyclesSinceReference = daysSinceReference / lunarCycle;
-    ageInDays = (cyclesSinceReference - Math.floor(cyclesSinceReference)) * lunarCycle;
-    
-    // Calcular iluminação correta (0-100%)
-    illumination = Math.round(50 * (1 - Math.cos(2 * Math.PI * ageInDays / lunarCycle)));
-    
-    // Determinar fase atual com intervalos corretos
-    if (ageInDays < 1.85) {
-      currentPhase = 'Nova';
-    } else if (ageInDays < 5.53) {
-      currentPhase = 'Crescente';
-    } else if (ageInDays < 9.22) {
-      currentPhase = 'Crescente Gibosa';
-    } else if (ageInDays < 12.91) {
-      currentPhase = 'Cheia';
-    } else if (ageInDays < 16.59) {
-      currentPhase = 'Minguante Gibosa';
-    } else if (ageInDays < 20.28) {
-      currentPhase = 'Minguante';
-    } else if (ageInDays < 23.97) {
-      currentPhase = 'Minguante Crescente';
-    } else {
-      currentPhase = 'Nova';
-    }
-  }
+  const ageInDays = calculateMoonAge();
+  const currentPhase = getPhaseFromAge(ageInDays);
+  const illumination = Math.round(50 * (1 - Math.cos(2 * Math.PI * ageInDays / LUNAR_CYCLE)));
   
   console.log(`🌙 [LUNAR LOCAL] Idade: ${ageInDays.toFixed(1)} dias, Fase: ${currentPhase}, Iluminação: ${illumination}%`);
-  
-  // Criar próximas fases (dados fixos para agosto de 2025)
-  const phases: LunarPhase[] = [
-    {
-      phase: 'Nova',
-      date: '5 de agosto de 2025',
-      timestamp: new Date('2025-08-05').getTime(),
-      illumination: 1,
-      fishing: 'Excelente',
-      color: 'bg-green-600'
-    },
-    {
-      phase: 'Crescente',
-      date: '12 de agosto de 2025', 
-      timestamp: new Date('2025-08-12').getTime(),
-      illumination: 25,
-      fishing: 'Boa',
-      color: 'bg-blue-500'
-    },
-    {
-      phase: 'Crescente Gibosa',
-      date: '18 de agosto de 2025',
-      timestamp: new Date('2025-08-18').getTime(), 
-      illumination: 75,
-      fishing: 'Regular',
-      color: 'bg-yellow-500'
-    },
-    {
-      phase: 'Cheia',
-      date: '22 de agosto de 2025',
-      timestamp: new Date('2025-08-22').getTime(),
-      illumination: 99,
-      fishing: 'Fraca',
-      color: 'bg-orange-500'
-    },
-    {
-      phase: 'Minguante Gibosa', 
-      date: '28 de agosto de 2025',
-      timestamp: new Date('2025-08-28').getTime(),
-      illumination: 75,
-      fishing: 'Regular',
-      color: 'bg-yellow-600'
-    },
-    {
-      phase: 'Minguante',
-      date: '3 de setembro de 2025',
-      timestamp: new Date('2025-09-03').getTime(),
-      illumination: 25,
-      fishing: 'Boa', 
-      color: 'bg-blue-600'
-    }
-  ];
-  
-  const bestFishingTimes = [
-    {
-      time: "05:30 - 07:00",
-      activity: "Nascente do Sol",
-      quality: 'excellent' as 'excellent' | 'good' | 'fair'
-    },
-    {
-      time: "17:30 - 19:00", 
-      activity: "Pôr do Sol",
-      quality: 'excellent' as 'excellent' | 'good' | 'fair'
-    },
-    {
-      time: "22:00 - 00:30",
-      activity: "Lua Alta",
-      quality: (currentPhase === 'Cheia' ? 'excellent' : 'good') as 'excellent' | 'good' | 'fair'
-    },
-    {
-      time: "03:00 - 05:00",
-      activity: "Madrugada",
-      quality: (currentPhase === 'Nova' ? 'good' : 'fair') as 'excellent' | 'good' | 'fair'
-    }
-  ];
   
   return {
     currentPhase: {
       phase: currentPhase,
       illumination,
       age: Math.round(ageInDays),
-      distance: Math.round(384400 + Math.sin(ageInDays * 0.2) * 20000)
+      distance: Math.round(384400 + Math.sin(2 * Math.PI * ageInDays / LUNAR_CYCLE) * 21000),
     },
-    phases: phases.sort((a, b) => a.timestamp - b.timestamp),
-    bestFishingTimes
+    phases: calculateNextPhases(ageInDays),
+    bestFishingTimes: getBestFishingTimes(currentPhase),
   };
 };
 
 export const useLunarData = () => {
   return useQuery<LunarData>({
-    queryKey: ['lunar', 'data', 'v5'], // Nova versão para forçar refresh
+    queryKey: ['lunar', 'data', 'v6'],
     queryFn: fetchLunarDataFromAPI,
-    refetchInterval: 2 * 60 * 60 * 1000, // Atualizar a cada 2 horas
-    staleTime: 60 * 60 * 1000, // Dados ficam fresh por 1 hora
-    retry: 1, // Apenas 1 tentativa para falhar rápido
-    retryDelay: 100, // Delay mínimo entre tentativas
+    refetchInterval: 2 * 60 * 60 * 1000,
+    staleTime: 60 * 60 * 1000,
+    retry: 1,
+    retryDelay: 100,
     refetchOnWindowFocus: false,
-    refetchOnMount: true, // Forçar reload para mostrar novos dados
-    networkMode: 'online', // Só tenta se estiver online
+    refetchOnMount: true,
+    networkMode: 'online',
   });
 };
