@@ -1,31 +1,44 @@
 
 
-# Limpeza: Remover Codigo Antigo do Calendario Lunar
+# Corrigir: Remover Prompt de Atualização Desnecessario
 
-## O que ja foi limpo
+## Problema
 
-O `useLunarData.ts` e o `lunarEphemeris.ts` estao corretos e limpos. Nao ha mais referencia a FarmSense, calculo por referencia unica, ou datas hardcoded no frontend.
+O popup "Atualização Disponível" aparece toda vez que o usuario abre o site. Isso acontece porque:
+- O Vite PWA esta configurado com `skipWaiting: true` e `clientsClaim: true`, ou seja, atualizacoes ja sao aplicadas automaticamente
+- Mas o codigo escuta o evento `controllerchange` e marca `hasUpdate = true`, mostrando o popup mesmo quando nao ha atualizacao real
 
-## O que ainda precisa ser removido
+## Solucao
 
-### Edge Function `lunar-proxy` (codigo morto)
+Remover o popup de atualizacao e o botao manual de atualizar do Header, ja que as atualizacoes acontecem automaticamente.
 
-O arquivo `supabase/functions/lunar-proxy/index.ts` ainda existe e contem:
-- Chamada a API FarmSense (que sempre falha com erro DNS)
-- Calculo de fallback por referencia unica (metodo antigo)
-- Nenhum codigo do frontend chama mais essa funcao
-
-### Acao
+## Alteracoes
 
 | Arquivo | Acao |
 |---------|------|
-| `supabase/functions/lunar-proxy/index.ts` | DELETAR - nao e mais usado |
+| `src/components/PWALifecycle.tsx` | Remover o `UpdatePrompt` do render |
+| `src/components/UpdatePrompt.tsx` | DELETAR - nao e mais necessario |
+| `src/components/Header.tsx` | Remover botao de atualizar (icone RefreshCw) do desktop e mobile |
+| `src/hooks/usePWALifecycle.ts` | Remover logica de `hasUpdate`, `isUpdateReady` e `reloadApp` |
 
-Apos deletar o arquivo, o edge function deployado tambem sera removido do Supabase.
+## Detalhes Tecnicos
+
+**PWALifecycle.tsx**: Remover a importacao e renderizacao do `UpdatePrompt`.
+
+**Header.tsx**: Remover:
+- Import do `RefreshCw`
+- Estado `isUpdating` e funcao `handleUpdateApp`
+- Botao de atualizar no desktop e no mobile
+
+**usePWALifecycle.ts**: Remover:
+- `hasUpdate` e `isUpdateReady` do estado
+- Listener de `controllerchange`
+- Funcao `reloadApp`
+- `setInterval` de checagem periodica
 
 ## Resultado
 
-- Menos codigo para manter
-- Sem edge function desnecessario consumindo recursos
-- Todo o calculo lunar e feito 100% no client com a tabela de efemerides
+- O usuario nao vera mais o popup irritante a cada visita
+- Atualizacoes continuam sendo aplicadas automaticamente pelo Service Worker
+- Interface mais limpa no Header (sem botao de refresh desnecessario)
 
