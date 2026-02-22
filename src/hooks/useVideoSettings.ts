@@ -15,9 +15,9 @@ export const useVideoSettings = () => {
     queryKey: ['video-settings'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('site_settings')
+        .from('site_settings_public')
         .select('youtube_live_url, youtube_video_url, youtube_institucional_url')
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data as VideoSettings;
