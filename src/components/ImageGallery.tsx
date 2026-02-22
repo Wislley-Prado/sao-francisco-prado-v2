@@ -117,6 +117,8 @@ export const ImageGallery = ({ images, title }: ImageGalleryProps) => {
                 <img
                   src={img.url}
                   alt={img.alt_text || `${title || 'Imagem'} - Foto ${index + 1}`}
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover"
                 />
                 {selectedIndex === index && (

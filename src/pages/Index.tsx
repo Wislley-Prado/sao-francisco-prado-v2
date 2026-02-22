@@ -1,18 +1,21 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Helmet } from 'react-helmet-async';
 import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
 import { AnunciosSection } from '@/components/AnunciosSection';
 import RanchosSection from '@/components/RanchosSection';
 import PackagesSection from '@/components/PackagesSection';
-import BlogSection from '@/components/BlogSection';
-import LunarCalendar from '@/components/LunarCalendar';
-import DamInfo from '@/components/DamInfo';
-import WeatherDashboard from '@/components/WeatherDashboard';
 import WhatsAppButton from '@/components/WhatsAppButton';
 import Footer from '@/components/Footer';
-import { FAQSection } from '@/components/FAQSection';
-import { TestimonialsSection } from '@/components/TestimonialsSection';
+import { Skeleton } from '@/components/ui/skeleton';
+
+// Lazy load below-the-fold sections
+const DamInfo = React.lazy(() => import('@/components/DamInfo'));
+const LunarCalendar = React.lazy(() => import('@/components/LunarCalendar'));
+const WeatherDashboard = React.lazy(() => import('@/components/WeatherDashboard'));
+const BlogSection = React.lazy(() => import('@/components/BlogSection'));
+const TestimonialsSection = React.lazy(() => import('@/components/TestimonialsSection').then(m => ({ default: m.TestimonialsSection })));
+const FAQSection = React.lazy(() => import('@/components/FAQSection').then(m => ({ default: m.FAQSection })));
 
 const Index = () => {
   return (
@@ -32,20 +35,32 @@ const Index = () => {
       <AnunciosSection posicao="topo" />
       
       {/* Dados em tempo real */}
-      <DamInfo />
-      <LunarCalendar />
-      <WeatherDashboard />
+      <Suspense fallback={<div className="py-16 container mx-auto px-4"><Skeleton className="h-64 w-full rounded-xl" /></div>}>
+        <DamInfo />
+      </Suspense>
+      <Suspense fallback={<div className="py-16 container mx-auto px-4"><Skeleton className="h-64 w-full rounded-xl" /></div>}>
+        <LunarCalendar />
+      </Suspense>
+      <Suspense fallback={<div className="py-16 container mx-auto px-4"><Skeleton className="h-64 w-full rounded-xl" /></div>}>
+        <WeatherDashboard />
+      </Suspense>
       
       <AnunciosSection posicao="meio" />
       
       {/* Conteúdo principal */}
       <RanchosSection />
       <PackagesSection />
-      <BlogSection />
+      <Suspense fallback={<div className="py-16 container mx-auto px-4"><Skeleton className="h-64 w-full rounded-xl" /></div>}>
+        <BlogSection />
+      </Suspense>
       
       {/* Seções de suporte */}
-      <TestimonialsSection />
-      <FAQSection />
+      <Suspense fallback={null}>
+        <TestimonialsSection />
+      </Suspense>
+      <Suspense fallback={null}>
+        <FAQSection />
+      </Suspense>
       
       <AnunciosSection posicao="rodape" />
       <WhatsAppButton />

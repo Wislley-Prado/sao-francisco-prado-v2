@@ -47,6 +47,8 @@ const RanchCard = ({ ranch }: RanchCardProps) => {
             <img 
               src={ranch.images[0]} 
               alt={ranch.name}
+              loading="lazy"
+              decoding="async"
               className="h-48 w-full object-cover"
             />
           ) : (
