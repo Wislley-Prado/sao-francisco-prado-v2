@@ -1,92 +1,118 @@
 
 
-## Plano: Corrigir Layout dos Anúncios no Mobile
+# Melhorar Performance com Lazy Loading de Imagens
 
-### Problemas Identificados
+## Problema Atual
 
-**1. Layout Mobile Cortado (`card_secundario`)**
+Analisando o codigo, encontrei que **varios componentes carregam imagens sem `loading="lazy"`**, o que significa que o navegador baixa todas as imagens de uma vez, mesmo as que estao fora da tela. Isso impacta:
 
-O problema está na estrutura do card secundário:
-- Container tem `min-h-[320px]` 
-- Imagem usa `h-[200px]` (fixo)
-- Sobra apenas ~120px para o conteúdo (título, descrição, badges, botão)
-- Resultado: botão de ação e informações ficam cortados
+- Tempo de carregamento inicial da pagina
+- Consumo de banda (egress do Supabase)
+- Performance no mobile
 
-**2. Painel Admin - Tipos Funcionando**
+### Componentes sem lazy loading:
+- **RanchCard** - imagem principal do rancho
+- **BlogCard** - imagem do post
+- **ImageGallery** - thumbnails e imagem principal
+- **TestimonialsSection** - fotos dos depoimentos
+- **AnunciosSection** - imagens dos anuncios
 
-Verifiquei o banco de dados e os tipos estão sendo salvos corretamente:
-- `card_secundario` - 6 anúncios
-- `full_width` - 1 anúncio
-
-O painel está funcionando. Se algo não aparece, pode ser um problema de cache do navegador ou filtro de posição.
-
----
-
-### Solução Proposta
-
-**Arquivo: `src/components/AnunciosSection.tsx`**
-
-#### Mudanças para `card_secundario` (mobile):
-
-1. **Aumentar altura do container mobile**: `min-h-[380px]` -> `min-h-[420px]`
-2. **Reduzir altura da imagem mobile**: `h-[200px]` -> `h-[140px]`
-3. **Adicionar scroll interno se necessário**: `overflow-y-auto` no conteúdo
-4. **Proteger área do botão**: padding-bottom maior para não sobrepor pontos de navegação
-
-#### Mudanças para `banner_principal` e `full_width` (mobile):
-
-5. **Aumentar padding inferior**: `pb-16` para dar espaço aos pontos de navegação
-6. **Limitar linha de texto**: `line-clamp-2` para título mobile
+### Componentes que ja tem:
+- PackageCard, FeaturedPackagesCarousel, PaidMediaBannerDisplay
 
 ---
 
-### Detalhes Técnicos
+## Solucao
 
-**Antes (card_secundario - linha 272-275):**
-```tsx
-<Card className="h-full min-h-[320px] md:min-h-[420px] ...">
-  <div className="flex flex-col md:grid md:grid-cols-2 gap-0 h-full">
-    <div className="relative h-[200px] md:h-full ...">
-```
+### 1. Criar componente `OptimizedImage` reutilizavel
 
-**Depois:**
-```tsx
-<Card className="h-full min-h-[420px] md:min-h-[420px] ...">
-  <div className="flex flex-col md:grid md:grid-cols-2 gap-0 h-full">
-    <div className="relative h-[140px] md:h-full ...">
-```
+Um componente centralizado que aplica automaticamente:
+- `loading="lazy"` em imagens fora do viewport
+- Placeholder com skeleton enquanto carrega
+- Tratamento de erro com fallback gradiente
+- Transicao suave (fade-in) ao carregar
 
-**Antes (conteúdo - linha 297):**
-```tsx
-<CardContent className="p-5 md:p-6 lg:p-8 flex flex-col justify-center flex-1 space-y-3 md:space-y-4">
-```
+Arquivo: `src/components/ui/optimized-image.tsx`
 
-**Depois:**
-```tsx
-<CardContent className="p-4 md:p-6 lg:p-8 flex flex-col justify-start flex-1 space-y-2 md:space-y-4 pb-6">
-```
+### 2. Aplicar lazy loading nos componentes existentes
 
-**Ajuste nos banners (linha 233):**
-```tsx
-<div className="absolute bottom-0 left-0 right-0 p-5 pb-14 md:p-10 lg:p-12">
-```
+Atualizar os seguintes componentes para usar `loading="lazy"` ou o novo `OptimizedImage`:
 
----
+| Componente | Mudanca |
+|-----------|---------|
+| RanchCard | Adicionar `loading="lazy"` na img |
+| BlogCard | Adicionar `loading="lazy"` na img |
+| ImageGallery | `loading="lazy"` nas thumbnails |
+| TestimonialsSection | `loading="lazy"` nos avatares |
+| AnunciosSection | `loading="lazy"` nas imagens |
 
-### Container Principal (linha 415)
+### 3. Lazy load de secoes na pagina Index
 
-Ajustar para altura mínima maior:
-```tsx
-<div className="relative min-h-[380px] md:min-h-[400px] group">
-```
+Usar `React.lazy` + `Suspense` para carregar sob demanda as secoes que ficam abaixo da dobra (below the fold):
+
+- DamInfo, LunarCalendar, WeatherDashboard
+- BlogSection, TestimonialsSection, FAQSection
+
+O HeroSection, Header e RanchosSection continuam carregando normalmente por estarem visiveis logo no inicio.
+
+### 4. Preconnect para o Supabase Storage
+
+Adicionar tag `<link rel="preconnect">` no `index.html` apontando para o dominio do Supabase Storage, para que o navegador inicie a conexao antes de precisar das imagens.
 
 ---
 
-### Resultado Esperado
+## Secao Tecnica
 
-- Botão de ação sempre visível no mobile
-- Título e descrição legíveis sem cortes
-- Pontos de navegação não sobrepõem conteúdo
-- Layout consistente entre tipos de anúncio
-- Informações de imóvel (preço, área, localização) visíveis
+### Componente OptimizedImage
 
+```text
+Props:
+- src: string
+- alt: string
+- className?: string
+- loading?: 'lazy' | 'eager' (default: 'lazy')
+- fallbackClassName?: string
+
+Comportamento:
+1. Renderiza Skeleton enquanto imagem carrega
+2. Ao carregar (onLoad), faz fade-in com opacity transition
+3. Ao falhar (onError), mostra div gradiente como fallback
+```
+
+### Lazy sections no Index.tsx
+
+```text
+const LazyDamInfo = React.lazy(() => import('@/components/DamInfo'));
+const LazyLunarCalendar = React.lazy(() => import('@/components/LunarCalendar'));
+const LazyWeatherDashboard = React.lazy(() => import('@/components/WeatherDashboard'));
+const LazyBlogSection = React.lazy(() => import('@/components/BlogSection'));
+const LazyTestimonialsSection = React.lazy(...)
+const LazyFAQSection = React.lazy(...)
+
+Cada um envolto em <Suspense fallback={<Skeleton />}>
+```
+
+### Preconnect
+
+Adicionar no `index.html`:
+```text
+<link rel="preconnect" href="https://zeqloqlhnbdeivnyghkx.supabase.co" />
+<link rel="dns-prefetch" href="https://zeqloqlhnbdeivnyghkx.supabase.co" />
+```
+
+### Arquivos modificados
+
+1. **Novo**: `src/components/ui/optimized-image.tsx`
+2. **Editar**: `src/components/RanchCard.tsx` - adicionar loading="lazy"
+3. **Editar**: `src/components/BlogCard.tsx` - adicionar loading="lazy"
+4. **Editar**: `src/components/ImageGallery.tsx` - loading="lazy" nas thumbnails
+5. **Editar**: `src/components/AnunciosSection.tsx` - loading="lazy"
+6. **Editar**: `src/pages/Index.tsx` - React.lazy para secoes below-fold
+7. **Editar**: `index.html` - preconnect tags
+
+### Impacto esperado
+
+- Reducao de 40-60% no carregamento inicial de imagens
+- Menor consumo de egress (imagens so baixam quando necessario)
+- Melhor LCP (Largest Contentful Paint) e CLS (Cumulative Layout Shift)
+- Bundles menores para o carregamento inicial da home
