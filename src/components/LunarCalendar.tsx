@@ -41,12 +41,16 @@ const LunarCalendar = () => {
         return <div className={`${baseClasses} bg-gray-800`}></div>;
       case 'Crescente':
         return <div className={`${baseClasses} bg-gradient-to-r from-gray-800 to-yellow-200`}></div>;
+      case 'Quarto Crescente':
+        return <div className={`${baseClasses} bg-gradient-to-r from-gray-800 via-yellow-200 to-yellow-200`}></div>;
       case 'Crescente Gibosa':
         return <div className={`${baseClasses} bg-gradient-to-r from-gray-600 to-yellow-100`}></div>;
       case 'Cheia':
         return <div className={`${baseClasses} bg-yellow-100 border-2 border-yellow-300`}></div>;
       case 'Minguante Gibosa':
         return <div className={`${baseClasses} bg-gradient-to-l from-gray-600 to-yellow-100`}></div>;
+      case 'Quarto Minguante':
+        return <div className={`${baseClasses} bg-gradient-to-l from-gray-800 via-yellow-200 to-yellow-200`}></div>;
       case 'Minguante':
         return <div className={`${baseClasses} bg-gradient-to-l from-gray-800 to-yellow-200`}></div>;
       case 'Minguante Crescente':
@@ -75,12 +79,16 @@ const LunarCalendar = () => {
         return <div className={`${baseClasses} bg-gray-800`}></div>;
       case 'Crescente':
         return <div className={`${baseClasses} bg-gradient-to-r from-gray-800 to-yellow-200`}></div>;
+      case 'Quarto Crescente':
+        return <div className={`${baseClasses} bg-gradient-to-r from-gray-800 via-yellow-200 to-yellow-200`}></div>;
       case 'Crescente Gibosa':
         return <div className={`${baseClasses} bg-gradient-to-r from-gray-600 to-yellow-100 border border-yellow-200`}></div>;
       case 'Cheia':
         return <div className={`${baseClasses} bg-yellow-100 border-2 border-yellow-300`}></div>;
       case 'Minguante Gibosa':
         return <div className={`${baseClasses} bg-gradient-to-l from-gray-600 to-yellow-100 border border-yellow-200`}></div>;
+      case 'Quarto Minguante':
+        return <div className={`${baseClasses} bg-gradient-to-l from-gray-800 via-yellow-200 to-yellow-200`}></div>;
       case 'Minguante':
         return <div className={`${baseClasses} bg-gradient-to-l from-gray-800 to-yellow-200`}></div>;
       case 'Minguante Crescente':
@@ -114,7 +122,7 @@ const LunarCalendar = () => {
             <CardContent className="pt-0 pb-4 md:pb-6">
               <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">
                 <div className="flex items-center space-x-3 md:space-x-4">
-                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-r from-gray-600 to-yellow-100 border border-yellow-200 shadow-lg flex-shrink-0"></div>
+                  {getCurrentMoonIcon(lunarData.currentPhase.phase, lunarData.currentPhase.illumination)}
                   <div className="text-center sm:text-left">
                     <h3 className="text-xl md:text-2xl font-bold">Lua {lunarData.currentPhase.phase}</h3>
                     <p className="text-blue-100 text-sm md:text-base">{lunarData.currentPhase.illumination}% iluminada</p>
@@ -123,9 +131,9 @@ const LunarCalendar = () => {
                 <div className="text-center sm:text-right">
                   <Badge className="bg-white text-blue-700 text-sm md:text-lg px-3 md:px-4 py-1 md:py-2">
                     {
-                      lunarData.currentPhase.phase === 'Nova' || lunarData.currentPhase.phase === 'Minguante Crescente' 
+                    lunarData.currentPhase.phase === 'Nova' || lunarData.currentPhase.phase === 'Minguante Crescente' 
                         ? 'Excelente' 
-                        : lunarData.currentPhase.phase === 'Crescente' || lunarData.currentPhase.phase === 'Minguante'
+                        : lunarData.currentPhase.phase === 'Crescente' || lunarData.currentPhase.phase === 'Minguante' || lunarData.currentPhase.phase === 'Quarto Crescente' || lunarData.currentPhase.phase === 'Quarto Minguante'
                         ? 'Boa' 
                         : lunarData.currentPhase.phase === 'Crescente Gibosa' || lunarData.currentPhase.phase === 'Minguante Gibosa'
                         ? 'Regular'
@@ -152,7 +160,7 @@ const LunarCalendar = () => {
                 {lunarData.phases.map((phase, index) => (
                   <div key={index} className="flex items-center justify-between p-3 md:p-4 bg-gray-50 rounded-lg border border-gray-100 hover:shadow-sm transition-all duration-200">
                     <div className="flex items-center space-x-3 md:space-x-4 flex-1 min-w-0">
-                      <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-gradient-to-r from-gray-800 to-yellow-200 flex-shrink-0"></div>
+                      {getMoonIcon(phase.phase, phase.illumination)}
                       <div className="min-w-0 flex-1">
                         <h4 className="font-semibold text-gray-900 text-sm md:text-base truncate">Lua {phase.phase}</h4>
                         <p className="text-xs md:text-sm text-gray-600">{phase.date}</p>
@@ -210,7 +218,7 @@ const LunarCalendar = () => {
               <div className="mt-6 md:mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="text-center p-4 md:p-6 bg-gray-50 rounded-lg border border-gray-100">
                   <h5 className="font-bold text-gray-900 mb-2 text-sm md:text-base">Lua Atual</h5>
-                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-full mx-auto my-2 shadow-lg bg-gradient-to-r from-gray-600 to-yellow-100 border border-yellow-200"></div>
+                  {getCurrentMoonIcon(lunarData.currentPhase.phase, lunarData.currentPhase.illumination)}
                   <p className="text-xs md:text-sm text-gray-600 font-medium">
                     {lunarData.currentPhase.phase}
                   </p>
@@ -220,7 +228,7 @@ const LunarCalendar = () => {
                 </div>
                 <div className="text-center p-4 md:p-6 bg-gray-50 rounded-lg border border-gray-100">
                   <h5 className="font-bold text-gray-900 mb-2 text-sm md:text-base">Próxima Fase</h5>
-                  <div className="w-5 h-5 md:w-6 md:h-6 rounded-full mx-auto my-2 md:my-3 bg-gradient-to-r from-gray-800 to-yellow-200"></div>
+                  {getMoonIcon(nextPhase.phase, nextPhase.illumination)}
                   <p className="text-xs md:text-sm text-gray-600 font-medium mt-2 md:mt-3">{nextPhase.phase}</p>
                   <p className="text-xs text-gray-500">{nextPhase.date}</p>
                 </div>
@@ -231,7 +239,7 @@ const LunarCalendar = () => {
                   Condição Atual: {
                     lunarData.currentPhase.phase === 'Nova' || lunarData.currentPhase.phase === 'Minguante Crescente' 
                       ? 'Excelente' 
-                      : lunarData.currentPhase.phase === 'Crescente' || lunarData.currentPhase.phase === 'Minguante'
+                      : lunarData.currentPhase.phase === 'Crescente' || lunarData.currentPhase.phase === 'Minguante' || lunarData.currentPhase.phase === 'Quarto Crescente' || lunarData.currentPhase.phase === 'Quarto Minguante'
                       ? 'Boa' 
                       : lunarData.currentPhase.phase === 'Crescente Gibosa' || lunarData.currentPhase.phase === 'Minguante Gibosa'
                       ? 'Regular'
@@ -241,7 +249,7 @@ const LunarCalendar = () => {
                 <p className="text-xs md:text-sm text-gray-700 leading-relaxed">
                   {lunarData.currentPhase.phase === 'Nova' || lunarData.currentPhase.phase === 'Minguante Crescente'
                     ? 'Condições ideais para pesca de tucunaré e dourado. Recomendamos iscas artificiais no período da manhã.'
-                    : lunarData.currentPhase.phase === 'Crescente' || lunarData.currentPhase.phase === 'Minguante'
+                    : lunarData.currentPhase.phase === 'Crescente' || lunarData.currentPhase.phase === 'Minguante' || lunarData.currentPhase.phase === 'Quarto Crescente' || lunarData.currentPhase.phase === 'Quarto Minguante'
                     ? 'Boa atividade dos peixes. Horários de madrugada e entardecer são mais promissores.'
                     : lunarData.currentPhase.phase === 'Crescente Gibosa' || lunarData.currentPhase.phase === 'Minguante Gibosa'
                     ? 'Fase gibosa com atividade moderada. Peixes mais ativos durante mudanças de luz.'
