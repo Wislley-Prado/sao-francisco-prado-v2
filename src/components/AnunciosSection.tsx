@@ -221,6 +221,8 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
           <img
             src={anuncio.imagem_url}
             alt={anuncio.titulo}
+            loading="lazy"
+            decoding="async"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
           />
           {/* Gradient overlay melhorado para legibilidade */}
@@ -277,6 +279,8 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
               <img
                 src={anuncio.imagem_url}
                 alt={anuncio.titulo}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
               />
               
@@ -363,6 +367,8 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
           <img
             src={anuncio.imagem_url}
             alt={anuncio.titulo}
+            loading="lazy"
+            decoding="async"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
           />
           {/* Gradient overlay melhorado */}
