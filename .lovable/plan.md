@@ -1,70 +1,62 @@
 
-# Corrigir Redes Sociais e Video Gravado na Home
 
-## Problema Encontrado
+# Corrigir Fases da Lua - Icones e Dados
 
-A causa raiz dos dois problemas e a mesma: **a view `site_settings_public` nao retorna dados para visitantes anonimos**.
+## Problemas Encontrados
 
-### Por que isso acontece?
+### 1. Icones da lua estao HARDCODED (nao mudam com a fase)
 
-A tabela `site_settings` tem RLS (Row Level Security) ativado com estas politicas:
-- **Admins**: podem ler e escrever (funciona)
-- **Visitantes**: a politica SELECT tem a condicao `false` -- ou seja, BLOQUEIA todas as leituras
+No componente `LunarCalendar.tsx`, existem funcoes `getMoonIcon()` e `getCurrentMoonIcon()` que foram **criadas mas NUNCA sao usadas**. Em vez disso, os icones estao fixos no HTML:
 
-A view `site_settings_public` faz `SELECT FROM site_settings`, mas como ela nao tem `SECURITY DEFINER`, ela roda com as permissoes do visitante (anon). Como o anon esta bloqueado pela RLS, a view retorna 0 linhas.
+- **Linha 117**: Icone da "Lua de Hoje" sempre mostra gradiente de Crescente Gibosa, independente da fase real
+- **Linha 155**: Todas as proximas fases mostram o MESMO icone generico (gradiente from-gray-800 to-yellow-200)
+- **Linha 213**: "Lua Atual" no painel inferior tambem e fixo
 
-### Impacto:
-1. **Redes sociais** -- o Footer usa `useSiteSettings()` que consulta a view `site_settings_public`. Como retorna vazio, `settings` e null e os links de Facebook, Instagram, YouTube, TikTok nao aparecem
-2. **Video gravado** -- o HeroSection usa `useVideoSettings()` que consulta `site_settings` diretamente com `.single()`. Como o anon esta bloqueado, retorna erro PGRST116 e o video cai no fallback (ID padrao `cN_BspPR2gg`)
+Resultado: a fase textual diz "Minguante" mas o icone mostra visual de "Crescente Gibosa".
 
-Os dados existem no banco corretamente:
-- `youtube_video_url`: `https://www.youtube.com/watch?v=vGVZlO0lrpQ`
-- `facebook_url`, `instagram_url`, `youtube_url`, `tiktok_url`: todos configurados
+### 2. Fallback local com datas de agosto 2025
+
+No hook `useLunarData.ts`, o fallback local (quando a API falha) tem:
+- Datas hardcoded de agosto 2025 (linhas 178-219)
+- Verificacao especifica para "3 de agosto de 2025" que nao faz sentido em 2026
+- Essas datas nunca serao atualizadas automaticamente
+
+### 3. FarmSense API sempre falha
+
+Os logs mostram que a API FarmSense **sempre retorna erro DNS** no edge function. O fallback do edge function funciona corretamente (calcula fase local), mas o fallback do hook client-side esta desatualizado.
 
 ---
 
 ## Solucao
 
-### 1. Recriar a view como SECURITY DEFINER
+### 1. Usar funcoes dinamicas de icone no LunarCalendar
 
-Recriar `site_settings_public` com `security_invoker = false` (SECURITY DEFINER). Isso faz a view rodar com permissoes do criador (owner/postgres), ignorando a RLS da tabela base. A view ja filtra apenas colunas seguras (sem tracking codes), entao e seguro.
+Substituir os 3 icones hardcoded por chamadas as funcoes ja existentes:
 
-Executar via migracao SQL:
+| Local | Linha | Mudanca |
+|-------|-------|---------|
+| Lua de Hoje (header) | 117 | Usar `getCurrentMoonIcon(lunarData.currentPhase.phase, lunarData.currentPhase.illumination)` |
+| Proximas fases (lista) | 155 | Usar `getMoonIcon(phase.phase, phase.illumination)` |
+| Lua Atual (painel inferior) | 213 | Usar `getCurrentMoonIcon(lunarData.currentPhase.phase, lunarData.currentPhase.illumination)` |
 
-```text
-DROP VIEW IF EXISTS site_settings_public;
+### 2. Atualizar fallback local no useLunarData.ts
 
-CREATE VIEW site_settings_public
-WITH (security_invoker = false)
-AS SELECT
-  id, created_at, updated_at,
-  whatsapp_numero, whatsapp_titulo, whatsapp_mensagem_padrao,
-  whatsapp_saudacao, whatsapp_instrucao, whatsapp_horario, whatsapp_opcoes,
-  youtube_live_url, youtube_video_url, youtube_institucional_url,
-  autor_avatar_url,
-  facebook_url, instagram_url, youtube_url, tiktok_url, twitter_url,
-  telefone_contato, email_contato,
-  copyright_text, reserva_button_link
-FROM site_settings;
+Remover as datas hardcoded de agosto 2025 e usar calculo dinamico que funciona para qualquer data:
 
-GRANT SELECT ON site_settings_public TO anon, authenticated;
-```
+- Remover a verificacao `isToday` para 3 de agosto de 2025
+- Calcular proximas fases dinamicamente baseado na idade da lua atual
+- Usar referencia de Lua Nova de janeiro 2026 (igual ao edge function)
+- Gerar datas futuras corretas para as proximas 4 fases
 
-### 2. Corrigir `useVideoSettings` para usar a view publica
+### 3. Melhorar mapeamento de fases
 
-Atualmente `useVideoSettings` consulta `site_settings` diretamente, o que falha por causa da RLS. Alterar para consultar `site_settings_public` com `.maybeSingle()` ao inves de `.single()`.
+O edge function retorna "Last Quarter" mas o `normalizePhase` mapeia para "Minguante". Na verdade "Last Quarter" = "Quarto Minguante", que esta entre Minguante Gibosa e Minguante Crescente. O mapeamento atual agrupa fases demais no mesmo nome.
 
-Arquivo: `src/hooks/useVideoSettings.ts`
+Corrigir mapeamento:
+- 'first quarter' → 'Quarto Crescente'
+- 'last quarter' → 'Quarto Minguante'
 
-Mudanca:
-- De: `supabase.from('site_settings').select(...).single()`
-- Para: `supabase.from('site_settings_public' as any).select(...).maybeSingle()`
-
-Isso elimina o erro PGRST116 e carrega as URLs de video corretamente.
-
-### 3. Nenhuma mudanca necessaria no Footer/Header
-
-Uma vez que a view funcione, o `useSiteSettings()` ja vai retornar os dados corretos e as redes sociais aparecerao automaticamente em todas as telas (PC e mobile).
+E adicionar esses nomes nos icones do `LunarCalendar`.
 
 ---
 
@@ -72,15 +64,36 @@ Uma vez que a view funcione, o `useSiteSettings()` ja vai retornar os dados corr
 
 ### Arquivos modificados
 
-1. **Nova migracao SQL**: recriar view `site_settings_public` com `security_invoker = false` e GRANT para anon
-2. **Editar** `src/hooks/useVideoSettings.ts`: mudar query de `site_settings` para `site_settings_public` e usar `maybeSingle()`
+1. **`src/components/LunarCalendar.tsx`**
+   - Substituir divs hardcoded por chamadas a `getMoonIcon()` e `getCurrentMoonIcon()`
+   - Adicionar cases para 'Quarto Crescente' e 'Quarto Minguante' nas funcoes de icone
+   - Adicionar esses nomes na logica de qualidade de pesca
 
-### Por que SECURITY DEFINER e seguro aqui
+2. **`src/hooks/useLunarData.ts`**
+   - Atualizar `normalizePhase` com mapeamentos corretos
+   - Remover datas hardcoded de agosto 2025
+   - Calcular proximas fases dinamicamente usando referencia de jan 2026
+   - Adicionar cores corretas para 'Quarto Crescente' e 'Quarto Minguante'
 
-A view `site_settings_public` ja exclui colunas sensiveis como `facebook_pixel`, `google_analytics`, `google_tag_manager` e `custom_head_scripts`. Ela so expoe dados publicos (redes sociais, WhatsApp, YouTube URLs). Usar SECURITY DEFINER neste caso e a pratica recomendada pelo Supabase para views publicas.
+### Calculo dinamico de proximas fases
+
+```text
+Referencia: Lua Nova 29 jan 2026 12:36 UTC
+Ciclo: 29.530588853 dias
+
+Fases no ciclo (em dias desde Lua Nova):
+- Quarto Crescente: ~7.38 dias
+- Lua Cheia: ~14.77 dias
+- Quarto Minguante: ~22.14 dias
+- Lua Nova: ~29.53 dias (proximo ciclo)
+
+Para cada fase, calcular:
+  diasAte = (diasDaFase - idadeAtual + ciclo) % ciclo
+  dataProxima = agora + diasAte
+```
 
 ### Resultado esperado
 
-- Redes sociais visíveis no Footer em PC e mobile
-- Video gravado correto na HeroSection (video ID: `vGVZlO0lrpQ`)
-- Sem erros PGRST116 no console
+- Icone da lua muda conforme a fase real (hoje: Quarto Minguante com visual adequado)
+- Proximas fases mostram datas corretas calculadas dinamicamente
+- Funciona para qualquer data futura sem precisar atualizar codigo
