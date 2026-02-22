@@ -18,7 +18,15 @@ const Configuracoes = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [savingManual, setSavingManual] = useState(false);
   const [lastUpdate, setLastUpdate] = useState<string | null>(null);
+  const [manualDam, setManualDam] = useState({
+    nivel: '',
+    volume: '',
+    afluencia: '',
+    defluencia: '',
+    data: new Date().toLocaleDateString('pt-BR'),
+  });
   const [settings, setSettings] = useState({
     facebook_pixel: '',
     google_analytics: '',
@@ -148,6 +156,41 @@ const Configuracoes = () => {
       toast.error('Erro ao atualizar dados da represa. Verifique se o workflow n8n está ativo.');
     } finally {
       setRefreshing(false);
+    }
+  };
+
+  const handleManualDamData = async () => {
+    if (!manualDam.nivel || !manualDam.volume || !manualDam.afluencia || !manualDam.defluencia) {
+      toast.error('Preencha todos os campos');
+      return;
+    }
+
+    setSavingManual(true);
+    try {
+      const damPayload = [{
+        tipo: 'tempo_real',
+        data_leitura: manualDam.data,
+        afluencia: manualDam.afluencia,
+        nivel_inicial: manualDam.nivel,
+        volume_inicial: manualDam.volume,
+        defluencia: manualDam.defluencia,
+        nivel_atual: manualDam.nivel,
+        volume_percentual: manualDam.volume,
+      }];
+
+      const { error } = await supabase
+        .from('dam_data')
+        .upsert({ id: 1, data: damPayload, updated_at: new Date().toISOString() });
+
+      if (error) throw error;
+
+      toast.success('Dados da represa salvos manualmente!');
+      setLastUpdate(new Date().toISOString());
+    } catch (error) {
+      console.error('Erro ao salvar dados manuais:', error);
+      toast.error('Erro ao salvar dados manuais');
+    } finally {
+      setSavingManual(false);
     }
   };
 
@@ -311,6 +354,88 @@ const Configuracoes = () => {
                   Use o botão acima apenas para atualizações emergenciais.
                 </AlertDescription>
               </Alert>
+            </div>
+
+            {/* Formulário de Entrada Manual */}
+            <div className="mt-6 pt-4 border-t border-border">
+              <div className="flex items-center gap-2 mb-4">
+                <HardDrive className="w-4 h-4 text-muted-foreground" />
+                <span className="font-medium text-sm">Entrada Manual de Dados</span>
+              </div>
+
+              <Alert className="mb-4">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription className="text-xs">
+                  Use este formulário para inserir dados manualmente enquanto o webhook não estiver funcionando.
+                  Quando o webhook voltar, os dados automáticos substituirão os manuais.
+                </AlertDescription>
+              </Alert>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="manual_nivel">Nível Atual (m)</Label>
+                  <Input
+                    id="manual_nivel"
+                    placeholder="Ex: 570,02"
+                    value={manualDam.nivel}
+                    onChange={(e) => setManualDam({ ...manualDam, nivel: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="manual_volume">Volume Útil (%)</Label>
+                  <Input
+                    id="manual_volume"
+                    placeholder="Ex: 83,37"
+                    value={manualDam.volume}
+                    onChange={(e) => setManualDam({ ...manualDam, volume: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="manual_afluencia">Afluência (m³/s)</Label>
+                  <Input
+                    id="manual_afluencia"
+                    placeholder="Ex: 1121,93"
+                    value={manualDam.afluencia}
+                    onChange={(e) => setManualDam({ ...manualDam, afluencia: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="manual_defluencia">Defluência (m³/s)</Label>
+                  <Input
+                    id="manual_defluencia"
+                    placeholder="Ex: 246,37"
+                    value={manualDam.defluencia}
+                    onChange={(e) => setManualDam({ ...manualDam, defluencia: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="manual_data">Data da Leitura</Label>
+                  <Input
+                    id="manual_data"
+                    placeholder="Ex: 22/02/2026"
+                    value={manualDam.data}
+                    onChange={(e) => setManualDam({ ...manualDam, data: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <Button
+                onClick={handleManualDamData}
+                disabled={savingManual}
+                className="mt-4 flex items-center gap-2"
+              >
+                {savingManual ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Salvando...
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4" />
+                    Salvar Dados Manuais
+                  </>
+                )}
+              </Button>
             </div>
           </CardContent>
         </Card>
