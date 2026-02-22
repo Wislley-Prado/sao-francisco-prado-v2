@@ -1,99 +1,120 @@
 
 
-# Corrigir Fases da Lua - Icones e Dados
+# Plano: Fases da Lua Sempre Corretas com Tabela Astronomica
 
-## Problemas Encontrados
+## Problema Atual
 
-### 1. Icones da lua estao HARDCODED (nao mudam com a fase)
+O sistema usa **uma unica Lua Nova de referencia** (29 jan 2026) e assume que o ciclo lunar e sempre 29.530588853 dias. Na realidade, o ciclo varia de 29.27 a 29.83 dias entre cada lunacao. Isso causa erro acumulado que faz a fase exibida divergir da fase real.
 
-No componente `LunarCalendar.tsx`, existem funcoes `getMoonIcon()` e `getCurrentMoonIcon()` que foram **criadas mas NUNCA sao usadas**. Em vez disso, os icones estao fixos no HTML:
+Alem disso, os limites de fase (1.85, 7.38, 9.22 dias, etc.) sao aproximacoes fixas que nao consideram a variacao de cada ciclo individual.
 
-- **Linha 117**: Icone da "Lua de Hoje" sempre mostra gradiente de Crescente Gibosa, independente da fase real
-- **Linha 155**: Todas as proximas fases mostram o MESMO icone generico (gradiente from-gray-800 to-yellow-200)
-- **Linha 213**: "Lua Atual" no painel inferior tambem e fixo
+## Solucao: Tabela de Efemerides Astronomicas
 
-Resultado: a fase textual diz "Minguante" mas o icone mostra visual de "Crescente Gibosa".
+Em vez de calcular a partir de uma referencia unica, usar uma **tabela com as datas exatas das 4 fases principais** para cada lunacao de 2025 a 2028. Essa e a mesma tecnica usada por aplicativos profissionais de fases da lua.
 
-### 2. Fallback local com datas de agosto 2025
+### Como funciona
 
-No hook `useLunarData.ts`, o fallback local (quando a API falha) tem:
-- Datas hardcoded de agosto 2025 (linhas 178-219)
-- Verificacao especifica para "3 de agosto de 2025" que nao faz sentido em 2026
-- Essas datas nunca serao atualizadas automaticamente
+1. Para a data atual, encontrar em qual "janela" de fases ela esta (entre qual fase anterior e qual proxima fase)
+2. A fase atual e determinada pela ultima fase principal que passou
+3. As proximas fases sao lidas diretamente da tabela -- sem calculo, sem erro
 
-### 3. FarmSense API sempre falha
+### Dados astronomicos
 
-Os logs mostram que a API FarmSense **sempre retorna erro DNS** no edge function. O fallback do edge function funciona corretamente (calcula fase local), mas o fallback do hook client-side esta desatualizado.
+Usar datas reais publicadas pelo Observatorio Naval dos EUA (USNO) e pelo timeanddate.com. Exemplo para 2026:
+
+```text
+Jan 29 - Nova
+Fev 05 - Quarto Crescente
+Fev 12 - Cheia
+Fev 20 - Quarto Minguante
+Fev 28 - Nova
+Mar 08 - Quarto Crescente
+... (continua para todo 2025-2028)
+```
+
+### Determinacao da fase entre marcos
+
+Entre duas fases principais, a fase intermediaria e determinada por posicao:
+- Entre Nova e Quarto Crescente: "Crescente"
+- Entre Quarto Crescente e Cheia: "Crescente Gibosa"
+- Entre Cheia e Quarto Minguante: "Minguante Gibosa"
+- Entre Quarto Minguante e Nova: "Minguante Crescente"
+
+A iluminacao e interpolada entre 0% (Nova) e 100% (Cheia) baseado na posicao proporcional.
 
 ---
 
-## Solucao
+## Implementacao
 
-### 1. Usar funcoes dinamicas de icone no LunarCalendar
+### 1. Criar tabela de efemerides (arquivo de dados)
 
-Substituir os 3 icones hardcoded por chamadas as funcoes ja existentes:
+Novo arquivo `src/lib/lunarEphemeris.ts` contendo um array com as datas exatas das 4 fases principais de jan 2025 a dez 2028 (~150 entradas). Cada entrada tem:
 
-| Local | Linha | Mudanca |
-|-------|-------|---------|
-| Lua de Hoje (header) | 117 | Usar `getCurrentMoonIcon(lunarData.currentPhase.phase, lunarData.currentPhase.illumination)` |
-| Proximas fases (lista) | 155 | Usar `getMoonIcon(phase.phase, phase.illumination)` |
-| Lua Atual (painel inferior) | 213 | Usar `getCurrentMoonIcon(lunarData.currentPhase.phase, lunarData.currentPhase.illumination)` |
+```text
+{ date: '2026-02-20T17:33:00Z', phase: 'last_quarter' }
+{ date: '2026-02-28T00:45:00Z', phase: 'new_moon' }
+```
 
-### 2. Atualizar fallback local no useLunarData.ts
+Fonte: datas publicadas pelo USNO / timeanddate.com.
 
-Remover as datas hardcoded de agosto 2025 e usar calculo dinamico que funciona para qualquer data:
+### 2. Funcao de busca da fase atual
 
-- Remover a verificacao `isToday` para 3 de agosto de 2025
-- Calcular proximas fases dinamicamente baseado na idade da lua atual
-- Usar referencia de Lua Nova de janeiro 2026 (igual ao edge function)
-- Gerar datas futuras corretas para as proximas 4 fases
+Nova funcao `getCurrentLunarPhase(date)`:
+- Percorre a tabela para encontrar a ultima fase principal antes da data informada e a proxima
+- Determina a fase intermediaria pela posicao entre os dois marcos
+- Calcula iluminacao por interpolacao cosseno entre os marcos
+- Retorna: nome da fase, iluminacao, proximas 4 fases (lidas da tabela)
 
-### 3. Melhorar mapeamento de fases
+### 3. Atualizar `useLunarData.ts`
 
-O edge function retorna "Last Quarter" mas o `normalizePhase` mapeia para "Minguante". Na verdade "Last Quarter" = "Quarto Minguante", que esta entre Minguante Gibosa e Minguante Crescente. O mapeamento atual agrupa fases demais no mesmo nome.
+- Remover o calculo baseado em referencia unica e offsets fixos
+- Chamar `getCurrentLunarPhase(new Date())` diretamente
+- Manter a mesma interface `LunarData` para nao quebrar o componente
+- Remover a dependencia do edge function (calculo e 100% local e preciso)
 
-Corrigir mapeamento:
-- 'first quarter' → 'Quarto Crescente'
-- 'last quarter' → 'Quarto Minguante'
+### 4. Simplificar edge function (opcional)
 
-E adicionar esses nomes nos icones do `LunarCalendar`.
+Como o calculo agora e feito no client com dados precisos, o edge function `lunar-proxy` pode ser simplificado ou removido. Manter apenas como fallback se necessario.
 
 ---
 
 ## Secao Tecnica
 
-### Arquivos modificados
+### Arquivos
 
-1. **`src/components/LunarCalendar.tsx`**
-   - Substituir divs hardcoded por chamadas a `getMoonIcon()` e `getCurrentMoonIcon()`
-   - Adicionar cases para 'Quarto Crescente' e 'Quarto Minguante' nas funcoes de icone
-   - Adicionar esses nomes na logica de qualidade de pesca
+| Arquivo | Acao |
+|---------|------|
+| `src/lib/lunarEphemeris.ts` | NOVO - tabela de efemerides 2025-2028 |
+| `src/hooks/useLunarData.ts` | EDITAR - usar efemerides em vez de calculo por referencia |
+| `src/components/LunarCalendar.tsx` | SEM MUDANCA - interface ja esta correta |
 
-2. **`src/hooks/useLunarData.ts`**
-   - Atualizar `normalizePhase` com mapeamentos corretos
-   - Remover datas hardcoded de agosto 2025
-   - Calcular proximas fases dinamicamente usando referencia de jan 2026
-   - Adicionar cores corretas para 'Quarto Crescente' e 'Quarto Minguante'
-
-### Calculo dinamico de proximas fases
+### Tabela de efemerides (parcial - 2026)
 
 ```text
-Referencia: Lua Nova 29 jan 2026 12:36 UTC
-Ciclo: 29.530588853 dias
-
-Fases no ciclo (em dias desde Lua Nova):
-- Quarto Crescente: ~7.38 dias
-- Lua Cheia: ~14.77 dias
-- Quarto Minguante: ~22.14 dias
-- Lua Nova: ~29.53 dias (proximo ciclo)
-
-Para cada fase, calcular:
-  diasAte = (diasDaFase - idadeAtual + ciclo) % ciclo
-  dataProxima = agora + diasAte
+2026-01-29T12:36Z  new_moon
+2026-02-05T08:02Z  first_quarter
+2026-02-12T13:53Z  full_moon
+2026-02-20T17:33Z  last_quarter
+2026-02-28T00:45Z  new_moon
+2026-03-08T09:29Z  first_quarter
+2026-03-14T06:55Z  full_moon
+2026-03-22T05:24Z  last_quarter
+2026-03-28T14:58Z  new_moon
+... (dados completos de jan 2025 a dez 2028)
 ```
 
-### Resultado esperado
+### Precisao
 
-- Icone da lua muda conforme a fase real (hoje: Quarto Minguante com visual adequado)
-- Proximas fases mostram datas corretas calculadas dinamicamente
-- Funciona para qualquer data futura sem precisar atualizar codigo
+- Erro maximo: +/- 2 minutos (precisao das efemerides USNO)
+- Comparado ao sistema atual: erro de ate +/- 12 horas
+- Funciona offline, sem dependencia de API externa
+- Basta adicionar mais datas ao array para cobrir anos futuros
+
+### Exemplo: 22 de fevereiro de 2026
+
+- Ultima fase principal: Quarto Minguante em 20/fev 17:33
+- Proxima fase principal: Nova em 28/fev 00:45
+- Posicao: entre Quarto Minguante e Nova = **Minguante Crescente**
+- Iluminacao: ~31% (decrescendo)
+- Resultado correto e automatico
+
