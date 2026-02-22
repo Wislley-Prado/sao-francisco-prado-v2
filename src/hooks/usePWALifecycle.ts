@@ -13,8 +13,6 @@ interface PWALifecycleState {
   isInstallable: boolean;
   isInstalled: boolean;
   isOnline: boolean;
-  hasUpdate: boolean;
-  isUpdateReady: boolean;
   isIOS: boolean;
   isAndroid: boolean;
   canInstallNatively: boolean;
@@ -36,8 +34,6 @@ export const usePWALifecycle = () => {
     isInstallable: false,
     isInstalled: false,
     isOnline: navigator.onLine,
-    hasUpdate: false,
-    isUpdateReady: false,
     isIOS,
     isAndroid,
     canInstallNatively: !isIOS, // iOS doesn't support native install prompt
@@ -90,53 +86,17 @@ export const usePWALifecycle = () => {
       setState(prev => ({ ...prev, isOnline: false }));
     };
 
-    // Listen for service worker updates
-    const handleSWUpdate = () => {
-      console.log('🔄 PWA: Service Worker update available');
-      setState(prev => ({ ...prev, hasUpdate: true }));
-    };
-
     // Add event listeners
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     window.addEventListener('appinstalled', handleAppInstalled);
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
-    // Service Worker registration and update detection
-    if ('serviceWorker' in navigator) {
-      console.log('⚙️ PWA: Service Worker supported');
-      navigator.serviceWorker.addEventListener('controllerchange', handleSWUpdate);
-      
-      // Check registration status
-      navigator.serviceWorker.getRegistration().then(registration => {
-        if (registration) {
-          console.log('✅ PWA: Service Worker registered', registration);
-        } else {
-          console.log('❌ PWA: Service Worker not registered');
-        }
-      });
-      
-      // Check for updates periodically
-      setInterval(() => {
-        navigator.serviceWorker.getRegistration().then(registration => {
-          if (registration) {
-            registration.update();
-          }
-        });
-      }, 60000); // Check every minute
-    } else {
-      console.log('❌ PWA: Service Worker not supported');
-    }
-
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.removeEventListener('appinstalled', handleAppInstalled);
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
-      
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.removeEventListener('controllerchange', handleSWUpdate);
-      }
     };
   }, []);
 
@@ -176,21 +136,9 @@ export const usePWALifecycle = () => {
     }
   };
 
-  const reloadApp = () => {
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistration().then(registration => {
-        if (registration?.waiting) {
-          registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-          window.location.reload();
-        }
-      });
-    }
-  };
-
   return {
     ...state,
     installApp,
-    reloadApp,
     canInstall: !!deferredPrompt,
   };
 };
