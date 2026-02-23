@@ -984,6 +984,7 @@ export type Database = {
           copyright_text: string | null
           created_at: string
           custom_head_scripts: string | null
+          dam_webhook_pausado: boolean
           dam_webhook_url: string | null
           email_contato: string | null
           facebook_pixel: string | null
@@ -1014,6 +1015,7 @@ export type Database = {
           copyright_text?: string | null
           created_at?: string
           custom_head_scripts?: string | null
+          dam_webhook_pausado?: boolean
           dam_webhook_url?: string | null
           email_contato?: string | null
           facebook_pixel?: string | null
@@ -1044,6 +1046,7 @@ export type Database = {
           copyright_text?: string | null
           created_at?: string
           custom_head_scripts?: string | null
+          dam_webhook_pausado?: boolean
           dam_webhook_url?: string | null
           email_contato?: string | null
           facebook_pixel?: string | null
