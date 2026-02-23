@@ -1,57 +1,41 @@
 
 
-# Formulario Manual de Dados da Represa no Admin
+# Botao Pausar/Retomar Webhook da Represa
 
 ## Problema
-O site da CEMIG mudou e o webhook automatizado (n8n) ainda nao foi atualizado. Voce precisa de uma forma de inserir manualmente os dados da represa (nivel, volume, afluencia, defluencia) pelo painel admin ate que a automacao seja corrigida.
+O cron job roda 4x ao dia e chama o webhook. Como o site da CEMIG mudou, o webhook retorna dados vazios ou errados, sobrescrevendo os dados manuais que voce inseriu.
 
 ## Solucao
-Adicionar um formulario de entrada manual na pagina de Configuracoes do admin, logo abaixo da secao existente "Dados da Represa no Banco". O webhook continua configurado e funcionando quando voce arrumar a automacao.
+Adicionar um campo `dam_webhook_pausado` na tabela `site_settings` e um botao de Pausar/Retomar no admin. Quando pausado, a edge function `dam-data-proxy` verifica esse campo e retorna sem fazer nada, preservando os dados manuais.
 
-## O que sera adicionado
+## Como vai funcionar
 
-Um formulario com os seguintes campos:
-- **Nivel Atual** (ex: 570,02)
-- **Volume Util %** (ex: 83,37)
-- **Afluencia m3/s** (ex: 1121,93)
-- **Defluencia m3/s** (ex: 246,37)
-- **Data da Leitura** (ex: 22/02/2026)
+1. Voce insere os dados manuais pelo formulario que ja existe
+2. Clica em **"Pausar Webhook"** - o botao fica vermelho mostrando que esta pausado
+3. O cron continua rodando nos horarios normais, mas a edge function ve que esta pausado e nao faz nada
+4. Seus dados manuais ficam preservados
+5. Quando arrumar a automacao, clica em **"Retomar Webhook"** e tudo volta ao normal
 
-Ao clicar em "Salvar Dados Manuais", os dados serao gravados diretamente na tabela `dam_data` no mesmo formato que o webhook usa, mantendo compatibilidade total.
+## O que sera alterado
+
+| Arquivo | O que muda |
+|---------|-----------|
+| Migracao SQL | Adiciona coluna `dam_webhook_pausado` na tabela `site_settings` |
+| `supabase/functions/dam-data-proxy/index.ts` | Verifica se webhook esta pausado antes de chamar |
+| `src/pages/admin/Configuracoes.tsx` | Botao Pausar/Retomar com estado visual claro |
 
 ## Detalhes Tecnicos
 
-### Arquivo: `src/pages/admin/Configuracoes.tsx`
+### 1. Migracao SQL
+Adicionar coluna `dam_webhook_pausado` (boolean, default false) na tabela `site_settings`.
 
-Adicionar dentro da secao "Integracoes Externas", apos o botao "Atualizar Agora":
+### 2. Edge Function `dam-data-proxy`
+No inicio da funcao, apos criar o cliente Supabase, buscar `dam_webhook_pausado` do `site_settings`. Se estiver `true`, retornar imediatamente com status 200 e mensagem `{"pausado": true, "message": "Webhook pausado pelo admin"}` sem chamar o webhook nem sobrescrever dados.
 
-1. Novo estado para os campos do formulario manual
-2. Formulario com inputs para nivel, volume, afluencia e defluencia
-3. Funcao `handleManualDamData` que:
-   - Monta o array no formato `NewApiResponseItem` (tipo `tempo_real`)
-   - Faz upsert na tabela `dam_data` com id=1
-   - Exibe toast de sucesso/erro
-4. Alerta informando que dados manuais serao substituidos quando o webhook voltar a funcionar
-
-### Formato dos dados salvos
-Os dados manuais serao salvos no mesmo formato JSON que o webhook usa:
-```text
-[{
-  tipo: "tempo_real",
-  data_leitura: "22/02/2026",
-  afluencia: "1121,93",
-  nivel_inicial: "570,02",
-  volume_inicial: "83,37",
-  defluencia: "246,37",
-  nivel_atual: "570,02",
-  volume_percentual: "83,37"
-}]
-```
-
-Isso garante que o `useDamData.ts` processe os dados manuais exatamente como processaria dados do webhook, sem nenhuma alteracao no frontend publico.
-
-### Nenhum outro arquivo precisa ser alterado
-- O hook `useDamData.ts` ja le da tabela `dam_data` e processa o formato
-- A edge function `dam-data-proxy` continua funcionando normalmente
-- Quando o webhook for corrigido, os dados automaticos simplesmente substituem os manuais
+### 3. Configuracoes.tsx
+- Novo estado `webhookPausado` (boolean)
+- Carregar o valor do banco ao abrir a pagina
+- Botao toggle que alterna entre "Pausar Webhook" (verde) e "Retomar Webhook" (vermelho quando pausado)
+- Alerta visual claro quando pausado: "Webhook PAUSADO - dados manuais estao protegidos"
+- Ao clicar, faz update no `site_settings` e exibe toast de confirmacao
 
