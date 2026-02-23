@@ -22,18 +22,30 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Buscar URL do webhook das configurações do site
-    let webhookUrl = DEFAULT_WEBHOOK_URL;
-
+    // Buscar configurações do site (webhook URL e flag de pausa)
     const { data: settings, error: settingsError } = await supabase
       .from('site_settings')
-      .select('dam_webhook_url')
+      .select('dam_webhook_url, dam_webhook_pausado')
       .limit(1)
       .single();
 
     if (settingsError) {
-      console.warn('⚠️ [PROXY] Erro ao buscar configurações, usando URL padrão:', settingsError.message);
-    } else if (settings?.dam_webhook_url) {
+      console.warn('⚠️ [PROXY] Erro ao buscar configurações:', settingsError.message);
+    }
+
+    // Verificar se o webhook está pausado
+    if (settings?.dam_webhook_pausado === true) {
+      console.log('⏸️ [PROXY] Webhook PAUSADO pelo admin. Dados manuais preservados.');
+      return new Response(JSON.stringify({
+        pausado: true,
+        message: 'Webhook pausado pelo admin. Dados manuais estão protegidos.',
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    let webhookUrl = DEFAULT_WEBHOOK_URL;
+    if (settings?.dam_webhook_url) {
       webhookUrl = settings.dam_webhook_url;
       console.log('📌 [PROXY] URL do webhook carregada do banco:', webhookUrl);
     } else {

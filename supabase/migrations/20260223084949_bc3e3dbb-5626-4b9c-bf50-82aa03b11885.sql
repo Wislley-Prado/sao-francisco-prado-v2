@@ -1,0 +1,1 @@
+ALTER TABLE public.site_settings ADD COLUMN dam_webhook_pausado boolean NOT NULL DEFAULT false;

@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Save, Code2, TrendingUp, Webhook, AlertCircle, RefreshCw, Database, Clock, User, Share2, Phone, Mail, Facebook, Instagram, Youtube, Calendar, FileText, Link2, Trash2, HardDrive } from 'lucide-react';
+import { Loader2, Save, Code2, TrendingUp, Webhook, AlertCircle, RefreshCw, Database, Clock, User, Share2, Phone, Mail, Facebook, Instagram, Youtube, Calendar, FileText, Link2, Trash2, HardDrive, Pause, Play } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -19,6 +19,8 @@ const Configuracoes = () => {
   const [saving, setSaving] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [savingManual, setSavingManual] = useState(false);
+  const [webhookPausado, setWebhookPausado] = useState(false);
+  const [togglingPause, setTogglingPause] = useState(false);
   const [lastUpdate, setLastUpdate] = useState<string | null>(null);
   const [manualDam, setManualDam] = useState({
     nivel: '',
@@ -64,6 +66,7 @@ const Configuracoes = () => {
       if (error) throw error;
 
       if (data) {
+        setWebhookPausado((data as any).dam_webhook_pausado === true);
         setSettings({
           facebook_pixel: data.facebook_pixel || '',
           google_analytics: data.google_analytics || '',
@@ -71,16 +74,13 @@ const Configuracoes = () => {
           custom_head_scripts: data.custom_head_scripts || '',
           dam_webhook_url: (data as any).dam_webhook_url || '',
           autor_avatar_url: (data as any).autor_avatar_url || '',
-          // Redes sociais
           facebook_url: (data as any).facebook_url || '',
           instagram_url: (data as any).instagram_url || '',
           youtube_url: (data as any).youtube_url || '',
           tiktok_url: (data as any).tiktok_url || '',
           twitter_url: (data as any).twitter_url || '',
-          // Contato
           telefone_contato: (data as any).telefone_contato || '',
           email_contato: (data as any).email_contato || '',
-          // Footer e Header
           copyright_text: (data as any).copyright_text || '',
           reserva_button_link: (data as any).reserva_button_link || ''
         });
@@ -106,6 +106,27 @@ const Configuracoes = () => {
       }
     } catch (error) {
       console.log('Sem dados da represa ainda');
+    }
+  };
+
+  const handleToggleWebhookPause = async () => {
+    setTogglingPause(true);
+    try {
+      const newValue = !webhookPausado;
+      const { error } = await supabase
+        .from('site_settings')
+        .update({ dam_webhook_pausado: newValue } as any)
+        .eq('id', SETTINGS_ID);
+
+      if (error) throw error;
+
+      setWebhookPausado(newValue);
+      toast.success(newValue ? 'Webhook PAUSADO! Dados manuais protegidos.' : 'Webhook RETOMADO! Automação ativa.');
+    } catch (error) {
+      console.error('Erro ao alterar pausa do webhook:', error);
+      toast.error('Erro ao alterar estado do webhook');
+    } finally {
+      setTogglingPause(false);
     }
   };
 
@@ -308,6 +329,57 @@ const Configuracoes = () => {
               </AlertDescription>
             </Alert>
 
+            {/* Controle de Pausa do Webhook */}
+            <div className="mt-6 pt-4 border-t border-border">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  {webhookPausado ? (
+                    <Pause className="w-4 h-4 text-destructive" />
+                  ) : (
+                    <Play className="w-4 h-4 text-green-600" />
+                  )}
+                  <span className="font-medium text-sm">Controle do Webhook</span>
+                </div>
+                <Badge variant={webhookPausado ? 'destructive' : 'default'} className="text-xs">
+                  {webhookPausado ? '⏸️ PAUSADO' : '▶️ ATIVO'}
+                </Badge>
+              </div>
+
+              {webhookPausado && (
+                <Alert className="mb-4 border-destructive">
+                  <Pause className="h-4 w-4 text-destructive" />
+                  <AlertDescription className="text-xs text-destructive">
+                    <strong>Webhook PAUSADO</strong> — O cron job continua rodando mas NÃO sobrescreve os dados manuais.
+                    Clique em "Retomar Webhook" quando a automação estiver corrigida.
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              <Button
+                variant={webhookPausado ? 'default' : 'destructive'}
+                onClick={handleToggleWebhookPause}
+                disabled={togglingPause}
+                className="flex items-center gap-2"
+              >
+                {togglingPause ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Alterando...
+                  </>
+                ) : webhookPausado ? (
+                  <>
+                    <Play className="w-4 h-4" />
+                    Retomar Webhook
+                  </>
+                ) : (
+                  <>
+                    <Pause className="w-4 h-4" />
+                    Pausar Webhook
+                  </>
+                )}
+              </Button>
+            </div>
+
             {/* Seção de Dados da Represa */}
             <div className="mt-6 pt-4 border-t border-border">
               <div className="flex items-center justify-between mb-4">
@@ -327,7 +399,7 @@ const Configuracoes = () => {
                 <Button 
                   variant="outline" 
                   onClick={handleRefreshDamData}
-                  disabled={refreshing}
+                  disabled={refreshing || webhookPausado}
                   className="flex items-center gap-2"
                 >
                   {refreshing ? (
@@ -343,7 +415,7 @@ const Configuracoes = () => {
                   )}
                 </Button>
                 <span className="text-xs text-muted-foreground">
-                  Força uma atualização imediata dos dados da represa
+                  {webhookPausado ? 'Desabilitado enquanto o webhook está pausado' : 'Força uma atualização imediata dos dados da represa'}
                 </span>
               </div>
 
