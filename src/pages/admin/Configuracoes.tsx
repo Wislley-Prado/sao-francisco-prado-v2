@@ -47,8 +47,7 @@ const Configuracoes = () => {
     email_contato: '',
     // Footer e Header
     copyright_text: '',
-    reserva_button_link: '',
-    reserva_button_text: ''
+    reserva_button_link: ''
   });
 
   useEffect(() => {
@@ -83,8 +82,7 @@ const Configuracoes = () => {
           telefone_contato: (data as any).telefone_contato || '',
           email_contato: (data as any).email_contato || '',
           copyright_text: (data as any).copyright_text || '',
-          reserva_button_link: (data as any).reserva_button_link || '',
-          reserva_button_text: (data as any).reserva_button_text || ''
+          reserva_button_link: (data as any).reserva_button_link || ''
         });
       }
     } catch (error) {
@@ -716,25 +714,9 @@ const Configuracoes = () => {
               <Separator />
 
               <div className="space-y-2">
-                <Label htmlFor="reserva_button_text" className="flex items-center gap-2">
-                  <FileText className="w-4 h-4" />
-                  Texto do Botão (Cabeçalho)
-                </Label>
-                <Input
-                  id="reserva_button_text"
-                  placeholder="Ex: Reservar, Agende Agora, Fale Conosco"
-                  value={settings.reserva_button_text}
-                  onChange={(e) => setSettings({ ...settings, reserva_button_text: e.target.value })}
-                />
-                <p className="text-xs text-muted-foreground">
-                  Texto exibido no botão do cabeçalho do site. Padrão: "Reservar"
-                </p>
-              </div>
-
-              <div className="space-y-2">
                 <Label htmlFor="reserva_button_link" className="flex items-center gap-2">
                   <Link2 className="w-4 h-4" />
-                  Link do Botão (Cabeçalho)
+                  Link do Botão "Reservar" (Cabeçalho)
                 </Label>
                 <Input
                   id="reserva_button_link"
@@ -743,7 +725,7 @@ const Configuracoes = () => {
                   onChange={(e) => setSettings({ ...settings, reserva_button_link: e.target.value })}
                 />
                 <p className="text-xs text-muted-foreground">
-                  URL de destino ao clicar no botão. Pode ser WhatsApp, formulário, etc.
+                  URL de destino ao clicar no botão "Reservar" no cabeçalho. Pode ser WhatsApp, formulário, etc.
                 </p>
               </div>
             </div>

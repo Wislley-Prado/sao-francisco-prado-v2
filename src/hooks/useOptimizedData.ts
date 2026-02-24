@@ -142,7 +142,6 @@ export interface SiteSettings {
   // Footer e Header
   copyright_text?: string;
   reserva_button_link?: string;
-  reserva_button_text?: string;
 }
 
 export interface Depoimento {

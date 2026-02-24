@@ -76,7 +76,7 @@ const Header = () => {
               }}
             >
               <Calendar className="h-4 w-4 mr-2" />
-              {settings?.reserva_button_text || 'Reservar'}
+              Reservar
             </Button>
           </div>
 
@@ -117,7 +117,7 @@ const Header = () => {
                   }}
                 >
                   <Calendar className="h-4 w-4 mr-2" />
-                  {settings?.reserva_button_text || 'Reservar'}
+                  Reservar
                 </Button>
               </div>
             </nav>
