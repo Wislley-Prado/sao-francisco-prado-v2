@@ -14,6 +14,29 @@ const HeroSection = () => {
   const { settings } = useVideoSettings();
   const [showVideo, setShowVideo] = useState(false);
 
+  const scrollToSection = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
+    // Element may not be in DOM yet (lazy loaded) — scroll down to trigger Suspense, then retry
+    window.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
+    const retries = 10;
+    let attempt = 0;
+    const interval = setInterval(() => {
+      const target = document.getElementById(id);
+      if (target) {
+        clearInterval(interval);
+        target.scrollIntoView({ behavior: 'smooth' });
+      } else if (++attempt >= retries) {
+        clearInterval(interval);
+      } else {
+        window.scrollBy({ top: window.innerHeight / 2, behavior: 'smooth' });
+      }
+    }, 400);
+  };
+
   const videoId = settings?.youtube_video_url 
     ? extractYouTubeId(settings.youtube_video_url)
     : 'cN_BspPR2gg';
@@ -53,6 +76,7 @@ const HeroSection = () => {
 
             <div className="grid grid-cols-3 gap-3 sm:gap-4 pt-6 sm:pt-8">
               <button
+                type="button"
                 onClick={() => navigate('/live')}
                 className="text-center group cursor-pointer"
                 aria-label="Ir para Transmissão Ao Vivo"
@@ -63,7 +87,8 @@ const HeroSection = () => {
                 <p className="text-xs sm:text-sm font-medium group-hover:text-sand-beige transition-colors">Transmissão Ao Vivo</p>
               </button>
               <button
-                onClick={() => document.getElementById('calendario-lunar')?.scrollIntoView({ behavior: 'smooth' })}
+                type="button"
+                onClick={() => scrollToSection('calendario-lunar')}
                 className="text-center group cursor-pointer"
                 aria-label="Ver Calendário Lunar"
               >
@@ -73,7 +98,8 @@ const HeroSection = () => {
                 <p className="text-xs sm:text-sm font-medium group-hover:text-sand-beige transition-colors">Calendário Lunar</p>
               </button>
               <button
-                onClick={() => document.getElementById('represa')?.scrollIntoView({ behavior: 'smooth' })}
+                type="button"
+                onClick={() => scrollToSection('represa')}
                 className="text-center group cursor-pointer"
                 aria-label="Ver Dados em Tempo Real"
               >
