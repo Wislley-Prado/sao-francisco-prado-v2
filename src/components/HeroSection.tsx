@@ -52,24 +52,36 @@ const HeroSection = () => {
             </div>
 
             <div className="grid grid-cols-3 gap-3 sm:gap-4 pt-6 sm:pt-8">
-              <div className="text-center">
-                <div className="bg-white bg-opacity-20 rounded-full p-2 sm:p-3 w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-2 flex items-center justify-center">
+              <button
+                onClick={() => navigate('/live')}
+                className="text-center group cursor-pointer"
+                aria-label="Ir para Transmissão Ao Vivo"
+              >
+                <div className="bg-white bg-opacity-20 rounded-full p-2 sm:p-3 w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-2 flex items-center justify-center group-hover:scale-110 group-hover:bg-opacity-30 transition-all duration-300">
                   <Waves className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
                 </div>
-                <p className="text-xs sm:text-sm font-medium">Transmissão Ao Vivo</p>
-              </div>
-              <div className="text-center">
-                <div className="bg-white bg-opacity-20 rounded-full p-2 sm:p-3 w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-2 flex items-center justify-center">
+                <p className="text-xs sm:text-sm font-medium group-hover:text-sand-beige transition-colors">Transmissão Ao Vivo</p>
+              </button>
+              <button
+                onClick={() => document.getElementById('calendario-lunar')?.scrollIntoView({ behavior: 'smooth' })}
+                className="text-center group cursor-pointer"
+                aria-label="Ver Calendário Lunar"
+              >
+                <div className="bg-white bg-opacity-20 rounded-full p-2 sm:p-3 w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-2 flex items-center justify-center group-hover:scale-110 group-hover:bg-opacity-30 transition-all duration-300">
                   <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
                 </div>
-                <p className="text-xs sm:text-sm font-medium">Calendário Lunar</p>
-              </div>
-              <div className="text-center">
-                <div className="bg-white bg-opacity-20 rounded-full p-2 sm:p-3 w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-2 flex items-center justify-center">
+                <p className="text-xs sm:text-sm font-medium group-hover:text-sand-beige transition-colors">Calendário Lunar</p>
+              </button>
+              <button
+                onClick={() => document.getElementById('represa')?.scrollIntoView({ behavior: 'smooth' })}
+                className="text-center group cursor-pointer"
+                aria-label="Ver Dados em Tempo Real"
+              >
+                <div className="bg-white bg-opacity-20 rounded-full p-2 sm:p-3 w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-2 flex items-center justify-center group-hover:scale-110 group-hover:bg-opacity-30 transition-all duration-300">
                   <Play className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
                 </div>
-                <p className="text-xs sm:text-sm font-medium">Dados em Tempo Real</p>
-              </div>
+                <p className="text-xs sm:text-sm font-medium group-hover:text-sand-beige transition-colors">Dados em Tempo Real</p>
+              </button>
             </div>
           </div>
 
