@@ -1,41 +1,61 @@
 
 
-# Botao Pausar/Retomar Webhook da Represa
+# Otimizacao de Performance do Site
 
-## Problema
-O cron job roda 4x ao dia e chama o webhook. Como o site da CEMIG mudou, o webhook retorna dados vazios ou errados, sobrescrevendo os dados manuais que voce inseriu.
+## Problemas Encontrados
 
-## Solucao
-Adicionar um campo `dam_webhook_pausado` na tabela `site_settings` e um botao de Pausar/Retomar no admin. Quando pausado, a edge function `dam-data-proxy` verifica esse campo e retorna sem fazer nada, preservando os dados manuais.
+| Problema | Impacto | Metrica |
+|----------|---------|---------|
+| Todas as 30+ paginas admin importadas eagerly no App.tsx | Bundle inicial enorme | 250 scripts, 9.7s load |
+| jspdf (165KB) carregado na homepage | Bundle desnecessario | +165KB |
+| DamInfo.tsx tem ~15 console.log a cada render | CPU desperdicada, DOM poluido | Script duration 1.9s |
+| YouTube iframe no HeroSection bloqueia rendering | FCP lento | FCP 6.6s |
+| 16,636 DOM nodes | Layout/style recalc lentos | 190ms layout |
+| recharts (219KB) carregado na homepage via DamInfo | Bundle pesado | +219KB |
 
-## Como vai funcionar
+## Solucao - 5 Mudancas Principais
 
-1. Voce insere os dados manuais pelo formulario que ja existe
-2. Clica em **"Pausar Webhook"** - o botao fica vermelho mostrando que esta pausado
-3. O cron continua rodando nos horarios normais, mas a edge function ve que esta pausado e nao faz nada
-4. Seus dados manuais ficam preservados
-5. Quando arrumar a automacao, clica em **"Retomar Webhook"** e tudo volta ao normal
+### 1. Lazy Load de TODAS as rotas admin no App.tsx
+Atualmente todas as 30+ paginas admin sao importadas com `import` estatico. Trocar todas por `React.lazy()`. Isso remove centenas de KB do bundle inicial que so usuarios comuns precisam.
 
-## O que sera alterado
+```text
+Antes: import AdminDashboard from "./pages/admin/Dashboard"
+Depois: const AdminDashboard = React.lazy(() => import("./pages/admin/Dashboard"))
+```
 
-| Arquivo | O que muda |
-|---------|-----------|
-| Migracao SQL | Adiciona coluna `dam_webhook_pausado` na tabela `site_settings` |
-| `supabase/functions/dam-data-proxy/index.ts` | Verifica se webhook esta pausado antes de chamar |
-| `src/pages/admin/Configuracoes.tsx` | Botao Pausar/Retomar com estado visual claro |
+Aplicar para TODAS as rotas admin e tambem para paginas publicas secundarias (Blog, BlogPost, LiveStream, PackageVip, etc).
 
-## Detalhes Tecnicos
+### 2. Remover console.log de producao no DamInfo.tsx
+O componente DamInfo tem ~15 `console.log` que rodam a cada render (sem dependencia no useEffect). Remover todos ou envolver em `if (import.meta.env.DEV)`. O mesmo no DamDashboard.tsx.
 
-### 1. Migracao SQL
-Adicionar coluna `dam_webhook_pausado` (boolean, default false) na tabela `site_settings`.
+### 3. Lazy load do YouTube iframe no HeroSection
+Substituir o iframe do YouTube por uma imagem de thumbnail clicavel. O iframe so carrega quando o usuario clicar play. Isso elimina o bloqueio de rendering do iframe.
 
-### 2. Edge Function `dam-data-proxy`
-No inicio da funcao, apos criar o cliente Supabase, buscar `dam_webhook_pausado` do `site_settings`. Se estiver `true`, retornar imediatamente com status 200 e mensagem `{"pausado": true, "message": "Webhook pausado pelo admin"}` sem chamar o webhook nem sobrescrever dados.
+```text
+Antes: <iframe src="youtube.com/embed/..." />
+Depois: <img src="youtube thumbnail" onClick={() => setShowVideo(true)} />
+        {showVideo && <iframe ... />}
+```
 
-### 3. Configuracoes.tsx
-- Novo estado `webhookPausado` (boolean)
-- Carregar o valor do banco ao abrir a pagina
-- Botao toggle que alterna entre "Pausar Webhook" (verde) e "Retomar Webhook" (vermelho quando pausado)
-- Alerta visual claro quando pausado: "Webhook PAUSADO - dados manuais estao protegidos"
-- Ao clicar, faz update no `site_settings` e exibe toast de confirmacao
+### 4. Lazy load de paginas publicas secundarias
+Paginas como PackageVip, PackageLuxo, PackageDiamante, PacoteDetalhes, RanchoDetalhes, PrivacyPolicy, BlogPost, LiveStream nao precisam estar no bundle inicial. Aplicar React.lazy().
+
+### 5. Remover console.log do App.tsx
+A linha `console.log('App: Starting with PWA support')` roda no corpo do componente (nao em useEffect), executando a cada render.
+
+## Resultado Esperado
+
+- Bundle inicial reduzido em ~60-70% (removendo admin + libs pesadas)
+- FCP de 6.6s para ~2-3s
+- DOM nodes reduzidos significativamente
+- Script duration reduzida pela metade
+
+## Arquivos Alterados
+
+| Arquivo | Mudanca |
+|---------|---------|
+| `src/App.tsx` | React.lazy para todas as rotas admin e paginas secundarias |
+| `src/components/DamInfo.tsx` | Remover console.log de producao |
+| `src/components/dam/DamDashboard.tsx` | Remover console.log de producao |
+| `src/components/HeroSection.tsx` | YouTube facade (thumbnail + click to load) |
 
