@@ -1,33 +1,36 @@
 
 
-# Tornar os 3 Icones do Hero Clicaveis
+# Botão "Reservar" Customizável pelo Admin
 
-## Problema
-Os tres icones no HeroSection (Transmissao Ao Vivo, Calendario Lunar, Dados em Tempo Real) sao apenas elementos visuais estaticos — nao tem `onClick` nem link. O usuario espera que sejam interativos.
+## Situação Atual
+- O link do botão "Reservar" já é configurável em **Configurações** (`reserva_button_link`)
+- O **texto** do botão está fixo como "Reservar" no código do Header
+- Você quer poder mudar tanto o **nome** quanto o **link** pelo painel admin
 
-## Solucao
+## O Que Será Feito
 
-Transformar cada icone em um botao clicavel com destino logico:
+### 1. Novo campo no banco de dados
+Adicionar coluna `reserva_button_text` na tabela `site_settings` com valor padrão "Reservar".
 
-| Icone | Acao |
-|-------|------|
-| Transmissao Ao Vivo | `navigate('/live')` |
-| Calendario Lunar | Scroll suave ate a secao `#calendario-lunar` na homepage |
-| Dados em Tempo Real | Scroll suave ate a secao `#dados-represa` na homepage |
+### 2. Painel Admin (Configurações)
+Adicionar um campo de texto **"Texto do Botão Reservar"** logo acima do campo de link que já existe, na seção "Footer e Header".
 
-## Mudancas
+### 3. Header do site
+O botão passará a usar o texto vindo do banco em vez do texto fixo "Reservar". Se não houver texto configurado, mantém "Reservar" como padrão.
 
-### `src/components/HeroSection.tsx`
-- Envolver cada icone em um `<button>` ou aplicar `onClick` + `cursor-pointer` nos divs existentes
-- Para "Transmissao Ao Vivo": usar `navigate('/live')`
-- Para "Calendario Lunar" e "Dados em Tempo Real": usar `document.getElementById('id')?.scrollIntoView({ behavior: 'smooth' })`
-- Adicionar efeito hover visual (scale ou brightness) para indicar que sao clicaveis
+## Arquivos Alterados
 
-### Verificacao de IDs das secoes
-Confirmar que os componentes `LunarCalendar` e `DamInfo` possuem os IDs corretos para o scroll funcionar. Se nao tiverem, adicionar `id="calendario-lunar"` e `id="dados-represa"` nos wrappers dessas secoes.
+| Arquivo | Mudança |
+|---------|---------|
+| Nova migration SQL | Adicionar coluna `reserva_button_text` |
+| `src/pages/admin/Configuracoes.tsx` | Novo campo input para o texto do botão |
+| `src/components/Header.tsx` | Usar `settings?.reserva_button_text` no botão |
+| `src/hooks/useOptimizedData.ts` | Incluir `reserva_button_text` no tipo `SiteSettings` |
 
-## Detalhes Tecnicos
-- Nenhuma dependencia nova
-- Apenas 1-2 arquivos alterados
-- Os IDs das secoes-alvo precisam existir nos componentes `LunarCalendar` e `DamInfo` (ou no `Index.tsx` envolvendo-os)
+## Resultado
+No admin, você terá dois campos lado a lado:
+- **Texto do Botão**: ex: "Agende Agora", "Fale Conosco", "Reserve Já"
+- **Link do Botão**: ex: `https://wa.me/5538988320108`
+
+O botão no cabeçalho do site mudará automaticamente.
 
