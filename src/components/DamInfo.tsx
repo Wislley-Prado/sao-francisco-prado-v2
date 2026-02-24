@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
@@ -16,55 +16,12 @@ import DamHistoryChart from './dam/DamHistoryChart';
 const DamInfo = () => {
   const { data: damData, isLoading, error, refetch, dataUpdatedAt } = useDamData();
   const renderCount = useRef(0);
-  const lastDataRef = useRef(damData);
-
-  // Incrementar contador de renders para debug
   renderCount.current += 1;
 
-  useEffect(() => {
-    console.log(`🎨 [UI] Render #${renderCount.current} - DamInfo componente renderizado`);
-    console.log('🎨 [UI] Estado atual:', {
-      damData,
-      isLoading,
-      error: error instanceof Error ? error.message : 'Unknown error',
-      dataUpdatedAt: dataUpdatedAt ? new Date(dataUpdatedAt).toISOString() : 'N/A'
-    });
-  });
-
-  // Detectar mudanças nos dados
-  useEffect(() => {
-    if (lastDataRef.current !== damData) {
-      console.log('🔄 [UI] DADOS MUDARAM!');
-      console.log('🔄 [UI] Dados anteriores:', lastDataRef.current);
-      console.log('🔄 [UI] Novos dados:', damData);
-      lastDataRef.current = damData;
-    }
-  }, [damData]);
-
-  // Log quando o componente monta/desmonta
-  useEffect(() => {
-    console.log('🏗️ [UI] DamInfo componente montado');
-    return () => {
-      console.log('🏗️ [UI] DamInfo componente desmontado');
-    };
-  }, []);
-
-  console.log('🎯 [UI] Dados atuais no render:', damData);
-  console.log('🎯 [UI] Loading state:', isLoading);
-  console.log('🎯 [UI] Error state:', error);
-
-  // Valores calculados corretamente
   const nivelAtualMetros = damData?.nivel_atual ? parseFloat(damData.nivel_atual) : 569.8;
   const volumePercentual = damData?.volume_util_percentual ? parseFloat(damData.volume_util_percentual) : 82;
   const afluencia = damData?.afluencia || '--';
   const defluencia = damData?.defluencia || '--';
-
-  console.log('📊 [UI] Valores calculados:', {
-    nivelAtualMetros,
-    volumePercentual,
-    afluencia,
-    defluencia
-  });
 
   const levelStatus = getStatusFromLevel(volumePercentual);
 
@@ -100,11 +57,9 @@ const DamInfo = () => {
   ];
 
   const handleRefetch = () => {
-    console.log('🔄 [UI] Botão de refresh clicado - forçando refetch');
     refetch();
   };
 
-  // Create proper Error objects for components that expect them
   const errorForComponents = error instanceof Error ? error : new Error('Unknown error occurred');
 
   return (
@@ -117,7 +72,6 @@ const DamInfo = () => {
           refetch={handleRefetch}
         />
 
-        {/* Dashboard Interativo */}
         <DamDashboard
           damData={damData}
           isLoading={isLoading}
@@ -127,13 +81,11 @@ const DamInfo = () => {
           onRefresh={handleRefetch}
         />
 
-        {/* Gráfico de Evolução Histórica */}
         <div className="mb-8">
           <DamHistoryChart damData={damData} />
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Main Info Card */}
           <div className="lg:col-span-2">
             <Card className="shadow-xl">
               <CardHeader className="bg-rio-blue text-white">
@@ -155,7 +107,6 @@ const DamInfo = () => {
                 </p>
               </CardHeader>
               <CardContent className="p-6">
-                {/* Main Level Display - CORRIGIDO */}
                 <div className="mb-8">
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-2xl font-bold text-gray-900">
@@ -180,9 +131,7 @@ const DamInfo = () => {
             </Card>
           </div>
 
-          {/* Side Info - Removido os cartões antigos */}
           <div className="space-y-6">
-            {/* Espaço reservado para futuros componentes se necessário */}
           </div>
         </div>
       </div>

@@ -1,3 +1,4 @@
+import React, { Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,65 +15,73 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { PrivateRoute } from "@/components/admin/PrivateRoute";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import Index from "./pages/Index";
-import LiveStream from "./pages/LiveStream";
-import RanchoDetalhes from "./pages/RanchoDetalhes";
-import PackageVip from "./pages/PackageVip";
-import PackageLuxo from "./pages/PackageLuxo";
-import PackageDiamante from "./pages/PackageDiamante";
-import PackagesIndex from "./pages/PackagesIndex";
-import PackagesIndexDynamic from "./pages/PackagesIndexDynamic";
-import PacoteDetalhes from "./pages/PacoteDetalhes";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import Blog from "./pages/Blog";
-import BlogPost from "./pages/BlogPost";
-import AdminLogin from "./pages/admin/Login";
-import AdminDashboard from "./pages/admin/Dashboard";
-import AdminRanchos from "./pages/admin/Ranchos";
-import RanchoNovo from "./pages/admin/RanchoNovo";
-import RanchoEditar from "./pages/admin/RanchoEditar";
-import AdminPacotes from "./pages/admin/Pacotes";
-import PacoteNovo from "./pages/admin/PacoteNovo";
-import PacoteEditar from "./pages/admin/PacoteEditar";
-import PacoteAnalytics from "./pages/admin/PacoteAnalytics";
-import AdminBlog from "./pages/admin/Blog";
-import BlogNovo from "./pages/admin/BlogNovo";
-import BlogEditar from "./pages/admin/BlogEditar";
-import BlogAnalytics from "./pages/admin/BlogAnalytics";
-import AdminConfiguracoes from "./pages/admin/Configuracoes";
-import WhatsAppConfig from "./pages/admin/WhatsAppConfig";
-import WhatsAppAnalytics from "./pages/admin/WhatsAppAnalytics";
-import Ajuda from "./pages/admin/Ajuda";
-import ConfiguracoesVideos from "./pages/admin/ConfiguracoesVideos";
-import Anuncios from "./pages/admin/Anuncios";
-import AnuncioNovo from "./pages/admin/AnuncioNovo";
-import AnuncioEditar from "./pages/admin/AnuncioEditar";
-import AdminAvaliacoes from "./pages/admin/Avaliacoes";
-import EstatisticasAvaliacoes from "./pages/admin/EstatisticasAvaliacoes";
-import AdminAnalytics from "./pages/admin/Analytics";
-import FAQs from "./pages/admin/FAQs";
-import FAQNovo from "./pages/admin/FAQNovo";
-import FAQEditar from "./pages/admin/FAQEditar";
-import Depoimentos from "./pages/admin/Depoimentos";
-import DepoimentoNovo from "./pages/admin/DepoimentoNovo";
-import DepoimentoEditar from "./pages/admin/DepoimentoEditar";
 import NotFound from "./pages/NotFound";
+
+// Lazy load - public secondary pages
+const LiveStream = React.lazy(() => import("./pages/LiveStream"));
+const RanchoDetalhes = React.lazy(() => import("./pages/RanchoDetalhes"));
+const PackageVip = React.lazy(() => import("./pages/PackageVip"));
+const PackageLuxo = React.lazy(() => import("./pages/PackageLuxo"));
+const PackageDiamante = React.lazy(() => import("./pages/PackageDiamante"));
+const PackagesIndex = React.lazy(() => import("./pages/PackagesIndex"));
+const PackagesIndexDynamic = React.lazy(() => import("./pages/PackagesIndexDynamic"));
+const PacoteDetalhes = React.lazy(() => import("./pages/PacoteDetalhes"));
+const PrivacyPolicy = React.lazy(() => import("./pages/PrivacyPolicy"));
+const Blog = React.lazy(() => import("./pages/Blog"));
+const BlogPost = React.lazy(() => import("./pages/BlogPost"));
+
+// Lazy load - admin pages
+const AdminLogin = React.lazy(() => import("./pages/admin/Login"));
+const AdminDashboard = React.lazy(() => import("./pages/admin/Dashboard"));
+const AdminRanchos = React.lazy(() => import("./pages/admin/Ranchos"));
+const RanchoNovo = React.lazy(() => import("./pages/admin/RanchoNovo"));
+const RanchoEditar = React.lazy(() => import("./pages/admin/RanchoEditar"));
+const AdminPacotes = React.lazy(() => import("./pages/admin/Pacotes"));
+const PacoteNovo = React.lazy(() => import("./pages/admin/PacoteNovo"));
+const PacoteEditar = React.lazy(() => import("./pages/admin/PacoteEditar"));
+const PacoteAnalytics = React.lazy(() => import("./pages/admin/PacoteAnalytics"));
+const AdminBlog = React.lazy(() => import("./pages/admin/Blog"));
+const BlogNovo = React.lazy(() => import("./pages/admin/BlogNovo"));
+const BlogEditar = React.lazy(() => import("./pages/admin/BlogEditar"));
+const BlogAnalytics = React.lazy(() => import("./pages/admin/BlogAnalytics"));
+const AdminConfiguracoes = React.lazy(() => import("./pages/admin/Configuracoes"));
+const WhatsAppConfig = React.lazy(() => import("./pages/admin/WhatsAppConfig"));
+const WhatsAppAnalytics = React.lazy(() => import("./pages/admin/WhatsAppAnalytics"));
+const Ajuda = React.lazy(() => import("./pages/admin/Ajuda"));
+const ConfiguracoesVideos = React.lazy(() => import("./pages/admin/ConfiguracoesVideos"));
+const Anuncios = React.lazy(() => import("./pages/admin/Anuncios"));
+const AnuncioNovo = React.lazy(() => import("./pages/admin/AnuncioNovo"));
+const AnuncioEditar = React.lazy(() => import("./pages/admin/AnuncioEditar"));
+const AdminAvaliacoes = React.lazy(() => import("./pages/admin/Avaliacoes"));
+const EstatisticasAvaliacoes = React.lazy(() => import("./pages/admin/EstatisticasAvaliacoes"));
+const AdminAnalytics = React.lazy(() => import("./pages/admin/Analytics"));
+const FAQs = React.lazy(() => import("./pages/admin/FAQs"));
+const FAQNovo = React.lazy(() => import("./pages/admin/FAQNovo"));
+const FAQEditar = React.lazy(() => import("./pages/admin/FAQEditar"));
+const Depoimentos = React.lazy(() => import("./pages/admin/Depoimentos"));
+const DepoimentoNovo = React.lazy(() => import("./pages/admin/DepoimentoNovo"));
+const DepoimentoEditar = React.lazy(() => import("./pages/admin/DepoimentoEditar"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 15 * 60 * 1000, // 15 minutes - dados considerados frescos por mais tempo
-      cacheTime: 60 * 60 * 1000, // 1 hour - mantém cache por mais tempo
-      refetchOnWindowFocus: false, // Desabilita refetch ao focar janela
-      refetchOnReconnect: false, // Desabilita refetch ao reconectar
-      refetchOnMount: false, // Desabilita refetch ao montar componente
-      retry: 1, // Apenas 1 retry
+      staleTime: 15 * 60 * 1000,
+      cacheTime: 60 * 60 * 1000,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchOnMount: false,
+      retry: 1,
     },
   },
 });
 
+const PageFallback = () => (
+  <div className="min-h-screen flex items-center justify-center">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+  </div>
+);
+
 const App = () => {
-  console.log('🚀 App: Starting with PWA support');
-  
   return (
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
@@ -86,6 +95,7 @@ const App = () => {
             <ScrollToTop />
             <PageViewTracker />
             <AuthProvider>
+              <Suspense fallback={<PageFallback />}>
               <Routes>
                 {/* Public Routes */}
                 <Route path="/" element={<Index />} />
@@ -93,7 +103,6 @@ const App = () => {
                 <Route path="/rancho/:slug" element={<RanchoDetalhes />} />
                 <Route path="/pacotes" element={<PackagesIndexDynamic />} />
                 <Route path="/pacote/:slug" element={<PacoteDetalhes />} />
-                {/* Páginas estáticas antigas (manter para compatibilidade) */}
                 <Route path="/pacotes-estaticos" element={<PackagesIndex />} />
                 <Route path="/pacote/vip" element={<PackageVip />} />
                 <Route path="/pacote/luxo" element={<PackageLuxo />} />
@@ -101,7 +110,6 @@ const App = () => {
                 <Route path="/politica-privacidade" element={<PrivacyPolicy />} />
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/blog/:slug" element={<BlogPost />} />
-                {/* Backward compatibility */}
                 <Route path="/pacote-vip" element={<PackageVip />} />
                 
                 {/* Admin Routes */}
@@ -145,9 +153,9 @@ const App = () => {
                   <Route path="ajuda" element={<Ajuda />} />
                 </Route>
                 
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
+              </Suspense>
               <CookieConsent />
             </AuthProvider>
           </BrowserRouter>
