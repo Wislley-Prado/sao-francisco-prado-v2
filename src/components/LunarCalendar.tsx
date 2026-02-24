@@ -101,7 +101,7 @@ const LunarCalendar = () => {
   const nextPhase = lunarData.phases[0];
 
   return (
-    <section className="py-8 md:py-16 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <section id="calendario-lunar" className="py-8 md:py-16 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col space-y-6 lg:space-y-8">
           {/* TODAY'S MOON - Destaque */}
