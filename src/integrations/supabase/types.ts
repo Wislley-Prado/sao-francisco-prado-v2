@@ -994,6 +994,7 @@ export type Database = {
           id: string
           instagram_url: string | null
           reserva_button_link: string | null
+          reserva_button_text: string | null
           telefone_contato: string | null
           tiktok_url: string | null
           twitter_url: string | null
@@ -1025,6 +1026,7 @@ export type Database = {
           id?: string
           instagram_url?: string | null
           reserva_button_link?: string | null
+          reserva_button_text?: string | null
           telefone_contato?: string | null
           tiktok_url?: string | null
           twitter_url?: string | null
@@ -1056,6 +1058,7 @@ export type Database = {
           id?: string
           instagram_url?: string | null
           reserva_button_link?: string | null
+          reserva_button_text?: string | null
           telefone_contato?: string | null
           tiktok_url?: string | null
           twitter_url?: string | null
