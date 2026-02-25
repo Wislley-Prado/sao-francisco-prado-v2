@@ -1,36 +1,40 @@
 
 
-# Botão "Reservar" Customizável pelo Admin
+# Gerar Script SQL para Clonar o Banco
 
-## Situação Atual
-- O link do botão "Reservar" já é configurável em **Configurações** (`reserva_button_link`)
-- O **texto** do botão está fixo como "Reservar" no código do Header
-- Você quer poder mudar tanto o **nome** quanto o **link** pelo painel admin
+## O que seria feito
 
-## O Que Será Feito
+Eu leio todas as tabelas, views, functions, triggers e RLS policies do seu banco atual e monto um **único arquivo SQL** com todos os comandos `CREATE TABLE`, `CREATE FUNCTION`, `CREATE POLICY`, etc.
 
-### 1. Novo campo no banco de dados
-Adicionar coluna `reserva_button_text` na tabela `site_settings` com valor padrão "Reservar".
+## Como você usaria
 
-### 2. Painel Admin (Configurações)
-Adicionar um campo de texto **"Texto do Botão Reservar"** logo acima do campo de link que já existe, na seção "Footer e Header".
+1. Abra o dashboard do **novo projeto Supabase**
+2. Vá em **SQL Editor** (menu lateral)
+3. Cole o script inteiro
+4. Clique em **Run**
+5. Pronto — todas as tabelas, policies e functions são criadas
 
-### 3. Header do site
-O botão passará a usar o texto vindo do banco em vez do texto fixo "Reservar". Se não houver texto configurado, mantém "Reservar" como padrão.
+## O que o script incluiria
 
-## Arquivos Alterados
+| Item | Incluido |
+|------|----------|
+| Todas as 20+ tabelas (ranchos, pacotes, blog_posts, site_settings, etc.) | Sim |
+| Colunas, tipos, defaults, constraints | Sim |
+| Views publicas (site_settings_public, avaliacoes_public, etc.) | Sim |
+| Functions (has_role, is_super_admin, update_updated_at) | Sim |
+| Todas as RLS policies | Sim |
+| Enum types (app_role) | Sim |
+| Storage buckets | Sim |
+| **Dados existentes** (registros nas tabelas) | **Nao** |
 
-| Arquivo | Mudança |
-|---------|---------|
-| Nova migration SQL | Adicionar coluna `reserva_button_text` |
-| `src/pages/admin/Configuracoes.tsx` | Novo campo input para o texto do botão |
-| `src/components/Header.tsx` | Usar `settings?.reserva_button_text` no botão |
-| `src/hooks/useOptimizedData.ts` | Incluir `reserva_button_text` no tipo `SiteSettings` |
+## Limitacao importante
 
-## Resultado
-No admin, você terá dois campos lado a lado:
-- **Texto do Botão**: ex: "Agende Agora", "Fale Conosco", "Reserve Já"
-- **Link do Botão**: ex: `https://wa.me/5538988320108`
+O script cria apenas a **estrutura** (schema). Os dados que voce ja tem (ranchos cadastrados, posts do blog, configuracoes, etc.) **nao sao copiados**. Para copiar dados, voce precisaria usar o `pg_dump` da Opcao 2.
 
-O botão no cabeçalho do site mudará automaticamente.
+## Resumo da comparacao
+
+- **Script SQL (esta opcao)**: Mais facil de executar (so colar), mas copia apenas estrutura
+- **pg_dump (Opcao 2)**: Precisa instalar CLI, mas copia estrutura + dados
+
+Se voce quer um projeto novo **limpo** com a mesma estrutura, o script SQL e perfeito. Se precisa dos dados tambem, use o pg_dump.
 
