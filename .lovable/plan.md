@@ -1,40 +1,43 @@
 
 
-# Gerar Script SQL para Clonar o Banco
+# Problema: Ordem Errada no Script SQL
 
-## O que seria feito
+## O que aconteceu
 
-Eu leio todas as tabelas, views, functions, triggers e RLS policies do seu banco atual e monto um **único arquivo SQL** com todos os comandos `CREATE TABLE`, `CREATE FUNCTION`, `CREATE POLICY`, etc.
+O erro `relation "public.user_roles" does not exist` ocorre porque o script cria as **functions** (`has_role`, `is_super_admin`) **antes** da tabela `user_roles`. As functions fazem `SELECT FROM public.user_roles`, mas a tabela ainda nao existe nesse momento.
 
-## Como você usaria
+## Correção
 
-1. Abra o dashboard do **novo projeto Supabase**
-2. Vá em **SQL Editor** (menu lateral)
-3. Cole o script inteiro
-4. Clique em **Run**
-5. Pronto — todas as tabelas, policies e functions são criadas
+Reordenar o script `docs/clone-database.sql` para:
 
-## O que o script incluiria
+1. Enum types
+2. **Tabela `user_roles` primeiro**
+3. Functions (`has_role`, `is_super_admin`, `update_updated_at_column`)
+4. Demais tabelas
+5. Views, RLS, Policies, Storage
 
-| Item | Incluido |
-|------|----------|
-| Todas as 20+ tabelas (ranchos, pacotes, blog_posts, site_settings, etc.) | Sim |
-| Colunas, tipos, defaults, constraints | Sim |
-| Views publicas (site_settings_public, avaliacoes_public, etc.) | Sim |
-| Functions (has_role, is_super_admin, update_updated_at) | Sim |
-| Todas as RLS policies | Sim |
-| Enum types (app_role) | Sim |
-| Storage buckets | Sim |
-| **Dados existentes** (registros nas tabelas) | **Nao** |
+Basta mover a criação da tabela `user_roles` (linhas 53-59) para **antes** das functions (linha 14).
 
-## Limitacao importante
+## Solução imediata (para o novo Supabase)
 
-O script cria apenas a **estrutura** (schema). Os dados que voce ja tem (ranchos cadastrados, posts do blog, configuracoes, etc.) **nao sao copiados**. Para copiar dados, voce precisaria usar o `pg_dump` da Opcao 2.
+Enquanto eu corrijo o arquivo, você pode rodar **apenas isto** no SQL Editor do novo projeto antes do resto do script:
 
-## Resumo da comparacao
+```sql
+CREATE TYPE public.app_role AS ENUM ('admin', 'user', 'super_admin');
 
-- **Script SQL (esta opcao)**: Mais facil de executar (so colar), mas copia apenas estrutura
-- **pg_dump (Opcao 2)**: Precisa instalar CLI, mas copia estrutura + dados
+CREATE TABLE public.user_roles (
+  id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id uuid NOT NULL,
+  role app_role NOT NULL,
+  created_at timestamp with time zone DEFAULT now()
+);
+```
 
-Se voce quer um projeto novo **limpo** com a mesma estrutura, o script SQL e perfeito. Se precisa dos dados tambem, use o pg_dump.
+Depois rode o restante do script normalmente.
+
+## Arquivo alterado
+
+| Arquivo | Mudança |
+|---------|---------|
+| `docs/clone-database.sql` | Mover criação de `user_roles` para antes das functions |
 
