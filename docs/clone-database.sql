@@ -9,7 +9,16 @@
 -- =====================================================
 CREATE TYPE public.app_role AS ENUM ('admin', 'user', 'super_admin');
 
--- 2. FUNCTIONS
+-- 2. TABELA user_roles (ANTES das functions que a referenciam)
+-- =====================================================
+CREATE TABLE public.user_roles (
+  id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id uuid NOT NULL,
+  role app_role NOT NULL,
+  created_at timestamp with time zone DEFAULT now()
+);
+
+-- 3. FUNCTIONS
 -- =====================================================
 CREATE OR REPLACE FUNCTION public.has_role(_user_id uuid, _role app_role)
  RETURNS boolean
@@ -47,16 +56,8 @@ BEGIN
 END;
 $$;
 
--- 3. TABLES
+-- 4. TABLES
 -- =====================================================
-
--- user_roles (precisa ser criada primeiro por causa das functions)
-CREATE TABLE public.user_roles (
-  id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id uuid NOT NULL,
-  role app_role NOT NULL,
-  created_at timestamp with time zone DEFAULT now()
-);
 
 -- ranchos
 CREATE TABLE public.ranchos (
