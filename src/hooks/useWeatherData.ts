@@ -66,7 +66,7 @@ const API_KEY = '6459a62448b61386ccc581f2cc307a2c';
 
 // Função para gerar dados estáveis baseados na data atual (fallback apenas)
 const generateStableWeatherData = (): WeatherData => {
-  console.log('🌤️ [WEATHER] Gerando dados simulados como fallback...');
+  if (import.meta.env.DEV) console.log('🌤️ [WEATHER] Gerando dados simulados como fallback...');
   
   const now = new Date();
   const currentTimestamp = Math.floor(now.getTime() / 1000);
@@ -160,13 +160,13 @@ const generateStableWeatherData = (): WeatherData => {
 
 // Função para buscar dados reais da API OpenWeatherMap
 const fetchWeatherData = async (): Promise<WeatherData> => {
-  console.log('🌤️ [WEATHER] Buscando dados REAIS da API OpenWeatherMap...');
+  if (import.meta.env.DEV) console.log('🌤️ [WEATHER] Buscando dados REAIS da API OpenWeatherMap...');
   
   // Coordenadas de Três Marias/MG
   const lat = -18.2028;
   const lon = -45.2394;
   
-  console.log(`🔑 [WEATHER] Usando chave da API configurada: ${API_KEY.substring(0, 8)}...`);
+  // API key log removed for production
   
   try {
     // Buscar dados atuais da API OpenWeatherMap
@@ -176,14 +176,14 @@ const fetchWeatherData = async (): Promise<WeatherData> => {
     
     if (!currentResponse.ok) {
       if (currentResponse.status === 401) {
-        console.error('❌ [WEATHER] Chave da API inválida ou expirada');
+        if (import.meta.env.DEV) console.error('❌ [WEATHER] Chave da API inválida ou expirada');
         throw new Error('Chave da API inválida');
       }
       throw new Error(`Erro na API Current Weather: ${currentResponse.status}`);
     }
     
     const currentData = await currentResponse.json();
-    console.log('✅ [WEATHER] Dados reais recebidos da API OpenWeatherMap:', currentData);
+    if (import.meta.env.DEV) console.log('✅ [WEATHER] Dados reais recebidos:', currentData);
     
     // Buscar previsão de 5 dias (dados horários)
     const forecastResponse = await fetch(
@@ -193,9 +193,9 @@ const fetchWeatherData = async (): Promise<WeatherData> => {
     let forecastData = null;
     if (forecastResponse.ok) {
       forecastData = await forecastResponse.json();
-      console.log('✅ [WEATHER] Previsão de 5 dias recebida da API');
+      if (import.meta.env.DEV) console.log('✅ [WEATHER] Previsão de 5 dias recebida');
     } else {
-      console.warn('⚠️ [WEATHER] Erro na previsão, usando dados simulados para forecast');
+      if (import.meta.env.DEV) console.warn('⚠️ [WEATHER] Erro na previsão, usando fallback');
     }
     
     // Processar dados atuais reais
@@ -296,8 +296,7 @@ const fetchWeatherData = async (): Promise<WeatherData> => {
     };
     
   } catch (error) {
-    console.error('❌ [WEATHER] Erro ao buscar dados da API:', error);
-    console.log('🔄 [WEATHER] Usando dados simulados como fallback...');
+    if (import.meta.env.DEV) console.error('❌ [WEATHER] Erro ao buscar dados da API:', error);
     return generateStableWeatherData();
   }
 };

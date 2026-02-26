@@ -11,6 +11,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import DOMPurify from 'dompurify';
 
 interface TrackingSettings {
@@ -29,12 +30,13 @@ const EMPTY_SETTINGS: TrackingSettings = {
 
 const TrackingScripts = () => {
   const [scripts, setScripts] = useState<TrackingSettings>(EMPTY_SETTINGS);
+  const { session, loading } = useAuth();
 
   useEffect(() => {
+    if (loading) return; // Aguardar auth resolver
+    if (!session) return; // Visitante anônimo - não faz request
+
     const fetchSettings = async () => {
-      // Só buscar tracking scripts se o usuário estiver autenticado (admin)
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return; // Visitante anônimo - não faz request
 
       try {
         const { data, error } = await supabase
@@ -56,7 +58,7 @@ const TrackingScripts = () => {
     };
 
     fetchSettings();
-  }, []);
+  }, [session, loading]);
 
   useEffect(() => {
     // Facebook Pixel
