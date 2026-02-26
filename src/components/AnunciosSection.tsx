@@ -85,7 +85,11 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
 
   useEffect(() => {
     if (anuncios.length > 0 && !isLoading) {
-      registerView(anuncios[currentIndex]);
+      // Delay view registration to not block initial render
+      const timer = setTimeout(() => {
+        registerView(anuncios[currentIndex]);
+      }, 2000);
+      return () => clearTimeout(timer);
     }
   }, [currentIndex, anuncios, isLoading, registerView]);
   // Registra clique sem abrir link (para uso com tag <a>)
