@@ -1,66 +1,40 @@
 
 
-# Diagnostico: Site Lento / Nao Abre no Celular
-
-## Resultados do Profiling (mobile 375x812)
-
-| Metrica | Valor | Ideal |
-|---------|-------|-------|
-| DOM Nodes | **15,948** | < 1,500 |
-| FCP | **4,996ms** | < 1,800ms |
-| Full Page Load | **5,126ms** | < 3,000ms |
-| Scripts carregados | 139 | -- |
-| PATCH requests (ads) | 7 | 0-1 |
+# Diagnostico: Site Nao Abre / Muito Lento
 
 ## Problemas Encontrados
 
-### 1. WhatsAppButton faz query duplicada a `site_settings_public`
-**Arquivo:** `src/components/WhatsAppButton.tsx` (linha 69)
-Faz `supabase.from('site_settings_public').select('*')` direto, ignorando o hook `useSiteSettings` que ja faz a mesma query com cache.
-**Impacto:** 1 request extra (674ms)
+### 1. HeroSection bloqueia render com 2 chamadas externas ao OpenWeatherMap
+O `HeroSection` chama `useWeatherData()` que faz **2 fetch HTTP externos** (current + forecast) para `api.openweathermap.org` no carregamento inicial. Em conexoes moveis lentas, isso pode levar 3-5 segundos e bloqueia a renderizacao do Hero.
 
-### 2. AnunciosSection registra views de TODOS os ads de uma vez
-**Arquivo:** `src/components/AnunciosSection.tsx`
-Existem 3 instancias (topo, meio, rodape) e cada uma registra views dos seus ads. Com 7 ads ativos, sao **7 PATCH requests** no carregamento inicial.
-**Impacto:** 7 requests write bloqueando o render
+### 2. Dupla verificacao de auth no startup
+- `TrackingScripts` chama `supabase.auth.getSession()` 
+- `AuthContext` chama `supabase.auth.getSession()`
+Sao 2 chamadas de autenticacao simultaneas antes de qualquer conteudo aparecer.
 
-### 3. recharts (224KB) carregado eagerly via DamInfo
-Os componentes `DamHistoryChart` e `DamLevelCard` importam recharts diretamente. Mesmo com `DamInfo` em Suspense/lazy, o recharts e resolvido como dependencia e carregado cedo.
-**Impacto:** 224KB + 1,102ms de parse
+### 3. Console.log excessivo em producao (cacheService)
+O `cacheService.ts` faz `console.log` em TODA operacao de cache (hit, miss, set, expire). Em mobile, isso causa jank no rendering. O `useDamData.ts` tambem emite 15+ logs por render.
 
-### 4. 15,948 DOM nodes
-O site renderiza TODAS as secoes (Hero, DamInfo, LunarCalendar, WeatherDashboard, Ranchos, Pacotes, Blog, Testimonials, FAQ, 3x Anuncios, WhatsApp, CookieConsent, Footer) de uma vez. Mesmo com Suspense, tudo resolve rapidamente.
+### 4. CookieConsent renderiza componentes pesados imediatamente
+O banner de cookies carrega `Dialog`, `Card`, `Switch`, `Label` etc. no primeiro render, mesmo que so precise de um banner simples.
+
+---
 
 ## Correcoes Planejadas
 
-### 1. WhatsAppButton: usar useSiteSettings
-Refatorar para consumir dados do hook centralizado, eliminando query duplicada.
+| # | Arquivo | Mudanca | Impacto |
+|---|---------|---------|---------|
+| 1 | `src/components/HeroSection.tsx` | Nao usar `useWeatherData()` e `useDamData()` diretamente - mostrar valores placeholder e carregar dados depois (defer) | Hero aparece instantaneamente |
+| 2 | `src/components/TrackingScripts.tsx` | Remover chamada `supabase.auth.getSession()` propria - usar o AuthContext que ja faz isso | Elimina 1 chamada auth duplicada |
+| 3 | `src/lib/cacheService.ts` | Remover TODOS os `console.log` em producao (verificar `import.meta.env.DEV`) | Menos jank no mobile |
+| 4 | `src/hooks/useDamData.ts` | Remover todos os `console.log` de debug | Menos jank no mobile |
+| 5 | `src/hooks/useWeatherData.ts` | Remover todos os `console.log` de debug | Menos jank no mobile |
 
-### 2. AnunciosSection: batch view registration
-Ao inves de registrar views individualmente, coletar IDs e fazer 1 unico PATCH apos 5 segundos. Ou melhor: so registrar view do ad **visivel** (currentIndex), nao de todos.
+### Detalhes Tecnicos
 
-### 3. Lazy import recharts nos componentes dam
-Usar `React.lazy()` para `DamHistoryChart` e `DamLevelCard`, ou dynamic import de recharts dentro deles.
+**HeroSection (Correcao 1)**: O componente vai renderizar imediatamente com valores default (temperatura 24C, nivel 86%, etc.) e depois atualizar quando os dados chegarem. Isso garante que o Hero aparece em <1 segundo mesmo em 3G lento. Os hooks continuam funcionando normalmente - apenas o render inicial nao fica bloqueado esperando.
 
-### 4. Adiar renderizacao de secoes abaixo do fold
-Usar `IntersectionObserver` para renderizar `RanchosSection`, `PackagesSection`, `BlogSection`, `TestimonialsSection`, `FAQSection` e `AnunciosSection` somente quando o usuario scrollar ate perto delas. Isso reduz DOM nodes iniciais drasticamente.
+**TrackingScripts (Correcao 2)**: Ao inves de chamar `getSession()` internamente, o componente vai receber o estado de autenticacao do `AuthContext` (via `useAuth()`). Como o AuthContext ja faz essa verificacao, elimina uma chamada de rede duplicada.
 
-### 5. Remover 2 dos 3 AnunciosSection do render inicial
-As secoes `meio` e `rodape` so devem carregar quando o usuario chegar nelas.
-
-## Arquivos a Editar
-
-| Arquivo | Mudanca |
-|---------|---------|
-| `src/components/WhatsAppButton.tsx` | Usar `useSiteSettings` ao inves de query direta |
-| `src/components/AnunciosSection.tsx` | Registrar view apenas do ad visivel, com delay de 5s |
-| `src/pages/Index.tsx` | Envolver secoes below-fold com IntersectionObserver lazy rendering |
-| `src/components/dam/DamHistoryChart.tsx` | Lazy import do recharts |
-| `src/components/dam/DamLevelCard.tsx` | Lazy import do recharts |
-
-## Impacto Esperado
-- De 15,948 para ~3,000 DOM nodes no carregamento inicial
-- De 7 PATCH requests para 1
-- FCP reduzido para ~2-3 segundos
-- Eliminacao de 1 query duplicada
+**Console.log (Correcoes 3-5)**: Em producao, cada `console.log` com emoji e string template custa tempo de CPU. Com ~20 logs por page load, isso causa stuttering perceptivel em celulares fracos. Vamos envolver todos em `if (import.meta.env.DEV)` para que so apareçam em desenvolvimento.
 
