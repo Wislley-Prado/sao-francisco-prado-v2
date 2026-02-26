@@ -1,98 +1,36 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { MessageCircle, X, Phone, Clock } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 import { registrarEventoWhatsApp } from '@/hooks/useWhatsAppAnalytics';
+import { useSiteSettings } from '@/hooks/useOptimizedData';
 
 interface QuickMessage {
   text: string;
   message: string;
 }
 
-interface WhatsAppSettings {
-  whatsapp_numero: string;
-  whatsapp_titulo: string;
-  whatsapp_mensagem_padrao: string;
-  whatsapp_saudacao: string;
-  whatsapp_instrucao: string;
-  whatsapp_horario: string;
-  whatsapp_opcoes: QuickMessage[];
-}
-
-const SETTINGS_ID = "00000000-0000-0000-0000-000000000001";
-
 const WhatsAppButton = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [settings, setSettings] = useState<WhatsAppSettings>({
-    whatsapp_numero: "5531999999999",
-    whatsapp_titulo: "PradoAqui - Atendimento",
-    whatsapp_mensagem_padrao: "Olá! Gostaria de saber mais sobre os pacotes de pesca no PradoAqui.",
-    whatsapp_saudacao: "👋 Olá! Como podemos ajudar você hoje?",
-    whatsapp_instrucao: "Escolha uma opção abaixo ou digite sua mensagem:",
-    whatsapp_horario: "Seg-Dom: 6h às 22h",
-    whatsapp_opcoes: [
-      {
-        text: "Quero fazer uma reserva",
-        message: "Olá! Gostaria de fazer uma reserva para pesca no Rio São Francisco."
-      },
-      {
-        text: "Consultar disponibilidade",
-        message: "Oi! Podem me informar a disponibilidade para os próximos finais de semana?"
-      },
-      {
-        text: "Informações sobre pacotes",
-        message: "Olá! Gostaria de saber mais detalhes sobre os pacotes de pesca disponíveis."
-      },
-      {
-        text: "Condições atuais do rio",
-        message: "Oi! Como estão as condições de pesca no rio hoje?"
-      }
-    ]
-  });
+  const { data: siteSettings } = useSiteSettings();
 
-  interface SiteSettingsPublic {
-    whatsapp_numero?: string;
-    whatsapp_titulo?: string;
-    whatsapp_mensagem_padrao?: string;
-    whatsapp_saudacao?: string;
-    whatsapp_instrucao?: string;
-    whatsapp_horario?: string;
-    whatsapp_opcoes?: QuickMessage[];
-  }
-
-  useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        // Usar view pública que não expõe tracking codes
-        const { data, error } = await supabase
-          .from("site_settings_public" as any)
-          .select("*")
-          .eq("id", SETTINGS_ID)
-          .single();
-
-        if (error) throw error;
-
-        const settingsData = data as unknown as SiteSettingsPublic;
-        if (settingsData) {
-          setSettings({
-            whatsapp_numero: settingsData.whatsapp_numero || settings.whatsapp_numero,
-            whatsapp_titulo: settingsData.whatsapp_titulo || settings.whatsapp_titulo,
-            whatsapp_mensagem_padrao: settingsData.whatsapp_mensagem_padrao || settings.whatsapp_mensagem_padrao,
-            whatsapp_saudacao: settingsData.whatsapp_saudacao || settings.whatsapp_saudacao,
-            whatsapp_instrucao: settingsData.whatsapp_instrucao || settings.whatsapp_instrucao,
-            whatsapp_horario: settingsData.whatsapp_horario || settings.whatsapp_horario,
-            whatsapp_opcoes: settingsData.whatsapp_opcoes || settings.whatsapp_opcoes,
-          });
-        }
-      } catch (error) {
-        console.error("Erro ao carregar configurações do WhatsApp:", error);
-      }
-    };
-
-    fetchSettings();
-  }, []);
+  // Cast to any to access raw Supabase field names which differ from SiteSettings interface
+  const raw = siteSettings as any;
+  const settings = {
+    whatsapp_numero: raw?.whatsapp_numero || "5531999999999",
+    whatsapp_titulo: raw?.whatsapp_titulo || "PradoAqui - Atendimento",
+    whatsapp_mensagem_padrao: raw?.whatsapp_mensagem_padrao || "Olá! Gostaria de saber mais sobre os pacotes de pesca no PradoAqui.",
+    whatsapp_saudacao: raw?.whatsapp_saudacao || "👋 Olá! Como podemos ajudar você hoje?",
+    whatsapp_instrucao: raw?.whatsapp_instrucao || "Escolha uma opção abaixo ou digite sua mensagem:",
+    whatsapp_horario: raw?.whatsapp_horario || "Seg-Dom: 6h às 22h",
+    whatsapp_opcoes: (raw?.whatsapp_opcoes || [
+      { text: "Quero fazer uma reserva", message: "Olá! Gostaria de fazer uma reserva para pesca no Rio São Francisco." },
+      { text: "Consultar disponibilidade", message: "Oi! Podem me informar a disponibilidade para os próximos finais de semana?" },
+      { text: "Informações sobre pacotes", message: "Olá! Gostaria de saber mais detalhes sobre os pacotes de pesca disponíveis." },
+      { text: "Condições atuais do rio", message: "Oi! Como estão as condições de pesca no rio hoje?" }
+    ]) as QuickMessage[],
+  };
 
   const handleWhatsAppClick = () => {
     registrarEventoWhatsApp("botao_whatsapp");

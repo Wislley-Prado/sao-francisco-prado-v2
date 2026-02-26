@@ -2,20 +2,27 @@ import React, { Suspense } from 'react';
 import { Helmet } from 'react-helmet-async';
 import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
-import { AnunciosSection } from '@/components/AnunciosSection';
-import RanchosSection from '@/components/RanchosSection';
-import PackagesSection from '@/components/PackagesSection';
 import WhatsAppButton from '@/components/WhatsAppButton';
 import Footer from '@/components/Footer';
 import { Skeleton } from '@/components/ui/skeleton';
+import LazySection from '@/components/LazySection';
 
-// Lazy load below-the-fold sections
+// Lazy load all below-the-fold sections
+const AnunciosSection = React.lazy(() => import('@/components/AnunciosSection').then(m => ({ default: m.AnunciosSection })));
 const DamInfo = React.lazy(() => import('@/components/DamInfo'));
 const LunarCalendar = React.lazy(() => import('@/components/LunarCalendar'));
 const WeatherDashboard = React.lazy(() => import('@/components/WeatherDashboard'));
+const RanchosSection = React.lazy(() => import('@/components/RanchosSection'));
+const PackagesSection = React.lazy(() => import('@/components/PackagesSection'));
 const BlogSection = React.lazy(() => import('@/components/BlogSection'));
 const TestimonialsSection = React.lazy(() => import('@/components/TestimonialsSection').then(m => ({ default: m.TestimonialsSection })));
 const FAQSection = React.lazy(() => import('@/components/FAQSection').then(m => ({ default: m.FAQSection })));
+
+const SectionSkeleton = () => (
+  <div className="py-16 container mx-auto px-4">
+    <Skeleton className="h-64 w-full rounded-xl" />
+  </div>
+);
 
 const Index = () => {
   return (
@@ -32,37 +39,77 @@ const Index = () => {
       </Helmet>
       <Header />
       <HeroSection />
-      <AnunciosSection posicao="topo" />
       
-      {/* Dados em tempo real */}
-      <Suspense fallback={<div className="py-16 container mx-auto px-4"><Skeleton className="h-64 w-full rounded-xl" /></div>}>
-        <DamInfo />
-      </Suspense>
-      <Suspense fallback={<div className="py-16 container mx-auto px-4"><Skeleton className="h-64 w-full rounded-xl" /></div>}>
-        <LunarCalendar />
-      </Suspense>
-      <Suspense fallback={<div className="py-16 container mx-auto px-4"><Skeleton className="h-64 w-full rounded-xl" /></div>}>
-        <WeatherDashboard />
-      </Suspense>
+      {/* Anúncios topo - lazy render quando próximo */}
+      <LazySection fallback={null} rootMargin="100px">
+        <Suspense fallback={null}>
+          <AnunciosSection posicao="topo" />
+        </Suspense>
+      </LazySection>
       
-      <AnunciosSection posicao="meio" />
+      {/* Dados em tempo real - defer until near viewport */}
+      <LazySection fallback={<SectionSkeleton />} rootMargin="300px">
+        <Suspense fallback={<SectionSkeleton />}>
+          <DamInfo />
+        </Suspense>
+      </LazySection>
+
+      <LazySection fallback={<SectionSkeleton />} rootMargin="200px">
+        <Suspense fallback={<SectionSkeleton />}>
+          <LunarCalendar />
+        </Suspense>
+      </LazySection>
+
+      <LazySection fallback={<SectionSkeleton />} rootMargin="200px">
+        <Suspense fallback={<SectionSkeleton />}>
+          <WeatherDashboard />
+        </Suspense>
+      </LazySection>
       
-      {/* Conteúdo principal */}
-      <RanchosSection />
-      <PackagesSection />
-      <Suspense fallback={<div className="py-16 container mx-auto px-4"><Skeleton className="h-64 w-full rounded-xl" /></div>}>
-        <BlogSection />
-      </Suspense>
+      <LazySection fallback={null} rootMargin="200px">
+        <Suspense fallback={null}>
+          <AnunciosSection posicao="meio" />
+        </Suspense>
+      </LazySection>
+      
+      {/* Conteúdo principal - defer */}
+      <LazySection fallback={<SectionSkeleton />} rootMargin="300px">
+        <Suspense fallback={<SectionSkeleton />}>
+          <RanchosSection />
+        </Suspense>
+      </LazySection>
+
+      <LazySection fallback={<SectionSkeleton />} rootMargin="200px">
+        <Suspense fallback={<SectionSkeleton />}>
+          <PackagesSection />
+        </Suspense>
+      </LazySection>
+
+      <LazySection fallback={<SectionSkeleton />} rootMargin="200px">
+        <Suspense fallback={<SectionSkeleton />}>
+          <BlogSection />
+        </Suspense>
+      </LazySection>
       
       {/* Seções de suporte */}
-      <Suspense fallback={null}>
-        <TestimonialsSection />
-      </Suspense>
-      <Suspense fallback={null}>
-        <FAQSection />
-      </Suspense>
+      <LazySection fallback={null} rootMargin="200px">
+        <Suspense fallback={null}>
+          <TestimonialsSection />
+        </Suspense>
+      </LazySection>
+
+      <LazySection fallback={null} rootMargin="200px">
+        <Suspense fallback={null}>
+          <FAQSection />
+        </Suspense>
+      </LazySection>
       
-      <AnunciosSection posicao="rodape" />
+      <LazySection fallback={null} rootMargin="200px">
+        <Suspense fallback={null}>
+          <AnunciosSection posicao="rodape" />
+        </Suspense>
+      </LazySection>
+
       <WhatsAppButton />
       <Footer />
     </div>
