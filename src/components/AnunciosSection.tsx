@@ -16,8 +16,7 @@ interface AnunciosSectionProps {
 const viewedAdsSession = new Set<string>();
 
 export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
-  const { data: anunciosData, isLoading } = useAnuncios(posicao);
-  const anuncios = anunciosData || [];
+  const { data: anuncios = [], isLoading } = useAnuncios(posicao);
   
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);

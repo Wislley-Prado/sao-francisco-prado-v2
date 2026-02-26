@@ -3,6 +3,7 @@
  * Elimina queries duplicadas e reduz egress em 60-70%
  */
 
+import React from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { cachedQuery, TTL, invalidateCacheByPrefix } from '@/lib/cacheService';
@@ -495,17 +496,20 @@ export const usePacoteBySlug = (slug: string | undefined) => {
 
 // ============= ANÚNCIOS =============
 
-export const useAnuncios = (posicao: string) => {
+/**
+ * useAllAnuncios - Busca TODOS os anúncios ativos em 1 única query.
+ * Filtra por posição no frontend, eliminando 3 requests separados.
+ */
+export const useAllAnuncios = () => {
   return useQuery(
-    ['anuncios', posicao],
+    ['anuncios', 'all'],
     () => cachedQuery<Anuncio[]>(
-      `anuncios_${posicao}`,
+      'anuncios_all',
       TTL.SEMI_DYNAMIC,
       async () => {
         const { data, error } = await supabase
           .from('anuncios')
           .select('*')
-          .eq('posicao', posicao)
           .eq('ativo', true)
           .order('ordem', { ascending: true });
 
@@ -522,6 +526,24 @@ export const useAnuncios = (posicao: string) => {
       retry: 1,
     }
   );
+};
+
+/**
+ * useAnuncios - Filtra anúncios por posição a partir da query consolidada.
+ */
+export const useAnuncios = (posicao: string) => {
+  const { data: allAnuncios, isLoading, error } = useAllAnuncios();
+  
+  const filtered = React.useMemo(
+    () => (allAnuncios || []).filter(a => a.posicao === posicao),
+    [allAnuncios, posicao]
+  );
+
+  return {
+    data: filtered,
+    isLoading,
+    error,
+  };
 };
 
 // ============= BLOG =============
