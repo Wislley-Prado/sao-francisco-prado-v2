@@ -55,9 +55,8 @@ export default defineConfig(({ mode }) => ({
         // navigateFallback: '/offline.html',
         // navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/]
       },
-      devOptions: {
-        enabled: true,
-        type: 'module'
+    devOptions: {
+        enabled: false
       }
     }),
     ViteImageOptimizer({

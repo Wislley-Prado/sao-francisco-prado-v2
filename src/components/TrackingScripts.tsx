@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import DOMPurify from 'dompurify';
+import { cachedQuery, TTL } from '@/lib/cacheService';
 
 const SETTINGS_ID = '00000000-0000-0000-0000-000000000001';
 
@@ -11,43 +12,48 @@ interface TrackingSettings {
   custom_head_scripts: string;
 }
 
+const EMPTY_SETTINGS: TrackingSettings = {
+  facebook_pixel: '',
+  google_analytics: '',
+  google_tag_manager: '',
+  custom_head_scripts: ''
+};
+
 const TrackingScripts = () => {
-  const [scripts, setScripts] = useState<TrackingSettings>({
-    facebook_pixel: '',
-    google_analytics: '',
-    google_tag_manager: '',
-    custom_head_scripts: ''
-  });
+  const [scripts, setScripts] = useState<TrackingSettings>(EMPTY_SETTINGS);
 
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        // Tentar acessar tabela original (funciona para admins)
-        // Se falhar, usa dados vazios (scripts não são carregados para visitantes anônimos via API)
-        // Nota: Os scripts são tipicamente visíveis no HTML de qualquer site público
-        const { data, error } = await supabase
-          .from('site_settings')
-          .select('facebook_pixel, google_analytics, google_tag_manager, custom_head_scripts')
-          .eq('id', SETTINGS_ID)
-          .single();
+        const data = await cachedQuery<TrackingSettings | null>(
+          'tracking_scripts',
+          TTL.SETTINGS,
+          async () => {
+            const { data, error } = await supabase
+              .from('site_settings')
+              .select('facebook_pixel, google_analytics, google_tag_manager, custom_head_scripts')
+              .eq('id', SETTINGS_ID)
+              .single();
 
-        if (error) {
-          // RLS impede acesso - isso é esperado para visitantes
-          // Em produção, considerar pré-renderizar scripts no HTML ou usar SSR
-          console.warn('Tracking scripts não disponíveis via API (RLS)');
-          return;
-        }
+            if (error) {
+              // RLS impede acesso - retorna null (será cacheado por 1h para não tentar novamente)
+              return null;
+            }
+
+            return data ? {
+              facebook_pixel: data.facebook_pixel || '',
+              google_analytics: data.google_analytics || '',
+              google_tag_manager: data.google_tag_manager || '',
+              custom_head_scripts: data.custom_head_scripts || ''
+            } : null;
+          }
+        );
 
         if (data) {
-          setScripts({
-            facebook_pixel: data.facebook_pixel || '',
-            google_analytics: data.google_analytics || '',
-            google_tag_manager: data.google_tag_manager || '',
-            custom_head_scripts: data.custom_head_scripts || ''
-          });
+          setScripts(data);
         }
       } catch (error) {
-        console.error('Erro ao carregar scripts de tracking:', error);
+        // Silenciar erros - não é crítico
       }
     };
 

@@ -310,7 +310,7 @@ export const useWeatherData = () => {
     staleTime: 5 * 60 * 1000, // Dados ficam fresh por 5 minutos
     retry: 2,
     retryDelay: 10000,
-    refetchOnWindowFocus: true,
-    refetchOnMount: true,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 };
