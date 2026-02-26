@@ -1,5 +1,7 @@
 import React, { Suspense } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
 import WhatsAppButton from '@/components/WhatsAppButton';
@@ -25,6 +27,21 @@ const SectionSkeleton = () => (
 );
 
 const Index = () => {
+  const { data: settings } = useQuery({
+    queryKey: ['site-settings-og'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('site_settings_public')
+        .select('og_image_url')
+        .limit(1)
+        .single();
+      return data;
+    },
+    staleTime: 30 * 60 * 1000,
+  });
+
+  const ogImage = (settings as any)?.og_image_url || '/og-image.png';
+
   return (
     <div className="min-h-screen">
       <Helmet>
@@ -32,10 +49,10 @@ const Index = () => {
         <meta name="description" content="Sua experiência de pesca no Rio São Francisco começa aqui! Ranchos exclusivos, pacotes personalizados e estrutura completa em Três Marias/MG." />
         <meta property="og:title" content="PradoAqui | Rio São Francisco ao Vivo" />
         <meta property="og:description" content="Sua experiência de pesca no Rio São Francisco começa aqui! Ranchos exclusivos e pacotes personalizados em Três Marias/MG." />
-        <meta property="og:image" content="/og-image.png" />
+        <meta property="og:image" content={ogImage} />
         <meta property="og:url" content="https://pradoaqui.com" />
         <meta name="twitter:title" content="PradoAqui | Rio São Francisco ao Vivo" />
-        <meta name="twitter:image" content="/og-image.png" />
+        <meta name="twitter:image" content={ogImage} />
       </Helmet>
       <Header />
       <HeroSection />
