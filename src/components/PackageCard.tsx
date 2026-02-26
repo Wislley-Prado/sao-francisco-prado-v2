@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Clock, Users, Fish, Star, Calendar } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { getOptimizedUrl } from '@/lib/imageUtils';
 
 interface Package {
   id: number;
@@ -46,10 +47,12 @@ const PackageCard = ({ pkg }: PackageCardProps) => {
       <CardHeader className="p-0">
         <div className="h-48 relative overflow-hidden">
           <img 
-            src={pkg.image} 
+            src={getOptimizedUrl(pkg.image, 400)} 
             alt={pkg.title}
             className="w-full h-full object-cover"
             loading="lazy"
+            width={400}
+            height={192}
             onError={(e) => {
               console.log('Erro ao carregar imagem:', pkg.image);
               e.currentTarget.style.display = 'none';

@@ -7,6 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ExternalLink, ChevronLeft, ChevronRight, MapPin, Ruler, DollarSign } from 'lucide-react';
 import { useAnuncios, Anuncio } from '@/hooks/useOptimizedData';
 import useEmblaCarousel from 'embla-carousel-react';
+import { getOptimizedUrl } from '@/lib/imageUtils';
 
 interface AnunciosSectionProps {
   posicao: 'topo' | 'meio' | 'rodape' | 'sidebar';
@@ -222,7 +223,7 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
           {renderAnuncioTag(anuncio)}
           
           <img
-            src={anuncio.imagem_url}
+            src={getOptimizedUrl(anuncio.imagem_url, 800)}
             alt={anuncio.titulo}
             loading="lazy"
             decoding="async"
@@ -280,7 +281,7 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
               {renderAnuncioTag(anuncio, 'top-left')}
               
               <img
-                src={anuncio.imagem_url}
+                src={getOptimizedUrl(anuncio.imagem_url, 600)}
                 alt={anuncio.titulo}
                 loading="lazy"
                 decoding="async"
@@ -368,7 +369,7 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
           {renderAnuncioTag(anuncio)}
           
           <img
-            src={anuncio.imagem_url}
+            src={getOptimizedUrl(anuncio.imagem_url, 800)}
             alt={anuncio.titulo}
             loading="lazy"
             decoding="async"

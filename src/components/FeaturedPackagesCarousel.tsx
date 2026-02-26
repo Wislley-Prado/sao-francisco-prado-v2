@@ -12,6 +12,7 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import Autoplay from 'embla-carousel-autoplay';
+import { getOptimizedUrl } from '@/lib/imageUtils';
 
 interface FeaturedPackage {
   id: number;
@@ -85,7 +86,7 @@ const FeaturedPackagesCarousel = ({ packages }: FeaturedPackagesCarouselProps) =
                     {/* Image */}
                     <div className="relative h-56 overflow-hidden">
                       <img
-                        src={pkg.image}
+                        src={getOptimizedUrl(pkg.image, 400)}
                         alt={pkg.title}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                         loading="lazy"
