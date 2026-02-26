@@ -90,11 +90,11 @@ const App = () => {
             <Toaster />
             <Sonner />
             <PWALifecycle />
-            <TrackingScripts />
             <BrowserRouter>
             <ScrollToTop />
             <PageViewTracker />
             <AuthProvider>
+              <TrackingScripts />
               <Suspense fallback={<PageFallback />}>
               <Routes>
                 {/* Public Routes */}
