@@ -1,48 +1,55 @@
 
 
-# Plano: Otimizar Velocidade do Site
+## Diagnóstico: Site Lento e Demora para Aparecer
 
-## Problemas Identificados
+### Problemas Encontrados
 
-Analisando os logs de rede e console, identifiquei os seguintes gargalos no carregamento inicial:
-
-### 1. TrackingScripts faz request que sempre falha (406)
-O componente `TrackingScripts.tsx` faz uma query direta a `site_settings` (tabela protegida por RLS), que retorna **erro 406** para visitantes. Isso gera uma request desperdiçada em cada carregamento.
-
-### 2. HeroSection dispara 3 hooks de dados simultaneamente
-O `HeroSection` carrega `useWeatherData`, `useDamData` e `useVideoSettings` imediatamente, gerando **4 requests** antes do usuário ver qualquer conteúdo.
-
-### 3. useWeatherData sobrescreve cache global
-O hook tem `refetchOnMount: true` e `refetchOnWindowFocus: true`, ignorando as configurações globais do QueryClient que desabilitam esses refetches.
-
-### 4. Requests duplicados a site_settings_public
-Vejo 2 requests separados para `site_settings_public` -- um do `useVideoSettings` e outro de outro componente (Header/Footer). Deveria ser uma única query.
-
-### 5. AnunciosSection faz PATCH em cada visualização
-Cada carregamento dispara múltiplos PATCH requests para atualizar contadores de visualização dos anúncios, bloqueando o thread.
-
-### 6. PWA devOptions habilitado
-No `vite.config.ts`, `devOptions.enabled: true` registra um service worker desnecessário que pode interferir no carregamento.
+Após análise de performance, identifiquei os seguintes problemas críticos:
 
 ---
 
-## Correções Planejadas
+### 1. Ícones PWA com tamanho absurdo (PROBLEMA PRINCIPAL)
 
-| # | Arquivo | Mudança | Impacto |
-|---|---------|---------|---------|
-| 1 | `TrackingScripts.tsx` | Usar `cachedQuery` com TTL de 1h ao invés de query direta; silenciar erro RLS | Elimina 1 request falhando |
-| 2 | `useWeatherData.ts` | Remover `refetchOnMount: true` e `refetchOnWindowFocus: true` para respeitar cache global | Elimina re-fetches desnecessários |
-| 3 | `vite.config.ts` | Remover `devOptions.enabled: true` | Evita SW em dev interferindo |
-| 4 | `AnunciosSection.tsx` | Fazer PATCH de visualização com `setTimeout` de 2s (debounce) para não bloquear render inicial | Carregamento mais rápido |
-| 5 | `index.html` | Adicionar `<link rel="preconnect">` para OpenWeatherMap API | Reduz latência DNS |
+Os ícones gerados anteriormente estão com tamanhos enormes, bloqueando o carregamento:
+
+| Arquivo | Tamanho Atual | Tamanho Ideal |
+|---------|--------------|---------------|
+| icon-32x32.png | **909 KB** | ~1 KB |
+| icon-192x192.png | **893 KB** | ~5 KB |
+| favicon.png | **791 KB** | ~2 KB |
+
+Esses 3 arquivos somam **2.5 MB** de download desnecessário logo no início. Isso explica por que o site demora para aparecer - o navegador precisa baixar esses ícones antes de renderizar.
+
+**First Contentful Paint: 4.97 segundos** (deveria ser < 1.5s)
+
+### 2. DOM excessivamente grande
+- **16.060 nós DOM** e **1.924 elementos** - indica que seções abaixo da dobra podem estar renderizando antes do necessário.
+
+### 3. Muitos scripts carregando simultaneamente
+- **140 recursos de script** e **164 recursos totais** carregando ao mesmo tempo.
+
+---
+
+### Plano de Correção
+
+#### Tarefa 1: Substituir ícones PWA por versões otimizadas
+- Regenerar os 5 ícones PWA (16x16, 32x32, 180x180, 192x192, 512x512) com tamanhos adequados (poucos KB cada)
+- Usar ícones simples e leves em vez das imagens pesadas atuais
+- Também otimizar o `favicon.png` e `favicon.ico`
+
+#### Tarefa 2: Otimizar carregamento inicial
+- Remover `loading="eager"` da thumbnail do YouTube no Hero (linha 149 do HeroSection) - usar `loading="lazy"` ou deixar o padrão
+- Garantir que os ícones no `<head>` do `index.html` não bloqueiem a renderização
+
+#### Tarefa 3: Reduzir DOM nodes
+- Verificar se componentes lazy-loaded (DamInfo, LunarCalendar, WeatherDashboard) estão de fato deferred corretamente
+- Considerar virtualização ou renderização condicional para seções fora da viewport
+
+---
 
 ### Detalhes Técnicos
 
-**TrackingScripts**: Vai tentar ler do cache localStorage primeiro (TTL 1h). Se não tiver cache, faz a query. Se der erro RLS, não tenta novamente por 1h.
+O problema principal é claro: os ícones PNG que criamos no passo anterior foram salvos sem compressão adequada (provavelmente como imagens raw/base64 muito grandes). Um `icon-32x32.png` de 909 KB é ~900x maior do que deveria ser. O navegador carrega esses favicons automaticamente via as tags `<link>` no `index.html`, bloqueando a renderização inicial.
 
-**useWeatherData**: Removendo as flags de refetch, os dados ficam em cache por 15 minutos (configuração global do QueryClient) ao invés de rebuscar toda vez que a aba ganha foco.
-
-**AnunciosSection**: O registro de visualização será adiado 2 segundos após render, permitindo que o conteúdo visual carregue primeiro.
-
-Todas as mudanças são de baixo risco e não alteram funcionalidade visível -- apenas reduzem requests e melhoram tempo de carregamento.
+A correção dos ícones sozinha deve reduzir o tempo de First Paint de ~5s para ~1-2s.
 
