@@ -1,6 +1,7 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useSiteSettings } from '@/hooks/useOptimizedData';
 
 export interface VideoSettings {
   youtube_live_url: string | null;
@@ -8,21 +9,19 @@ export interface VideoSettings {
   youtube_institucional_url: string | null;
 }
 
+/**
+ * useVideoSettings - Reutiliza dados de useSiteSettings (elimina query duplicada)
+ */
 export const useVideoSettings = () => {
   const queryClient = useQueryClient();
+  const { data: siteSettings, isLoading } = useSiteSettings();
 
-  const { data: settings, isLoading } = useQuery({
-    queryKey: ['video-settings'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('site_settings_public')
-        .select('youtube_live_url, youtube_video_url, youtube_institucional_url')
-        .maybeSingle();
-
-      if (error) throw error;
-      return data as VideoSettings;
-    },
-  });
+  // Extrair video settings dos site settings já carregados
+  const settings: VideoSettings | null = siteSettings ? {
+    youtube_live_url: siteSettings.youtube_live_url || null,
+    youtube_video_url: siteSettings.youtube_video_url || null,
+    youtube_institucional_url: siteSettings.youtube_institucional_url || null,
+  } : null;
 
   const updateSettings = useMutation({
     mutationFn: async (newSettings: Partial<VideoSettings>) => {
@@ -34,6 +33,7 @@ export const useVideoSettings = () => {
       if (error) throw error;
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['site-settings'] });
       queryClient.invalidateQueries({ queryKey: ['video-settings'] });
       toast.success('Configurações de vídeo atualizadas com sucesso!');
     },
@@ -69,6 +69,6 @@ export const extractYouTubeId = (url: string): string | null => {
 };
 
 export const isValidYouTubeUrl = (url: string): boolean => {
-  if (!url) return true; // Empty is valid (optional field)
+  if (!url) return true;
   return extractYouTubeId(url) !== null;
 };

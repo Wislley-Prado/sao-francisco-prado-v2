@@ -1,9 +1,17 @@
+/**
+ * TrackingScripts - Carrega scripts de tracking apenas para admins autenticados.
+ * 
+ * A tabela site_settings_public NÃO expõe facebook_pixel, google_analytics,
+ * google_tag_manager, nem custom_head_scripts (campos sensíveis).
+ * Portanto, este componente só funciona para admins autenticados que têm
+ * acesso à tabela site_settings via RLS.
+ * 
+ * Para visitantes anônimos, o componente não faz nenhum request.
+ */
+
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import DOMPurify from 'dompurify';
-import { cachedQuery, TTL } from '@/lib/cacheService';
-
-const SETTINGS_ID = '00000000-0000-0000-0000-000000000001';
 
 interface TrackingSettings {
   facebook_pixel: string;
@@ -24,35 +32,25 @@ const TrackingScripts = () => {
 
   useEffect(() => {
     const fetchSettings = async () => {
+      // Só buscar tracking scripts se o usuário estiver autenticado (admin)
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return; // Visitante anônimo - não faz request
+
       try {
-        const data = await cachedQuery<TrackingSettings | null>(
-          'tracking_scripts',
-          TTL.SETTINGS,
-          async () => {
-            const { data, error } = await supabase
-              .from('site_settings')
-              .select('facebook_pixel, google_analytics, google_tag_manager, custom_head_scripts')
-              .eq('id', SETTINGS_ID)
-              .single();
+        const { data, error } = await supabase
+          .from('site_settings')
+          .select('facebook_pixel, google_analytics, google_tag_manager, custom_head_scripts')
+          .single();
 
-            if (error) {
-              // RLS impede acesso - retorna null (será cacheado por 1h para não tentar novamente)
-              return null;
-            }
+        if (error || !data) return;
 
-            return data ? {
-              facebook_pixel: data.facebook_pixel || '',
-              google_analytics: data.google_analytics || '',
-              google_tag_manager: data.google_tag_manager || '',
-              custom_head_scripts: data.custom_head_scripts || ''
-            } : null;
-          }
-        );
-
-        if (data) {
-          setScripts(data);
-        }
-      } catch (error) {
+        setScripts({
+          facebook_pixel: data.facebook_pixel || '',
+          google_analytics: data.google_analytics || '',
+          google_tag_manager: data.google_tag_manager || '',
+          custom_head_scripts: data.custom_head_scripts || ''
+        });
+      } catch {
         // Silenciar erros - não é crítico
       }
     };
@@ -131,7 +129,6 @@ const TrackingScripts = () => {
     // Scripts personalizados (sanitizados)
     if (scripts.custom_head_scripts) {
       const customDiv = document.createElement('div');
-      // Sanitize HTML to prevent XSS attacks
       const sanitizedHTML = DOMPurify.sanitize(scripts.custom_head_scripts, {
         ADD_TAGS: ['script', 'style', 'link'],
         ADD_ATTR: ['src', 'href', 'rel', 'type', 'async', 'defer'],

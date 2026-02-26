@@ -989,6 +989,7 @@ export type Database = {
           email_contato: string | null
           facebook_pixel: string | null
           facebook_url: string | null
+          favicon_url: string | null
           google_analytics: string | null
           google_tag_manager: string | null
           id: string
@@ -1021,6 +1022,7 @@ export type Database = {
           email_contato?: string | null
           facebook_pixel?: string | null
           facebook_url?: string | null
+          favicon_url?: string | null
           google_analytics?: string | null
           google_tag_manager?: string | null
           id?: string
@@ -1053,6 +1055,7 @@ export type Database = {
           email_contato?: string | null
           facebook_pixel?: string | null
           facebook_url?: string | null
+          favicon_url?: string | null
           google_analytics?: string | null
           google_tag_manager?: string | null
           id?: string
@@ -1239,6 +1242,7 @@ export type Database = {
           created_at: string | null
           email_contato: string | null
           facebook_url: string | null
+          favicon_url: string | null
           id: string | null
           instagram_url: string | null
           reserva_button_link: string | null
@@ -1265,6 +1269,7 @@ export type Database = {
           created_at?: string | null
           email_contato?: string | null
           facebook_url?: string | null
+          favicon_url?: string | null
           id?: string | null
           instagram_url?: string | null
           reserva_button_link?: string | null
@@ -1291,6 +1296,7 @@ export type Database = {
           created_at?: string | null
           email_contato?: string | null
           facebook_url?: string | null
+          favicon_url?: string | null
           id?: string | null
           instagram_url?: string | null
           reserva_button_link?: string | null
