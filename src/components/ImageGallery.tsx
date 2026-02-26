@@ -3,7 +3,7 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, X, ZoomIn, Expand } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { getOptimizedUrl } from '@/lib/imageUtils';
+import { getOptimizedUrl, getOriginalUrl } from '@/lib/imageUtils';
 
 interface ImageGalleryProps {
   images: {
@@ -63,6 +63,12 @@ export const ImageGallery = ({ images, title }: ImageGalleryProps) => {
               className="w-full h-[400px] lg:h-[500px] object-cover transition-transform duration-500 group-hover:scale-105"
               loading="eager"
               fetchPriority="high"
+              onError={(e) => {
+                const original = getOriginalUrl(images[selectedIndex]?.url);
+                if (e.currentTarget.src !== original) {
+                  e.currentTarget.src = original;
+                }
+              }}
             />
             
             {/* Gradient Overlay */}
@@ -123,6 +129,12 @@ export const ImageGallery = ({ images, title }: ImageGalleryProps) => {
                   loading="lazy"
                   decoding="async"
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    const original = getOriginalUrl(img.url);
+                    if (e.currentTarget.src !== original) {
+                      e.currentTarget.src = original;
+                    }
+                  }}
                 />
                 {selectedIndex === index && (
                   <div className="absolute inset-0 bg-primary/10" />

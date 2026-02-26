@@ -12,7 +12,7 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import Autoplay from 'embla-carousel-autoplay';
-import { getOptimizedUrl } from '@/lib/imageUtils';
+import { getOptimizedUrl, getOriginalUrl } from '@/lib/imageUtils';
 
 interface FeaturedPackage {
   id: number;
@@ -91,12 +91,17 @@ const FeaturedPackagesCarousel = ({ packages }: FeaturedPackagesCarouselProps) =
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                         loading="lazy"
                         onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                          e.currentTarget.parentElement!.classList.add(
-                            'bg-gradient-to-br',
-                            'from-rio-blue',
-                            'to-water-green'
-                          );
+                          const original = getOriginalUrl(pkg.image);
+                          if (e.currentTarget.src !== original) {
+                            e.currentTarget.src = original;
+                          } else {
+                            e.currentTarget.style.display = 'none';
+                            e.currentTarget.parentElement!.classList.add(
+                              'bg-gradient-to-br',
+                              'from-rio-blue',
+                              'to-water-green'
+                            );
+                          }
                         }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>

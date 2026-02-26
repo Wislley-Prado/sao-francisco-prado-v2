@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Clock, Users, Fish, Star, Calendar } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { getOptimizedUrl } from '@/lib/imageUtils';
+import { getOptimizedUrl, getOriginalUrl } from '@/lib/imageUtils';
 
 interface Package {
   id: number;
@@ -54,9 +54,13 @@ const PackageCard = ({ pkg }: PackageCardProps) => {
             width={400}
             height={192}
             onError={(e) => {
-              console.log('Erro ao carregar imagem:', pkg.image);
-              e.currentTarget.style.display = 'none';
-              e.currentTarget.parentElement!.classList.add('bg-gradient-to-br', 'from-rio-blue', 'to-water-green');
+              const original = getOriginalUrl(pkg.image);
+              if (e.currentTarget.src !== original) {
+                e.currentTarget.src = original;
+              } else {
+                e.currentTarget.style.display = 'none';
+                e.currentTarget.parentElement!.classList.add('bg-gradient-to-br', 'from-rio-blue', 'to-water-green');
+              }
             }}
           />
           <div className="absolute inset-0 bg-black bg-opacity-20"></div>
