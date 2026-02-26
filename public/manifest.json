@@ -2,6 +2,7 @@
   "name": "PradoAqui - Pesca no Rio São Francisco",
   "short_name": "PradoAqui",
   "description": "Sua experiência de pesca no Rio São Francisco começa aqui! Ranchos exclusivos, pacotes personalizados e estrutura completa em Três Marias/MG.",
+  "id": "/",
   "start_url": "/",
   "display": "standalone",
   "theme_color": "#17A2B8",
@@ -11,6 +12,9 @@
   "lang": "pt-BR",
   "categories": ["tourism", "lifestyle", "sports"],
   "prefer_related_applications": false,
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
   "icons": [
     {
       "src": "/icons/icon-16x16.png",
