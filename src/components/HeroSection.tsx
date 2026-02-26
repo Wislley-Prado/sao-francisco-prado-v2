@@ -146,7 +146,7 @@ const HeroSection = () => {
                           src={`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`}
                           alt="Vídeo do Rio São Francisco"
                           className="w-full h-full object-cover"
-                          loading="lazy"
+                          loading="eager"
                         />
                         <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/30 transition-colors">
                           <div className="w-16 h-16 sm:w-20 sm:h-20 bg-red-600 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">

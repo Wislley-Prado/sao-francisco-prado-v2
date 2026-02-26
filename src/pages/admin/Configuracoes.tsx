@@ -11,7 +11,6 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { clearAllCache, getCacheStats, resetCacheStats, invalidateCacheByPrefix } from '@/lib/cacheService';
-import FaviconUploader from '@/components/admin/FaviconUploader';
 
 const SETTINGS_ID = '00000000-0000-0000-0000-000000000001';
 
@@ -48,8 +47,7 @@ const Configuracoes = () => {
     email_contato: '',
     // Footer e Header
     copyright_text: '',
-    reserva_button_link: '',
-    favicon_url: ''
+    reserva_button_link: ''
   });
 
   useEffect(() => {
@@ -84,8 +82,7 @@ const Configuracoes = () => {
           telefone_contato: (data as any).telefone_contato || '',
           email_contato: (data as any).email_contato || '',
           copyright_text: (data as any).copyright_text || '',
-          reserva_button_link: (data as any).reserva_button_link || '',
-          favicon_url: (data as any).favicon_url || ''
+          reserva_button_link: (data as any).reserva_button_link || ''
         });
       }
     } catch (error) {
@@ -247,12 +244,6 @@ const Configuracoes = () => {
       </div>
 
       <div className="grid gap-6">
-        {/* Favicon Uploader */}
-        <FaviconUploader
-          currentFaviconUrl={settings.favicon_url}
-          onFaviconUpdated={(url) => setSettings({ ...settings, favicon_url: url })}
-        />
-
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
