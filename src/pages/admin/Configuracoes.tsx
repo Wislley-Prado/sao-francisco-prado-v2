@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2, Save, Code2, TrendingUp, Webhook, AlertCircle, RefreshCw, Database, Clock, User, Share2, Phone, Mail, Facebook, Instagram, Youtube, Calendar, FileText, Link2, Trash2, HardDrive, Pause, Play } from 'lucide-react';
+import { BrandImagesCard } from '@/components/admin/configuracoes/BrandImagesCard';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -29,6 +30,7 @@ const Configuracoes = () => {
     defluencia: '',
     data: new Date().toLocaleDateString('pt-BR'),
   });
+  const [brandImages, setBrandImages] = useState({ favicon_url: '', og_image_url: '', pwa_icon_url: '' });
   const [settings, setSettings] = useState({
     facebook_pixel: '',
     google_analytics: '',
@@ -67,6 +69,11 @@ const Configuracoes = () => {
 
       if (data) {
         setWebhookPausado((data as any).dam_webhook_pausado === true);
+        setBrandImages({
+          favicon_url: (data as any).favicon_url || '',
+          og_image_url: (data as any).og_image_url || '',
+          pwa_icon_url: (data as any).pwa_icon_url || '',
+        });
         setSettings({
           facebook_pixel: data.facebook_pixel || '',
           google_analytics: data.google_analytics || '',
@@ -244,6 +251,14 @@ const Configuracoes = () => {
       </div>
 
       <div className="grid gap-6">
+        {/* Card de Imagens do Site */}
+        <BrandImagesCard
+          faviconUrl={brandImages.favicon_url}
+          ogImageUrl={brandImages.og_image_url}
+          pwaIconUrl={brandImages.pwa_icon_url}
+          onUpdate={fetchSettings}
+        />
+
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">

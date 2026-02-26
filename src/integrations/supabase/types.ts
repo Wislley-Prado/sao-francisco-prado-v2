@@ -1251,6 +1251,8 @@ export type Database = {
           favicon_url: string | null
           id: string | null
           instagram_url: string | null
+          og_image_url: string | null
+          pwa_icon_url: string | null
           reserva_button_link: string | null
           reserva_button_text: string | null
           telefone_contato: string | null
@@ -1278,6 +1280,8 @@ export type Database = {
           favicon_url?: string | null
           id?: string | null
           instagram_url?: string | null
+          og_image_url?: string | null
+          pwa_icon_url?: string | null
           reserva_button_link?: string | null
           reserva_button_text?: string | null
           telefone_contato?: string | null
@@ -1305,6 +1309,8 @@ export type Database = {
           favicon_url?: string | null
           id?: string | null
           instagram_url?: string | null
+          og_image_url?: string | null
+          pwa_icon_url?: string | null
           reserva_button_link?: string | null
           reserva_button_text?: string | null
           telefone_contato?: string | null
