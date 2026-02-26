@@ -71,20 +71,14 @@ stats = loadStats();
  * Log cache event with emoji indicators
  */
 export const logCacheEvent = (
-  type: 'HIT' | 'MISS' | 'SUPABASE' | 'SET' | 'EXPIRE',
-  key: string,
-  details?: string
+  _type: 'HIT' | 'MISS' | 'SUPABASE' | 'SET' | 'EXPIRE',
+  _key: string,
+  _details?: string
 ): void => {
-  const emoji = {
-    HIT: '✅',
-    MISS: '❌',
-    SUPABASE: '🌐',
-    SET: '💾',
-    EXPIRE: '⏰',
-  };
-  
-  const timestamp = new Date().toLocaleTimeString();
-  console.log(`[Cache ${emoji[type]}] ${timestamp} | ${type} | ${key}${details ? ` | ${details}` : ''}`);
+  // Logs only in development to avoid mobile jank
+  if (!import.meta.env.DEV) return;
+  const emoji = { HIT: '✅', MISS: '❌', SUPABASE: '🌐', SET: '💾', EXPIRE: '⏰' };
+  console.log(`[Cache ${emoji[_type]}] ${_type} | ${_key}${_details ? ` | ${_details}` : ''}`);
 };
 
 /**
@@ -164,7 +158,7 @@ export const setInCache = <T>(key: string, data: T, ttl: number): void => {
     try {
       localStorage.setItem(fullKey, JSON.stringify(entry));
     } catch {
-      console.warn('[Cache] localStorage full, using memory only');
+      if (import.meta.env.DEV) console.warn('[Cache] localStorage full, using memory only');
     }
   }
 };
@@ -189,7 +183,7 @@ export const invalidateCache = (key: string): void => {
   } catch {
     // Ignore errors
   }
-  console.log(`[Cache 🗑️] Invalidated: ${key}`);
+  if (import.meta.env.DEV) console.log(`[Cache 🗑️] Invalidated: ${key}`);
 };
 
 /**
@@ -216,7 +210,7 @@ export const invalidateCacheByPrefix = (prefix: string): void => {
   } catch {
     // Ignore errors
   }
-  console.log(`[Cache 🗑️] Invalidated all: ${prefix}*`);
+  if (import.meta.env.DEV) console.log(`[Cache 🗑️] Invalidated all: ${prefix}*`);
 };
 
 /**
@@ -271,7 +265,7 @@ export const getCacheStats = (): CacheStats & { hitRate: string; savings: string
 export const resetCacheStats = (): void => {
   stats = { hits: 0, misses: 0, supabaseCalls: 0 };
   saveStats();
-  console.log('[Cache 📊] Stats reset');
+  if (import.meta.env.DEV) console.log('[Cache 📊] Stats reset');
 };
 
 /**
@@ -289,7 +283,7 @@ export const clearAllCache = (): void => {
   } catch {
     // Ignore errors
   }
-  console.log('[Cache 🧹] All cache cleared');
+  if (import.meta.env.DEV) console.log('[Cache 🧹] All cache cleared');
 };
 
 /**
@@ -325,5 +319,5 @@ if (typeof window !== 'undefined') {
     clear: clearAllCache,
     invalidate: invalidateCache,
   };
-  console.log('[Cache 🚀] Cache system initialized. Use window.pradoCache for debugging.');
+  if (import.meta.env.DEV) console.log('[Cache 🚀] Cache system initialized. Use window.pradoCache for debugging.');
 }

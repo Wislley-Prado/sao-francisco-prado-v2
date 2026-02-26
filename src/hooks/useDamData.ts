@@ -52,7 +52,7 @@ const calcularTendencia = (historico: NewApiResponseItem[]): string => {
 
 // Mapear dados do formato da API para DamData
 const mapNewApiDataToDamData = (apiData: NewApiResponseItem[]): DamData => {
-  console.log('🔄 [MAPPING] Processando dados da API:', apiData?.length || 0, 'itens');
+  if (import.meta.env.DEV) console.log('🔄 [MAPPING] Processando dados da API:', apiData?.length || 0, 'itens');
   
   const tempoReal = apiData.find(item => item.tipo === 'tempo_real');
   const historico = apiData.filter(item => item.tipo === 'historico');
@@ -97,7 +97,7 @@ const mapNewApiDataToDamData = (apiData: NewApiResponseItem[]): DamData => {
 
 // Buscar dados diretamente do banco (cache)
 const fetchDamDataFromDB = async (): Promise<DamData> => {
-  console.log('🔧 [FETCH] Buscando dados da represa do banco...');
+  if (import.meta.env.DEV) console.log('🔧 [FETCH] Buscando dados da represa do banco...');
   
   const { data, error } = await supabase
     .from('dam_data')
@@ -106,17 +106,17 @@ const fetchDamDataFromDB = async (): Promise<DamData> => {
     .single();
 
   if (error) {
-    console.error('❌ [FETCH] Erro ao buscar do banco:', error);
+    if (import.meta.env.DEV) console.error('❌ [FETCH] Erro ao buscar do banco:', error);
     throw new Error('Erro ao buscar dados da represa');
   }
 
   if (!data?.data || Object.keys(data.data as object).length === 0) {
-    console.warn('⚠️ [FETCH] Dados vazios no banco, aguardando atualização do cron...');
+    if (import.meta.env.DEV) console.warn('⚠️ [FETCH] Dados vazios no banco, aguardando atualização do cron...');
     throw new Error('Dados ainda não disponíveis. Aguarde a próxima atualização.');
   }
 
   const responseData = data.data as { sucesso?: boolean; dados?: NewApiResponseItem[] } | NewApiResponseItem[];
-  console.log('📦 [FETCH] Dados do banco carregados, atualizado em:', data.updated_at);
+  if (import.meta.env.DEV) console.log('📦 [FETCH] Dados do banco carregados, atualizado em:', data.updated_at);
 
   // Formato com wrapper (sucesso/dados)
   if (responseData && 'sucesso' in responseData && Array.isArray(responseData.dados)) {
