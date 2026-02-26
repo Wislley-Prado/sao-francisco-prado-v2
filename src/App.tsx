@@ -10,6 +10,7 @@ import { PWALifecycle } from "@/components/PWALifecycle";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import CookieConsent from "@/components/CookieConsent";
 import TrackingScripts from "@/components/TrackingScripts";
+import DynamicFavicon from "@/components/DynamicFavicon";
 import PageViewTracker from "@/components/PageViewTracker";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { PrivateRoute } from "@/components/admin/PrivateRoute";
@@ -91,6 +92,7 @@ const App = () => {
             <Sonner />
             <PWALifecycle />
             <TrackingScripts />
+            <DynamicFavicon />
             <BrowserRouter>
             <ScrollToTop />
             <PageViewTracker />
