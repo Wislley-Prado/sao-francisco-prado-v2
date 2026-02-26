@@ -15,16 +15,14 @@ export default defineConfig(({ mode }) => ({
     react(),
     mode === 'development' && componentTagger(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       includeAssets: ['favicon.ico', 'icons/*.png', 'robots.txt'],
       manifest: false, // Use external manifest.json
-      injectRegister: 'auto',
+      injectRegister: null,
       strategies: 'generateSW',
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,jpg,jpeg,svg,woff,woff2}'],
         cleanupOutdatedCaches: true,
-        clientsClaim: true,
-        skipWaiting: true,
         maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 10 MB
         runtimeCaching: [
           {

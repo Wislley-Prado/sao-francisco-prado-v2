@@ -1,12 +1,14 @@
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Fish, Phone, Mail, MapPin, Facebook, Instagram, Youtube } from 'lucide-react';
+import { Fish, Phone, Mail, MapPin, Facebook, Instagram, Youtube, Download } from 'lucide-react';
 import { useSiteSettings } from '@/hooks/useOptimizedData';
+import { usePWALifecycle } from '@/hooks/usePWALifecycle';
 
 const Footer = () => {
   const navigate = useNavigate();
   const { data: settings } = useSiteSettings();
   const location = useLocation();
+  const { isInstallable, isInstalled, canInstallNatively, installApp, isIOS } = usePWALifecycle();
 
   const handleNavClick = (href: string, hash: string) => {
     if (hash) {
@@ -150,6 +152,16 @@ const Footer = () => {
                 <span className="text-gray-500 text-sm">Nenhuma rede social configurada</span>
               )}
             </div>
+            {/* Botão Instalar App - só aparece quando possível */}
+            {isInstallable && !isInstalled && canInstallNatively && (
+              <button
+                onClick={() => installApp()}
+                className="mt-4 flex items-center gap-2 text-sm text-gray-300 hover:text-rio-blue transition-colors bg-transparent border border-gray-700 rounded-lg px-4 py-2"
+              >
+                <Download className="h-4 w-4" />
+                Instalar App
+              </button>
+            )}
           </div>
         </div>
 
