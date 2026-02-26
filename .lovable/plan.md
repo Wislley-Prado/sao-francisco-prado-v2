@@ -1,40 +1,37 @@
 
 
-# Diagnostico: Site Nao Abre / Muito Lento
+# Plano: Upload de Imagens PWA, Favicon e OG Image no Admin
 
-## Problemas Encontrados
+## O que sera feito
 
-### 1. HeroSection bloqueia render com 2 chamadas externas ao OpenWeatherMap
-O `HeroSection` chama `useWeatherData()` que faz **2 fetch HTTP externos** (current + forecast) para `api.openweathermap.org` no carregamento inicial. Em conexoes moveis lentas, isso pode levar 3-5 segundos e bloqueia a renderizacao do Hero.
+Adicionar uma nova seção (Card) na pagina `Configuracoes.tsx` com 3 uploaders:
+1. **Favicon** — salva URL no campo `favicon_url` (ja existe no banco)
+2. **OG Image** — para compartilhamento em redes sociais
+3. **Icones PWA** — icone 192x192 e 512x512
 
-### 2. Dupla verificacao de auth no startup
-- `TrackingScripts` chama `supabase.auth.getSession()` 
-- `AuthContext` chama `supabase.auth.getSession()`
-Sao 2 chamadas de autenticacao simultaneas antes de qualquer conteudo aparecer.
+As imagens serao salvas no bucket `configuracoes` do Supabase Storage (ja existe) e as URLs salvas em `site_settings`.
 
-### 3. Console.log excessivo em producao (cacheService)
-O `cacheService.ts` faz `console.log` em TODA operacao de cache (hit, miss, set, expire). Em mobile, isso causa jank no rendering. O `useDamData.ts` tambem emite 15+ logs por render.
+## Detalhes Tecnicos
 
-### 4. CookieConsent renderiza componentes pesados imediatamente
-O banner de cookies carrega `Dialog`, `Card`, `Switch`, `Label` etc. no primeiro render, mesmo que so precise de um banner simples.
+### Banco de dados
+- `favicon_url` ja existe em `site_settings`
+- Precisamos adicionar `og_image_url` e `pwa_icon_url` via migration SQL
+- As imagens serao comprimidas no client antes do upload usando o `compressImage` ja existente
 
----
+### Componente DynamicFavicon
+- Criar componente que le `favicon_url` de `site_settings_public` e injeta `<link rel="icon">` no document head
+- Tambem atualiza os icones PWA dinamicamente
 
-## Correcoes Planejadas
+### Frontend (Index.tsx, Blog.tsx, BlogPost.tsx)
+- Alterar as tags `og:image` para usar a URL dinamica do `og_image_url` quando disponivel
 
-| # | Arquivo | Mudanca | Impacto |
-|---|---------|---------|---------|
-| 1 | `src/components/HeroSection.tsx` | Nao usar `useWeatherData()` e `useDamData()` diretamente - mostrar valores placeholder e carregar dados depois (defer) | Hero aparece instantaneamente |
-| 2 | `src/components/TrackingScripts.tsx` | Remover chamada `supabase.auth.getSession()` propria - usar o AuthContext que ja faz isso | Elimina 1 chamada auth duplicada |
-| 3 | `src/lib/cacheService.ts` | Remover TODOS os `console.log` em producao (verificar `import.meta.env.DEV`) | Menos jank no mobile |
-| 4 | `src/hooks/useDamData.ts` | Remover todos os `console.log` de debug | Menos jank no mobile |
-| 5 | `src/hooks/useWeatherData.ts` | Remover todos os `console.log` de debug | Menos jank no mobile |
+## Arquivos a criar/editar
 
-### Detalhes Tecnicos
-
-**HeroSection (Correcao 1)**: O componente vai renderizar imediatamente com valores default (temperatura 24C, nivel 86%, etc.) e depois atualizar quando os dados chegarem. Isso garante que o Hero aparece em <1 segundo mesmo em 3G lento. Os hooks continuam funcionando normalmente - apenas o render inicial nao fica bloqueado esperando.
-
-**TrackingScripts (Correcao 2)**: Ao inves de chamar `getSession()` internamente, o componente vai receber o estado de autenticacao do `AuthContext` (via `useAuth()`). Como o AuthContext ja faz essa verificacao, elimina uma chamada de rede duplicada.
-
-**Console.log (Correcoes 3-5)**: Em producao, cada `console.log` com emoji e string template custa tempo de CPU. Com ~20 logs por page load, isso causa stuttering perceptivel em celulares fracos. Vamos envolver todos em `if (import.meta.env.DEV)` para que so apareçam em desenvolvimento.
+| Arquivo | Acao |
+|---------|------|
+| `supabase/migrations/add_brand_image_fields.sql` | Adicionar `og_image_url` e `pwa_icon_url` a `site_settings` e view publica |
+| `src/pages/admin/Configuracoes.tsx` | Adicionar Card "Imagens do Site" com 3 uploaders (favicon, og-image, icones PWA) |
+| `src/components/DynamicFavicon.tsx` | Componente que injeta favicon/PWA icons dinamicos no head |
+| `src/App.tsx` | Montar `<DynamicFavicon />` |
+| `src/pages/Index.tsx` | Usar `og_image_url` dinamico nas meta tags |
 
