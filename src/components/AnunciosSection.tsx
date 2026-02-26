@@ -7,7 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ExternalLink, ChevronLeft, ChevronRight, MapPin, Ruler, DollarSign } from 'lucide-react';
 import { useAnuncios, Anuncio } from '@/hooks/useOptimizedData';
 import useEmblaCarousel from 'embla-carousel-react';
-import { getOptimizedUrl } from '@/lib/imageUtils';
+import { getOptimizedUrl, getOriginalUrl } from '@/lib/imageUtils';
 
 interface AnunciosSectionProps {
   posicao: 'topo' | 'meio' | 'rodape' | 'sidebar';

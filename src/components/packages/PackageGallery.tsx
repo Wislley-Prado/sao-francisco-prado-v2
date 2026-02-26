@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ImageIcon, Camera } from 'lucide-react';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
-import { getOptimizedUrl } from '@/lib/imageUtils';
+import { getOptimizedUrl, getOriginalUrl } from '@/lib/imageUtils';
 
 const Carousel = lazy(() => import('@/components/ui/carousel').then(module => ({
   default: module.Carousel

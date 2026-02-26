@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Users, MapPin, Wifi, Car, Waves, Utensils, Star, Eye } from 'lucide-react';
-import { getOptimizedUrl } from '@/lib/imageUtils';
+import { getOptimizedUrl, getOriginalUrl } from '@/lib/imageUtils';
 
 interface Ranch {
   id: string | number;
@@ -53,6 +53,12 @@ const RanchCard = ({ ranch }: RanchCardProps) => {
               width={400}
               height={192}
               className="h-48 w-full object-cover"
+              onError={(e) => {
+                const original = getOriginalUrl(ranch.images[0]);
+                if (e.currentTarget.src !== original) {
+                  e.currentTarget.src = original;
+                }
+              }}
             />
           ) : (
             <div className="h-48 bg-gradient-to-br from-rio-blue to-water-green" />
