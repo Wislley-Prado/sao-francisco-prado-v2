@@ -2,6 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar, User, ArrowRight } from 'lucide-react';
+import { getOptimizedUrl } from '@/lib/imageUtils';
 
 interface BlogPost {
   id: string;
@@ -22,7 +23,7 @@ const BlogCard = ({ post }: BlogCardProps) => {
     <Card className="h-full hover:shadow-lg transition-shadow duration-300 group cursor-pointer">
       <div className="aspect-video overflow-hidden rounded-t-lg">
         <img 
-          src={post.image} 
+          src={getOptimizedUrl(post.image, 400)} 
           alt={post.title}
           loading="lazy"
           decoding="async"

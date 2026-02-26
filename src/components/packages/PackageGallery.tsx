@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ImageIcon, Camera } from 'lucide-react';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
+import { getOptimizedUrl } from '@/lib/imageUtils';
 
 const Carousel = lazy(() => import('@/components/ui/carousel').then(module => ({
   default: module.Carousel
@@ -32,7 +33,7 @@ const GalleryImage = ({ image, index, onClick }: { image: { url: string; alt?: s
         onClick={onClick}
       >
         <img
-          src={image.url}
+          src={getOptimizedUrl(image.url, index < 6 ? 600 : 400)}
           alt={image.alt || `Foto ${index + 1}`}
           loading={index < 6 ? 'eager' : 'lazy'}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"

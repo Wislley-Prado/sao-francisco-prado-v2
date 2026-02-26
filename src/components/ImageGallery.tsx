@@ -3,6 +3,7 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, X, ZoomIn, Expand } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getOptimizedUrl } from '@/lib/imageUtils';
 
 interface ImageGalleryProps {
   images: {
@@ -57,9 +58,11 @@ export const ImageGallery = ({ images, title }: ImageGalleryProps) => {
             onClick={() => setLightboxOpen(true)}
           >
             <img
-              src={images[selectedIndex]?.url}
+              src={getOptimizedUrl(images[selectedIndex]?.url, 800)}
               alt={images[selectedIndex]?.alt_text || title || 'Imagem'}
               className="w-full h-[400px] lg:h-[500px] object-cover transition-transform duration-500 group-hover:scale-105"
+              loading="eager"
+              fetchPriority="high"
             />
             
             {/* Gradient Overlay */}
@@ -115,7 +118,7 @@ export const ImageGallery = ({ images, title }: ImageGalleryProps) => {
                 )}
               >
                 <img
-                  src={img.url}
+                  src={getOptimizedUrl(img.url, 120)}
                   alt={img.alt_text || `${title || 'Imagem'} - Foto ${index + 1}`}
                   loading="lazy"
                   decoding="async"

@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Users, MapPin, Wifi, Car, Waves, Utensils, Star, Eye } from 'lucide-react';
+import { getOptimizedUrl } from '@/lib/imageUtils';
 
 interface Ranch {
   id: string | number;
@@ -45,10 +46,12 @@ const RanchCard = ({ ranch }: RanchCardProps) => {
         <div className="relative">
           {ranch.images && ranch.images.length > 0 ? (
             <img 
-              src={ranch.images[0]} 
+              src={getOptimizedUrl(ranch.images[0], 400)} 
               alt={ranch.name}
               loading="lazy"
               decoding="async"
+              width={400}
+              height={192}
               className="h-48 w-full object-cover"
             />
           ) : (
