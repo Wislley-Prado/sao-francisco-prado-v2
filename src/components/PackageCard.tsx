@@ -47,7 +47,7 @@ const PackageCard = ({ pkg }: PackageCardProps) => {
       <CardHeader className="p-0">
         <div className="h-48 relative overflow-hidden">
           <img 
-            src={getOptimizedUrl(pkg.image, 400)} 
+            src={getOptimizedUrl(pkg.image, 800)} 
             alt={pkg.title}
             className="w-full h-full object-cover"
             loading="lazy"
