@@ -1,7 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
-import { componentTagger } from "lovable-tagger";
 import { VitePWA } from 'vite-plugin-pwa';
 import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
 
@@ -13,7 +12,6 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react(),
-    mode === 'development' && componentTagger(),
     VitePWA({
       registerType: 'prompt',
       includeAssets: ['favicon.ico', 'icons/*.png', 'robots.txt'],
