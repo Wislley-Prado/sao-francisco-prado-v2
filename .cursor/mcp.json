@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "supabase": {
+      "url": "https://pradoaqui.vendopro.com.br/mcp?features=docs%2Cdatabase%2Cdebugging%2Cdevelopment"
+    }
+  }
+}

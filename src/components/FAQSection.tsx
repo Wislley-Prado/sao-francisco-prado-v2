@@ -7,9 +7,20 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FAQVoteButtons } from "@/components/FAQVoteButtons";
 import { useFAQs } from "@/hooks/useOptimizedData";
+import { useEffect } from "react";
+import { invalidateCache } from "@/lib/cacheService";
 
 export const FAQSection = () => {
-  const { data: faqs, isLoading } = useFAQs();
+  const { data: faqs, isLoading, refetch } = useFAQs();
+
+  // If no data and not loading, try to invalidate cache and reload
+  // This handles the case where a previous empty result was cached
+  useEffect(() => {
+    if (!isLoading && (!faqs || faqs.length === 0)) {
+      invalidateCache('faqs_general');
+      refetch();
+    }
+  }, [isLoading, faqs, refetch]);
 
   if (isLoading) {
     return null;

@@ -55,6 +55,7 @@ const WhatsAppAnalytics = () => {
 
   useEffect(() => {
     carregarAnalytics();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [periodo, dateRange, compararPeriodos]);
 
   const carregarAnalytics = async () => {
@@ -64,7 +65,7 @@ const WhatsAppAnalytics = () => {
       let dataFimStr: string;
       let dataInicioDate: Date;
       let dataFimDate: Date;
-      
+
       if (periodo === "custom" && dateRange?.from) {
         dataInicioDate = startOfDay(dateRange.from);
         dataFimDate = dateRange.to ? endOfDay(dateRange.to) : endOfDay(new Date());
@@ -93,8 +94,8 @@ const WhatsAppAnalytics = () => {
       const mensagemRapida = eventos?.filter(e => e.evento === "mensagem_rapida").length || 0;
       const botaoWhatsapp = eventos?.filter(e => e.evento === "botao_whatsapp").length || 0;
 
-      const taxaConversao = widgetAberto > 0 
-        ? ((mensagemRapida + botaoWhatsapp) / widgetAberto) * 100 
+      const taxaConversao = widgetAberto > 0
+        ? ((mensagemRapida + botaoWhatsapp) / widgetAberto) * 100
         : 0;
 
       setAnalytics({
@@ -108,7 +109,7 @@ const WhatsAppAnalytics = () => {
       if (compararPeriodos && typeof periodo === "number") {
         const periodoAnteriorInicio = subDays(new Date(dataInicioStr), periodo).toISOString();
         const periodoAnteriorFim = dataInicioStr;
-        
+
         const { data: eventosAnteriores } = await supabase
           .from("whatsapp_analytics")
           .select("evento")
@@ -138,10 +139,10 @@ const WhatsAppAnalytics = () => {
         .order("created_at", { ascending: true });
 
       const eventosPorDia: { [key: string]: EventoTemporal } = {};
-      
+
       eventosCompletos?.forEach((evento) => {
         const data = format(new Date(evento.created_at), "dd/MM", { locale: ptBR });
-        
+
         if (!eventosPorDia[data]) {
           eventosPorDia[data] = {
             data,
@@ -150,7 +151,7 @@ const WhatsAppAnalytics = () => {
             botao_whatsapp: 0,
           };
         }
-        
+
         if (evento.evento === "widget_aberto") eventosPorDia[data].widget_aberto++;
         if (evento.evento === "mensagem_rapida") eventosPorDia[data].mensagem_rapida++;
         if (evento.evento === "botao_whatsapp") eventosPorDia[data].botao_whatsapp++;
@@ -194,13 +195,13 @@ const WhatsAppAnalytics = () => {
     csvContent += `Mensagens Rápidas,${analytics.total_mensagem_rapida}\n`;
     csvContent += `Botão WhatsApp,${analytics.total_botao_whatsapp}\n`;
     csvContent += `Taxa de Conversão,${analytics.taxa_conversao.toFixed(1)}%\n\n`;
-    
+
     csvContent += "Eventos ao Longo do Tempo\n";
     csvContent += "Data,Widget Aberto,Mensagem Rápida,Botão WhatsApp\n";
     eventosTempo.forEach(evento => {
       csvContent += `${evento.data},${evento.widget_aberto},${evento.mensagem_rapida},${evento.botao_whatsapp}\n`;
     });
-    
+
     csvContent += "\nMensagens Mais Clicadas\n";
     csvContent += "Mensagem,Total de Cliques\n";
     mensagensPopulares.forEach(msg => {
@@ -218,13 +219,13 @@ const WhatsAppAnalytics = () => {
 
   const exportarPDF = () => {
     const doc = new jsPDF();
-    
+
     // Título
     doc.setFontSize(18);
     doc.text("Analytics WhatsApp", 14, 20);
     doc.setFontSize(11);
     doc.text(`Gerado em: ${format(new Date(), "dd/MM/yyyy HH:mm", { locale: ptBR })}`, 14, 28);
-    
+
     // Resumo de métricas
     autoTable(doc, {
       startY: 35,
@@ -236,10 +237,10 @@ const WhatsAppAnalytics = () => {
         ["Taxa de Conversão", `${analytics.taxa_conversao.toFixed(1)}%`],
       ],
     });
-    
+
     // Eventos ao longo do tempo
     autoTable(doc, {
-      startY: (doc as any).lastAutoTable.finalY + 10,
+      startY: (doc as jsPDF & { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 10,
       head: [["Data", "Widget Aberto", "Mensagem Rápida", "Botão WhatsApp"]],
       body: eventosTempo.map(e => [
         e.data,
@@ -248,16 +249,16 @@ const WhatsAppAnalytics = () => {
         e.botao_whatsapp.toString()
       ]),
     });
-    
+
     // Mensagens mais clicadas
     if (mensagensPopulares.length > 0) {
       autoTable(doc, {
-        startY: (doc as any).lastAutoTable.finalY + 10,
+        startY: (doc as jsPDF & { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 10,
         head: [["Mensagem", "Total de Cliques"]],
         body: mensagensPopulares.map(m => [m.mensagem_tipo, m.total.toString()]),
       });
     }
-    
+
     doc.save(`whatsapp-analytics-${format(new Date(), "yyyy-MM-dd")}.pdf`);
   };
 
@@ -267,262 +268,262 @@ const WhatsAppAnalytics = () => {
   };
 
   return (
-      <div className="space-y-6">
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight">Analytics WhatsApp</h1>
-              <p className="text-muted-foreground">
-                Acompanhe o desempenho do widget de WhatsApp
-              </p>
-            </div>
-            
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={exportarCSV}>
-                <Download className="h-4 w-4 mr-2" />
-                CSV
-              </Button>
-              <Button variant="outline" size="sm" onClick={exportarPDF}>
-                <Download className="h-4 w-4 mr-2" />
-                PDF
-              </Button>
-              <WhatsAppDataCleanup
-                dataInicio={dataInicio}
-                dataFim={dataFim}
-                onCleanupComplete={carregarAnalytics}
-                onExport={exportarCSV}
-              />
-            </div>
+    <div className="space-y-6">
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Analytics WhatsApp</h1>
+            <p className="text-muted-foreground">
+              Acompanhe o desempenho do widget de WhatsApp
+            </p>
           </div>
 
-          <div className="flex items-center gap-4 flex-wrap">
-            <Tabs value={periodo.toString()} onValueChange={(v) => setPeriodo(v === "custom" ? "custom" : Number(v) as 7 | 30)}>
-              <TabsList>
-                <TabsTrigger value="7">7 dias</TabsTrigger>
-                <TabsTrigger value="30">30 dias</TabsTrigger>
-                <TabsTrigger value="custom">Personalizado</TabsTrigger>
-              </TabsList>
-            </Tabs>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={exportarCSV}>
+              <Download className="h-4 w-4 mr-2" />
+              CSV
+            </Button>
+            <Button variant="outline" size="sm" onClick={exportarPDF}>
+              <Download className="h-4 w-4 mr-2" />
+              PDF
+            </Button>
+            <WhatsAppDataCleanup
+              dataInicio={dataInicio}
+              dataFim={dataFim}
+              onCleanupComplete={carregarAnalytics}
+              onExport={exportarCSV}
+            />
+          </div>
+        </div>
 
-            {periodo === "custom" && (
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "justify-start text-left font-normal",
-                      !dateRange && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {dateRange?.from ? (
-                      dateRange.to ? (
-                        <>
-                          {format(dateRange.from, "dd/MM/yyyy")} - {format(dateRange.to, "dd/MM/yyyy")}
-                        </>
-                      ) : (
-                        format(dateRange.from, "dd/MM/yyyy")
-                      )
+        <div className="flex items-center gap-4 flex-wrap">
+          <Tabs value={periodo.toString()} onValueChange={(v) => setPeriodo(v === "custom" ? "custom" : Number(v) as 7 | 30)}>
+            <TabsList>
+              <TabsTrigger value="7">7 dias</TabsTrigger>
+              <TabsTrigger value="30">30 dias</TabsTrigger>
+              <TabsTrigger value="custom">Personalizado</TabsTrigger>
+            </TabsList>
+          </Tabs>
+
+          {periodo === "custom" && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "justify-start text-left font-normal",
+                    !dateRange && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {dateRange?.from ? (
+                    dateRange.to ? (
+                      <>
+                        {format(dateRange.from, "dd/MM/yyyy")} - {format(dateRange.to, "dd/MM/yyyy")}
+                      </>
                     ) : (
-                      <span>Selecionar período</span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    initialFocus
-                    mode="range"
-                    defaultMonth={dateRange?.from}
-                    selected={dateRange}
-                    onSelect={setDateRange}
-                    numberOfMonths={2}
-                    className={cn("p-3 pointer-events-auto")}
-                  />
-                </PopoverContent>
-              </Popover>
-            )}
-
-            {typeof periodo === "number" && (
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="comparar"
-                  checked={compararPeriodos}
-                  onCheckedChange={setCompararPeriodos}
+                      format(dateRange.from, "dd/MM/yyyy")
+                    )
+                  ) : (
+                    <span>Selecionar período</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  initialFocus
+                  mode="range"
+                  defaultMonth={dateRange?.from}
+                  selected={dateRange}
+                  onSelect={setDateRange}
+                  numberOfMonths={2}
+                  className={cn("p-3 pointer-events-auto")}
                 />
-                <Label htmlFor="comparar">Comparar com período anterior</Label>
-              </div>
-            )}
-          </div>
+              </PopoverContent>
+            </Popover>
+          )}
+
+          {typeof periodo === "number" && (
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="comparar"
+                checked={compararPeriodos}
+                onCheckedChange={setCompararPeriodos}
+              />
+              <Label htmlFor="comparar">Comparar com período anterior</Label>
+            </div>
+          )}
         </div>
+      </div>
 
-        {/* Cards de Estatísticas */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Widget Aberto</CardTitle>
-              <MessageCircle className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{analytics.total_widget_aberto}</div>
-              <p className="text-xs text-muted-foreground">
-                Visualizações do widget
-              </p>
-              {analyticsComparacao && (
-                <p className={cn(
-                  "text-xs font-medium mt-1",
-                  calcularVariacao(analytics.total_widget_aberto, analyticsComparacao.total_widget_aberto) >= 0 
-                    ? "text-green-600" 
-                    : "text-red-600"
-                )}>
-                  {calcularVariacao(analytics.total_widget_aberto, analyticsComparacao.total_widget_aberto) >= 0 ? "+" : ""}
-                  {calcularVariacao(analytics.total_widget_aberto, analyticsComparacao.total_widget_aberto).toFixed(1)}% vs período anterior
-                </p>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Mensagens Rápidas</CardTitle>
-              <MousePointer className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{analytics.total_mensagem_rapida}</div>
-              <p className="text-xs text-muted-foreground">
-                Cliques em mensagens pré-definidas
-              </p>
-              {analyticsComparacao && (
-                <p className={cn(
-                  "text-xs font-medium mt-1",
-                  calcularVariacao(analytics.total_mensagem_rapida, analyticsComparacao.total_mensagem_rapida) >= 0 
-                    ? "text-green-600" 
-                    : "text-red-600"
-                )}>
-                  {calcularVariacao(analytics.total_mensagem_rapida, analyticsComparacao.total_mensagem_rapida) >= 0 ? "+" : ""}
-                  {calcularVariacao(analytics.total_mensagem_rapida, analyticsComparacao.total_mensagem_rapida).toFixed(1)}% vs período anterior
-                </p>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Botão WhatsApp</CardTitle>
-              <BarChart3 className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{analytics.total_botao_whatsapp}</div>
-              <p className="text-xs text-muted-foreground">
-                Cliques diretos no botão
-              </p>
-              {analyticsComparacao && (
-                <p className={cn(
-                  "text-xs font-medium mt-1",
-                  calcularVariacao(analytics.total_botao_whatsapp, analyticsComparacao.total_botao_whatsapp) >= 0 
-                    ? "text-green-600" 
-                    : "text-red-600"
-                )}>
-                  {calcularVariacao(analytics.total_botao_whatsapp, analyticsComparacao.total_botao_whatsapp) >= 0 ? "+" : ""}
-                  {calcularVariacao(analytics.total_botao_whatsapp, analyticsComparacao.total_botao_whatsapp).toFixed(1)}% vs período anterior
-                </p>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Taxa de Conversão</CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{analytics.taxa_conversao.toFixed(1)}%</div>
-              <p className="text-xs text-muted-foreground">
-                Ações / Visualizações
-              </p>
-              {analyticsComparacao && (
-                <p className={cn(
-                  "text-xs font-medium mt-1",
-                  calcularVariacao(analytics.taxa_conversao, analyticsComparacao.taxa_conversao) >= 0 
-                    ? "text-green-600" 
-                    : "text-red-600"
-                )}>
-                  {calcularVariacao(analytics.taxa_conversao, analyticsComparacao.taxa_conversao) >= 0 ? "+" : ""}
-                  {calcularVariacao(analytics.taxa_conversao, analyticsComparacao.taxa_conversao).toFixed(1)}% vs período anterior
-                </p>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Gráfico de Eventos ao Longo do Tempo */}
+      {/* Cards de Estatísticas */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
-          <CardHeader>
-            <CardTitle>Eventos ao Longo do Tempo</CardTitle>
-            <CardDescription>
-              Visualização diária das interações com o widget
-            </CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Widget Aberto</CardTitle>
+            <MessageCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={350}>
-              <LineChart data={eventosTempo}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="data" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line 
-                  type="monotone" 
-                  dataKey="widget_aberto" 
-                  stroke="hsl(var(--primary))" 
-                  name="Widget Aberto"
-                  strokeWidth={2}
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="mensagem_rapida" 
-                  stroke="hsl(var(--chart-2))" 
-                  name="Mensagem Rápida"
-                  strokeWidth={2}
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="botao_whatsapp" 
-                  stroke="hsl(var(--chart-3))" 
-                  name="Botão WhatsApp"
-                  strokeWidth={2}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            <div className="text-2xl font-bold">{analytics.total_widget_aberto}</div>
+            <p className="text-xs text-muted-foreground">
+              Visualizações do widget
+            </p>
+            {analyticsComparacao && (
+              <p className={cn(
+                "text-xs font-medium mt-1",
+                calcularVariacao(analytics.total_widget_aberto, analyticsComparacao.total_widget_aberto) >= 0
+                  ? "text-green-600"
+                  : "text-red-600"
+              )}>
+                {calcularVariacao(analytics.total_widget_aberto, analyticsComparacao.total_widget_aberto) >= 0 ? "+" : ""}
+                {calcularVariacao(analytics.total_widget_aberto, analyticsComparacao.total_widget_aberto).toFixed(1)}% vs período anterior
+              </p>
+            )}
           </CardContent>
         </Card>
 
-        {/* Mensagens Mais Clicadas */}
         <Card>
-          <CardHeader>
-            <CardTitle>Mensagens Mais Clicadas</CardTitle>
-            <CardDescription>
-              Ranking das mensagens rápidas mais populares
-            </CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Mensagens Rápidas</CardTitle>
+            <MousePointer className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            {mensagensPopulares.length > 0 ? (
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={mensagensPopulares}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="mensagem_tipo" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="total" fill="hsl(var(--primary))" name="Cliques" />
-                </BarChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="flex items-center justify-center h-[300px] text-muted-foreground">
-                Nenhuma mensagem rápida clicada ainda
-              </div>
+            <div className="text-2xl font-bold">{analytics.total_mensagem_rapida}</div>
+            <p className="text-xs text-muted-foreground">
+              Cliques em mensagens pré-definidas
+            </p>
+            {analyticsComparacao && (
+              <p className={cn(
+                "text-xs font-medium mt-1",
+                calcularVariacao(analytics.total_mensagem_rapida, analyticsComparacao.total_mensagem_rapida) >= 0
+                  ? "text-green-600"
+                  : "text-red-600"
+              )}>
+                {calcularVariacao(analytics.total_mensagem_rapida, analyticsComparacao.total_mensagem_rapida) >= 0 ? "+" : ""}
+                {calcularVariacao(analytics.total_mensagem_rapida, analyticsComparacao.total_mensagem_rapida).toFixed(1)}% vs período anterior
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Botão WhatsApp</CardTitle>
+            <BarChart3 className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{analytics.total_botao_whatsapp}</div>
+            <p className="text-xs text-muted-foreground">
+              Cliques diretos no botão
+            </p>
+            {analyticsComparacao && (
+              <p className={cn(
+                "text-xs font-medium mt-1",
+                calcularVariacao(analytics.total_botao_whatsapp, analyticsComparacao.total_botao_whatsapp) >= 0
+                  ? "text-green-600"
+                  : "text-red-600"
+              )}>
+                {calcularVariacao(analytics.total_botao_whatsapp, analyticsComparacao.total_botao_whatsapp) >= 0 ? "+" : ""}
+                {calcularVariacao(analytics.total_botao_whatsapp, analyticsComparacao.total_botao_whatsapp).toFixed(1)}% vs período anterior
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Taxa de Conversão</CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{analytics.taxa_conversao.toFixed(1)}%</div>
+            <p className="text-xs text-muted-foreground">
+              Ações / Visualizações
+            </p>
+            {analyticsComparacao && (
+              <p className={cn(
+                "text-xs font-medium mt-1",
+                calcularVariacao(analytics.taxa_conversao, analyticsComparacao.taxa_conversao) >= 0
+                  ? "text-green-600"
+                  : "text-red-600"
+              )}>
+                {calcularVariacao(analytics.taxa_conversao, analyticsComparacao.taxa_conversao) >= 0 ? "+" : ""}
+                {calcularVariacao(analytics.taxa_conversao, analyticsComparacao.taxa_conversao).toFixed(1)}% vs período anterior
+              </p>
             )}
           </CardContent>
         </Card>
       </div>
+
+      {/* Gráfico de Eventos ao Longo do Tempo */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Eventos ao Longo do Tempo</CardTitle>
+          <CardDescription>
+            Visualização diária das interações com o widget
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={350}>
+            <LineChart data={eventosTempo}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="data" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line
+                type="monotone"
+                dataKey="widget_aberto"
+                stroke="hsl(var(--primary))"
+                name="Widget Aberto"
+                strokeWidth={2}
+              />
+              <Line
+                type="monotone"
+                dataKey="mensagem_rapida"
+                stroke="hsl(var(--chart-2))"
+                name="Mensagem Rápida"
+                strokeWidth={2}
+              />
+              <Line
+                type="monotone"
+                dataKey="botao_whatsapp"
+                stroke="hsl(var(--chart-3))"
+                name="Botão WhatsApp"
+                strokeWidth={2}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+      {/* Mensagens Mais Clicadas */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Mensagens Mais Clicadas</CardTitle>
+          <CardDescription>
+            Ranking das mensagens rápidas mais populares
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {mensagensPopulares.length > 0 ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={mensagensPopulares}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="mensagem_tipo" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="total" fill="hsl(var(--primary))" name="Cliques" />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+              Nenhuma mensagem rápida clicada ainda
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

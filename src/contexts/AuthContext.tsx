@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { User, Session } from '@supabase/supabase-js';
+import { User, Session, AuthError } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -9,8 +9,8 @@ interface AuthContextType {
   session: Session | null;
   isAdmin: boolean;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signUp: (email: string, password: string) => Promise<{ error: any }>;
+  signIn: (email: string, password: string) => Promise<{ error: AuthError | Error | null }>;
+  signUp: (email: string, password: string) => Promise<{ error: AuthError | Error | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -93,9 +93,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       toast.success('Login realizado com sucesso!');
       return { error: null };
-    } catch (error: any) {
+    } catch (error) {
       toast.error('Erro ao fazer login');
-      return { error };
+      return { error: error as Error };
     }
   };
 
@@ -118,9 +118,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       toast.success('Cadastro realizado! Verifique seu email.');
       return { error: null };
-    } catch (error: any) {
+    } catch (error) {
       toast.error('Erro ao criar conta');
-      return { error };
+      return { error: error as Error };
     }
   };
 
@@ -152,6 +152,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {

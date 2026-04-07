@@ -62,8 +62,8 @@ export const BotaoReserva = ({ pacoteId, trackingCode }: { pacoteId: string; tra
  * EXEMPLO 3: Rastrear clique no WhatsApp
  * Use quando o usuário clicar para entrar em contato via WhatsApp
  */
-export const BotaoWhatsApp = ({ pacoteId, telefone, trackingCode }: { 
-  pacoteId: string; 
+export const BotaoWhatsApp = ({ pacoteId, telefone, trackingCode }: {
+  pacoteId: string;
   telefone: string;
   trackingCode?: string;
 }) => {
@@ -113,8 +113,8 @@ export const ConfirmarVenda = async (pacoteId: string, valor: number, trackingCo
   }
 
   // Google Analytics (GA4)
-  if (typeof window !== 'undefined' && (window as any).gtag) {
-    (window as any).gtag('event', 'purchase', {
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', 'purchase', {
       transaction_id: `pacote_${pacoteId}_${Date.now()}`,
       value: valor,
       currency: 'BRL',

@@ -74,7 +74,7 @@ const PackagesIndexDynamic = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
+
       {/* Hero Section */}
       <section className="relative py-20 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground">
         <div className="absolute inset-0 bg-black/10"></div>
@@ -117,7 +117,7 @@ const PackagesIndexDynamic = () => {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {pacotes.map((pacote) => {
                 const Icon = getTipoIcon(pacote.tipo);
-                
+
                 return (
                   <Card key={pacote.id} className="overflow-hidden hover:shadow-xl transition-all duration-300 group">
                     {/* Imagem */}
@@ -127,7 +127,7 @@ const PackagesIndexDynamic = () => {
                         alt={pacote.nome}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                       />
-                      
+
                       {/* Badges */}
                       <div className="absolute top-4 left-4 flex gap-2">
                         {pacote.popular && (

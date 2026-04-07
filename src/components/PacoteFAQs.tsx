@@ -27,11 +27,10 @@ const FAQItem = ({ faq, index, value }: { faq: FAQ; index: number; value: string
   return (
     <div
       ref={ref}
-      className={`transition-all duration-700 ${
-        isVisible 
-          ? 'opacity-100 translate-y-0' 
-          : 'opacity-0 translate-y-6'
-      }`}
+      className={`transition-all duration-700 ${isVisible
+        ? 'opacity-100 translate-y-0'
+        : 'opacity-0 translate-y-6'
+        }`}
       style={{ transitionDelay: `${index * 100}ms` }}
     >
       <AccordionItem value={value} className="border-b border-border/50 hover:border-primary/30 transition-colors">
@@ -59,6 +58,7 @@ export const PacoteFAQs = ({ pacoteId }: PacoteFAQsProps) => {
 
   useEffect(() => {
     fetchFaqs();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pacoteId]);
 
   const fetchFaqs = async () => {
@@ -67,7 +67,7 @@ export const PacoteFAQs = ({ pacoteId }: PacoteFAQsProps) => {
         .from("faqs")
         .select("*")
         .eq("ativo", true)
-        .eq("pacote_id", pacoteId)
+        .or(`pacote_id.eq.${pacoteId},and(rancho_id.is.null,pacote_id.is.null)`)
         .order("ordem", { ascending: true });
 
       if (error) throw error;
@@ -102,11 +102,10 @@ export const PacoteFAQs = ({ pacoteId }: PacoteFAQsProps) => {
       <div className="container max-w-4xl mx-auto px-4">
         <div
           ref={titleRef}
-          className={`text-center mb-12 transition-all duration-700 ${
-            titleVisible 
-              ? 'opacity-100 translate-y-0' 
-              : 'opacity-0 translate-y-4'
-          }`}
+          className={`text-center mb-12 transition-all duration-700 ${titleVisible
+            ? 'opacity-100 translate-y-0'
+            : 'opacity-0 translate-y-4'
+            }`}
         >
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
             Perguntas Frequentes

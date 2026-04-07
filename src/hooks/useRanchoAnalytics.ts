@@ -6,6 +6,7 @@ type AnalyticsEvent = "visualizacao" | "clique_whatsapp" | "clique_reserva";
 export const useRanchoAnalytics = (ranchoId: string, evento: AnalyticsEvent) => {
   useEffect(() => {
     const registrarEvento = async () => {
+      if (!ranchoId || ranchoId.length < 32) return;
       try {
         const { error } = await supabase.from("rancho_analytics").insert([{
           rancho_id: ranchoId,
@@ -26,6 +27,7 @@ export const useRanchoAnalytics = (ranchoId: string, evento: AnalyticsEvent) => 
 };
 
 export const registrarEvento = async (ranchoId: string, evento: AnalyticsEvent) => {
+  if (!ranchoId || ranchoId.length < 32) return;
   try {
     const { error } = await supabase.from("rancho_analytics").insert([{
       rancho_id: ranchoId,

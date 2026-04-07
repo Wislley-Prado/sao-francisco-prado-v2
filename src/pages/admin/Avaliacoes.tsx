@@ -27,12 +27,12 @@ export default function Avaliacoes() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data as any[];
+      return data as Array<{ id: string; nome_usuario: string; nota: number; comentario: string; resposta_admin: string | null; created_at: string; verificado: boolean; email: string; ranchos: { nome: string } }>;
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: async ({ id, updates }: { id: string; updates: any }) => {
+    mutationFn: async ({ id, updates }: { id: string; updates: Record<string, unknown> }) => {
       const { error } = await supabase
         .from("avaliacoes")
         .update(updates)
@@ -114,11 +114,10 @@ export default function Avaliacoes() {
                     {Array.from({ length: 5 }).map((_, i) => (
                       <Star
                         key={i}
-                        className={`h-4 w-4 ${
-                          i < avaliacao.nota
+                        className={`h-4 w-4 ${i < avaliacao.nota
                             ? "fill-yellow-400 text-yellow-400"
                             : "text-muted"
-                        }`}
+                          }`}
                       />
                     ))}
                   </div>
@@ -180,11 +179,10 @@ export default function Avaliacoes() {
                     {Array.from({ length: 5 }).map((_, i) => (
                       <Star
                         key={i}
-                        className={`h-4 w-4 ${
-                          i < avaliacao.nota
+                        className={`h-4 w-4 ${i < avaliacao.nota
                             ? "fill-yellow-400 text-yellow-400"
                             : "text-muted"
-                        }`}
+                          }`}
                       />
                     ))}
                   </div>

@@ -25,6 +25,7 @@ export const RanchoFAQs = ({ ranchoId }: RanchoFAQsProps) => {
 
   useEffect(() => {
     fetchFaqs();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ranchoId]);
 
   const fetchFaqs = async () => {
@@ -33,7 +34,7 @@ export const RanchoFAQs = ({ ranchoId }: RanchoFAQsProps) => {
         .from("faqs")
         .select("*")
         .eq("ativo", true)
-        .eq("rancho_id", ranchoId)
+        .or(`rancho_id.eq.${ranchoId},and(rancho_id.is.null,pacote_id.is.null)`)
         .order("ordem", { ascending: true });
 
       if (error) throw error;

@@ -39,8 +39,8 @@ interface FAQFormProps {
 export const FAQForm = ({ initialData }: FAQFormProps) => {
   const navigate = useNavigate();
   const isEditing = !!initialData;
-  const [pacotes, setPacotes] = useState<any[]>([]);
-  const [ranchos, setRanchos] = useState<any[]>([]);
+  const [pacotes, setPacotes] = useState<Array<{ id: string; nome: string }>>([]);
+  const [ranchos, setRanchos] = useState<Array<{ id: string; nome: string }>>([]);
 
   useEffect(() => {
     fetchPacotes();

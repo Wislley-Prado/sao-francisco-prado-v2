@@ -8,6 +8,7 @@ import Header from '@/components/Header';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
 import FeaturedPackagesCarousel from '@/components/FeaturedPackagesCarousel';
+import Footer from '@/components/Footer';
 
 interface PacoteImage {
   id: string;
@@ -36,8 +37,31 @@ interface Pacote {
   pacote_imagens: PacoteImage[];
 }
 
+interface FormattedPackage {
+  id: number;
+  slug: string;
+  title: string;
+  description: string;
+  rawPrice: number;
+  price: string;
+  parcelasQtd: number;
+  parcelaValor: number;
+  desconto: number;
+  precoAvista: number;
+  vagasDisponiveis?: number;
+  duration: string;
+  people: string;
+  rating: number;
+  features: string[];
+  image: string;
+  popular: boolean;
+  destaque: boolean;
+  badge: string;
+  badgeColor: string;
+}
+
 const PackagesIndex = () => {
-  const [packages, setPackages] = useState<any[]>([]);
+  const [packages, setPackages] = useState<FormattedPackage[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -61,8 +85,8 @@ const PackagesIndex = () => {
         if (error) throw error;
 
         const formattedPackages = data?.map((pacote: Pacote, index: number) => {
-          const mainImage = pacote.pacote_imagens.find(img => img.principal) || 
-                           pacote.pacote_imagens.sort((a, b) => a.ordem - b.ordem)[0];
+          const mainImage = pacote.pacote_imagens.find(img => img.principal) ||
+            pacote.pacote_imagens.sort((a, b) => a.ordem - b.ordem)[0];
 
           const parcelasQtd = pacote.parcelas_quantidade || 10;
           const parcelaValor = pacote.parcela_valor || (pacote.preco / parcelasQtd);
@@ -74,8 +98,8 @@ const PackagesIndex = () => {
             slug: pacote.slug,
             title: pacote.nome,
             description: pacote.descricao || '',
-            price: pacote.preco,
-            priceFormatted: `R$ ${pacote.preco.toFixed(2).replace('.', ',')}`,
+            rawPrice: pacote.preco,
+            price: `R$ ${pacote.preco.toFixed(2).replace('.', ',')}`,
             parcelasQtd,
             parcelaValor,
             desconto,
@@ -112,14 +136,14 @@ const PackagesIndex = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-50 to-blue-50">
       <Header />
-      
+
       {/* Hero Section */}
       <section className="relative py-20 bg-gradient-to-r from-blue-600 to-blue-800 text-white">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="relative container mx-auto px-4 text-center">
           <h1 className="text-5xl font-bold mb-6">Nossos Pacotes de Pesca</h1>
           <p className="text-xl mb-8 max-w-3xl mx-auto">
-            Escolha o pacote ideal para sua experiência de pesca esportiva no Rio São Francisco. 
+            Escolha o pacote ideal para sua experiência de pesca esportiva no Rio São Francisco.
             Temos opções para todos os perfis, desde o pescador iniciante até o mais exigente.
           </p>
           <div className="flex justify-center gap-6 text-lg">
@@ -166,13 +190,12 @@ const PackagesIndex = () => {
               packages.map((pkg, index) => {
                 const IconComponent = getIcon(index);
                 return (
-                  <Card 
+                  <Card
                     key={pkg.id}
-                    className={`relative overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 ${
-                      pkg.popular 
-                        ? 'ring-2 ring-sunset-orange shadow-xl scale-105' 
-                        : 'hover:shadow-lg'
-                    }`}
+                    className={`relative overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 ${pkg.popular
+                      ? 'ring-2 ring-sunset-orange shadow-xl scale-105'
+                      : 'hover:shadow-lg'
+                      }`}
                   >
                     {/* Badge */}
                     <div className="absolute top-4 right-4 z-10">
@@ -184,8 +207,8 @@ const PackagesIndex = () => {
                     {/* Image Header */}
                     <CardHeader className="p-0">
                       <div className="h-48 relative overflow-hidden">
-                        <img 
-                          src={pkg.image} 
+                        <img
+                          src={pkg.image}
                           alt={pkg.title}
                           className="w-full h-full object-cover"
                           loading="lazy"
@@ -227,13 +250,13 @@ const PackagesIndex = () => {
                         <div className="text-xs opacity-80">sem juros</div>
                         {pkg.desconto > 0 ? (
                           <div className="mt-2 pt-2 border-t border-white/20">
-                            <span className="text-xs line-through opacity-70">R$ {pkg.price.toFixed(2).replace('.', ',')}</span>
+                            <span className="text-xs line-through opacity-70">R$ {pkg.rawPrice.toFixed(2).replace('.', ',')}</span>
                             <span className="ml-2 font-semibold">R$ {pkg.precoAvista.toFixed(2).replace('.', ',')} à vista</span>
                             <Badge className="ml-2 bg-white/20 text-white text-xs">{pkg.desconto}% OFF</Badge>
                           </div>
                         ) : (
                           <div className="text-xs mt-1 opacity-80">
-                            ou R$ {pkg.price.toFixed(2).replace('.', ',')} à vista
+                            ou R$ {pkg.rawPrice.toFixed(2).replace('.', ',')} à vista
                           </div>
                         )}
                       </div>
@@ -266,14 +289,13 @@ const PackagesIndex = () => {
                       </div>
 
                       {/* CTA Button */}
-                      <Button 
-                        className={`w-full ${
-                          pkg.destaque
-                            ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700'
-                            : pkg.popular 
-                              ? 'bg-sunset-orange hover:bg-orange-600' 
-                              : 'bg-rio-blue hover:bg-blue-600'
-                        } text-white`}
+                      <Button
+                        className={`w-full ${pkg.destaque
+                          ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700'
+                          : pkg.popular
+                            ? 'bg-sunset-orange hover:bg-orange-600'
+                            : 'bg-rio-blue hover:bg-blue-600'
+                          } text-white`}
                         asChild
                       >
                         <Link to={`/pacote/${pkg.slug}`}>
@@ -364,6 +386,8 @@ const PackagesIndex = () => {
           </div>
         </div>
       </section>
+
+      <Footer />
     </div>
   );
 };

@@ -16,7 +16,7 @@ import { Loader2 } from 'lucide-react';
 interface DeletePacoteDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  pacote: any;
+  pacote: { id: string; nome: string; pacote_imagens?: Array<{ id: string; url: string }> } | null;
   onSuccess: () => void;
 }
 
@@ -37,7 +37,7 @@ export const DeletePacoteDialog = ({
       // Excluir imagens do storage
       if (pacote.pacote_imagens && pacote.pacote_imagens.length > 0) {
         const filePaths = pacote.pacote_imagens
-          .map((img: any) => {
+          .map((img: { url: string }) => {
             const url = new URL(img.url);
             return url.pathname.split('/').slice(-2).join('/');
           })
@@ -73,9 +73,10 @@ export const DeletePacoteDialog = ({
       toast.success('Pacote excluído com sucesso!');
       onSuccess();
       onOpenChange(false);
-    } catch (error: any) {
+    } catch (error) {
+      const isError = error instanceof Error;
       console.error('Error deleting pacote:', error);
-      toast.error(error.message || 'Erro ao excluir pacote');
+      toast.error(isError ? error.message : 'Erro ao excluir pacote');
     } finally {
       setIsDeleting(false);
     }

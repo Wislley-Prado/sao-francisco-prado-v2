@@ -1,0 +1,7 @@
+[dotenv@17.3.1] injecting env (5) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+Error reading view: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column site_settings_public.favicon_url does not exist'
+}

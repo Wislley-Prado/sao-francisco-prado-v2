@@ -18,7 +18,7 @@ interface PaidMediaBannerProps {
     data_inicio?: string;
     data_fim?: string;
   } | null;
-  onChange: (value: any) => void;
+  onChange: (value: PaidMediaBannerProps['value']) => void;
 }
 
 export const PaidMediaBanner = ({ value, onChange }: PaidMediaBannerProps) => {

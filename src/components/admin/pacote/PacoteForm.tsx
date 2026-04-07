@@ -26,6 +26,7 @@ import { CoordenadasHelper } from './CoordenadasHelper';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Loader2, Plus, X } from 'lucide-react';
+import { invalidateCacheByPrefix } from '@/lib/cacheService';
 
 const pacoteSchema = z.object({
   nome: z.string().min(3, 'Nome deve ter no mínimo 3 caracteres'),
@@ -81,15 +82,49 @@ const pacoteSchema = z.object({
 
 type PacoteFormData = z.infer<typeof pacoteSchema>;
 
+export interface PacoteData {
+  id: string;
+  nome?: string;
+  slug?: string;
+  descricao?: string;
+  preco?: number;
+  duracao?: string;
+  pessoas?: number;
+  rating?: number;
+  tipo?: 'pescaria' | 'completo' | 'personalizado';
+  ativo?: boolean;
+  popular?: boolean;
+  destaque?: boolean;
+  parcelas_quantidade?: number;
+  parcela_valor?: number;
+  desconto_avista?: number;
+  vagas_disponiveis?: number;
+  tracking_code?: string;
+  telefone_whatsapp?: string;
+  endereco_completo?: string;
+  latitude?: number | string;
+  longitude?: number | string;
+  video_youtube?: string;
+  caracteristicas?: string[];
+  inclusos?: string[];
+  pacote_imagens?: Array<{
+    id: string;
+    url: string;
+    principal: boolean;
+    alt_text?: string;
+    ordem: number;
+  }>;
+}
+
 interface PacoteFormProps {
-  pacote?: any;
+  pacote?: PacoteData | null;
   onSuccess: () => void;
 }
 
 export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [images, setImages] = useState<ImageFile[]>(
-    pacote?.pacote_imagens?.map((img: any, index: number) => ({
+    pacote?.pacote_imagens?.map((img: { id: string; url: string; principal: boolean; alt_text?: string; ordem?: number }, index: number) => ({
       id: img.id,
       url: img.url,
       principal: img.principal,
@@ -305,10 +340,15 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
         toast.success('Pacote criado com sucesso!');
       }
 
+      // Invalida cache para refletir as mudanças imediatamente
+      invalidateCacheByPrefix('pacote');
+      invalidateCacheByPrefix('pacotes');
+
       onSuccess();
-    } catch (error: any) {
+    } catch (error) {
+      const isError = error instanceof Error;
       console.error('Error saving pacote:', error);
-      toast.error(error.message || 'Erro ao salvar pacote');
+      toast.error(isError ? error.message : 'Erro ao salvar pacote');
     } finally {
       setIsSubmitting(false);
     }
@@ -385,7 +425,7 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
             {/* Seção de Preços e Parcelamento */}
             <div className="rounded-lg border p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 border-green-200 dark:border-green-800">
               <h3 className="text-lg font-semibold mb-4 text-green-800 dark:text-green-200">💰 Preços e Parcelamento</h3>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <FormField
                   control={form.control}
@@ -412,8 +452,8 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Número de Parcelas</FormLabel>
-                      <Select 
-                        onValueChange={(val) => field.onChange(parseInt(val))} 
+                      <Select
+                        onValueChange={(val) => field.onChange(parseInt(val))}
                         defaultValue={String(field.value || 10)}
                       >
                         <FormControl>
@@ -510,7 +550,7 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
                   <div className="text-center">
                     <div className="text-2xl font-bold text-green-600 dark:text-green-400">
                       {form.watch('parcelas_quantidade') || 10}x de R$ {(
-                        form.watch('parcela_valor') || 
+                        form.watch('parcela_valor') ||
                         (form.watch('preco') / (form.watch('parcelas_quantidade') || 10))
                       ).toFixed(2)}
                     </div>
@@ -799,7 +839,7 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
               </div>
 
               {/* Helper para extrair coordenadas */}
-              <CoordenadasHelper 
+              <CoordenadasHelper
                 onCoordenadasExtraidas={(latitude, longitude) => {
                   form.setValue('latitude', latitude);
                   form.setValue('longitude', longitude);

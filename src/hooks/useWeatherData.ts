@@ -67,14 +67,14 @@ const API_KEY = '6459a62448b61386ccc581f2cc307a2c';
 // Função para gerar dados estáveis baseados na data atual (fallback apenas)
 const generateStableWeatherData = (): WeatherData => {
   if (import.meta.env.DEV) console.log('🌤️ [WEATHER] Gerando dados simulados como fallback...');
-  
+
   const now = new Date();
   const currentTimestamp = Math.floor(now.getTime() / 1000);
-  
+
   // Usar a data atual como seed para valores consistentes
   const dayOfYear = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24));
   const seed = dayOfYear + now.getFullYear();
-  
+
   // Função para gerar números pseudo-aleatórios consistentes
   const seededRandom = (min: number, max: number, offset: number = 0) => {
     const x = Math.sin(seed + offset) * 10000;
@@ -85,7 +85,7 @@ const generateStableWeatherData = (): WeatherData => {
   // Temperatura base para Três Marias (clima tropical)
   const baseTemp = 26; // Temperatura média anual
   const temperature = baseTemp + seededRandom(-3, 4, 1);
-  
+
   const current: CurrentWeather = {
     temperature,
     feels_like: temperature + seededRandom(-2, 3, 2),
@@ -109,7 +109,7 @@ const generateStableWeatherData = (): WeatherData => {
   for (let i = 1; i <= 24; i++) {
     const hourTimestamp = currentTimestamp + (i * 3600);
     const hourTemp = temperature + seededRandom(-2, 3, i + 10);
-    
+
     hourly.push({
       dt: hourTimestamp,
       temperature: hourTemp,
@@ -130,7 +130,7 @@ const generateStableWeatherData = (): WeatherData => {
   for (let i = 1; i <= 7; i++) {
     const dayTimestamp = currentTimestamp + (i * 24 * 3600);
     const dayBaseTemp = temperature + seededRandom(-2, 3, i + 100);
-    
+
     daily.push({
       dt: dayTimestamp,
       temp_min: dayBaseTemp - seededRandom(3, 6, i + 110),
@@ -161,19 +161,19 @@ const generateStableWeatherData = (): WeatherData => {
 // Função para buscar dados reais da API OpenWeatherMap
 const fetchWeatherData = async (): Promise<WeatherData> => {
   if (import.meta.env.DEV) console.log('🌤️ [WEATHER] Buscando dados REAIS da API OpenWeatherMap...');
-  
+
   // Coordenadas de Três Marias/MG
   const lat = -18.2028;
   const lon = -45.2394;
-  
+
   // API key log removed for production
-  
+
   try {
     // Buscar dados atuais da API OpenWeatherMap
     const currentResponse = await fetch(
       `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric&lang=pt_br`
     );
-    
+
     if (!currentResponse.ok) {
       if (currentResponse.status === 401) {
         if (import.meta.env.DEV) console.error('❌ [WEATHER] Chave da API inválida ou expirada');
@@ -181,15 +181,15 @@ const fetchWeatherData = async (): Promise<WeatherData> => {
       }
       throw new Error(`Erro na API Current Weather: ${currentResponse.status}`);
     }
-    
+
     const currentData = await currentResponse.json();
     if (import.meta.env.DEV) console.log('✅ [WEATHER] Dados reais recebidos:', currentData);
-    
+
     // Buscar previsão de 5 dias (dados horários)
     const forecastResponse = await fetch(
       `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric&lang=pt_br`
     );
-    
+
     let forecastData = null;
     if (forecastResponse.ok) {
       forecastData = await forecastResponse.json();
@@ -197,7 +197,7 @@ const fetchWeatherData = async (): Promise<WeatherData> => {
     } else {
       if (import.meta.env.DEV) console.warn('⚠️ [WEATHER] Erro na previsão, usando fallback');
     }
-    
+
     // Processar dados atuais reais
     const current: CurrentWeather = {
       temperature: Math.round(currentData.main.temp),
@@ -216,11 +216,11 @@ const fetchWeatherData = async (): Promise<WeatherData> => {
       sunset: currentData.sys.sunset,
       dt: currentData.dt
     };
-    
+
     // Processar previsão horária se disponível
     let hourly: HourlyForecast[] = [];
     if (forecastData && forecastData.list) {
-      hourly = forecastData.list.slice(0, 24).map((item: any) => ({
+      hourly = forecastData.list.slice(0, 24).map((item: { dt: number; main: { temp: number; feels_like: number; humidity: number }; wind?: { speed?: number; deg?: number }; weather: Array<{ main: string; description: string; icon: string }>; pop?: number; clouds?: { all?: number } }) => ({
         dt: item.dt,
         temperature: Math.round(item.main.temp),
         feels_like: Math.round(item.main.feels_like),
@@ -238,13 +238,13 @@ const fetchWeatherData = async (): Promise<WeatherData> => {
       const fallbackData = generateStableWeatherData();
       hourly = fallbackData.hourly;
     }
-    
+
     // Processar previsão diária (agregar dados horários)
     let daily: DailyForecast[] = [];
     if (forecastData && forecastData.list) {
       const dailyMap = new Map();
-      
-      forecastData.list.forEach((item: any) => {
+
+      forecastData.list.forEach((item: { dt: number; main: { temp: number; humidity: number }; wind?: { speed?: number }; weather: Array<{ main: string; description: string; icon: string }>; pop?: number }) => {
         const date = new Date(item.dt * 1000).toDateString();
         if (!dailyMap.has(date)) {
           dailyMap.set(date, {
@@ -264,8 +264,8 @@ const fetchWeatherData = async (): Promise<WeatherData> => {
           existing.temps.push(item.main.temp);
         }
       });
-      
-      daily = Array.from(dailyMap.values()).slice(0, 7).map((day: any) => ({
+
+      daily = Array.from(dailyMap.values()).slice(0, 7).map((day: { dt: number; temps: number[]; humidity: number; wind_speed: number; weather_main: string; weather_description: string; weather_icon: string; pop: number; sunrise: number; sunset: number }) => ({
         dt: day.dt,
         temp_min: Math.round(Math.min(...day.temps)),
         temp_max: Math.round(Math.max(...day.temps)),
@@ -283,7 +283,7 @@ const fetchWeatherData = async (): Promise<WeatherData> => {
       const fallbackData = generateStableWeatherData();
       daily = fallbackData.daily;
     }
-    
+
     return {
       current,
       hourly,
@@ -294,7 +294,7 @@ const fetchWeatherData = async (): Promise<WeatherData> => {
         timezone: 'America/Sao_Paulo'
       }
     };
-    
+
   } catch (error) {
     if (import.meta.env.DEV) console.error('❌ [WEATHER] Erro ao buscar dados da API:', error);
     return generateStableWeatherData();

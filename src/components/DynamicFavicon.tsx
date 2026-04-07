@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 const updateLink = (rel: string, href: string, sizes?: string, type?: string) => {
   let selector = `link[rel="${rel}"]`;
   if (sizes) selector += `[sizes="${sizes}"]`;
-  
+
   let link = document.querySelector(selector) as HTMLLinkElement | null;
   if (!link) {
     link = document.createElement('link');
@@ -16,6 +16,11 @@ const updateLink = (rel: string, href: string, sizes?: string, type?: string) =>
   if (type) link.type = type;
   link.href = href;
 };
+
+interface FaviconSettings {
+  favicon_url: string | null;
+  pwa_icon_url: string | null;
+}
 
 export const DynamicFavicon = () => {
   const { data: settings } = useQuery({
@@ -41,8 +46,9 @@ export const DynamicFavicon = () => {
       updateLink('apple-touch-icon', settings.favicon_url);
     }
 
-    if ((settings as any).pwa_icon_url) {
-      updateLink('icon', (settings as any).pwa_icon_url, '192x192', 'image/png');
+    const typedSettings = settings as FaviconSettings;
+    if (typedSettings.pwa_icon_url) {
+      updateLink('icon', typedSettings.pwa_icon_url, '192x192', 'image/png');
     }
   }, [settings]);
 

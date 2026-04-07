@@ -44,17 +44,17 @@ export default function EstatisticasAvaliacoes() {
   const mediaGeral = avaliacoes?.length
     ? (avaliacoes.reduce((acc, av) => acc + av.nota, 0) / avaliacoes.length).toFixed(1)
     : "0.0";
-  
+
   const avaliacoesPositivas = avaliacoes?.filter(av => av.nota >= 4).length || 0;
-  const taxaPositiva = totalAvaliacoes > 0 
-    ? ((avaliacoesPositivas / totalAvaliacoes) * 100).toFixed(1) 
+  const taxaPositiva = totalAvaliacoes > 0
+    ? ((avaliacoesPositivas / totalAvaliacoes) * 100).toFixed(1)
     : "0";
 
   // Estatísticas por rancho
-  const estatisticasPorRancho = avaliacoes?.reduce((acc: any[], av: any) => {
+  const estatisticasPorRancho = avaliacoes?.reduce((acc: Array<{ rancho: string; total: number; somaNotas: number; media: string }>, av) => {
     const ranchoNome = av.ranchos?.nome || "Desconhecido";
     const existing = acc.find(item => item.rancho === ranchoNome);
-    
+
     if (existing) {
       existing.total += 1;
       existing.somaNotas += av.nota;
@@ -67,7 +67,7 @@ export default function EstatisticasAvaliacoes() {
         media: av.nota.toFixed(1),
       });
     }
-    
+
     return acc;
   }, []) || [];
 
@@ -90,7 +90,7 @@ export default function EstatisticasAvaliacoes() {
   avaliacoes?.forEach(av => {
     const avDate = startOfDay(new Date(av.created_at));
     const daysDiff = Math.floor((new Date().getTime() - avDate.getTime()) / (1000 * 60 * 60 * 24));
-    
+
     if (daysDiff < 30) {
       const index = 29 - daysDiff;
       last30Days[index].quantidade += 1;
@@ -125,22 +125,22 @@ export default function EstatisticasAvaliacoes() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Estatísticas de Avaliações</h1>
-          <p className="text-muted-foreground mt-1">
-            Análise detalhada das avaliações dos ranchos
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">Estatísticas de Avaliações</h1>
+            <p className="text-muted-foreground mt-1">
+              Análise detalhada das avaliações dos ranchos
+            </p>
+          </div>
+          <Button
+            onClick={handleExportPDF}
+            disabled={totalAvaliacoes === 0}
+          >
+            <FileDown className="h-4 w-4 mr-2" />
+            Exportar PDF
+          </Button>
         </div>
-        <Button 
-          onClick={handleExportPDF} 
-          disabled={totalAvaliacoes === 0}
-        >
-          <FileDown className="h-4 w-4 mr-2" />
-          Exportar PDF
-        </Button>
-      </div>
-        
+
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {[1, 2, 3, 4].map((i) => (
             <Skeleton key={i} className="h-32" />
@@ -230,17 +230,17 @@ export default function EstatisticasAvaliacoes() {
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={last30Days}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis 
-                  dataKey="data" 
+                <XAxis
+                  dataKey="data"
                   tick={{ fontSize: 12 }}
                   interval={4}
                 />
                 <YAxis />
                 <Tooltip />
-                <Line 
-                  type="monotone" 
-                  dataKey="quantidade" 
-                  stroke="hsl(var(--primary))" 
+                <Line
+                  type="monotone"
+                  dataKey="quantidade"
+                  stroke="hsl(var(--primary))"
                   strokeWidth={2}
                   name="Avaliações"
                 />
@@ -293,8 +293,8 @@ export default function EstatisticasAvaliacoes() {
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={estatisticasPorRancho}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis 
-                  dataKey="rancho" 
+                <XAxis
+                  dataKey="rancho"
                   tick={{ fontSize: 12 }}
                   angle={-45}
                   textAnchor="end"
@@ -304,16 +304,16 @@ export default function EstatisticasAvaliacoes() {
                 <YAxis yAxisId="right" orientation="right" domain={[0, 5]} />
                 <Tooltip />
                 <Legend />
-                <Bar 
+                <Bar
                   yAxisId="left"
-                  dataKey="total" 
-                  fill="hsl(var(--primary))" 
+                  dataKey="total"
+                  fill="hsl(var(--primary))"
                   name="Total de Avaliações"
                 />
-                <Bar 
+                <Bar
                   yAxisId="right"
-                  dataKey="media" 
-                  fill="#22c55e" 
+                  dataKey="media"
+                  fill="#22c55e"
                   name="Média de Notas"
                 />
               </BarChart>
@@ -333,17 +333,17 @@ export default function EstatisticasAvaliacoes() {
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={last30Days}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis 
-                  dataKey="data" 
+                <XAxis
+                  dataKey="data"
                   tick={{ fontSize: 12 }}
                   interval={4}
                 />
                 <YAxis domain={[0, 5]} />
                 <Tooltip />
-                <Line 
-                  type="monotone" 
-                  dataKey="mediaNotas" 
-                  stroke="#22c55e" 
+                <Line
+                  type="monotone"
+                  dataKey="mediaNotas"
+                  stroke="#22c55e"
                   strokeWidth={2}
                   name="Média de Notas"
                   dot={{ fill: '#22c55e' }}
@@ -398,11 +398,10 @@ export default function EstatisticasAvaliacoes() {
                             {Array.from({ length: 5 }).map((_, i) => (
                               <Star
                                 key={i}
-                                className={`h-4 w-4 ${
-                                  i < Math.round(Number(stat.media))
+                                className={`h-4 w-4 ${i < Math.round(Number(stat.media))
                                     ? "fill-yellow-400 text-yellow-400"
                                     : "text-muted"
-                                }`}
+                                  }`}
                               />
                             ))}
                           </div>

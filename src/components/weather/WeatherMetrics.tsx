@@ -4,7 +4,14 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Wind, Droplets, Gauge, Eye } from 'lucide-react';
 
 interface WeatherMetricsProps {
-  current: any;
+  current: {
+    wind_speed: number;
+    wind_direction: number;
+    humidity: number;
+    pressure: number;
+    visibility: number;
+    [key: string]: unknown;
+  };
 }
 
 const WeatherMetrics = ({ current }: WeatherMetricsProps) => {

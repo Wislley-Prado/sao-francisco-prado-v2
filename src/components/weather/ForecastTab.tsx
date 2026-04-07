@@ -5,8 +5,18 @@ import { Badge } from '@/components/ui/badge';
 import { Calendar } from 'lucide-react';
 
 interface ForecastTabProps {
-  weatherData: any;
-  current: any;
+  weatherData: {
+    daily: Array<{
+      dt: number;
+      weather_icon: string;
+      weather_description: string;
+      pop: number;
+      wind_speed: number;
+      temp_min: number;
+      temp_max: number;
+    }>;
+  };
+  current: { dt: number };
   getWeatherIcon: (iconCode: string) => React.ReactNode;
 }
 
@@ -24,18 +34,18 @@ const ForecastTab = ({ weatherData, current, getWeatherIcon }: ForecastTabProps)
       </CardHeader>
       <CardContent>
         <div className="space-y-3 sm:space-y-4">
-          {weatherData.daily.map((day: any, index: number) => {
+          {weatherData.daily.map((day: { dt: number; weather_icon: string; weather_description: string; pop: number; wind_speed: number; temp_min: number; temp_max: number }, index: number) => {
             const dayDate = new Date(day.dt * 1000);
             const currentDataDateOnly = new Date(current.dt * 1000);
             currentDataDateOnly.setHours(0, 0, 0, 0);
-            
+
             const dayDateOnly = new Date(dayDate);
             dayDateOnly.setHours(0, 0, 0, 0);
-            
+
             const isToday = dayDateOnly.getTime() === currentDataDateOnly.getTime();
             const tomorrowDate = new Date(currentDataDateOnly.getTime() + 24 * 60 * 60 * 1000);
             const isTomorrow = dayDateOnly.getTime() === tomorrowDate.getTime();
-            
+
             let dayLabel;
             if (isToday) {
               dayLabel = 'HOJE';
@@ -44,8 +54,8 @@ const ForecastTab = ({ weatherData, current, getWeatherIcon }: ForecastTabProps)
             } else {
               dayLabel = dayDate.toLocaleDateString('pt-BR', { weekday: 'long' }).toUpperCase();
             }
-            
-            const fullDate = dayDate.toLocaleDateString('pt-BR', { 
+
+            const fullDate = dayDate.toLocaleDateString('pt-BR', {
               day: '2-digit',
               month: '2-digit',
               year: 'numeric'
@@ -78,18 +88,17 @@ const ForecastTab = ({ weatherData, current, getWeatherIcon }: ForecastTabProps)
                   </div>
                   <div className="text-center">
                     <div className="text-xs text-gray-600">Pesca</div>
-                    <Badge className={`text-xs ${
-                      day.temp_min >= 18 && day.temp_max <= 30 && day.wind_speed <= 15 && day.pop <= 30
-                        ? 'bg-green-500' 
+                    <Badge className={`text-xs ${day.temp_min >= 18 && day.temp_max <= 30 && day.wind_speed <= 15 && day.pop <= 30
+                        ? 'bg-green-500'
                         : day.wind_speed <= 20 && day.pop <= 50
-                        ? 'bg-yellow-500'
-                        : 'bg-red-500'
-                    } text-white`}>
+                          ? 'bg-yellow-500'
+                          : 'bg-red-500'
+                      } text-white`}>
                       {day.temp_min >= 18 && day.temp_max <= 30 && day.wind_speed <= 15 && day.pop <= 30
-                        ? 'Ótima' 
+                        ? 'Ótima'
                         : day.wind_speed <= 20 && day.pop <= 50
-                        ? 'Boa'
-                        : 'Regular'}
+                          ? 'Boa'
+                          : 'Regular'}
                     </Badge>
                   </div>
                 </div>

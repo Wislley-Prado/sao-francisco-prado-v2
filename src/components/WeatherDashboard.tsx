@@ -2,10 +2,10 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Cloud, 
-  CloudRain, 
-  Sun, 
+import {
+  Cloud,
+  CloudRain,
+  Sun,
   TrendingUp,
   Calendar,
   Clock
@@ -41,30 +41,30 @@ const WeatherDashboard = () => {
     return iconMap[iconCode] || <Sun className="h-5 w-5 sm:h-6 sm:w-6 text-yellow-500" />;
   };
 
-  const getFishingCondition = (weather: any) => {
+  const getFishingCondition = (weather: { current: { temperature: number; wind_speed: number; clouds: number; pressure: number } }) => {
     if (!weather) return { status: 'unknown', text: 'Dados indisponíveis', color: 'bg-gray-500' };
-    
+
     const temp = weather.current.temperature;
     const wind = weather.current.wind_speed;
     const clouds = weather.current.clouds;
     const pressure = weather.current.pressure;
-    
+
     let score = 0;
-    
+
     if (temp >= 20 && temp <= 28) score += 3;
     else if (temp >= 18 && temp <= 30) score += 2;
     else score += 1;
-    
+
     if (wind <= 10) score += 3;
     else if (wind <= 15) score += 2;
     else if (wind <= 25) score += 1;
-    
+
     if (clouds >= 20 && clouds <= 60) score += 2;
     else if (clouds <= 80) score += 1;
-    
+
     if (pressure >= 1013 && pressure <= 1020) score += 2;
     else if (pressure >= 1008 && pressure <= 1025) score += 1;
-    
+
     if (score >= 8) return { status: 'excellent', text: 'Excelente', color: 'bg-green-500' };
     if (score >= 6) return { status: 'good', text: 'Boa', color: 'bg-blue-500' };
     if (score >= 4) return { status: 'fair', text: 'Regular', color: 'bg-yellow-500' };

@@ -10,7 +10,7 @@ interface SocialMediaLinksProps {
     twitter?: string;
     linkedin?: string;
   };
-  onChange: (value: any) => void;
+  onChange: (value: SocialMediaLinksProps['value']) => void;
 }
 
 export const SocialMediaLinks = ({ value, onChange }: SocialMediaLinksProps) => {

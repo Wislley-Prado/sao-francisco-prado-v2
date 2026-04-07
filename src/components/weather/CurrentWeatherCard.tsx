@@ -5,7 +5,15 @@ import { Badge } from '@/components/ui/badge';
 import { Sunrise, Sunset } from 'lucide-react';
 
 interface CurrentWeatherCardProps {
-  current: any;
+  current: {
+    weather_icon: string;
+    weather_description: string;
+    temperature: number;
+    feels_like: number;
+    sunrise: number;
+    sunset: number;
+    [key: string]: unknown;
+  };
   getWeatherIcon: (iconCode: string) => React.ReactNode;
   fishingCondition: { text: string; color: string };
   now: Date;

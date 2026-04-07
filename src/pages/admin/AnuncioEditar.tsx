@@ -10,15 +10,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import { ArrowLeft, Save } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
+import { invalidateCacheByPrefix } from '@/lib/cacheService';
 import { ImageUploader } from '@/components/admin/anuncio/ImageUploader';
 
 export default function AnuncioEditar() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const queryClient = useQueryClient();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showImovelFields, setShowImovelFields] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     titulo: '',
     subtitulo: '',
@@ -34,6 +37,7 @@ export default function AnuncioEditar() {
     duracao_exibicao: 8,
     data_inicio: '',
     data_fim: '',
+    custom_html: '',
     // Campos específicos para imóveis
     imovel_area: '',
     imovel_unidade_area: 'm2',
@@ -43,6 +47,7 @@ export default function AnuncioEditar() {
 
   useEffect(() => {
     fetchAnuncio();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const fetchAnuncio = async () => {
@@ -71,6 +76,7 @@ export default function AnuncioEditar() {
           duracao_exibicao: data.duracao_exibicao || 8,
           data_inicio: data.data_inicio ? data.data_inicio.split('T')[0] : '',
           data_fim: data.data_fim ? data.data_fim.split('T')[0] : '',
+          custom_html: data.custom_html || '',
           // Campos de imóveis
           imovel_area: data.imovel_area ? String(data.imovel_area) : '',
           imovel_unidade_area: data.imovel_unidade_area || 'm2',
@@ -117,6 +123,7 @@ export default function AnuncioEditar() {
           duracao_exibicao: formData.duracao_exibicao,
           data_inicio: formData.data_inicio || null,
           data_fim: formData.data_fim || null,
+          custom_html: formData.custom_html || null,
           // Campos de imóveis (nullable)
           imovel_area: formData.imovel_area ? parseFloat(formData.imovel_area) : null,
           imovel_unidade_area: formData.imovel_area ? formData.imovel_unidade_area : null,
@@ -126,6 +133,9 @@ export default function AnuncioEditar() {
         .eq('id', id);
 
       if (error) throw error;
+
+      invalidateCacheByPrefix('anuncios_all');
+      queryClient.invalidateQueries({ queryKey: ['anuncios'] });
 
       toast.success('Anúncio atualizado com sucesso!');
       navigate('/admin/anuncios');
@@ -235,8 +245,8 @@ export default function AnuncioEditar() {
 
                     <div className="space-y-2">
                       <Label htmlFor="imovel_unidade_area">Unidade</Label>
-                      <Select 
-                        value={formData.imovel_unidade_area} 
+                      <Select
+                        value={formData.imovel_unidade_area}
                         onValueChange={(value) => setFormData({ ...formData, imovel_unidade_area: value })}
                       >
                         <SelectTrigger>
@@ -280,6 +290,21 @@ export default function AnuncioEditar() {
               value={formData.imagem_url}
               onChange={(url) => setFormData({ ...formData, imagem_url: url || '' })}
             />
+
+            <div className="space-y-2">
+              <Label htmlFor="custom_html">Código HTML/Script Customizado (Opcional)</Label>
+              <Textarea
+                id="custom_html"
+                value={formData.custom_html}
+                onChange={(e) => setFormData({ ...formData, custom_html: e.target.value })}
+                placeholder="Insira o código do AdSense ou outro script aqui..."
+                rows={6}
+                className="font-mono text-sm"
+              />
+              <p className="text-xs text-muted-foreground">
+                Se este campo estiver preenchido, ele será priorizado em relação à imagem e link acima. Use para tags de script, frames ou HTML customizado.
+              </p>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">

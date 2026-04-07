@@ -12,6 +12,7 @@ import { Link } from 'react-router-dom';
 import { useWeatherData } from '@/hooks/useWeatherData';
 import { useDamData } from '@/hooks/useDamData';
 import { getVisibilityText } from '@/utils/weatherUtils';
+import Footer from '@/components/Footer';
 
 const LiveStream = () => {
   const { data: weatherData, isLoading: weatherLoading } = useWeatherData();
@@ -78,7 +79,7 @@ const LiveStream = () => {
                 Estatísticas
               </TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="conditions" className="mt-4">
               <Card>
                 <CardContent className="p-4">
@@ -104,11 +105,11 @@ const LiveStream = () => {
                 </CardContent>
               </Card>
             </TabsContent>
-            
+
             <TabsContent value="info" className="mt-4">
               <StreamInfo />
             </TabsContent>
-            
+
             <TabsContent value="stats" className="mt-4">
               <Card>
                 <CardContent className="p-4">
@@ -142,7 +143,7 @@ const LiveStream = () => {
 
         {/* Layout Desktop - Lado a Lado */}
         <div className="hidden lg:grid lg:grid-cols-3 lg:gap-6">
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 space-y-6">
             <StreamInfo />
           </div>
           <div className="lg:col-span-2">
@@ -175,6 +176,8 @@ const LiveStream = () => {
           </div>
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 };

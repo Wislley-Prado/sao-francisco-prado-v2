@@ -6,11 +6,12 @@ import { supabase } from "@/integrations/supabase/client";
 
 export default function DepoimentoEditar() {
   const { id } = useParams();
-  const [depoimento, setDepoimento] = useState<any>(null);
+  const [depoimento, setDepoimento] = useState<{ id: string;[key: string]: unknown } | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchDepoimento();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const fetchDepoimento = async () => {

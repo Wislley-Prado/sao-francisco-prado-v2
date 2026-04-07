@@ -11,9 +11,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  MapPin, Users, Bed, Bath, Maximize, Star, 
-  Wifi, Car, Waves, Utensils, Wind, Tv, 
+import {
+  MapPin, Users, Bed, Bath, Maximize, Star,
+  Wifi, Car, Waves, Utensils, Wind, Tv,
   ArrowLeft, MessageCircle, Loader2, CheckCircle,
   Calendar, Play, CalendarDays, Navigation, Compass, ExternalLink, Copy
 } from 'lucide-react';
@@ -24,6 +24,7 @@ import { RanchoFAQs } from '@/components/RanchoFAQs';
 import { useRanchoBySlug } from '@/hooks/useOptimizedData';
 import { ShareButtons } from '@/components/ShareButtons';
 import { SITE_CONFIG } from '@/lib/constants';
+import { invalidateCache } from '@/lib/cacheService';
 
 const amenityIcons: { [key: string]: React.ReactNode } = {
   'Wi-Fi': <Wifi className="h-5 w-5" />,
@@ -39,10 +40,21 @@ const amenityIcons: { [key: string]: React.ReactNode } = {
 const RanchoDetalhes = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  
+
   // Use optimized hook with cache
-  const { data: ranchoData, isLoading: loading } = useRanchoBySlug(slug);
-  
+  const { data: ranchoData, isLoading: loading, refetch } = useRanchoBySlug(slug);
+
+  // Cache self-healing: if coordinates are missing but it's a known rancho, try clearing cache
+  useEffect(() => {
+    if (!loading && ranchoData && !ranchoData.latitude && slug) {
+      console.log(`[Cache] Dados de localização ausentes para ${slug}, invalidando cache...`);
+      invalidateCache(`rancho_${slug}`);
+      invalidateCache('ranchos_all');
+      invalidateCache('ranchos_available');
+      refetch();
+    }
+  }, [ranchoData, loading, slug, refetch]);
+
   // Transform to expected format
   const rancho = React.useMemo(() => {
     if (!ranchoData) return null;
@@ -98,10 +110,10 @@ const RanchoDetalhes = () => {
         ALLOW_DATA_ATTR: false
       });
       trackingDiv.innerHTML = sanitizedHTML;
-      
+
       Array.from(trackingDiv.children).forEach((element) => {
         const clonedElement = element.cloneNode(true) as HTMLElement;
-        
+
         if (clonedElement.tagName === 'SCRIPT') {
           const script = document.createElement('script');
           if ((element as HTMLScriptElement).src) {
@@ -120,12 +132,12 @@ const RanchoDetalhes = () => {
 
   const handleWhatsAppReserva = () => {
     if (!rancho) return;
-    
+
     // Registrar clique no WhatsApp
     registrarEvento(rancho.id, "clique_whatsapp");
-    
+
     const phone = rancho.telefone_whatsapp || "5531999999999";
-    
+
     // Usar mensagem personalizada se existir, senão usa padrão
     let message: string;
     if (rancho.mensagem_whatsapp) {
@@ -135,26 +147,26 @@ const RanchoDetalhes = () => {
     } else {
       message = `Olá! Gostaria de fazer uma reserva no ${rancho.nome} (${rancho.localizacao}). Pode me passar mais informações sobre disponibilidade e valores?`;
     }
-    
+
     const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
   };
 
   const getYouTubeEmbedUrl = (url: string) => {
     if (!url) return null;
-    
+
     // Extract video ID from YouTube Shorts URL
-    const shortsMatch = url.match(/shorts\/([a-zA-Z0-9_-]+)/);
+    const shortsMatch = url.match(/shorts\/([a-zA-Z0-9_-]{11})/);
     if (shortsMatch) {
       return `https://www.youtube.com/embed/${shortsMatch[1]}`;
     }
-    
-    // Handle regular YouTube URLs as fallback
-    const videoMatch = url.match(/[?&]v=([a-zA-Z0-9_-]+)/);
+
+    // Regular YouTube URLs (watch?v= or youtu.be/)
+    const videoMatch = url.match(/(?:v=|\/)([a-zA-Z0-9_-]{11})(?:[&?]|$)/);
     if (videoMatch) {
       return `https://www.youtube.com/embed/${videoMatch[1]}`;
     }
-    
+
     return null;
   };
 
@@ -188,9 +200,9 @@ const RanchoDetalhes = () => {
         <meta name="twitter:image" content={mainImage} />
         <link rel="canonical" href={pageUrl} />
       </Helmet>
-      
+
       <Header />
-      
+
       <main className="pt-20">
         {/* Breadcrumb & Back Button */}
         <div className="max-w-7xl mx-auto px-4 py-6">
@@ -224,7 +236,7 @@ const RanchoDetalhes = () => {
                     <Badge className="bg-green-500 text-white">Disponível</Badge>
                   )}
                 </div>
-                
+
                 <div className="flex items-center text-muted-foreground mb-4">
                   <MapPin className="h-5 w-5 mr-2" />
                   <span className="text-lg">{rancho.localizacao}</span>
@@ -343,92 +355,7 @@ const RanchoDetalhes = () => {
                 </>
               )}
 
-              {/* Google Maps Location */}
-              {rancho.latitude && rancho.longitude && (
-                <>
-                  <Separator />
-                  <div id="map-section">
-                    {/* Header com ícone */}
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/25">
-                        <MapPin className="h-6 w-6 text-white" />
-                      </div>
-                      <div>
-                        <h2 className="text-2xl font-bold">Localização</h2>
-                        <p className="text-sm text-muted-foreground">Veja como chegar ao rancho</p>
-                      </div>
-                    </div>
 
-                    {/* Card de Endereço */}
-                    {rancho.endereco_completo && (
-                      <Card className="mb-4 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200/50 dark:border-blue-800/50">
-                        <CardContent className="p-4">
-                          <div className="flex items-start gap-3">
-                            <Navigation className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
-                            <div className="flex-1">
-                              <p className="font-medium text-foreground">{rancho.endereco_completo}</p>
-                              <div className="flex flex-wrap gap-2 mt-3">
-                                <Button 
-                                  size="sm" 
-                                  variant="outline"
-                                  className="text-blue-600 border-blue-300 hover:bg-blue-50 dark:text-blue-400 dark:border-blue-700 dark:hover:bg-blue-950/50"
-                                  onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${rancho.latitude},${rancho.longitude}`, '_blank')}
-                                >
-                                  <ExternalLink className="h-4 w-4 mr-2" />
-                                  Abrir no Maps
-                                </Button>
-                                <Button 
-                                  size="sm" 
-                                  variant="ghost"
-                                  className="text-muted-foreground hover:text-foreground"
-                                  onClick={() => {
-                                    navigator.clipboard.writeText(rancho.endereco_completo || '');
-                                    toast.success('Endereço copiado!');
-                                  }}
-                                >
-                                  <Copy className="h-4 w-4 mr-2" />
-                                  Copiar
-                                </Button>
-                              </div>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    )}
-
-                    {/* Mapa com Visual Premium */}
-                    <Card className="overflow-hidden shadow-xl border-0 rounded-2xl">
-                      <div className="bg-gradient-to-r from-blue-500 to-indigo-600 px-4 py-3">
-                        <div className="flex items-center justify-between flex-wrap gap-2">
-                          <span className="text-white text-sm font-medium flex items-center gap-2">
-                            <Compass className="h-4 w-4" />
-                            {Math.abs(rancho.latitude).toFixed(4)}°S, {Math.abs(rancho.longitude).toFixed(4)}°W
-                          </span>
-                          <Badge className="bg-white/20 text-white border-white/30 hover:bg-white/30">
-                            <span className="relative flex h-2 w-2 mr-2">
-                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                              <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
-                            </span>
-                            Localização exata
-                          </Badge>
-                        </div>
-                      </div>
-                      <CardContent className="p-0">
-                        <div className="relative w-full h-[400px] bg-muted">
-                          <iframe
-                            src={`https://www.google.com/maps?q=${rancho.latitude},${rancho.longitude}&hl=pt-BR&z=14&output=embed`}
-                            className="w-full h-full border-0"
-                            allowFullScreen
-                            loading="lazy"
-                            referrerPolicy="no-referrer-when-downgrade"
-                            title={`Mapa ${rancho.nome}`}
-                          />
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </>
-              )}
 
               {/* Google Calendar Availability */}
               {rancho.google_calendar_url && (
@@ -452,7 +379,10 @@ const RanchoDetalhes = () => {
                             Calendário de Reservas
                           </h3>
                           <div className="flex items-center gap-2">
-                            <Badge className="bg-white/20 text-white border-white/30 hover:bg-white/30">
+                            <Badge
+                              className="bg-white/20 text-white border-white/30 hover:bg-white/30 cursor-pointer transition-all hover:scale-105 active:scale-95"
+                              onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${rancho.latitude},${rancho.longitude}`, '_blank')}
+                            >
                               <span className="relative flex h-2 w-2 mr-2">
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
@@ -469,7 +399,35 @@ const RanchoDetalhes = () => {
                         {/* Container com overflow hidden para esconder o rodapé do Google Calendar */}
                         <div className="relative w-full h-[550px] overflow-hidden bg-background">
                           <iframe
-                            src={`${rancho.google_calendar_url}&showTitle=0&showPrint=0&showTabs=0&showCalendars=0&showTz=0&mode=MONTH&wkst=1&bgcolor=%23ffffff&ctz=America/Sao_Paulo`}
+                            src={(() => {
+                              try {
+                                const url = new URL(rancho.google_calendar_url);
+                                if (!url.hostname.includes('calendar.google.com')) return rancho.google_calendar_url;
+
+                                const params = new URLSearchParams(url.search);
+                                params.set('showTitle', '0');
+                                params.set('showPrint', '0');
+                                params.set('showTabs', '0');
+                                params.set('showCalendars', '0');
+                                params.set('showTz', '0');
+                                params.set('mode', 'MONTH');
+                                params.set('wkst', '1');
+                                params.set('bgcolor', '#ffffff');
+                                params.set('ctz', 'America/Sao_Paulo');
+
+                                if (!url.pathname.includes('/embed')) {
+                                  const cid = params.get('cid');
+                                  if (cid) {
+                                    params.set('src', cid);
+                                    params.delete('cid');
+                                  }
+                                }
+
+                                return `https://calendar.google.com/calendar/embed?${params.toString()}`;
+                              } catch (e) {
+                                return rancho.google_calendar_url;
+                              }
+                            })()}
                             className="w-full border-0"
                             style={{ height: '620px', marginBottom: '-70px' }}
                             frameBorder="0"
@@ -530,7 +488,7 @@ const RanchoDetalhes = () => {
                     </div>
                   </div>
 
-                  <Button 
+                  <Button
                     onClick={handleWhatsAppReserva}
                     className="w-full bg-green-500 hover:bg-green-600 text-white"
                     size="lg"
@@ -565,6 +523,104 @@ const RanchoDetalhes = () => {
           </div>
         </div>
       </main>
+
+      {/* Seção de Localização Premium */}
+      {((rancho.latitude && rancho.longitude) || rancho.endereco_completo) ? (
+        <section className="py-12 bg-muted/30">
+          <div className="container max-w-7xl mx-auto px-4">
+            {/* Header com ícone gradiente */}
+            <div className="flex items-center gap-3 mb-8">
+              <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/25">
+                <MapPin className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground">Localização</h2>
+                <p className="text-sm text-muted-foreground">Veja como chegar ao local da pescaria</p>
+              </div>
+            </div>
+
+            {/* Card de Endereço */}
+            {rancho.endereco_completo && (
+              <Card className="mb-6 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200/50 dark:border-blue-800/50">
+                <CardContent className="p-4">
+                  <div className="flex items-start gap-3">
+                    <Navigation className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-1 flex-shrink-0" />
+                    <div className="flex-1">
+                      <p className="font-medium text-foreground">{rancho.endereco_completo}</p>
+                      <div className="flex flex-wrap gap-2 mt-3">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="border-blue-300 dark:border-blue-700 hover:bg-blue-100 dark:hover:bg-blue-900/30"
+                          onClick={() => {
+                            const queryStr = (rancho.latitude && rancho.longitude) ? `${rancho.latitude},${rancho.longitude}` : encodeURIComponent(rancho.endereco_completo || '');
+                            const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${queryStr}`;
+                            window.open(mapsUrl, '_blank');
+                          }}
+                        >
+                          <ExternalLink className="h-4 w-4 mr-2" />
+                          Abrir no Maps
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="border-blue-300 dark:border-blue-700 hover:bg-blue-100 dark:hover:bg-blue-900/30"
+                          onClick={() => {
+                            navigator.clipboard.writeText(rancho.endereco_completo || '');
+                            toast.success('Endereço copiado!');
+                          }}
+                        >
+                          <Copy className="h-4 w-4 mr-2" />
+                          Copiar
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Mapa com Visual Premium */}
+            <Card className="overflow-hidden shadow-xl border-0 rounded-2xl">
+              <div className="bg-gradient-to-r from-blue-500 to-indigo-600 px-4 py-3">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <span className="text-white text-sm font-medium flex items-center gap-2">
+                    <Compass className="h-4 w-4" />
+                    {rancho.latitude && rancho.longitude ? `${Math.abs(rancho.latitude).toFixed(4)}°S, ${Math.abs(rancho.longitude).toFixed(4)}°W` : 'Localização'}
+                  </span>
+                  <Badge
+                    className="bg-white/20 text-white border-white/30 hover:bg-white/30 cursor-pointer transition-all hover:scale-105 active:scale-95"
+                    onClick={() => {
+                      const queryStr = (rancho.latitude && rancho.longitude) ? `${rancho.latitude},${rancho.longitude}` : encodeURIComponent(rancho.endereco_completo || '');
+                      window.open(`https://www.google.com/maps/search/?api=1&query=${queryStr}`, '_blank');
+                    }}
+                    title="Ver localização no Google Maps"
+                  >
+                    <span className="relative flex h-2 w-2 mr-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                    </span>
+                    Localização exata
+                  </Badge>
+                </div>
+              </div>
+              <div className="relative w-full h-[400px]">
+                <iframe
+                  src={rancho.latitude && rancho.longitude ? `https://www.google.com/maps?q=${rancho.latitude},${rancho.longitude}&hl=pt-BR&z=14&output=embed` : `https://www.google.com/maps?q=${encodeURIComponent(rancho.endereco_completo || '')}&hl=pt-BR&z=14&output=embed`}
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title={`Mapa - ${rancho.nome}`}
+                  className="absolute inset-0"
+                />
+              </div>
+            </Card>
+          </div>
+        </section>
+      ) : null}
 
       {/* Seção de Compartilhamento */}
       {rancho && (

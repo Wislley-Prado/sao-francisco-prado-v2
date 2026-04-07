@@ -1,0 +1,4 @@
+ALTER TABLE site_settings 
+ADD COLUMN IF NOT EXISTS favicon_url TEXT,
+ADD COLUMN IF NOT EXISTS og_image_url TEXT,
+ADD COLUMN IF NOT EXISTS pwa_icon_url TEXT;

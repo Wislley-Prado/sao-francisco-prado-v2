@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useSiteSettings } from '@/hooks/useOptimizedData';
+import { invalidateCache } from '@/lib/cacheService';
 
 export interface VideoSettings {
   youtube_live_url: string | null;
@@ -25,16 +26,30 @@ export const useVideoSettings = () => {
 
   const updateSettings = useMutation({
     mutationFn: async (newSettings: Partial<VideoSettings>) => {
+      // Usar o ID do siteSettings se disponível, ou o ID padrão do projeto como fallback
+      const SETTINGS_ID = '00000000-0000-0000-0000-000000000001';
+      const settingsId = siteSettings?.id || SETTINGS_ID;
+
+      console.log('Atualizando/Criando configurações com ID:', settingsId);
+
+      // Usar upsert para garantir que o registro exista, especialmente útil se o banco foi recém-clonado
       const { error } = await supabase
         .from('site_settings')
-        .update(newSettings)
-        .eq('id', (await supabase.from('site_settings').select('id').single()).data?.id);
+        .upsert({
+          id: settingsId,
+          ...newSettings,
+          updated_at: new Date().toISOString()
+        });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Erro ao salvar no banco de dados:', error);
+        throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['site-settings'] });
       queryClient.invalidateQueries({ queryKey: ['video-settings'] });
+      invalidateCache('site_settings');
       toast.success('Configurações de vídeo atualizadas com sucesso!');
     },
     onError: (error) => {
@@ -53,11 +68,11 @@ export const useVideoSettings = () => {
 
 export const extractYouTubeId = (url: string): string | null => {
   if (!url) return null;
-  
+
   const patterns = [
-    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&?\/\s]+)/,
-    /youtube\.com\/shorts\/([^&?\/\s]+)/,
-    /youtube\.com\/live\/([^&?\/\s]+)/,
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&?/\s]+)/,
+    /youtube\.com\/shorts\/([^&?/\s]+)/,
+    /youtube\.com\/live\/([^&?/\s]+)/,
   ];
 
   for (const pattern of patterns) {

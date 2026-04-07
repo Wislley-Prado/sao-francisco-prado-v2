@@ -1,5 +1,7 @@
 
 import type { Config } from "tailwindcss";
+import tailwindcssAnimate from "tailwindcss-animate";
+import typography from "@tailwindcss/typography";
 
 export default {
 	darkMode: ["class"],
@@ -116,18 +118,18 @@ export default {
 					}
 				},
 				'float': {
-					'0%, 100%': { 
+					'0%, 100%': {
 						transform: 'translateY(0px)'
 					},
-					'50%': { 
+					'50%': {
 						transform: 'translateY(-10px)'
 					}
 				},
 				'wave': {
-					'0%, 100%': { 
+					'0%, 100%': {
 						transform: 'scaleY(1)'
 					},
-					'50%': { 
+					'50%': {
 						transform: 'scaleY(1.1)'
 					}
 				},
@@ -155,5 +157,5 @@ export default {
 			}
 		}
 	},
-	plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
+	plugins: [tailwindcssAnimate, typography],
 } satisfies Config;

@@ -98,6 +98,7 @@ export interface Anuncio {
   imovel_area?: number;
   imovel_localizacao?: string;
   imovel_unidade_area?: string;
+  custom_html?: string;
 }
 
 export interface BlogPost {
@@ -247,7 +248,7 @@ export const useRanchos = (onlyAvailable = true) => {
 
 export const useRanchoBySlug = (slug: string | undefined) => {
   const { data: ranchos } = useRanchos(false);
-  
+
   return useQuery(
     ['rancho', slug],
     () => cachedQuery<RanchoWithImages | null>(
@@ -411,7 +412,7 @@ export const usePacotes = (onlyActive = true) => {
 
 export const usePacoteBySlug = (slug: string | undefined) => {
   const { data: pacotes } = usePacotes(false);
-  
+
   return useQuery(
     ['pacote', slug],
     () => cachedQuery<PacoteWithImages | null>(
@@ -533,7 +534,7 @@ export const useAllAnuncios = () => {
  */
 export const useAnuncios = (posicao: string) => {
   const { data: allAnuncios, isLoading, error } = useAllAnuncios();
-  
+
   const filtered = React.useMemo(
     () => (allAnuncios || []).filter(a => a.posicao === posicao),
     [allAnuncios, posicao]
@@ -654,7 +655,7 @@ export const useDepoimentos = () => {
 
 export const useFAQs = (pacoteId?: string, ranchoId?: string) => {
   const key = pacoteId ? `pacote_${pacoteId}` : ranchoId ? `rancho_${ranchoId}` : 'general';
-  
+
   return useQuery(
     ['faqs', key],
     () => cachedQuery<FAQ[]>(
@@ -702,7 +703,7 @@ export const useSiteSettings = () => {
       async () => {
         // Usar view pública que não expõe tracking codes sensíveis
         const { data, error } = await supabase
-          .from('site_settings_public' as any)
+          .from('site_settings_public')
           .select('*')
           .maybeSingle();
 
@@ -945,7 +946,7 @@ export const useDashboardStats = () => {
           supabase.from('blog_posts').select('publicado'),
           supabase.from('depoimentos').select('ativo'),
         ]);
-        
+
         return {
           totalRanchos: ranchos.data?.length || 0,
           ranchosDisponiveis: ranchos.data?.filter(r => r.disponivel).length || 0,
@@ -1009,7 +1010,7 @@ export const useInvalidateCache = () => {
       invalidateCacheByPrefix('admin_blog_posts');
       queryClient.invalidateQueries(['admin-blog-posts-cached']);
     },
-invalidateAdminPacotes: () => {
+    invalidateAdminPacotes: () => {
       invalidateCacheByPrefix('admin_pacotes');
       queryClient.invalidateQueries(['admin-pacotes-cached']);
     },

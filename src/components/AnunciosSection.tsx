@@ -18,13 +18,13 @@ const viewedAdsSession = new Set<string>();
 
 export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
   const { data: anuncios = [], isLoading } = useAnuncios(posicao);
-  
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  
+
   // Embla Carousel para swipe no mobile
-  const [emblaRef, emblaApi] = useEmblaCarousel({ 
+  const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
     dragFree: false,
     containScroll: 'trimSnaps'
@@ -33,11 +33,11 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
   // Sincroniza o índice do Embla com o estado
   useEffect(() => {
     if (!emblaApi) return;
-    
+
     const onSelect = () => {
       setCurrentIndex(emblaApi.selectedScrollSnap());
     };
-    
+
     emblaApi.on('select', onSelect);
     return () => {
       emblaApi.off('select', onSelect);
@@ -72,7 +72,7 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
     // Skip if already viewed in this session
     if (viewedAdsSession.has(anuncio.id)) return;
     viewedAdsSession.add(anuncio.id);
-    
+
     try {
       await supabase
         .from('anuncios')
@@ -121,7 +121,7 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
     return (
       <section className="py-6 container mx-auto px-4">
         <div className="relative rounded-xl overflow-hidden">
-          <Skeleton className="w-full h-[320px] md:h-[400px]" />
+          <Skeleton className="w-full h-[240px] md:h-[320px]" />
         </div>
       </section>
     );
@@ -137,11 +137,11 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
   // Tag discreta "Patrocinado" - menos intrusiva
   const renderAnuncioTag = (anuncio: Anuncio, position: 'top-right' | 'top-left' = 'top-right') => {
     if (!anuncio.link_url) return null;
-    
-    const positionClasses = position === 'top-right' 
-      ? 'top-3 right-3' 
+
+    const positionClasses = position === 'top-right'
+      ? 'top-3 right-3'
       : 'top-3 left-3';
-    
+
     return (
       <a
         href={anuncio.link_url}
@@ -215,13 +215,39 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
   };
 
   const renderAnuncio = (anuncio: Anuncio) => {
+    // Se houver HTML customizado, renderiza ele e ignora o resto
+    if (anuncio.custom_html) {
+      return (
+        <div className="flex justify-center items-center h-full min-h-[150px] w-full bg-muted/20 rounded-2xl overflow-hidden shadow-md">
+          <div
+            dangerouslySetInnerHTML={{ __html: anuncio.custom_html }}
+            className="w-full h-full flex justify-center items-center"
+            ref={(el) => {
+              if (el) {
+                // Força a execução de scripts injetados
+                const scripts = el.getElementsByTagName('script');
+                for (let i = 0; i < scripts.length; i++) {
+                  const s = document.createElement('script');
+                  s.text = scripts[i].text;
+                  for (let j = 0; j < scripts[i].attributes.length; j++) {
+                    s.setAttribute(scripts[i].attributes[j].name, scripts[i].attributes[j].value);
+                  }
+                  scripts[i].parentNode?.replaceChild(s, scripts[i]);
+                }
+              }
+            }}
+          />
+        </div>
+      );
+    }
+
     // Banner Principal (Hero Style)
     if (anuncio.tipo === 'banner_principal') {
       return (
-        <div className="relative h-full min-h-[320px] md:min-h-[420px] rounded-2xl overflow-hidden group shadow-xl">
+        <div className="relative w-full aspect-[4/3] sm:aspect-[16/9] md:aspect-[21/9] max-h-[450px] rounded-2xl overflow-hidden group shadow-xl">
           {/* Tag Anúncio clicável */}
           {renderAnuncioTag(anuncio)}
-          
+
           <img
             src={getOptimizedUrl(anuncio.imagem_url, 800)}
             alt={anuncio.titulo}
@@ -231,7 +257,7 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
           />
           {/* Gradient overlay melhorado para legibilidade */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10" />
-          
+
           {/* Container de conteúdo com melhor espaçamento */}
           <div className="absolute bottom-0 left-0 right-0 p-5 pb-14 md:p-10 lg:p-12">
             <div className="max-w-3xl space-y-3 md:space-y-4">
@@ -240,7 +266,7 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
                   {anuncio.subtitulo}
                 </span>
               )}
-              <h2 className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-bold text-white leading-tight tracking-tight" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
+              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white leading-tight tracking-tight" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
                 {anuncio.titulo}
               </h2>
               {anuncio.descricao && (
@@ -270,7 +296,7 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
     // Card Secundário - Layout responsivo: coluna no mobile, lado a lado no desktop
     if (anuncio.tipo === 'card_secundario') {
       const hasImovelInfo = anuncio.imovel_area || anuncio.imovel_preco || anuncio.imovel_localizacao;
-      
+
       return (
         <Card className="overflow-hidden hover:shadow-2xl transition-all duration-300 border-0 shadow-xl rounded-2xl bg-card">
           {/* Layout: Coluna no mobile, Flex row no tablet+ */}
@@ -279,7 +305,7 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
             <div className="relative w-full md:w-[45%] aspect-[16/9] md:aspect-[4/3] flex-shrink-0 overflow-hidden">
               {/* Tag Patrocinado na imagem */}
               {renderAnuncioTag(anuncio, 'top-left')}
-              
+
               <img
                 src={getOptimizedUrl(anuncio.imagem_url, 600)}
                 alt={anuncio.titulo}
@@ -287,7 +313,7 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
                 decoding="async"
                 className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
               />
-              
+
               {hasImovelInfo && (
                 <div className="absolute bottom-3 left-3">
                   <Badge className="bg-green-600 hover:bg-green-700 text-xs font-semibold px-2.5 py-1 shadow-md">
@@ -296,7 +322,7 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
                 </div>
               )}
             </div>
-            
+
             {/* Conteúdo - ao lado da imagem no desktop */}
             <CardContent className="p-4 sm:p-5 md:p-6 flex flex-col justify-center flex-1 md:w-[55%]">
               {/* Header */}
@@ -310,14 +336,14 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
                   {anuncio.titulo}
                 </h3>
               </div>
-              
+
               {/* Descrição */}
               {anuncio.descricao && (
                 <p className="text-muted-foreground text-sm md:text-base line-clamp-2 mb-3">
                   {anuncio.descricao}
                 </p>
               )}
-              
+
               {/* Informações de imóvel - compactas */}
               {hasImovelInfo && (
                 <div className="flex flex-wrap gap-1.5 md:gap-2 mb-4">
@@ -341,7 +367,7 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
                   )}
                 </div>
               )}
-              
+
               {/* Botão - alinhado à esquerda no desktop */}
               {anuncio.link_url && (
                 <a
@@ -364,10 +390,10 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
     // Full Width
     if (anuncio.tipo === 'full_width') {
       return (
-        <div className="relative h-full min-h-[320px] md:min-h-[420px] rounded-2xl overflow-hidden group shadow-xl">
+        <div className="relative w-full aspect-video md:aspect-[21/9] lg:aspect-[4/1] max-h-[350px] rounded-2xl overflow-hidden group shadow-xl">
           {/* Tag Anúncio clicável */}
           {renderAnuncioTag(anuncio)}
-          
+
           <img
             src={getOptimizedUrl(anuncio.imagem_url, 800)}
             alt={anuncio.titulo}
@@ -377,7 +403,7 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
           />
           {/* Gradient overlay melhorado */}
           <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent" />
-          
+
           {/* Container de conteúdo centralizado verticalmente */}
           <div className="absolute inset-0 flex items-center p-5 pb-14 md:p-10 lg:p-12">
             <div className="max-w-xl space-y-3 md:space-y-4">
@@ -386,7 +412,7 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
                   {anuncio.subtitulo}
                 </span>
               )}
-              <h3 className="text-xl sm:text-2xl md:text-4xl font-bold text-white leading-tight tracking-tight" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
+              <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-white leading-tight tracking-tight" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
                 {anuncio.titulo}
               </h3>
               {anuncio.descricao && (
@@ -418,7 +444,7 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
 
   // Renderização baseada no tipo de anúncio
   return (
-    <section 
+    <section
       className="py-6 container mx-auto px-4"
       onMouseEnter={() => hasMultiple && setIsPaused(true)}
       onMouseLeave={() => hasMultiple && setIsPaused(false)}
@@ -453,7 +479,7 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
             >
               <ChevronLeft className="w-5 h-5" />
             </Button>
-            
+
             <Button
               variant="ghost"
               size="icon"
@@ -476,11 +502,10 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
                     e.stopPropagation();
                     goToSlide(index);
                   }}
-                  className={`rounded-full transition-all ${
-                    index === currentIndex 
-                      ? 'w-4 h-1.5 bg-white/80' 
+                  className={`rounded-full transition-all ${index === currentIndex
+                      ? 'w-4 h-1.5 bg-white/80'
                       : 'w-1.5 h-1.5 bg-white/40 hover:bg-white/60'
-                  }`}
+                    }`}
                   aria-label={`Ir para anúncio ${index + 1}`}
                 />
               ))}

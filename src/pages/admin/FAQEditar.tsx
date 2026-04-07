@@ -6,11 +6,12 @@ import { supabase } from "@/integrations/supabase/client";
 
 export default function FAQEditar() {
   const { id } = useParams();
-  const [faq, setFaq] = useState<any>(null);
+  const [faq, setFaq] = useState<{ id: string;[key: string]: unknown } | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchFaq();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const fetchFaq = async () => {

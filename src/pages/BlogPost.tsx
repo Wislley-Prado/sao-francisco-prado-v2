@@ -109,9 +109,9 @@ const BlogPost = () => {
         <meta name="twitter:image" content={post.imagem_destaque || '/og-image.png'} />
         <link rel="canonical" href={pageUrl} />
       </Helmet>
-      
+
       <Header />
-      
+
       <main className="flex-1 bg-background">
         {/* Back Button */}
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
@@ -176,19 +176,19 @@ const BlogPost = () => {
           <Separator className="my-8" />
 
           {/* Content */}
-          <div 
+          <div
             className="prose prose-lg max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-li:text-foreground prose-a:text-primary hover:prose-a:text-primary/80"
             dangerouslySetInnerHTML={{ __html: sanitizedContent }}
           />
 
           {/* Paid Media Banner */}
-          <PaidMediaBannerDisplay 
+          <PaidMediaBannerDisplay
             postId={post.id}
-            banner_midia_paga={post.banner_midia_paga as any} 
+            banner_midia_paga={post.banner_midia_paga as { imagem_url: string; link_url: string; data_inicio: string; data_fim: string } | undefined}
           />
 
           {/* Auto Share Buttons - Always visible */}
-          <AutoShareButtons 
+          <AutoShareButtons
             postId={post.id}
             titulo={post.titulo}
             url={pageUrl}
@@ -197,9 +197,9 @@ const BlogPost = () => {
 
           {/* Manual Social Media Links - Only if configured */}
           {post.redes_sociais && (
-            <SocialShareButtons 
+            <SocialShareButtons
               postId={post.id}
-              redes_sociais={post.redes_sociais as any} 
+              redes_sociais={post.redes_sociais as Record<string, string>}
             />
           )}
 
@@ -221,7 +221,7 @@ const BlogPost = () => {
         </article>
 
         {/* Related Posts Section */}
-        <RelatedPosts 
+        <RelatedPosts
           currentPostId={post.id}
           categoria={post.categoria}
           tags={post.tags}

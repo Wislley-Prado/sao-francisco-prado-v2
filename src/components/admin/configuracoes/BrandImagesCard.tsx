@@ -45,32 +45,43 @@ const ImageUploader = ({ label, description, currentUrl, bucket, path, field, ma
 
     setUploading(true);
     try {
+      console.log(`Iniciando upload para ${label}...`);
       const compressed = await compressImage(file, { maxWidth, maxHeight, quality: 0.9 });
-      
+
       const ext = file.name.split('.').pop() || 'png';
       const fileName = `${path}.${ext}`;
+      console.log(`Arquivo processado: ${fileName}, bucket: ${bucket}`);
 
-      const { error: uploadError } = await supabase.storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
         .from(bucket)
         .upload(fileName, compressed, { upsert: true, cacheControl: '3600' });
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Erro no upload storage:', uploadError);
+        throw new Error(`Erro no storage: ${uploadError.message}`);
+      }
+
+      console.log('Upload para storage concluído com sucesso:', uploadData);
 
       const { data: urlData } = supabase.storage.from(bucket).getPublicUrl(fileName);
       const publicUrl = `${urlData.publicUrl}?t=${Date.now()}`;
+      console.log(`URL pública gerada: ${publicUrl}`);
 
       const { error: updateError } = await supabase
         .from('site_settings')
-        .update({ [field]: publicUrl } as any)
+        .update({ [field]: publicUrl } as Record<string, unknown>)
         .eq('id', SETTINGS_ID);
 
-      if (updateError) throw updateError;
+      if (updateError) {
+        console.error('Erro na atualização do banco site_settings:', updateError);
+        throw new Error(`Erro no banco: ${updateError.message}`);
+      }
 
       toast.success(`${label} atualizado com sucesso!`);
       onUpdate();
-    } catch (error) {
-      console.error(`Erro ao fazer upload de ${label}:`, error);
-      toast.error(`Erro ao fazer upload de ${label}`);
+    } catch (error: any) {
+      console.error(`Erro fatal ao fazer upload de ${label}:`, error);
+      toast.error(`Erro ao fazer upload: ${error.message || 'Erro desconhecido'}`);
     } finally {
       setUploading(false);
       if (inputRef.current) inputRef.current.value = '';
@@ -82,7 +93,7 @@ const ImageUploader = ({ label, description, currentUrl, bucket, path, field, ma
     try {
       const { error } = await supabase
         .from('site_settings')
-        .update({ [field]: null } as any)
+        .update({ [field]: null } as Record<string, unknown>)
         .eq('id', SETTINGS_ID);
 
       if (error) throw error;

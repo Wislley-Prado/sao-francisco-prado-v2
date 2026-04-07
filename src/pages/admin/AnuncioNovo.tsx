@@ -10,16 +10,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
+import { invalidateCacheByPrefix } from '@/lib/cacheService';
 import { ArrowLeft, Save, Sparkles } from 'lucide-react';
 import { ImageUploader } from '@/components/admin/anuncio/ImageUploader';
 import { AnuncioTemplates } from '@/components/admin/anuncio/AnuncioTemplates';
 
 export default function AnuncioNovo() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<string | undefined>(undefined);
   const [showImovelFields, setShowImovelFields] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     titulo: '',
     subtitulo: '',
@@ -35,14 +38,16 @@ export default function AnuncioNovo() {
     duracao_exibicao: 8,
     data_inicio: '',
     data_fim: '',
+    custom_html: '',
     // Campos específicos para imóveis
     imovel_area: '',
+
     imovel_unidade_area: 'm2',
     imovel_preco: '',
     imovel_localizacao: '',
   });
 
-  const handleTemplateSelect = (config: any) => {
+  const handleTemplateSelect = (config: { tipo: string; posicao: string; duracao_exibicao: number; ordem: number; texto_botao: string }) => {
     setFormData({
       ...formData,
       tipo: config.tipo,
@@ -81,6 +86,7 @@ export default function AnuncioNovo() {
         duracao_exibicao: formData.duracao_exibicao,
         data_inicio: formData.data_inicio || null,
         data_fim: formData.data_fim || null,
+        custom_html: formData.custom_html || null,
         // Campos de imóveis (nullable)
         imovel_area: formData.imovel_area ? parseFloat(formData.imovel_area) : null,
         imovel_unidade_area: formData.imovel_area ? formData.imovel_unidade_area : null,
@@ -89,6 +95,9 @@ export default function AnuncioNovo() {
       });
 
       if (error) throw error;
+
+      invalidateCacheByPrefix('anuncios_all');
+      queryClient.invalidateQueries({ queryKey: ['anuncios'] });
 
       toast.success('Anúncio criado com sucesso!');
       navigate('/admin/anuncios');
@@ -191,7 +200,7 @@ export default function AnuncioNovo() {
           </TabsList>
 
           <TabsContent value="template" className="space-y-6">
-            <AnuncioTemplates 
+            <AnuncioTemplates
               onSelectTemplate={handleTemplateSelect}
               selectedTemplate={selectedTemplate}
             />
@@ -283,8 +292,8 @@ export default function AnuncioNovo() {
 
                     <div className="space-y-2">
                       <Label htmlFor="imovel_unidade_area">Unidade</Label>
-                      <Select 
-                        value={formData.imovel_unidade_area} 
+                      <Select
+                        value={formData.imovel_unidade_area}
                         onValueChange={(value) => setFormData({ ...formData, imovel_unidade_area: value })}
                       >
                         <SelectTrigger>
@@ -328,6 +337,21 @@ export default function AnuncioNovo() {
               value={formData.imagem_url}
               onChange={(url) => setFormData({ ...formData, imagem_url: url || '' })}
             />
+
+            <div className="space-y-2">
+              <Label htmlFor="custom_html">Código HTML/Script Customizado (Opcional)</Label>
+              <Textarea
+                id="custom_html"
+                value={formData.custom_html}
+                onChange={(e) => setFormData({ ...formData, custom_html: e.target.value })}
+                placeholder="Insira o código do AdSense ou outro script aqui..."
+                rows={6}
+                className="font-mono text-sm"
+              />
+              <p className="text-xs text-muted-foreground">
+                Se este campo estiver preenchido, ele será priorizado em relação à imagem e link acima. Use para tags de script, frames ou HTML customizado.
+              </p>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">

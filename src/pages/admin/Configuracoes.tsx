@@ -11,11 +11,15 @@ import { BrandImagesCard } from '@/components/admin/configuracoes/BrandImagesCar
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { clearAllCache, getCacheStats, resetCacheStats, invalidateCacheByPrefix } from '@/lib/cacheService';
+import { clearAllCache, getCacheStats, resetCacheStats, invalidateCacheByPrefix, invalidateCache } from '@/lib/cacheService';
+import { useQueryClient } from '@tanstack/react-query';
 
 const SETTINGS_ID = '00000000-0000-0000-0000-000000000001';
 
+type SettingsData = Record<string, string | boolean | null>;
+
 const Configuracoes = () => {
+  const queryClient = useQueryClient();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -49,7 +53,10 @@ const Configuracoes = () => {
     email_contato: '',
     // Footer e Header
     copyright_text: '',
-    reserva_button_link: ''
+    reserva_button_link: '',
+    youtube_live_url: '',
+    youtube_video_url: '',
+    youtube_institucional_url: ''
   });
 
   useEffect(() => {
@@ -68,28 +75,32 @@ const Configuracoes = () => {
       if (error) throw error;
 
       if (data) {
-        setWebhookPausado((data as any).dam_webhook_pausado === true);
+        const settingsData = data as SettingsData;
+        setWebhookPausado(settingsData.dam_webhook_pausado === true);
         setBrandImages({
-          favicon_url: (data as any).favicon_url || '',
-          og_image_url: (data as any).og_image_url || '',
-          pwa_icon_url: (data as any).pwa_icon_url || '',
+          favicon_url: (settingsData.favicon_url as string) || '',
+          og_image_url: (settingsData.og_image_url as string) || '',
+          pwa_icon_url: (settingsData.pwa_icon_url as string) || '',
         });
         setSettings({
           facebook_pixel: data.facebook_pixel || '',
           google_analytics: data.google_analytics || '',
           google_tag_manager: data.google_tag_manager || '',
           custom_head_scripts: data.custom_head_scripts || '',
-          dam_webhook_url: (data as any).dam_webhook_url || '',
-          autor_avatar_url: (data as any).autor_avatar_url || '',
-          facebook_url: (data as any).facebook_url || '',
-          instagram_url: (data as any).instagram_url || '',
-          youtube_url: (data as any).youtube_url || '',
-          tiktok_url: (data as any).tiktok_url || '',
-          twitter_url: (data as any).twitter_url || '',
-          telefone_contato: (data as any).telefone_contato || '',
-          email_contato: (data as any).email_contato || '',
-          copyright_text: (data as any).copyright_text || '',
-          reserva_button_link: (data as any).reserva_button_link || ''
+          dam_webhook_url: (settingsData.dam_webhook_url as string) || '',
+          autor_avatar_url: (settingsData.autor_avatar_url as string) || '',
+          facebook_url: (settingsData.facebook_url as string) || '',
+          instagram_url: (settingsData.instagram_url as string) || '',
+          youtube_url: (settingsData.youtube_url as string) || '',
+          tiktok_url: (settingsData.tiktok_url as string) || '',
+          twitter_url: (settingsData.twitter_url as string) || '',
+          telefone_contato: (settingsData.telefone_contato as string) || '',
+          email_contato: (settingsData.email_contato as string) || '',
+          copyright_text: (settingsData.copyright_text as string) || '',
+          reserva_button_link: (settingsData.reserva_button_link as string) || '',
+          youtube_live_url: (settingsData.youtube_live_url as string) || '',
+          youtube_video_url: (settingsData.youtube_video_url as string) || '',
+          youtube_institucional_url: (settingsData.youtube_institucional_url as string) || ''
         });
       }
     } catch (error) {
@@ -122,12 +133,13 @@ const Configuracoes = () => {
       const newValue = !webhookPausado;
       const { error } = await supabase
         .from('site_settings')
-        .update({ dam_webhook_pausado: newValue } as any)
+        .update({ dam_webhook_pausado: newValue } as Record<string, unknown>)
         .eq('id', SETTINGS_ID);
 
       if (error) throw error;
 
       setWebhookPausado(newValue);
+      invalidateCache('site_settings');
       toast.success(newValue ? 'Webhook PAUSADO! Dados manuais protegidos.' : 'Webhook RETOMADO! Automação ativa.');
     } catch (error) {
       console.error('Erro ao alterar pausa do webhook:', error);
@@ -147,6 +159,8 @@ const Configuracoes = () => {
 
       if (error) throw error;
 
+      invalidateCache('site_settings');
+      queryClient.invalidateQueries({ queryKey: ['site-settings'] });
       toast.success('Configurações salvas com sucesso!');
     } catch (error) {
       console.error('Erro ao salvar configurações:', error);
@@ -172,7 +186,7 @@ const Configuracoes = () => {
       }
 
       const data = await response.json();
-      
+
       if (data.saved_to_db) {
         toast.success('Dados da represa atualizados com sucesso!');
         setLastUpdate(new Date().toISOString());
@@ -335,11 +349,11 @@ const Configuracoes = () => {
                 URL do webhook n8n que retorna os dados da represa de Três Marias
               </p>
             </div>
-            
+
             <Alert>
               <AlertCircle className="h-4 w-4" />
               <AlertDescription className="text-xs">
-                <strong>Importante:</strong> O workflow no n8n deve estar <strong>ativo</strong> para funcionar. 
+                <strong>Importante:</strong> O workflow no n8n deve estar <strong>ativo</strong> para funcionar.
                 Ative usando o toggle no canto superior direito do editor do n8n.
               </AlertDescription>
             </Alert>
@@ -411,8 +425,8 @@ const Configuracoes = () => {
               </div>
 
               <div className="flex items-center gap-3">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   onClick={handleRefreshDamData}
                   disabled={refreshing || webhookPausado}
                   className="flex items-center gap-2"
@@ -552,9 +566,9 @@ const Configuracoes = () => {
             </div>
             {settings.autor_avatar_url && (
               <div className="flex items-center gap-3">
-                <img 
-                  src={settings.autor_avatar_url} 
-                  alt="Preview do avatar" 
+                <img
+                  src={settings.autor_avatar_url}
+                  alt="Preview do avatar"
                   className="w-12 h-12 rounded-full object-cover border"
                 />
                 <span className="text-sm text-muted-foreground">Preview do avatar</span>
@@ -578,7 +592,7 @@ const Configuracoes = () => {
             {/* Redes Sociais */}
             <div className="space-y-4">
               <h4 className="font-medium text-sm text-muted-foreground">Redes Sociais</h4>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="facebook_url" className="flex items-center gap-2">
@@ -620,9 +634,48 @@ const Configuracoes = () => {
                 </div>
 
                 <div className="space-y-2">
+                  <Label htmlFor="youtube_live_url" className="flex items-center gap-2">
+                    <Play className="w-4 h-4" />
+                    YouTube (Live URL)
+                  </Label>
+                  <Input
+                    id="youtube_live_url"
+                    placeholder="https://youtube.com/watch?v=..."
+                    value={settings.youtube_live_url}
+                    onChange={(e) => setSettings({ ...settings, youtube_live_url: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="youtube_video_url" className="flex items-center gap-2">
+                    <Youtube className="w-4 h-4" />
+                    YouTube (Vídeo/Shorts Home)
+                  </Label>
+                  <Input
+                    id="youtube_video_url"
+                    placeholder="https://youtube.com/shorts/..."
+                    value={settings.youtube_video_url}
+                    onChange={(e) => setSettings({ ...settings, youtube_video_url: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="youtube_institucional_url" className="flex items-center gap-2">
+                    <Play className="w-4 h-4" />
+                    YouTube (Vídeo Institucional)
+                  </Label>
+                  <Input
+                    id="youtube_institucional_url"
+                    placeholder="https://youtube.com/watch?v=..."
+                    value={settings.youtube_institucional_url}
+                    onChange={(e) => setSettings({ ...settings, youtube_institucional_url: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
                   <Label htmlFor="tiktok_url" className="flex items-center gap-2">
                     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z"/>
+                      <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z" />
                     </svg>
                     TikTok
                   </Label>
@@ -637,7 +690,7 @@ const Configuracoes = () => {
                 <div className="space-y-2">
                   <Label htmlFor="twitter_url" className="flex items-center gap-2">
                     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                     </svg>
                     X (Twitter)
                   </Label>
@@ -656,7 +709,7 @@ const Configuracoes = () => {
             {/* Informações de Contato */}
             <div className="space-y-4">
               <h4 className="font-medium text-sm text-muted-foreground">Informações de Contato</h4>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="telefone_contato" className="flex items-center gap-2">
@@ -690,7 +743,7 @@ const Configuracoes = () => {
             <Alert>
               <Share2 className="h-4 w-4" />
               <AlertDescription className="text-xs">
-                Deixe em branco os campos de redes sociais que não deseja exibir no footer. 
+                Deixe em branco os campos de redes sociais que não deseja exibir no footer.
                 Apenas as redes com URL preenchida serão mostradas.
               </AlertDescription>
             </Alert>
@@ -826,10 +879,10 @@ const Configuracoes = () => {
             {/* Ações de Cache */}
             <div className="space-y-3">
               <h4 className="font-medium text-sm text-muted-foreground">Ações de Cache</h4>
-              
+
               <div className="flex flex-wrap gap-2">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   size="sm"
                   onClick={() => {
                     invalidateCacheByPrefix('ranchos');
@@ -839,9 +892,9 @@ const Configuracoes = () => {
                   <RefreshCw className="w-4 h-4 mr-2" />
                   Limpar Ranchos
                 </Button>
-                
-                <Button 
-                  variant="outline" 
+
+                <Button
+                  variant="outline"
                   size="sm"
                   onClick={() => {
                     invalidateCacheByPrefix('pacotes');
@@ -851,9 +904,9 @@ const Configuracoes = () => {
                   <RefreshCw className="w-4 h-4 mr-2" />
                   Limpar Pacotes
                 </Button>
-                
-                <Button 
-                  variant="outline" 
+
+                <Button
+                  variant="outline"
                   size="sm"
                   onClick={() => {
                     invalidateCacheByPrefix('depoimentos');
@@ -863,9 +916,9 @@ const Configuracoes = () => {
                   <RefreshCw className="w-4 h-4 mr-2" />
                   Limpar Depoimentos
                 </Button>
-                
-                <Button 
-                  variant="outline" 
+
+                <Button
+                  variant="outline"
                   size="sm"
                   onClick={() => {
                     invalidateCacheByPrefix('blog');
@@ -880,8 +933,8 @@ const Configuracoes = () => {
               <Separator />
 
               <div className="flex flex-wrap gap-2">
-                <Button 
-                  variant="destructive" 
+                <Button
+                  variant="destructive"
                   size="sm"
                   onClick={() => {
                     clearAllCache();
@@ -892,9 +945,9 @@ const Configuracoes = () => {
                   <Trash2 className="w-4 h-4 mr-2" />
                   Limpar Todo Cache
                 </Button>
-                
-                <Button 
-                  variant="outline" 
+
+                <Button
+                  variant="outline"
                   size="sm"
                   onClick={() => {
                     resetCacheStats();
@@ -910,7 +963,7 @@ const Configuracoes = () => {
             <Alert>
               <Database className="h-4 w-4" />
               <AlertDescription className="text-xs">
-                O cache é usado para reduzir chamadas ao banco de dados e melhorar a performance. 
+                O cache é usado para reduzir chamadas ao banco de dados e melhorar a performance.
                 Limpe apenas quando necessário forçar a atualização dos dados no site.
               </AlertDescription>
             </Alert>

@@ -11,35 +11,33 @@ interface PackageTestimonialsProps {
   maxItems?: number;
 }
 
-const TestimonialCard = ({ depoimento, index }: { depoimento: any; index: number }) => {
+const TestimonialCard = ({ depoimento, index }: { depoimento: { rating: number; depoimento: string; foto_url?: string; nome: string; cargo?: string }; index: number }) => {
   const { ref, isVisible } = useScrollReveal({ threshold: 0.2 });
 
   return (
     <div
       ref={ref}
-      className={`transition-all duration-700 ${
-        isVisible 
-          ? 'opacity-100 translate-y-0' 
+      className={`transition-all duration-700 ${isVisible
+          ? 'opacity-100 translate-y-0'
           : 'opacity-0 translate-y-8'
-      }`}
+        }`}
       style={{ transitionDelay: `${index * 150}ms` }}
     >
-      <Card 
+      <Card
         className="relative overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-2xl transition-all duration-300 h-full hover:scale-[1.02]"
       >
         <CardContent className="pt-6">
           <Quote className="absolute top-4 right-4 w-12 h-12 text-primary/10" />
-          
+
           {/* Rating */}
           <div className="flex gap-1 mb-4">
             {[...Array(5)].map((_, i) => (
               <Star
                 key={i}
-                className={`w-5 h-5 transition-all ${
-                  i < depoimento.rating
+                className={`w-5 h-5 transition-all ${i < depoimento.rating
                     ? 'fill-yellow-400 text-yellow-400'
                     : 'text-muted-foreground/30'
-                }`}
+                  }`}
               />
             ))}
           </div>
@@ -77,13 +75,13 @@ const TestimonialCard = ({ depoimento, index }: { depoimento: any; index: number
   );
 };
 
-export const PackageTestimonials = ({ 
-  pacoteId, 
+export const PackageTestimonials = ({
+  pacoteId,
   tipoPacote,
-  maxItems = 4 
+  maxItems = 4
 }: PackageTestimonialsProps) => {
   const { ref: titleRef, isVisible: titleVisible } = useScrollReveal({ threshold: 0.5 });
-  
+
   const { data: depoimentos, isLoading } = useQuery({
     queryKey: ['depoimentos-pacote', pacoteId, tipoPacote],
     queryFn: async () => {
@@ -103,7 +101,7 @@ export const PackageTestimonials = ({
       }
 
       const { data, error } = await query.limit(maxItems);
-      
+
       if (error) throw error;
       return data || [];
     },
@@ -132,11 +130,10 @@ export const PackageTestimonials = ({
       <div className="container max-w-7xl mx-auto px-4">
         <div
           ref={titleRef}
-          className={`text-center mb-12 transition-all duration-700 ${
-            titleVisible 
-              ? 'opacity-100 translate-y-0' 
+          className={`text-center mb-12 transition-all duration-700 ${titleVisible
+              ? 'opacity-100 translate-y-0'
               : 'opacity-0 translate-y-4'
-          }`}
+            }`}
         >
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
             O que dizem nossos clientes

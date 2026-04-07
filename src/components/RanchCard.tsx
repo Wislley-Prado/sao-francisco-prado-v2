@@ -64,11 +64,19 @@ const RanchCard = ({ ranch }: RanchCardProps) => {
             <div className="h-48 bg-gradient-to-br from-rio-blue to-water-green" />
           )}
           <div className="absolute inset-0 bg-black bg-opacity-20"></div>
-          <div className="absolute top-4 right-4">
+          <div className="absolute top-4 right-4 flex flex-col gap-2 items-end">
             {ranch.available ? (
-              <Badge className="bg-green-500 text-white">Disponível</Badge>
+              <Badge className="bg-green-500 hover:bg-green-600 text-white shadow-md">Disponível</Badge>
             ) : (
-              <Badge className="bg-red-500 text-white">Ocupado</Badge>
+              <Badge className="bg-red-500 hover:bg-red-600 text-white shadow-md">Ocupado</Badge>
+            )}
+            
+            {/* Etiquetas de Localização Aquática */}
+            {ranch.location?.toLowerCase().includes('represa') && (
+              <Badge className="bg-blue-600 hover:bg-blue-700 text-white shadow-md">Represa</Badge>
+            )}
+            {ranch.location?.toLowerCase().includes('rio') && (
+              <Badge className="bg-cyan-600 hover:bg-cyan-700 text-white shadow-md">Rio</Badge>
             )}
           </div>
           <div className="absolute bottom-4 left-4 text-white">

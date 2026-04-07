@@ -33,11 +33,11 @@ interface WhatsAppDataCleanupProps {
   onExport: () => void;
 }
 
-export const WhatsAppDataCleanup = ({ 
-  dataInicio, 
-  dataFim, 
+export const WhatsAppDataCleanup = ({
+  dataInicio,
+  dataFim,
   onCleanupComplete,
-  onExport 
+  onExport
 }: WhatsAppDataCleanupProps) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -75,13 +75,13 @@ export const WhatsAppDataCleanup = ({
     setLoading(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      
+
       if (!session) {
         throw new Error("Sessão não encontrada");
       }
 
-      const payload: any = { tipo };
-      
+      const payload: Record<string, unknown> = { tipo };
+
       if (tipo === "periodo" && dataInicio && dataFim) {
         payload.dataInicio = dataInicio.toISOString();
         payload.dataFim = dataFim.toISOString();
@@ -106,11 +106,12 @@ export const WhatsAppDataCleanup = ({
       setConfirmOpen(false);
       setConfirmado(false);
       onCleanupComplete();
-    } catch (error: any) {
+    } catch (error) {
+      const isError = error instanceof Error;
       console.error("Erro ao limpar dados:", error);
       toast({
         title: "Erro ao limpar dados",
-        description: error.message || "Ocorreu um erro ao tentar limpar os dados",
+        description: isError ? error.message : "Ocorreu um erro ao tentar limpar os dados",
         variant: "destructive",
       });
     } finally {
@@ -148,9 +149,9 @@ export const WhatsAppDataCleanup = ({
               <AlertTriangle className="h-5 w-5 text-yellow-500 mt-0.5 flex-shrink-0" />
               <div className="text-sm">
                 <p className="font-medium text-yellow-500 mb-1">Recomendamos exportar antes</p>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={handleExportAntes}
                   className="mt-2"
                 >
@@ -160,7 +161,7 @@ export const WhatsAppDataCleanup = ({
               </div>
             </div>
 
-            <RadioGroup value={tipo} onValueChange={(v) => setTipo(v as any)}>
+            <RadioGroup value={tipo} onValueChange={(v) => setTipo(v as "periodo" | "antigos" | "tudo")}>
               <div className="flex items-center space-x-2 border rounded-lg p-3">
                 <RadioGroupItem value="periodo" id="periodo" />
                 <Label htmlFor="periodo" className="flex-1 cursor-pointer">
@@ -210,13 +211,13 @@ export const WhatsAppDataCleanup = ({
 
             <div className="border-t pt-4">
               <div className="flex items-start space-x-2">
-                <Checkbox 
-                  id="confirmar" 
+                <Checkbox
+                  id="confirmar"
                   checked={confirmado}
                   onCheckedChange={(checked) => setConfirmado(checked as boolean)}
                 />
-                <Label 
-                  htmlFor="confirmar" 
+                <Label
+                  htmlFor="confirmar"
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                 >
                   Confirmo que desejo excluir esses dados permanentemente
@@ -232,8 +233,8 @@ export const WhatsAppDataCleanup = ({
             <Button variant="outline" onClick={() => setDialogOpen(false)}>
               Cancelar
             </Button>
-            <Button 
-              variant="destructive" 
+            <Button
+              variant="destructive"
               onClick={handleLimpar}
               disabled={!confirmado}
             >
@@ -258,7 +259,7 @@ export const WhatsAppDataCleanup = ({
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={loading}>Cancelar</AlertDialogCancel>
-            <AlertDialogAction 
+            <AlertDialogAction
               onClick={executarLimpeza}
               disabled={loading}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"

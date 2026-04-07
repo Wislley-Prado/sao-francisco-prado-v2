@@ -199,7 +199,7 @@ export const DepoimentoForm = ({ initialData }: DepoimentoFormProps) => {
               <FormLabel>Avaliação (1-5 estrelas)</FormLabel>
               <Select
                 onValueChange={(value) => field.onChange(parseInt(value))}
-                value={field.value.toString()}
+                value={field.value?.toString() || "5"}
               >
                 <FormControl>
                   <SelectTrigger>
@@ -275,8 +275,8 @@ export const DepoimentoForm = ({ initialData }: DepoimentoFormProps) => {
               <FormItem>
                 <FormLabel>Pacote Específico (Opcional)</FormLabel>
                 <Select
-                  onValueChange={field.onChange}
-                  value={field.value || ""}
+                  onValueChange={(val) => field.onChange(val === "none" ? null : val)}
+                  value={field.value || "none"}
                 >
                   <FormControl>
                     <SelectTrigger>
@@ -284,7 +284,7 @@ export const DepoimentoForm = ({ initialData }: DepoimentoFormProps) => {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="">Nenhum (geral)</SelectItem>
+                    <SelectItem value="none">Nenhum (geral)</SelectItem>
                     {pacotes?.map((pacote) => (
                       <SelectItem key={pacote.id} value={pacote.id}>
                         {pacote.nome}
@@ -307,8 +307,8 @@ export const DepoimentoForm = ({ initialData }: DepoimentoFormProps) => {
               <FormItem>
                 <FormLabel>Tipo de Pacote (Opcional)</FormLabel>
                 <Select
-                  onValueChange={field.onChange}
-                  value={field.value || ""}
+                  onValueChange={(val) => field.onChange(val === "none" ? null : val)}
+                  value={field.value || "none"}
                 >
                   <FormControl>
                     <SelectTrigger>
@@ -316,7 +316,7 @@ export const DepoimentoForm = ({ initialData }: DepoimentoFormProps) => {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="">Nenhum (geral)</SelectItem>
+                    <SelectItem value="none">Nenhum (geral)</SelectItem>
                     <SelectItem value="pescaria">Pescaria</SelectItem>
                     <SelectItem value="completo">Completo</SelectItem>
                     <SelectItem value="personalizado">Personalizado</SelectItem>

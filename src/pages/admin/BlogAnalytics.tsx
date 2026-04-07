@@ -44,7 +44,7 @@ const BlogAnalytics = () => {
     }, {});
 
   // Agrupar por post
-  const postBreakdown = analytics?.reduce((acc: any[], curr: any) => {
+  const postBreakdown = analytics?.reduce((acc: Array<{ post_id: string; titulo: string; slug: string; clicks: number }>, curr) => {
     const existingPost = acc.find(p => p.post_id === curr.post_id);
     if (existingPost) {
       existingPost.clicks++;

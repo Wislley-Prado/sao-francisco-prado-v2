@@ -4,20 +4,28 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 interface TimelineTabProps {
-  weatherData: any;
-  current: any;
+  weatherData: {
+    hourly: Array<{
+      dt: number;
+      temperature: number;
+      pop: number;
+      wind_speed: number;
+      weather_icon: string;
+    }>;
+  };
+  current: { dt: number };
   getWeatherIcon: (iconCode: string) => React.ReactNode;
   now: Date;
 }
 
 const TimelineTab = ({ weatherData, current, getWeatherIcon, now }: TimelineTabProps) => {
-  const hourlyChartData = weatherData.hourly.map((hour: any, index: number) => {
+  const hourlyChartData = weatherData.hourly.map((hour: { temperature: number; wind_speed: number; pop: number }, index: number) => {
     const hourDate = new Date(now.getTime() + (index * 3600000));
     return {
       time: hourDate.toLocaleTimeString('pt-BR', { hour: '2-digit' }),
-      fullTime: hourDate.toLocaleString('pt-BR', { 
-        weekday: 'short', 
-        day: '2-digit', 
+      fullTime: hourDate.toLocaleString('pt-BR', {
+        weekday: 'short',
+        day: '2-digit',
         month: '2-digit',
         hour: '2-digit',
         minute: '2-digit'
@@ -41,14 +49,14 @@ const TimelineTab = ({ weatherData, current, getWeatherIcon, now }: TimelineTabP
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={hourlyChartData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis 
-                dataKey="time" 
+              <XAxis
+                dataKey="time"
                 tick={{ fontSize: 12 }}
                 interval="preserveStartEnd"
               />
               <YAxis yAxisId="temp" orientation="left" tick={{ fontSize: 12 }} />
               <YAxis yAxisId="wind" orientation="right" tick={{ fontSize: 12 }} />
-              <Tooltip 
+              <Tooltip
                 formatter={(value, name) => [
                   `${value}${name === 'temperatura' ? '°C' : name === 'vento' ? ' km/h' : '%'}`,
                   name === 'temperatura' ? 'Temperatura' : name === 'vento' ? 'Vento' : 'Chuva'
@@ -65,17 +73,17 @@ const TimelineTab = ({ weatherData, current, getWeatherIcon, now }: TimelineTabP
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2 sm:gap-4">
-          {weatherData.hourly.slice(0, 8).map((hour: any, index: number) => {
+          {weatherData.hourly.slice(0, 8).map((hour: { dt: number; weather_icon: string; temperature: number; pop: number; wind_speed: number }, index: number) => {
             const hourDate = new Date(hour.dt * 1000);
             const currentDataDateOnly = new Date(current.dt * 1000);
             currentDataDateOnly.setHours(0, 0, 0, 0);
-            
+
             const hourDateOnly = new Date(hourDate);
             hourDateOnly.setHours(0, 0, 0, 0);
-            
+
             const isToday = hourDateOnly.getTime() === currentDataDateOnly.getTime();
             const dayLabel = isToday ? 'Hoje' : hourDate.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit' });
-            
+
             return (
               <Card key={index} className="text-center">
                 <CardContent className="p-2 sm:p-3">

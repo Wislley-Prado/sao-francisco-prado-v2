@@ -7,11 +7,15 @@
 
 -- 1. ENUM TYPES
 -- =====================================================
-CREATE TYPE public.app_role AS ENUM ('admin', 'user', 'super_admin');
+DO $$ BEGIN
+    CREATE TYPE public.app_role AS ENUM ('admin', 'user', 'super_admin');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- 2. TABELA user_roles (ANTES das functions que a referenciam)
 -- =====================================================
-CREATE TABLE public.user_roles (
+CREATE TABLE IF NOT EXISTS public.user_roles (
   id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id uuid NOT NULL,
   role app_role NOT NULL,
@@ -60,7 +64,7 @@ $$;
 -- =====================================================
 
 -- ranchos
-CREATE TABLE public.ranchos (
+CREATE TABLE IF NOT EXISTS public.ranchos (
   id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   nome text NOT NULL,
   slug text NOT NULL UNIQUE,
@@ -89,7 +93,7 @@ CREATE TABLE public.ranchos (
 );
 
 -- rancho_imagens
-CREATE TABLE public.rancho_imagens (
+CREATE TABLE IF NOT EXISTS public.rancho_imagens (
   id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   rancho_id uuid NOT NULL REFERENCES public.ranchos(id),
   url text NOT NULL,
@@ -100,7 +104,7 @@ CREATE TABLE public.rancho_imagens (
 );
 
 -- rancho_analytics
-CREATE TABLE public.rancho_analytics (
+CREATE TABLE IF NOT EXISTS public.rancho_analytics (
   id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   rancho_id uuid NOT NULL REFERENCES public.ranchos(id),
   evento text NOT NULL,
@@ -110,7 +114,7 @@ CREATE TABLE public.rancho_analytics (
 );
 
 -- pacotes
-CREATE TABLE public.pacotes (
+CREATE TABLE IF NOT EXISTS public.pacotes (
   id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   nome text NOT NULL,
   slug text NOT NULL UNIQUE,
@@ -140,7 +144,7 @@ CREATE TABLE public.pacotes (
 );
 
 -- pacote_imagens
-CREATE TABLE public.pacote_imagens (
+CREATE TABLE IF NOT EXISTS public.pacote_imagens (
   id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   pacote_id uuid NOT NULL REFERENCES public.pacotes(id),
   url text NOT NULL,
@@ -151,7 +155,7 @@ CREATE TABLE public.pacote_imagens (
 );
 
 -- pacote_analytics
-CREATE TABLE public.pacote_analytics (
+CREATE TABLE IF NOT EXISTS public.pacote_analytics (
   id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   pacote_id uuid NOT NULL REFERENCES public.pacotes(id),
   evento text NOT NULL,
@@ -162,7 +166,7 @@ CREATE TABLE public.pacote_analytics (
 );
 
 -- depoimentos
-CREATE TABLE public.depoimentos (
+CREATE TABLE IF NOT EXISTS public.depoimentos (
   id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   nome text NOT NULL,
   depoimento text NOT NULL,
@@ -178,7 +182,7 @@ CREATE TABLE public.depoimentos (
 );
 
 -- blog_posts
-CREATE TABLE public.blog_posts (
+CREATE TABLE IF NOT EXISTS public.blog_posts (
   id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   titulo text NOT NULL,
   slug text NOT NULL UNIQUE,
@@ -198,7 +202,7 @@ CREATE TABLE public.blog_posts (
 );
 
 -- blog_analytics
-CREATE TABLE public.blog_analytics (
+CREATE TABLE IF NOT EXISTS public.blog_analytics (
   id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   post_id uuid NOT NULL REFERENCES public.blog_posts(id),
   evento text NOT NULL,
@@ -209,7 +213,7 @@ CREATE TABLE public.blog_analytics (
 );
 
 -- faqs
-CREATE TABLE public.faqs (
+CREATE TABLE IF NOT EXISTS public.faqs (
   id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   pergunta text NOT NULL,
   resposta text NOT NULL,
@@ -222,7 +226,7 @@ CREATE TABLE public.faqs (
 );
 
 -- faq_votes
-CREATE TABLE public.faq_votes (
+CREATE TABLE IF NOT EXISTS public.faq_votes (
   id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   faq_id uuid NOT NULL REFERENCES public.faqs(id),
   voto boolean NOT NULL,
@@ -232,7 +236,7 @@ CREATE TABLE public.faq_votes (
 );
 
 -- avaliacoes
-CREATE TABLE public.avaliacoes (
+CREATE TABLE IF NOT EXISTS public.avaliacoes (
   id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   rancho_id uuid NOT NULL REFERENCES public.ranchos(id),
   nome_usuario text NOT NULL,
@@ -247,7 +251,7 @@ CREATE TABLE public.avaliacoes (
 );
 
 -- anuncios
-CREATE TABLE public.anuncios (
+CREATE TABLE IF NOT EXISTS public.anuncios (
   id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   titulo text NOT NULL,
   subtitulo text,
@@ -274,7 +278,7 @@ CREATE TABLE public.anuncios (
 );
 
 -- site_settings
-CREATE TABLE public.site_settings (
+CREATE TABLE IF NOT EXISTS public.site_settings (
   id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   telefone_contato text DEFAULT '(38) 98832-0108'::text,
   email_contato text DEFAULT 'contato@pradoaqui.com.br'::text,
@@ -308,7 +312,7 @@ CREATE TABLE public.site_settings (
 );
 
 -- configuracoes
-CREATE TABLE public.configuracoes (
+CREATE TABLE IF NOT EXISTS public.configuracoes (
   id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   chave text NOT NULL,
   valor text,
@@ -319,14 +323,14 @@ CREATE TABLE public.configuracoes (
 );
 
 -- dam_data
-CREATE TABLE public.dam_data (
+CREATE TABLE IF NOT EXISTS public.dam_data (
   id integer NOT NULL DEFAULT 1 PRIMARY KEY,
   data jsonb NOT NULL DEFAULT '{}'::jsonb,
   updated_at timestamp with time zone NOT NULL DEFAULT now()
 );
 
 -- whatsapp_analytics
-CREATE TABLE public.whatsapp_analytics (
+CREATE TABLE IF NOT EXISTS public.whatsapp_analytics (
   id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   evento text NOT NULL,
   mensagem_tipo text,
@@ -336,7 +340,7 @@ CREATE TABLE public.whatsapp_analytics (
 );
 
 -- categorias
-CREATE TABLE public.categorias (
+CREATE TABLE IF NOT EXISTS public.categorias (
   id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   nome text NOT NULL,
   slug text NOT NULL UNIQUE,
@@ -348,7 +352,7 @@ CREATE TABLE public.categorias (
 );
 
 -- produtos
-CREATE TABLE public.produtos (
+CREATE TABLE IF NOT EXISTS public.produtos (
   id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   nome text NOT NULL,
   slug text NOT NULL UNIQUE,
@@ -366,7 +370,7 @@ CREATE TABLE public.produtos (
 );
 
 -- produto_imagens
-CREATE TABLE public.produto_imagens (
+CREATE TABLE IF NOT EXISTS public.produto_imagens (
   id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   produto_id uuid NOT NULL REFERENCES public.produtos(id),
   url text NOT NULL,
@@ -377,7 +381,7 @@ CREATE TABLE public.produto_imagens (
 );
 
 -- propriedades_venda
-CREATE TABLE public.propriedades_venda (
+CREATE TABLE IF NOT EXISTS public.propriedades_venda (
   id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   titulo text NOT NULL,
   slug text NOT NULL UNIQUE,

@@ -7,6 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Plus, Trash2 } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { invalidateCache } from "@/lib/cacheService";
 
 const SETTINGS_ID = "00000000-0000-0000-0000-000000000001";
 
@@ -16,6 +18,7 @@ interface QuickMessage {
 }
 
 const WhatsAppConfig = () => {
+  const queryClient = useQueryClient();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState({
@@ -69,12 +72,15 @@ const WhatsAppConfig = () => {
         .from("site_settings")
         .update({
           ...settings,
-          whatsapp_opcoes: quickMessages as any,
+          whatsapp_opcoes: quickMessages as unknown as Array<{ [key: string]: string | number | boolean | null }>,
           updated_at: new Date().toISOString(),
         })
         .eq("id", SETTINGS_ID);
 
       if (error) throw error;
+
+      invalidateCache('site_settings');
+      queryClient.invalidateQueries({ queryKey: ['site-settings'] });
 
       toast.success("Configurações salvas com sucesso!");
     } catch (error) {

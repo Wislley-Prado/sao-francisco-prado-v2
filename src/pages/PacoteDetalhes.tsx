@@ -23,14 +23,26 @@ import { toast } from 'sonner';
 import { usePacoteBySlug } from '@/hooks/useOptimizedData';
 import { ShareButtons } from '@/components/ShareButtons';
 import { SITE_CONFIG } from '@/lib/constants';
+import { invalidateCache } from '@/lib/cacheService';
 
 const PacoteDetalhes = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  
+
   // Use optimized hook with cache
-  const { data: pacoteData, isLoading: loading } = usePacoteBySlug(slug);
-  
+  const { data: pacoteData, isLoading: loading, refetch } = usePacoteBySlug(slug);
+
+  // Cache self-healing: if coordinates are missing but it's a known pacote, try clearing cache
+  useEffect(() => {
+    if (!loading && pacoteData && !pacoteData.latitude && slug) {
+      console.log(`[Cache] Dados de localização ausentes para ${slug}, invalidando cache...`);
+      invalidateCache(`pacote_${slug}`);
+      invalidateCache('pacotes_all');
+      invalidateCache('pacotes_available');
+      refetch();
+    }
+  }, [pacoteData, loading, slug, refetch]);
+
   // Transform to expected format
   const pacote = useMemo(() => {
     if (!pacoteData) return null;
@@ -133,6 +145,7 @@ const PacoteDetalhes = () => {
   };
 
   // Mapear ícones para features
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const iconMap: Record<string, any> = {
     'pesca': Fish,
     'acomodação': Home,
@@ -143,8 +156,26 @@ const PacoteDetalhes = () => {
     'seguro': Shield,
   };
 
+  const getYouTubeEmbedUrl = (url: string) => {
+    if (!url) return null;
+
+    // Extract video ID from YouTube Shorts URL
+    const shortsMatch = url.match(/shorts\/([a-zA-Z0-9_-]{11})/);
+    if (shortsMatch) {
+      return `https://www.youtube.com/embed/${shortsMatch[1]}`;
+    }
+
+    // Regular YouTube URLs (watch?v= or youtu.be/)
+    const videoMatch = url.match(/(?:v=|\/)([a-zA-Z0-9_-]{11})(?:[&?]|$)/);
+    if (videoMatch) {
+      return `https://www.youtube.com/embed/${videoMatch[1]}`;
+    }
+
+    return null;
+  };
+
   const getFeatureIcon = (title: string) => {
-    const key = Object.keys(iconMap).find(k => 
+    const key = Object.keys(iconMap).find(k =>
       title.toLowerCase().includes(k)
     );
     return iconMap[key] || Fish;
@@ -166,9 +197,9 @@ const PacoteDetalhes = () => {
   };
 
   // Imagem principal
-  const mainImage = pacote?.imagens.find(img => img.principal)?.url || 
-                   pacote?.imagens[0]?.url || 
-                   '/placeholder.svg';
+  const mainImage = pacote?.imagens.find(img => img.principal)?.url ||
+    pacote?.imagens[0]?.url ||
+    '/placeholder.svg';
 
   if (loading) {
     return (
@@ -207,7 +238,7 @@ const PacoteDetalhes = () => {
         <meta name="twitter:image" content={heroImage} />
         <link rel="canonical" href={pageUrl} />
       </Helmet>
-      
+
       <Header />
       <PackagePageLayout
         sidebar={
@@ -248,150 +279,182 @@ const PacoteDetalhes = () => {
           highlights={pacote.caracteristicas?.slice(0, 6)}
         />
 
-        {features.length > 0 && (
-          <PackageFeatures features={features} tier={tier} />
-        )}
+        {
+          features.length > 0 && (
+            <PackageFeatures features={features} tier={tier} />
+          )
+        }
 
         {/* Galeria Premium */}
-        {pacote.imagens.length > 0 && (
-          <section className="py-12">
-            <div className="container max-w-7xl mx-auto px-4">
-              <ImageGallery 
-                images={pacote.imagens.map(img => ({
-                  url: img.url,
-                  alt_text: img.alt_text,
-                  principal: img.principal
-                }))} 
-                title={pacote.nome} 
-              />
-            </div>
-          </section>
-        )}
+        {
+          pacote.imagens.length > 0 && (
+            <section className="py-12">
+              <div className="container max-w-7xl mx-auto px-4">
+                <ImageGallery
+                  images={pacote.imagens.map(img => ({
+                    url: img.url,
+                    alt_text: img.alt_text,
+                    principal: img.principal
+                  }))}
+                  title={pacote.nome}
+                />
+              </div>
+            </section>
+          )
+        }
 
         <Separator className="my-4" />
 
         {/* Seção de Vídeo Premium */}
-        {pacote.video_youtube && (
-          <section className="py-12">
-            <div className="container max-w-7xl mx-auto px-4">
-              {/* Header com ícone gradiente */}
-              <div className="flex items-center gap-3 mb-8">
-                <div className="p-3 rounded-xl bg-gradient-to-br from-red-500 to-red-600 shadow-lg shadow-red-500/25">
-                  <Play className="h-6 w-6 text-white fill-white" />
-                </div>
-                <div>
-                  <h2 className="text-2xl md:text-3xl font-bold text-foreground">Conheça o Pacote</h2>
-                  <p className="text-sm text-muted-foreground">Assista ao vídeo e veja tudo que te espera</p>
-                </div>
-              </div>
-              
-              <Card className="overflow-hidden shadow-xl border-0">
-                <div className="bg-gradient-to-r from-red-500 to-red-600 px-4 py-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-white text-sm font-medium flex items-center gap-2">
-                      <Play className="h-4 w-4 fill-white" />
-                      Vídeo do Pacote
-                    </span>
-                    <Badge className="bg-white/20 text-white border-0 hover:bg-white/30">
-                      🎬 Exclusivo
-                    </Badge>
+        {
+          pacote.video_youtube && (
+            <section className="py-12">
+              <div className="container max-w-7xl mx-auto px-4">
+                {/* Header com ícone gradiente */}
+                <div className="flex items-center gap-3 mb-8">
+                  <div className="p-3 rounded-xl bg-gradient-to-br from-red-500 to-red-600 shadow-lg shadow-red-500/25">
+                    <Play className="h-6 w-6 text-white fill-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl md:text-3xl font-bold text-foreground">Conheça o Pacote</h2>
+                    <p className="text-sm text-muted-foreground">Assista ao vídeo e veja tudo que te espera</p>
                   </div>
                 </div>
-                <CardContent className="p-0">
-                  <YouTubePlayer videoUrl={pacote.video_youtube} title={pacote.nome} />
-                </CardContent>
-              </Card>
-            </div>
-          </section>
-        )}
+
+                <Card className="overflow-hidden shadow-xl border-0">
+                  <div className="bg-gradient-to-r from-red-500 to-red-600 px-4 py-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-white text-sm font-medium flex items-center gap-2">
+                        <Play className="h-4 w-4 fill-white" />
+                        Vídeo do Pacote
+                      </span>
+                      <Badge className="bg-white/20 text-white border-0 hover:bg-white/30">
+                        🎬 Exclusivo
+                      </Badge>
+                    </div>
+                  </div>
+                  <CardContent className="p-0">
+                    <div className="relative w-full aspect-video md:aspect-[9/16] max-w-lg mx-auto overflow-hidden">
+                      {getYouTubeEmbedUrl(pacote.video_youtube) ? (
+                        <iframe
+                          src={getYouTubeEmbedUrl(pacote.video_youtube) || ''}
+                          className="absolute inset-0 w-full h-full"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          allowFullScreen
+                          title={`Vídeo ${pacote.nome}`}
+                        />
+                      ) : (
+                        <YouTubePlayer videoUrl={pacote.video_youtube} title={pacote.nome} />
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </section>
+          )
+        }
 
         <Separator className="my-4" />
 
         {/* Seção de Localização Premium */}
-        {pacote.latitude && pacote.longitude && (
-          <section className="py-12 bg-muted/30">
-            <div className="container max-w-7xl mx-auto px-4">
-              {/* Header com ícone gradiente */}
-              <div className="flex items-center gap-3 mb-8">
-                <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/25">
-                  <MapPin className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-2xl md:text-3xl font-bold text-foreground">Localização</h2>
-                  <p className="text-sm text-muted-foreground">Veja como chegar ao local da pescaria</p>
-                </div>
-              </div>
-
-              {/* Card de Endereço */}
-              {pacote.endereco_completo && (
-                <Card className="mb-6 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200/50 dark:border-blue-800/50">
-                  <CardContent className="p-4">
-                    <div className="flex items-start gap-3">
-                      <Navigation className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-1 flex-shrink-0" />
-                      <div className="flex-1">
-                        <p className="font-medium text-foreground">{pacote.endereco_completo}</p>
-                        <div className="flex flex-wrap gap-2 mt-3">
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            className="border-blue-300 dark:border-blue-700 hover:bg-blue-100 dark:hover:bg-blue-900/30"
-                            onClick={() => {
-                              const mapsUrl = `https://www.google.com/maps?q=${pacote.latitude},${pacote.longitude}`;
-                              window.open(mapsUrl, '_blank');
-                            }}
-                          >
-                            <ExternalLink className="h-4 w-4 mr-2" />
-                            Abrir no Maps
-                          </Button>
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            className="border-blue-300 dark:border-blue-700 hover:bg-blue-100 dark:hover:bg-blue-900/30"
-                            onClick={() => {
-                              navigator.clipboard.writeText(pacote.endereco_completo || '');
-                              toast.success('Endereço copiado!');
-                            }}
-                          >
-                            <Copy className="h-4 w-4 mr-2" />
-                            Copiar
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Mapa com Visual Premium */}
-              <Card className="overflow-hidden shadow-xl border-0">
-                <div className="bg-gradient-to-r from-blue-500 to-indigo-600 px-4 py-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-white text-sm font-medium flex items-center gap-2">
-                      <Compass className="h-4 w-4" />
-                      {Math.abs(pacote.latitude).toFixed(4)}°S, {Math.abs(pacote.longitude).toFixed(4)}°W
-                    </span>
-                    <Badge className="bg-white/20 text-white border-0 hover:bg-white/30 animate-pulse">
-                      📍 Localização exata
-                    </Badge>
+        {
+          ((pacote.latitude && pacote.longitude) || pacote.endereco_completo) ? (
+            <section className="py-12 bg-muted/30">
+              <div className="container max-w-7xl mx-auto px-4">
+                {/* Header com ícone gradiente */}
+                <div className="flex items-center gap-3 mb-8">
+                  <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/25">
+                    <MapPin className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl md:text-3xl font-bold text-foreground">Localização</h2>
+                    <p className="text-sm text-muted-foreground">Veja como chegar ao local da pescaria</p>
                   </div>
                 </div>
-                <div className="relative w-full h-[400px]">
-                  <iframe
-                    src={`https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d3000!2d${pacote.longitude}!3d${pacote.latitude}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1spt-BR!2sbr!4v1`}
-                    width="100%"
-                    height="100%"
-                    style={{ border: 0 }}
-                    allowFullScreen
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    title={`Mapa - ${pacote.nome}`}
-                    className="absolute inset-0"
-                  />
-                </div>
-              </Card>
-            </div>
-          </section>
-        )}
+
+                {/* Card de Endereço */}
+                {pacote.endereco_completo && (
+                  <Card className="mb-6 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200/50 dark:border-blue-800/50">
+                    <CardContent className="p-4">
+                      <div className="flex items-start gap-3">
+                        <Navigation className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-1 flex-shrink-0" />
+                        <div className="flex-1">
+                          <p className="font-medium text-foreground">{pacote.endereco_completo}</p>
+                          <div className="flex flex-wrap gap-2 mt-3">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="border-blue-300 dark:border-blue-700 hover:bg-blue-100 dark:hover:bg-blue-900/30"
+                              onClick={() => {
+                                const queryStr = (pacote.latitude && pacote.longitude) ? `${pacote.latitude},${pacote.longitude}` : encodeURIComponent(pacote.endereco_completo || '');
+                                const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${queryStr}`;
+                                window.open(mapsUrl, '_blank');
+                              }}
+                            >
+                              <ExternalLink className="h-4 w-4 mr-2" />
+                              Abrir no Maps
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="border-blue-300 dark:border-blue-700 hover:bg-blue-100 dark:hover:bg-blue-900/30"
+                              onClick={() => {
+                                navigator.clipboard.writeText(pacote.endereco_completo || '');
+                                toast.success('Endereço copiado!');
+                              }}
+                            >
+                              <Copy className="h-4 w-4 mr-2" />
+                              Copiar
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Mapa com Visual Premium */}
+                <Card className="overflow-hidden shadow-xl border-0 rounded-2xl">
+                  <div className="bg-gradient-to-r from-blue-500 to-indigo-600 px-4 py-3">
+                    <div className="flex items-center justify-between flex-wrap gap-2">
+                      <span className="text-white text-sm font-medium flex items-center gap-2">
+                        <Compass className="h-4 w-4" />
+                        {pacote.latitude && pacote.longitude ? `${Math.abs(pacote.latitude).toFixed(4)}°S, ${Math.abs(pacote.longitude).toFixed(4)}°W` : 'Localização'}
+                      </span>
+                      <Badge
+                        className="bg-white/20 text-white border-white/30 hover:bg-white/30 cursor-pointer transition-all hover:scale-105 active:scale-95"
+                        onClick={() => {
+                          const queryStr = (pacote.latitude && pacote.longitude) ? `${pacote.latitude},${pacote.longitude}` : encodeURIComponent(pacote.endereco_completo || '');
+                          window.open(`https://www.google.com/maps/search/?api=1&query=${queryStr}`, '_blank');
+                        }}
+                        title="Ver localização no Google Maps"
+                      >
+                        <span className="relative flex h-2 w-2 mr-2">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                        </span>
+                        Localização exata
+                      </Badge>
+                    </div>
+                  </div>
+                  <div className="relative w-full h-[400px]">
+                    <iframe
+                      src={pacote.latitude && pacote.longitude ? `https://www.google.com/maps?q=${pacote.latitude},${pacote.longitude}&hl=pt-BR&z=14&output=embed` : `https://www.google.com/maps?q=${encodeURIComponent(pacote.endereco_completo || '')}&hl=pt-BR&z=14&output=embed`}
+                      width="100%"
+                      height="100%"
+                      style={{ border: 0 }}
+                      allowFullScreen
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      title={`Mapa - ${pacote.nome}`}
+                      className="absolute inset-0"
+                    />
+                  </div>
+                </Card>
+              </div>
+            </section>
+          ) : null
+        }
 
         {/* Depoimentos */}
         <section className="py-16 bg-muted/30">
@@ -404,7 +467,7 @@ const PacoteDetalhes = () => {
                 Experiências reais de quem já viveu momentos inesquecíveis
               </p>
             </div>
-            <PackageTestimonials 
+            <PackageTestimonials
               pacoteId={pacote.id}
               tipoPacote={pacote.tipo as 'pescaria' | 'completo' | 'personalizado'}
               maxItems={4}
@@ -433,7 +496,7 @@ const PacoteDetalhes = () => {
             </div>
           </div>
         </section>
-      </PackagePageLayout>
+      </PackagePageLayout >
       <Footer />
     </>
   );

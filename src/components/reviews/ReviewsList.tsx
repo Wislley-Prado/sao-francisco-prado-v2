@@ -24,7 +24,7 @@ export const ReviewsList = ({ ranchoId }: ReviewsListProps) => {
     queryFn: async () => {
       // Usar view pública que não expõe emails
       const { data, error } = await supabase
-        .from("avaliacoes_public" as any)
+        .from("avaliacoes_public")
         .select("id, nome_usuario, nota, comentario, resposta_admin, created_at, imagens")
         .eq("rancho_id", ranchoId)
         .order("created_at", { ascending: false });
@@ -66,11 +66,10 @@ export const ReviewsList = ({ ranchoId }: ReviewsListProps) => {
             {Array.from({ length: 5 }).map((_, i) => (
               <Star
                 key={i}
-                className={`h-4 w-4 ${
-                  i < Math.round(Number(mediaNotas))
-                    ? "fill-yellow-400 text-yellow-400"
-                    : "text-muted"
-                }`}
+                className={`h-4 w-4 ${i < Math.round(Number(mediaNotas))
+                  ? "fill-yellow-400 text-yellow-400"
+                  : "text-muted"
+                  }`}
               />
             ))}
           </div>
@@ -82,8 +81,8 @@ export const ReviewsList = ({ ranchoId }: ReviewsListProps) => {
 
       <div className="space-y-4">
         {avaliacoes.map((avaliacao) => (
-          <ReviewCard 
-            key={avaliacao.id} 
+          <ReviewCard
+            key={avaliacao.id}
             nome_usuario={avaliacao.nome_usuario}
             nota={avaliacao.nota}
             comentario={avaliacao.comentario}

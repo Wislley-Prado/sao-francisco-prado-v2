@@ -72,9 +72,9 @@ const Blog = () => {
         <meta name="twitter:title" content="Blog PradoAqui | Dicas de Pesca" />
         <meta name="twitter:image" content="/og-image.png" />
       </Helmet>
-      
+
       <Header />
-      
+
       <main className="flex-1 bg-gradient-to-br from-background to-muted/20">
         {/* Hero Section */}
         <section className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground py-16">
@@ -169,7 +169,7 @@ const Blog = () => {
                   >
                     <ChevronLeft className="h-4 w-4" />
                   </Button>
-                  
+
                   <div className="flex items-center gap-1">
                     {[...Array(totalPages)].map((_, i) => (
                       <Button

@@ -15,6 +15,8 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Plus, Pencil, Trash, Search, Eye, EyeOff, Star, BarChart } from 'lucide-react';
 import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
+import { invalidateCacheByPrefix } from '@/lib/cacheService';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,6 +46,7 @@ interface Anuncio {
 
 export default function Anuncios() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [anuncios, setAnuncios] = useState<Anuncio[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -81,6 +84,9 @@ export default function Anuncios() {
 
       if (error) throw error;
 
+      invalidateCacheByPrefix('anuncios_all');
+      queryClient.invalidateQueries({ queryKey: ['anuncios'] });
+
       toast.success('Anúncio excluído com sucesso');
       fetchAnuncios();
     } catch (error) {
@@ -99,6 +105,9 @@ export default function Anuncios() {
         .eq('id', id);
 
       if (error) throw error;
+
+      invalidateCacheByPrefix('anuncios_all');
+      queryClient.invalidateQueries({ queryKey: ['anuncios'] });
 
       toast.success(`Anúncio ${!currentStatus ? 'ativado' : 'desativado'} com sucesso`);
       fetchAnuncios();

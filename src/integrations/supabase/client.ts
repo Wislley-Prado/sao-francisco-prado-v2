@@ -2,8 +2,8 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const SUPABASE_URL = "https://zeqloqlhnbdeivnyghkx.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InplcWxvcWxobmJkZWl2bnlnaGt4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNTAxNjcsImV4cCI6MjA3MzcyNjE2N30.j96GObK0f5AUgc5O38n6gum3OU4u_5OFyxRaLj76GwY";
+const SUPABASE_URL = "https://pradoaqui.vendopro.com.br";
+const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ewogICJyb2xlIjogImFub24iLAogICJpc3MiOiAic3VwYWJhc2UiLAogICJpYXQiOiAxNzE1MDUwODAwLAogICJleHAiOiAxODcyODE3MjAwCn0.nqb_unyHxgo3J_IBedTTuIiMHgeTG0v6UMmmZTHiG8s";
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";

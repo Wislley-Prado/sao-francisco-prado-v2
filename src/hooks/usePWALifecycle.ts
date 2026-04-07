@@ -1,5 +1,14 @@
 import { useState, useEffect } from 'react';
 
+// Extending standard interfaces for vendor-specific properties
+interface NavigatorWithVendor extends Navigator {
+  standalone?: boolean;
+}
+
+interface WindowWithMSStream extends Window {
+  MSStream?: unknown;
+}
+
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
   readonly userChoice: Promise<{
@@ -21,15 +30,15 @@ interface PWALifecycleState {
 const detectPlatform = () => {
   console.log('🔍 Detecting platform...');
   const userAgent = navigator.userAgent || navigator.vendor;
-  const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !(window as any).MSStream;
+  const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !(window as WindowWithMSStream).MSStream;
   const isAndroid = /android/i.test(userAgent);
-  
+
   return { isIOS, isAndroid };
 };
 
 export const usePWALifecycle = () => {
   const { isIOS, isAndroid } = detectPlatform();
-  
+
   const [state, setState] = useState<PWALifecycleState>({
     isInstallable: false,
     isInstalled: false,
@@ -44,16 +53,16 @@ export const usePWALifecycle = () => {
   useEffect(() => {
     console.log('🔧 PWA Lifecycle: Initializing...');
     console.log('📱 Platform Detection:', { isIOS, isAndroid });
-    console.log('🌐 Navigator Info:', { 
-      userAgent: navigator.userAgent, 
+    console.log('🌐 Navigator Info:', {
+      userAgent: navigator.userAgent,
       onLine: navigator.onLine,
-      serviceWorker: 'serviceWorker' in navigator 
+      serviceWorker: 'serviceWorker' in navigator
     });
-    
+
     // Check if app is already installed
     const isInstalled = window.matchMedia('(display-mode: standalone)').matches ||
-                       (window.navigator as any).standalone === true;
-    
+      (window.navigator as NavigatorWithVendor).standalone === true;
+
     console.log('📦 Installation Status:', { isInstalled });
     setState(prev => ({ ...prev, isInstalled }));
 
@@ -69,10 +78,10 @@ export const usePWALifecycle = () => {
     const handleAppInstalled = () => {
       console.log('✅ PWA: App installed successfully');
       setDeferredPrompt(null);
-      setState(prev => ({ 
-        ...prev, 
-        isInstalled: true, 
-        isInstallable: false 
+      setState(prev => ({
+        ...prev,
+        isInstalled: true,
+        isInstallable: false
       }));
     };
 
@@ -98,16 +107,16 @@ export const usePWALifecycle = () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, []);
+  }, [isAndroid, isIOS]);
 
   const installApp = async () => {
     console.log('📱 PWA: Install attempt', { isIOS, deferredPrompt: !!deferredPrompt });
-    
+
     if (isIOS) {
       console.log('🍎 PWA: iOS detected - manual installation required');
       return false; // iOS requires manual installation
     }
-    
+
     if (!deferredPrompt) {
       console.log('❌ PWA: No deferred prompt available');
       return false;
@@ -117,15 +126,15 @@ export const usePWALifecycle = () => {
       console.log('🚀 PWA: Showing install prompt');
       await deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
-      
+
       console.log('🎯 PWA: User choice:', outcome);
-      
+
       if (outcome === 'accepted') {
         setDeferredPrompt(null);
-        setState(prev => ({ 
-          ...prev, 
+        setState(prev => ({
+          ...prev,
           isInstallable: false,
-          isInstalled: true 
+          isInstalled: true
         }));
         return true;
       }

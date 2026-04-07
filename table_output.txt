@@ -1,0 +1,7 @@
+[dotenv@17.3.1] injecting env (5) from .env -- tip: ⚙️  override existing env vars with { override: true }
+Table data: {
+  id: '00000000-0000-0000-0000-000000000001',
+  favicon_url: null,
+  pwa_icon_url: null,
+  og_image_url: null
+}

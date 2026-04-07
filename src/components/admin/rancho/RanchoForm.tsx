@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, memo } from 'react';
-import { useForm, useWatch } from 'react-hook-form';
+import { useForm, useWatch, Control, UseFormReturn } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
@@ -24,6 +24,7 @@ import { toast } from 'sonner';
 import { Loader2, X, Plus } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { CoordenadasHelper } from '@/components/admin/shared/CoordenadasHelper';
+import { invalidateCacheByPrefix } from '@/lib/cacheService';
 
 const COMODIDADES_PADRAO = [
   'WiFi',
@@ -70,7 +71,26 @@ const ranchoSchema = z.object({
         message: 'URL inválida. Use um link válido do YouTube (Shorts, vídeo normal ou youtu.be)',
       }
     ),
-  google_calendar_url: z.string().url('URL inválida do Google Calendar').optional().or(z.literal('')),
+  google_calendar_url: z.string().optional().or(z.literal('')).transform(val => {
+    if (!val) return val;
+    // Se for um iframe, tenta extrair o src
+    const srcMatch = val.match(/src=["']([^"']+)["']/);
+    if (srcMatch && srcMatch[1]) {
+      return srcMatch[1];
+    }
+    return val;
+  }).refine(
+    (val) => {
+      if (!val || val === '') return true;
+      try {
+        new URL(val);
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    { message: 'URL inválida ou código de iframe incorreto' }
+  ),
   tracking_code: z.string().optional(),
   latitude: z.string().optional().or(z.literal('')),
   longitude: z.string().optional().or(z.literal('')),
@@ -79,16 +99,48 @@ const ranchoSchema = z.object({
 
 type RanchoFormData = z.infer<typeof ranchoSchema>;
 
+export interface RanchoData {
+  id: string;
+  nome?: string;
+  slug?: string;
+  descricao?: string;
+  localizacao?: string;
+  capacidade?: number;
+  quartos?: number;
+  banheiros?: number;
+  area?: number;
+  preco?: number;
+  rating?: number;
+  disponivel?: boolean;
+  destaque?: boolean;
+  comodidades?: string[];
+  telefone_whatsapp?: string;
+  mensagem_whatsapp?: string;
+  video_youtube?: string;
+  google_calendar_url?: string;
+  tracking_code?: string;
+  latitude?: string | number;
+  longitude?: string | number;
+  endereco_completo?: string;
+  rancho_imagens?: Array<{
+    id: string;
+    url: string;
+    principal: boolean;
+    alt_text?: string;
+    ordem?: number;
+  }>;
+}
+
 interface RanchoFormProps {
-  rancho?: any;
+  rancho?: RanchoData | null;
   onSuccess: () => void;
 }
 
 // Componente otimizado para campo de localização com tags
-const LocationFieldWithTags = memo(({ control }: { control: any }) => {
+const LocationFieldWithTags = memo(({ control }: { control: Control<RanchoFormData> }) => {
   const localizacao = useWatch({ control, name: 'localizacao' }) || '';
   const destaque = useWatch({ control, name: 'destaque' });
-  
+
   const tags = useMemo(() => {
     const loc = localizacao.toLowerCase();
     return {
@@ -134,10 +186,10 @@ const LocationFieldWithTags = memo(({ control }: { control: any }) => {
 LocationFieldWithTags.displayName = 'LocationFieldWithTags';
 
 // Componente otimizado para comodidades personalizadas
-const ComodidadesPersonalizadasSection = memo(({ form }: { form: any }) => {
+const ComodidadesPersonalizadasSection = memo(({ form }: { form: UseFormReturn<RanchoFormData> }) => {
   const comodidades = useWatch({ control: form.control, name: 'comodidades' }) || [];
-  
-  const personalizadas = useMemo(() => 
+
+  const personalizadas = useMemo(() =>
     comodidades.filter((c: string) => !COMODIDADES_PADRAO.includes(c)),
     [comodidades]
   );
@@ -172,7 +224,7 @@ ComodidadesPersonalizadasSection.displayName = 'ComodidadesPersonalizadasSection
 export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [images, setImages] = useState<ImageFile[]>(
-    rancho?.rancho_imagens?.map((img: any, index: number) => ({
+    rancho?.rancho_imagens?.map((img: { id: string; url: string; principal: boolean; alt_text?: string; ordem?: number }, index: number) => ({
       id: img.id,
       url: img.url,
       principal: img.principal,
@@ -329,15 +381,15 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
       // Delete removed images
       if (rancho) {
         const existingImageIds = existingImages.map((img) => img.id);
-        const originalImageIds = rancho.rancho_imagens?.map((img: any) => img.id) || [];
+        const originalImageIds = rancho.rancho_imagens?.map((img: { id: string }) => img.id) || [];
         const deletedImageIds = originalImageIds.filter(
           (id: string) => !existingImageIds.includes(id)
         );
 
         if (deletedImageIds.length > 0) {
-          const imagesToDelete = rancho.rancho_imagens.filter((img: any) =>
+          const imagesToDelete = rancho.rancho_imagens?.filter((img: { id: string; url: string }) =>
             deletedImageIds.includes(img.id)
-          );
+          ) || [];
 
           for (const img of imagesToDelete) {
             const urlParts = img.url.split('/');
@@ -351,6 +403,10 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
             .in('id', deletedImageIds);
         }
       }
+
+      // Invalida cache para refletir as mudanças imediatamente
+      invalidateCacheByPrefix('rancho');
+      invalidateCacheByPrefix('ranchos');
 
       onSuccess();
     } catch (error) {
@@ -678,8 +734,8 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
                 <FormItem>
                   <FormLabel>Mensagem Personalizada do WhatsApp</FormLabel>
                   <FormControl>
-                    <Textarea 
-                      {...field} 
+                    <Textarea
+                      {...field}
                       rows={3}
                       placeholder="Olá! Gostaria de fazer uma reserva no {nome} ({localizacao})."
                     />

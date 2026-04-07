@@ -37,8 +37,8 @@ const RelatedPosts = ({ currentPostId, categoria, tags }: RelatedPostsProps) => 
       // If we have tags, sort by relevance (posts with matching tags first)
       if (tags && tags.length > 0 && data) {
         return data.sort((a, b) => {
-          const aMatchingTags = (a as any).tags?.filter((tag: string) => tags.includes(tag)).length || 0;
-          const bMatchingTags = (b as any).tags?.filter((tag: string) => tags.includes(tag)).length || 0;
+          const aMatchingTags = ((a as unknown) as { tags?: string[] }).tags?.filter((tag: string) => tags.includes(tag)).length || 0;
+          const bMatchingTags = ((b as unknown) as { tags?: string[] }).tags?.filter((tag: string) => tags.includes(tag)).length || 0;
           return bMatchingTags - aMatchingTags;
         }).slice(0, 6);
       }

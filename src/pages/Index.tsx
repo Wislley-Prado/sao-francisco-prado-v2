@@ -40,7 +40,7 @@ const Index = () => {
     staleTime: 30 * 60 * 1000,
   });
 
-  const ogImage = (settings as any)?.og_image_url || '/og-image.png';
+  const ogImage = (settings as { og_image_url?: string })?.og_image_url || '/og-image.png';
 
   return (
     <div className="min-h-screen">
@@ -56,14 +56,14 @@ const Index = () => {
       </Helmet>
       <Header />
       <HeroSection />
-      
+
       {/* Anúncios topo - lazy render quando próximo */}
       <LazySection fallback={null} rootMargin="100px">
         <Suspense fallback={null}>
           <AnunciosSection posicao="topo" />
         </Suspense>
       </LazySection>
-      
+
       {/* Dados em tempo real - defer until near viewport */}
       <LazySection fallback={<SectionSkeleton />} rootMargin="300px">
         <Suspense fallback={<SectionSkeleton />}>
@@ -82,13 +82,13 @@ const Index = () => {
           <WeatherDashboard />
         </Suspense>
       </LazySection>
-      
+
       <LazySection fallback={null} rootMargin="200px">
         <Suspense fallback={null}>
           <AnunciosSection posicao="meio" />
         </Suspense>
       </LazySection>
-      
+
       {/* Conteúdo principal - defer */}
       <LazySection fallback={<SectionSkeleton />} rootMargin="300px">
         <Suspense fallback={<SectionSkeleton />}>
@@ -107,7 +107,7 @@ const Index = () => {
           <BlogSection />
         </Suspense>
       </LazySection>
-      
+
       {/* Seções de suporte */}
       <LazySection fallback={null} rootMargin="200px">
         <Suspense fallback={null}>
@@ -120,7 +120,7 @@ const Index = () => {
           <FAQSection />
         </Suspense>
       </LazySection>
-      
+
       <LazySection fallback={null} rootMargin="200px">
         <Suspense fallback={null}>
           <AnunciosSection posicao="rodape" />

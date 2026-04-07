@@ -24,39 +24,44 @@ export const CoordenadasHelper = ({ onCoordenadasExtraidas }: CoordenadasHelperP
 
     try {
       // Padrões de URL do Google Maps:
-      // 1. https://www.google.com/maps/place/.../@-17.341050,-44.892090,17z/...
-      // 2. https://maps.google.com/?q=-17.341050,-44.892090
-      // 3. https://www.google.com/maps/@-17.341050,-44.892090,17z
-      // 4. https://goo.gl/maps/... (encurtado)
-
       let latitude: number | null = null;
       let longitude: number | null = null;
-
-      // Padrão 1: URL com @
-      const pattern1 = /@(-?\d+\.\d+),(-?\d+\.\d+)/;
-      const match1 = url.match(pattern1);
+      // Padrão 1: Coordenadas exatas diretas da área de transferência (ex: -18.1671, -45.2380)
+      const rawPattern = /^(-?\d+\.\d{4,}),\s*(-?\d+\.\d{4,})$/;
+      const rawMatch = url.trim().match(rawPattern);
       
-      if (match1) {
-        latitude = parseFloat(match1[1]);
-        longitude = parseFloat(match1[2]);
-      } else {
-        // Padrão 2: URL com ?q=
-        const pattern2 = /\?q=(-?\d+\.\d+),(-?\d+\.\d+)/;
-        const match2 = url.match(pattern2);
-        
-        if (match2) {
-          latitude = parseFloat(match2[1]);
-          longitude = parseFloat(match2[2]);
-        } else {
-          // Padrão 3: Buscar qualquer par de coordenadas na URL
-          const pattern3 = /(-?\d+\.\d{4,}),\s*(-?\d+\.\d{4,})/;
-          const match3 = url.match(pattern3);
-          
-          if (match3) {
-            latitude = parseFloat(match3[1]);
-            longitude = parseFloat(match3[2]);
-          }
-        }
+      // Padrão 2: Extrato exato do pino (!3d e !4d da URL)
+      const pinPattern = /!3d(-?\d+\.\d+).*?!4d(-?\d+\.\d+)/;
+      const pinMatch = url.match(pinPattern);
+      
+      // Padrão 3: ?q=LAT,LNG
+      const qPattern = /[\?&]q=(-?\d+\.\d+),(-?\d+\.\d+)/;
+      const qMatch = url.match(qPattern);
+      
+      // Padrão 4: @LAT,LNG (Centro da tela - Menos preciso)
+      const viewportPattern = /@(-?\d+\.\d+),(-?\d+\.\d+)/;
+      const viewportMatch = url.match(viewportPattern);
+      
+      // Padrão 5: Tentar capturar qualquer formato numérico com virgula no meio se for texto sujo
+      const fallbackPattern = /(-?\d+\.\d{4,})[,\s]+(-?\d+\.\d{4,})/;
+      const fallbackMatch = url.match(fallbackPattern);
+
+      if (rawMatch) {
+        latitude = parseFloat(rawMatch[1]);
+        longitude = parseFloat(rawMatch[2]);
+      } else if (pinMatch) {
+        latitude = parseFloat(pinMatch[1]);
+        longitude = parseFloat(pinMatch[2]);
+      } else if (qMatch) {
+        latitude = parseFloat(qMatch[1]);
+        longitude = parseFloat(qMatch[2]);
+      } else if (fallbackMatch && !url.includes('google.com')) {
+        latitude = parseFloat(fallbackMatch[1]);
+        longitude = parseFloat(fallbackMatch[2]);
+      } else if (viewportMatch) {
+        // Usa o viewport center por último, já que não é a posição exata do pino
+        latitude = parseFloat(viewportMatch[1]);
+        longitude = parseFloat(viewportMatch[2]);
       }
 
       if (latitude !== null && longitude !== null) {
@@ -101,7 +106,7 @@ export const CoordenadasHelper = ({ onCoordenadasExtraidas }: CoordenadasHelperP
               Extrair Coordenadas do Google Maps
             </Label>
             <p className="text-xs text-muted-foreground">
-              Cole o link do Google Maps abaixo e as coordenadas serão extraídas automaticamente
+              Cole as coordenadas exatas ou o link do Google Maps para preencher automaticamente
             </p>
           </div>
         </div>
@@ -111,7 +116,7 @@ export const CoordenadasHelper = ({ onCoordenadasExtraidas }: CoordenadasHelperP
             <Input
               value={url}
               onChange={(e) => setUrl(e.target.value)}
-              placeholder="https://www.google.com/maps/@-17.341,-44.892,17z"
+              placeholder="Ex: -18.1671, -45.2380 ou Cole a URL do Google Maps..."
               className="text-xs"
               onKeyPress={(e) => e.key === 'Enter' && extrairCoordenadas()}
             />
@@ -153,9 +158,9 @@ export const CoordenadasHelper = ({ onCoordenadasExtraidas }: CoordenadasHelperP
           <p className="font-medium">Como usar:</p>
           <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
             <li>Abra o Google Maps e encontre o local</li>
-            <li>Clique com botão direito no local e selecione as coordenadas</li>
-            <li>Cole a URL completa do navegador aqui</li>
-            <li>Clique em "Extrair Coordenadas"</li>
+            <li>Recomendado: Clique com botão direito no pino vermelho e copie as coordenadas</li>
+            <li>Ou opcionalmente, copie a URL completa do navegador</li>
+            <li>Cole o valor copiado aqui e clique em Extrair</li>
           </ol>
         </div>
       </CardContent>

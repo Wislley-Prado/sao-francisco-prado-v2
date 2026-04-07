@@ -15,15 +15,15 @@ const WhatsAppButton = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { data: siteSettings } = useSiteSettings();
 
-  // Cast to any to access raw Supabase field names which differ from SiteSettings interface
-  const raw = siteSettings as any;
+  // Cast siteSettings to avoid any
+  const raw = (siteSettings as unknown) as Record<string, unknown> | undefined;
   const settings = {
-    whatsapp_numero: raw?.whatsapp_numero || "5531999999999",
-    whatsapp_titulo: raw?.whatsapp_titulo || "PradoAqui - Atendimento",
-    whatsapp_mensagem_padrao: raw?.whatsapp_mensagem_padrao || "Olá! Gostaria de saber mais sobre os pacotes de pesca no PradoAqui.",
-    whatsapp_saudacao: raw?.whatsapp_saudacao || "👋 Olá! Como podemos ajudar você hoje?",
-    whatsapp_instrucao: raw?.whatsapp_instrucao || "Escolha uma opção abaixo ou digite sua mensagem:",
-    whatsapp_horario: raw?.whatsapp_horario || "Seg-Dom: 6h às 22h",
+    whatsapp_numero: (raw?.whatsapp_numero as string) || "5531999999999",
+    whatsapp_titulo: (raw?.whatsapp_titulo as string) || "PradoAqui - Atendimento",
+    whatsapp_mensagem_padrao: (raw?.whatsapp_mensagem_padrao as string) || "Olá! Gostaria de saber mais sobre os pacotes de pesca no PradoAqui.",
+    whatsapp_saudacao: (raw?.whatsapp_saudacao as string) || "👋 Olá! Como podemos ajudar você hoje?",
+    whatsapp_instrucao: (raw?.whatsapp_instrucao as string) || "Escolha uma opção abaixo ou digite sua mensagem:",
+    whatsapp_horario: (raw?.whatsapp_horario as string) || "Seg-Dom: 6h às 22h",
     whatsapp_opcoes: (raw?.whatsapp_opcoes || [
       { text: "Quero fazer uma reserva", message: "Olá! Gostaria de fazer uma reserva para pesca no Rio São Francisco." },
       { text: "Consultar disponibilidade", message: "Oi! Podem me informar a disponibilidade para os próximos finais de semana?" },
@@ -82,7 +82,7 @@ const WhatsAppButton = () => {
                 </Button>
               </div>
             </div>
-            
+
             <CardContent className="p-4 space-y-3">
               <div className="bg-gray-100 rounded-lg p-3 text-sm">
                 <p className="text-gray-700 mb-2">
@@ -145,7 +145,7 @@ const WhatsAppButton = () => {
             <MessageCircle className="h-6 w-6" />
           )}
         </Button>
-        
+
         {/* Notification Badge */}
         {!isOpen && (
           <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">

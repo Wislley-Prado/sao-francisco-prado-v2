@@ -91,6 +91,7 @@ export const BlogForm = ({ initialData, onSubmit, onCancel, isSubmitting }: Blog
     if (form.watch('publicado') && !form.watch('data_publicacao')) {
       form.setValue('data_publicacao', new Date());
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.watch('publicado')]);
 
   const handleAddTag = (tag: string) => {
@@ -251,8 +252,8 @@ export const BlogForm = ({ initialData, onSubmit, onCancel, isSubmitting }: Blog
           />
         </FormSection>
 
-        <FormSection 
-          title="Redes Sociais" 
+        <FormSection
+          title="Redes Sociais"
           description="Links para compartilhamento nas redes sociais"
         >
           <FormField
@@ -272,8 +273,8 @@ export const BlogForm = ({ initialData, onSubmit, onCancel, isSubmitting }: Blog
           />
         </FormSection>
 
-        <FormSection 
-          title="Mídia Paga" 
+        <FormSection
+          title="Mídia Paga"
           description="Banner publicitário com link para o anunciante"
         >
           <FormField
