@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,6 +26,7 @@ const AdminLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const { signIn, signUp, user, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
 
@@ -36,10 +39,12 @@ const AdminLogin = () => {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage('');
     
     // Validate input
     const validation = loginSchema.safeParse({ email: email.trim(), password });
     if (!validation.success) {
+      setErrorMessage(validation.error.errors[0].message);
       toast.error(validation.error.errors[0].message);
       return;
     }
@@ -53,6 +58,8 @@ const AdminLogin = () => {
       setTimeout(() => {
         navigate('/admin');
       }, 500);
+    } else {
+      setErrorMessage('Credenciais inválidas. Verifique seu e-mail e senha.');
     }
 
     setIsLoading(false);
@@ -112,6 +119,12 @@ const AdminLogin = () => {
 
             <TabsContent value="signin">
               <form onSubmit={handleSignIn} className="space-y-4">
+                {errorMessage && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>{errorMessage}</AlertDescription>
+                  </Alert>
+                )}
                 <div className="space-y-2">
                   <Label htmlFor="email-signin">Email</Label>
                   <Input
