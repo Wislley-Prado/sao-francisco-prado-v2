@@ -1355,7 +1355,7 @@ const Ajuda = () => {
           <div className="space-y-2">
             <h4 className="font-semibold">🏗️ Arquitetura:</h4>
             <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
-              <li><strong>Frontend:</strong> Lovable (desenvolvimento) → Hostinger (produção)</li>
+              <li><strong>Frontend:</strong> Antigravity por Wislley Prado (desenvolvimento) → Hostinger (produção)</li>
               <li><strong>Backend:</strong> Supabase (PostgreSQL + Edge Functions)</li>
               <li><strong>Domínio:</strong> pradoaqui.com.br (Hostinger)</li>
               <li><strong>SSL:</strong> HTTPS configurado automaticamente</li>
@@ -1365,7 +1365,7 @@ const Ajuda = () => {
           <div className="space-y-2">
             <h4 className="font-semibold">🚀 Processo de Deploy:</h4>
             <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground">
-              <li>Desenvolvimento feito no Lovable</li>
+              <li>Desenvolvimento feito com Antigravity por Wislley Prado</li>
               <li>Código exportado para GitHub</li>
               <li>Build gerado e enviado para Hostinger</li>
               <li>Arquivos servidos via servidor Apache</li>
@@ -1382,6 +1382,74 @@ const Ajuda = () => {
           </div>
 
           <Badge variant="secondary">Infraestrutura Profissional</Badge>
+        </div>
+      )
+    },
+
+    // ===== SEÇÃO: IMAGENS E TAMANHOS =====
+    {
+      id: 'imagens',
+      icon: Image,
+      title: 'Guia de Imagens e Tamanhos',
+      color: 'text-amber-500',
+      category: 'Técnico',
+      content: (
+        <div className="space-y-4">
+          <p className="text-muted-foreground">
+            Recomendações técnicas para garantir que suas imagens fiquem perfeitas e o site carregue rápido.
+          </p>
+          
+          <div className="space-y-2">
+            <h4 className="font-semibold flex items-center gap-2">
+              <Home className="w-4 h-4" /> Capas de Ranchos e Pacotes:
+            </h4>
+            <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+              <li><strong>Proporção ideal:</strong> 16:9 (formato horizontal padrão).</li>
+              <li><strong>Tamanho recomendado:</strong> 1920x1080 pixels (Resolução Full HD).</li>
+              <li><strong>Tamanho mínimo para não estourar:</strong> 1280x720 pixels.</li>
+              <li><strong>Dica:</strong> Evite imagens retrato (verticais) como fotos principais, pois a galeria do site exibe e recorta de forma horizontal.</li>
+            </ul>
+          </div>
+
+          <div className="space-y-2">
+            <h4 className="font-semibold flex items-center gap-2">
+              <FileText className="w-4 h-4" /> Blog e Compartilhamento (Redes Sociais):
+            </h4>
+            <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+              <li><strong>Capa do Post (Thumbnail):</strong> 1200x630 pixels. Tamanho perfeito de "Open Graph" garantindo que a imagem não seja cortada no preview do WhatsApp ou Facebook.</li>
+              <li><strong>Imagens no meio do texto:</strong> Recomendado até 1000 pixels de largura.</li>
+            </ul>
+          </div>
+
+          <div className="space-y-2">
+            <h4 className="font-semibold flex items-center gap-2">
+              <Building2 className="w-4 h-4" /> Anúncios e Banners:
+            </h4>
+            <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+              <li><strong>Banners principais (Topo/Footer largo):</strong> 1920x500 pixels.</li>
+              <li><strong>Cards de Anúncio isolados no meio:</strong> 800x800 pixels (Quadrado/1:1).</li>
+              <li><strong>Regra de Ouro:</strong> Concentre as informações de texto ou rostos no CENTRO da imagem, pois laterais podem ser cortadas no celular.</li>
+            </ul>
+          </div>
+
+          <div className="space-y-2">
+            <h4 className="font-semibold flex items-center gap-2">
+              <MessageSquare className="w-4 h-4" /> Depoimentos e Avatares:
+            </h4>
+            <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+              <li><strong>Fotos de cliente:</strong> 400x400 pixels (formato quadrado). Como o sistema corta automaticamente para círculo, mantenha a pessoa centralizada.</li>
+            </ul>
+          </div>
+
+          <div className="space-y-2">
+            <h4 className="font-semibold">💡 Dicas de Peso e Formato:</h4>
+            <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+              <li>Sempre prefira fotos nos formatos <strong>WebP</strong> (melhor compressão atual) ou <strong>JPG</strong>. Reserve o <strong>PNG</strong> apenas para logotipos que precisam de fundo transparente.</li>
+              <li>Peso ideal: O site já vem com otimizar de imagens (Image Optimizer/Compressão), mas tente nunca subir arquivos acima de 1 ou 2 MB. O ideal é abaixo de 500KB!</li>
+            </ul>
+          </div>
+
+          <Badge variant="secondary">Qualidade Visual</Badge>
         </div>
       )
     }
