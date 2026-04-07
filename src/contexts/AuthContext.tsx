@@ -11,6 +11,7 @@ interface AuthContextType {
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: AuthError | Error | null }>;
   signUp: (email: string, password: string) => Promise<{ error: AuthError | Error | null }>;
+  updateProfile: (fullName: string, avatarUrl: string) => Promise<{ error: AuthError | Error | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -124,6 +125,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const updateProfile = async (fullName: string, avatarUrl: string) => {
+    try {
+      const { data, error } = await supabase.auth.updateUser({
+        data: { full_name: fullName, avatar_url: avatarUrl }
+      });
+
+      if (error) {
+        toast.error(error.message);
+        return { error };
+      }
+
+      setUser(data.user);
+      toast.success('Perfil atualizado com sucesso!');
+      return { error: null };
+    } catch (error) {
+      toast.error('Erro ao atualizar perfil');
+      return { error: error as Error };
+    }
+  };
+
   const signOut = async () => {
     try {
       await supabase.auth.signOut();
@@ -144,6 +165,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         loading,
         signIn,
         signUp,
+        updateProfile,
         signOut,
       }}
     >
