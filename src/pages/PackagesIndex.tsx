@@ -138,10 +138,19 @@ const PackagesIndex = () => {
       <Header />
 
       {/* Hero Section */}
-      <section className="relative py-20 bg-gradient-to-r from-blue-600 to-blue-800 text-white">
-        <div className="absolute inset-0 bg-black/20"></div>
+      <section 
+        className="relative py-28 md:py-36 bg-cover bg-center text-white" 
+        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&q=80&w=2000')" }}
+      >
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent bottom-[-1px]"></div>
         <div className="relative container mx-auto px-4 text-center">
-          <h1 className="text-5xl font-bold mb-6">Nossos Pacotes de Pesca</h1>
+          <Badge className="bg-white/10 text-white border-white/20 mb-6 px-4 py-1.5 backdrop-blur-md">
+            Experiências Inesquecíveis
+          </Badge>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 tracking-tight drop-shadow-lg">
+            Nossos Pacotes de <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-blue-100">Pesca</span>
+          </h1>
           <p className="text-xl mb-8 max-w-3xl mx-auto">
             Escolha o pacote ideal para sua experiência de pesca esportiva no Rio São Francisco.
             Temos opções para todos os perfis, desde o pescador iniciante até o mais exigente.

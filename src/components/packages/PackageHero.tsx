@@ -42,21 +42,21 @@ export const PackageHero = ({
   tier,
   onCtaClick,
 }: PackageHeroProps) => {
-  const parallaxOffset = useParallax({ speed: 0.5 });
+  const parallaxOffset = useParallax({ speed: 0.15 });
 
   return (
-    <div className="relative h-[65vh] md:h-[70vh] overflow-hidden">
+    <div className="relative h-[65vh] md:h-[70vh] overflow-hidden bg-black">
       {/* Background Image with Parallax Effect */}
       <div 
-        className="absolute inset-0 bg-cover bg-center scale-110 transition-transform duration-100"
+        className="absolute inset-0 bg-cover bg-center transition-transform duration-100 opacity-95"
         style={{ 
           backgroundImage: `url(${imageUrl})`,
-          transform: `translateY(${parallaxOffset}px)`
+          transform: `translateY(${parallaxOffset}px) scale(1.03)`
         }}
       >
-      {/* Gradient Overlay - Subtle for better image visibility */}
-        <div className="absolute inset-0 bg-black/20" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+      {/* Gradient Overlay - Better visibility while preserving the image */}
+        <div className="absolute inset-0 bg-black/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-black/10" />
       </div>
 
       {/* Decorative Elements */}

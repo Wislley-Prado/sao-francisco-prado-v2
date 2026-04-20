@@ -76,14 +76,22 @@ const PackagesIndexDynamic = () => {
       <Header />
 
       {/* Hero Section */}
-      <section className="relative py-20 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground">
-        <div className="absolute inset-0 bg-black/10"></div>
+      <section 
+        className="relative py-28 md:py-36 bg-cover bg-center text-white" 
+        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&q=80&w=2000')" }}
+      >
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent bottom-[-1px]"></div>
+        
         <div className="relative container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-            Pacotes de Pescaria Personalizados
+          <Badge className="bg-primary/20 text-primary-foreground border-primary/30 mb-6 px-4 py-1.5 backdrop-blur-md">
+            Experiências Inesquecíveis
+          </Badge>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 tracking-tight drop-shadow-lg">
+            Pacotes de Pescaria <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-primary">Personalizados</span>
           </h1>
-          <p className="text-xl md:text-2xl max-w-3xl mx-auto text-primary-foreground/90">
-            Escolha o pacote perfeito para sua aventura no Rio São Francisco
+          <p className="text-lg md:text-2xl max-w-3xl mx-auto text-white/90 drop-shadow flex flex-col sm:flex-row items-center justify-center gap-2">
+            Escolha o pacote perfeito para sua aventura no maravilhoso Rio São Francisco
           </p>
         </div>
       </section>
