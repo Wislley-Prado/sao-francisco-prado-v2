@@ -36,7 +36,7 @@ const pacoteSchema = z.object({
   duracao: z.string().min(1, 'Duração é obrigatória'),
   pessoas: z.number().min(1, 'Mínimo 1 pessoa'),
   rating: z.number().min(0).max(5),
-  tipo: z.enum(['pescaria', 'completo', 'personalizado']),
+  tipo: z.enum(['pescaria', 'completo', 'personalizado', 'expedicao', 'curso', 'passeio']),
   ativo: z.boolean(),
   popular: z.boolean(),
   destaque: z.boolean(),
@@ -91,7 +91,7 @@ export interface PacoteData {
   duracao?: string;
   pessoas?: number;
   rating?: number;
-  tipo?: 'pescaria' | 'completo' | 'personalizado';
+  tipo?: 'pescaria' | 'completo' | 'personalizado' | 'expedicao' | 'curso' | 'passeio';
   ativo?: boolean;
   popular?: boolean;
   destaque?: boolean;
@@ -639,6 +639,9 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
                     </FormControl>
                     <SelectContent>
                       <SelectItem value="pescaria">Pescaria</SelectItem>
+                      <SelectItem value="expedicao">Expedição</SelectItem>
+                      <SelectItem value="curso">Curso de Pesca</SelectItem>
+                      <SelectItem value="passeio">Passeio Náutico</SelectItem>
                       <SelectItem value="completo">Completo</SelectItem>
                       <SelectItem value="personalizado">Personalizado</SelectItem>
                     </SelectContent>
