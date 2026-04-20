@@ -40,6 +40,8 @@ const HeroSection = () => {
   const videoId = settings?.youtube_video_url 
     ? extractYouTubeId(settings.youtube_video_url)
     : 'cN_BspPR2gg';
+  const isShorts = settings?.youtube_video_url?.includes('/shorts/') || false;
+  
   const temperature = weatherData?.current.temperature || 24;
   const damLevel = damData?.volume_util_percentual ? parseFloat(damData.volume_util_percentual).toFixed(1) : '86.0';
   const windSpeed = weatherData?.current.wind_speed || 12;
@@ -126,7 +128,7 @@ const HeroSection = () => {
                   </div>
                   
                   {/* YouTube Facade - loads iframe only on click */}
-                  <div className="aspect-video bg-black rounded-lg overflow-hidden relative">
+                  <div className={`${isShorts ? 'aspect-[9/16] max-w-[280px] sm:max-w-xs mx-auto' : 'aspect-video'} bg-black rounded-lg overflow-hidden relative`}>
                     {showVideo ? (
                       <iframe 
                         src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&controls=1&showinfo=0&rel=0&modestbranding=1`} 
