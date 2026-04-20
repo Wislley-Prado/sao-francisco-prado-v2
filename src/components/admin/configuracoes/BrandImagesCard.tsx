@@ -22,14 +22,15 @@ export interface ImageUploaderProps {
   currentUrl: string;
   bucket: string;
   path: string;
-  field: string;
+  field?: string;
+  customUpdater?: (publicUrl: string) => Promise<void>;
   maxWidth: number;
   maxHeight: number;
   onUpdate: () => void;
   previewSize?: string;
 }
 
-export const ImageUploader = ({ label, description, currentUrl, bucket, path, field, maxWidth, maxHeight, onUpdate, previewSize = 'w-16 h-16' }: ImageUploaderProps) => {
+export const ImageUploader = ({ label, description, currentUrl, bucket, path, field, customUpdater, maxWidth, maxHeight, onUpdate, previewSize = 'w-16 h-16' }: ImageUploaderProps) => {
   const [uploading, setUploading] = useState(false);
   const [removing, setRemoving] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -67,14 +68,18 @@ export const ImageUploader = ({ label, description, currentUrl, bucket, path, fi
       const publicUrl = `${urlData.publicUrl}?t=${Date.now()}`;
       console.log(`URL pública gerada: ${publicUrl}`);
 
-      const { error: updateError } = await supabase
-        .from('site_settings')
-        .update({ [field]: publicUrl } as Record<string, unknown>)
-        .eq('id', SETTINGS_ID);
+      if (customUpdater) {
+        await customUpdater(publicUrl);
+      } else if (field) {
+        const { error: updateError } = await supabase
+          .from('site_settings')
+          .update({ [field]: publicUrl } as Record<string, unknown>)
+          .eq('id', SETTINGS_ID);
 
-      if (updateError) {
-        console.error('Erro na atualização do banco site_settings:', updateError);
-        throw new Error(`Erro no banco: ${updateError.message}`);
+        if (updateError) {
+          console.error('Erro na atualização do banco site_settings:', updateError);
+          throw new Error(`Erro no banco: ${updateError.message}`);
+        }
       }
 
       toast.success(`${label} atualizado com sucesso!`);
@@ -91,12 +96,15 @@ export const ImageUploader = ({ label, description, currentUrl, bucket, path, fi
   const handleRemove = async () => {
     setRemoving(true);
     try {
-      const { error } = await supabase
-        .from('site_settings')
-        .update({ [field]: null } as Record<string, unknown>)
-        .eq('id', SETTINGS_ID);
-
-      if (error) throw error;
+      if (customUpdater) {
+        await customUpdater('');
+      } else if (field) {
+        const { error } = await supabase
+          .from('site_settings')
+          .update({ [field]: null } as Record<string, unknown>)
+          .eq('id', SETTINGS_ID);
+        if (error) throw error;
+      }
       toast.success(`${label} removido`);
       onUpdate();
     } catch (error) {

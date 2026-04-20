@@ -18,6 +18,32 @@ const Blog = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [heroImage, setHeroImage] = useState('');
+
+  // Fetch blog hero image from site mappings
+  const { data: heroData } = useQuery({
+    queryKey: ['blog-hero'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('site_settings_public')
+        .select('reserva_button_text')
+        .eq('id', '00000000-0000-0000-0000-000000000001')
+        .single();
+      
+      if (error) return null;
+      if (data?.reserva_button_text) {
+        const url = data.reserva_button_text.split('|')[1];
+        if (url) return url;
+      }
+      return null;
+    }
+  });
+
+  React.useEffect(() => {
+    if (heroData) {
+      setHeroImage(heroData);
+    }
+  }, [heroData]);
 
   const { data: posts, isLoading } = useQuery({
     queryKey: ['blog-posts', searchTerm, categoryFilter],
@@ -77,8 +103,20 @@ const Blog = () => {
 
       <main className="flex-1 bg-gradient-to-br from-background to-muted/20">
         {/* Hero Section */}
-        <section className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground py-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section 
+          className="relative bg-cover bg-center text-primary-foreground py-16" 
+          style={heroImage ? { backgroundImage: `url('${heroImage}')` } : {}}
+        >
+          {heroImage ? (
+            <>
+              <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent bottom-[-1px]"></div>
+            </>
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary/80"></div>
+          )}
+          
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 drop-shadow-lg">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">Blog PradoAqui</h1>
             <p className="text-lg md:text-xl opacity-90 max-w-2xl">
               Dicas, novidades e informações sobre pesca no Rio São Francisco

@@ -75,10 +75,13 @@ const PackagesIndex = () => {
           .single();
         
         if (data && data.reserva_button_text) {
-          setHeroImage(data.reserva_button_text);
-        } else {
-          setHeroImage('https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&q=80&w=2000');
+          const split = data.reserva_button_text.split('|');
+          if (split[0]) {
+            setHeroImage(split[0]);
+            return;
+          }
         }
+        setHeroImage('https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&q=80&w=2000');
       } catch (err) {
         setHeroImage('https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&q=80&w=2000');
       }

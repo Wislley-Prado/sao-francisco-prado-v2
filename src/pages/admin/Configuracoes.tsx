@@ -57,7 +57,8 @@ const Configuracoes = () => {
     youtube_live_url: '',
     youtube_video_url: '',
     youtube_institucional_url: '',
-    packages_hero_url: ''
+    packages_hero_url: '',
+    blog_hero_url: ''
   });
 
   useEffect(() => {
@@ -102,7 +103,8 @@ const Configuracoes = () => {
           youtube_live_url: (settingsData.youtube_live_url as string) || '',
           youtube_video_url: (settingsData.youtube_video_url as string) || '',
           youtube_institucional_url: (settingsData.youtube_institucional_url as string) || '',
-          packages_hero_url: (settingsData.reserva_button_text as string) || ''
+          packages_hero_url: (settingsData.reserva_button_text as string)?.split('|')[0] || '',
+          blog_hero_url: (settingsData.reserva_button_text as string)?.split('|')[1] || ''
         });
       }
     } catch (error) {
@@ -803,21 +805,44 @@ const Configuracoes = () => {
               <div className="space-y-4">
                 <div className="flex items-center gap-2 mb-2">
                   <Image className="w-5 h-5 text-muted-foreground" />
-                  <h4 className="font-medium text-sm text-muted-foreground">Banner Principal: Pacotes de Pesca</h4>
+                  <h4 className="font-medium text-sm text-muted-foreground">Banners Principais</h4>
                 </div>
                 
-                <ImageUploader
-                  label="Imagem de Destaque dos Pacotes"
-                  description="Aparece grandão no topo da página de todos os Pacotes  (recomendado: 1920x1080px horizontal)"
-                  currentUrl={settings.packages_hero_url}
-                  bucket="configuracoes"
-                  path="packages-hero"
-                  field="reserva_button_text"
-                  maxWidth={1920}
-                  maxHeight={1080}
-                  onUpdate={fetchSettings}
-                  previewSize="h-32 w-auto object-cover"
-                />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <ImageUploader
+                    label="Imagem de Destaque dos Pacotes"
+                    description="Aparece grandão no topo da página de todos os Pacotes (1920x1080px horizontal)"
+                    currentUrl={settings.packages_hero_url}
+                    bucket="configuracoes"
+                    path="packages-hero"
+                    customUpdater={async (url) => {
+                      const combined = `${url}|${settings.blog_hero_url}`;
+                      const { error } = await supabase.from('site_settings').update({ reserva_button_text: combined }).eq('id', '00000000-0000-0000-0000-000000000001');
+                      if (error) throw error;
+                    }}
+                    maxWidth={1920}
+                    maxHeight={1080}
+                    onUpdate={fetchSettings}
+                    previewSize="h-32 w-auto object-cover"
+                  />
+
+                  <ImageUploader
+                    label="Imagem de Destaque do Blog"
+                    description="Aparece grandão no topo da página do Blog (1920x1080px horizontal)"
+                    currentUrl={settings.blog_hero_url}
+                    bucket="configuracoes"
+                    path="blog-hero"
+                    customUpdater={async (url) => {
+                      const combined = `${settings.packages_hero_url}|${url}`;
+                      const { error } = await supabase.from('site_settings').update({ reserva_button_text: combined }).eq('id', '00000000-0000-0000-0000-000000000001');
+                      if (error) throw error;
+                    }}
+                    maxWidth={1920}
+                    maxHeight={1080}
+                    onUpdate={fetchSettings}
+                    previewSize="h-32 w-auto object-cover"
+                  />
+                </div>
               </div>
 
             </div>
