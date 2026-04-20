@@ -12,7 +12,7 @@ const Header = () => {
 
   const navItems = [
     { name: 'Início', href: '/', hash: '' },
-    { name: 'Ranchos', href: '/', hash: 'ranchos' },
+    { name: 'Ranchos', href: '/ranchos', hash: '' },
     { name: 'Pacotes', href: '/pacotes', hash: '' },
     { name: 'Blog', href: '/blog', hash: '' },
     { name: 'Transmissão', href: '/live', hash: '' },

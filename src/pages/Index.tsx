@@ -14,7 +14,6 @@ const AnunciosSection = React.lazy(() => import('@/components/AnunciosSection').
 const DamInfo = React.lazy(() => import('@/components/DamInfo'));
 const LunarCalendar = React.lazy(() => import('@/components/LunarCalendar'));
 const WeatherDashboard = React.lazy(() => import('@/components/WeatherDashboard'));
-const RanchosSection = React.lazy(() => import('@/components/RanchosSection'));
 const PackagesSection = React.lazy(() => import('@/components/PackagesSection'));
 const BlogSection = React.lazy(() => import('@/components/BlogSection'));
 const TestimonialsSection = React.lazy(() => import('@/components/TestimonialsSection').then(m => ({ default: m.TestimonialsSection })));
@@ -90,12 +89,6 @@ const Index = () => {
       </LazySection>
 
       {/* Conteúdo principal - defer */}
-      <LazySection fallback={<SectionSkeleton />} rootMargin="300px" id="ranchos">
-        <Suspense fallback={<SectionSkeleton />}>
-          <RanchosSection />
-        </Suspense>
-      </LazySection>
-
       <LazySection fallback={<SectionSkeleton />} rootMargin="200px">
         <Suspense fallback={<SectionSkeleton />}>
           <PackagesSection />

@@ -24,6 +24,7 @@ const RanchoDetalhes = React.lazy(() => import("./pages/RanchoDetalhes"));
 const PackageVip = React.lazy(() => import("./pages/PackageVip"));
 const PackageLuxo = React.lazy(() => import("./pages/PackageLuxo"));
 const PackageDiamante = React.lazy(() => import("./pages/PackageDiamante"));
+const RanchosIndex = React.lazy(() => import("./pages/RanchosIndex"));
 const PackagesIndex = React.lazy(() => import("./pages/PackagesIndex"));
 const PackagesIndexDynamic = React.lazy(() => import("./pages/PackagesIndexDynamic"));
 const PacoteDetalhes = React.lazy(() => import("./pages/PacoteDetalhes"));
@@ -104,6 +105,7 @@ const App = () => {
                 <Route path="/live" element={<LiveStream />} />
                 <Route path="/rancho/:slug" element={<RanchoDetalhes />} />
                 <Route path="/pacotes" element={<PackagesIndexDynamic />} />
+                <Route path="/ranchos" element={<RanchosIndex />} />
                 <Route path="/pacote/:slug" element={<PacoteDetalhes />} />
                 <Route path="/pacotes-estaticos" element={<PackagesIndex />} />
                 <Route path="/pacote/vip" element={<PackageVip />} />
