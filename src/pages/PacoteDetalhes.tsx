@@ -241,6 +241,18 @@ const PacoteDetalhes = () => {
 
       <Header />
       <PackagePageLayout
+        hero={
+          <PackageHero
+            title={pacote.nome}
+            subtitle={pacote.tipo}
+            imageUrl={mainImage}
+            rating={pacote.rating}
+            reviewsCount={127}
+            badge={badge}
+            tier={tier}
+            onCtaClick={handleReservarClick}
+          />
+        }
         sidebar={
           <PackagePricing
             price={pacote.preco}
@@ -256,16 +268,6 @@ const PacoteDetalhes = () => {
           />
         }
       >
-        <PackageHero
-          title={pacote.nome}
-          subtitle={pacote.tipo}
-          imageUrl={mainImage}
-          rating={pacote.rating}
-          reviewsCount={127}
-          badge={badge}
-          tier={tier}
-          onCtaClick={handleReservarClick}
-        />
 
         <PackageQuickInfo
           duration={pacote.duracao}
@@ -312,24 +314,24 @@ const PacoteDetalhes = () => {
               <div className="container max-w-7xl mx-auto px-4">
                 {/* Header com ícone gradiente */}
                 <div className="flex items-center gap-3 mb-8">
-                  <div className="p-3 rounded-xl bg-gradient-to-br from-red-500 to-red-600 shadow-lg shadow-red-500/25">
+                  <div className="p-3 rounded-xl bg-slate-900 border border-white/5 shadow-xl shadow-black/10">
                     <Play className="h-6 w-6 text-white fill-white" />
                   </div>
                   <div>
                     <h2 className="text-2xl md:text-3xl font-bold text-foreground">Conheça o Pacote</h2>
-                    <p className="text-sm text-muted-foreground">Assista ao vídeo e veja tudo que te espera</p>
+                    <p className="text-sm text-muted-foreground">Assista ao vídeo e veja uma prévia exclusiva</p>
                   </div>
                 </div>
 
-                <Card className="overflow-hidden shadow-xl border-0">
-                  <div className="bg-gradient-to-r from-red-500 to-red-600 px-4 py-3">
+                <Card className="overflow-hidden shadow-2xl border-0 bg-slate-900 rounded-2xl">
+                  <div className="bg-gradient-to-r from-slate-950 to-black px-4 py-4 border-b border-white/5">
                     <div className="flex items-center justify-between">
-                      <span className="text-white text-sm font-medium flex items-center gap-2">
-                        <Play className="h-4 w-4 fill-white" />
-                        Vídeo do Pacote
+                      <span className="text-slate-200 text-sm font-medium flex items-center gap-2">
+                        <Play className="h-4 w-4 fill-rio-blue text-rio-blue" />
+                        Apresentação Exclusiva
                       </span>
-                      <Badge className="bg-white/20 text-white border-0 hover:bg-white/30">
-                        🎬 Exclusivo
+                      <Badge className="bg-rio-blue/20 text-rio-blue border-0 hover:bg-rio-blue/30 backdrop-blur-sm">
+                        🎬 Cinematográfico
                       </Badge>
                     </div>
                   </div>

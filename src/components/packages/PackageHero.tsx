@@ -74,14 +74,14 @@ export const PackageHero = ({
           )}
           
           <h1 
-            className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-white mb-6 leading-tight"
+            className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-white mb-6 leading-tight capitalize"
             style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5), 0 4px 16px rgba(0,0,0,0.3)' }}
           >
             {title}
           </h1>
           
           <p 
-            className="text-xl md:text-2xl text-white/95 mb-8 max-w-3xl leading-relaxed"
+            className="text-xl md:text-2xl text-white/95 mb-8 max-w-3xl leading-relaxed capitalize"
             style={{ textShadow: '0 1px 4px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.3)' }}
           >
             {subtitle}

@@ -6,9 +6,10 @@ import { Button } from '@/components/ui/button';
 interface PackagePageLayoutProps {
   children: ReactNode;
   sidebar?: ReactNode;
+  hero?: ReactNode;
 }
 
-export const PackagePageLayout = ({ children, sidebar }: PackagePageLayoutProps) => {
+export const PackagePageLayout = ({ children, sidebar, hero }: PackagePageLayoutProps) => {
   const navigate = useNavigate();
 
   return (
@@ -28,8 +29,15 @@ export const PackagePageLayout = ({ children, sidebar }: PackagePageLayoutProps)
         </div>
       </div>
 
+      {/* Hero Content (Full Width) */}
+      {hero && (
+        <div className="w-full">
+          {hero}
+        </div>
+      )}
+
       {/* Main Content */}
-      <div className="pb-16">
+      <div className="pb-16 pt-8">
         {sidebar ? (
           <div className="container max-w-7xl mx-auto px-4 py-8">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
