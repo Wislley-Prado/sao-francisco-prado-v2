@@ -58,7 +58,8 @@ const Configuracoes = () => {
     youtube_video_url: '',
     youtube_institucional_url: '',
     packages_hero_url: '',
-    blog_hero_url: ''
+    blog_hero_url: '',
+    ranchos_hero_url: ''
   });
 
   useEffect(() => {
@@ -104,7 +105,8 @@ const Configuracoes = () => {
           youtube_video_url: (settingsData.youtube_video_url as string) || '',
           youtube_institucional_url: (settingsData.youtube_institucional_url as string) || '',
           packages_hero_url: (settingsData.reserva_button_text as string)?.split('|')[0] || '',
-          blog_hero_url: (settingsData.reserva_button_text as string)?.split('|')[1] || ''
+          blog_hero_url: (settingsData.reserva_button_text as string)?.split('|')[1] || '',
+          ranchos_hero_url: (settingsData.reserva_button_text as string)?.split('|')[2] || ''
         });
       }
     } catch (error) {
@@ -808,15 +810,15 @@ const Configuracoes = () => {
                   <h4 className="font-medium text-sm text-muted-foreground">Banners Principais</h4>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   <ImageUploader
                     label="Imagem de Destaque dos Pacotes"
-                    description="Aparece grandão no topo da página de todos os Pacotes (1920x1080px horizontal)"
+                    description="Aparece no topo da página de Pacotes (1920x1080px horizontal)"
                     currentUrl={settings.packages_hero_url}
                     bucket="configuracoes"
                     path="packages-hero"
                     customUpdater={async (url) => {
-                      const combined = `${url}|${settings.blog_hero_url}`;
+                      const combined = `${url}|${settings.blog_hero_url}|${settings.ranchos_hero_url}`;
                       const { error } = await supabase.from('site_settings').update({ reserva_button_text: combined }).eq('id', '00000000-0000-0000-0000-000000000001');
                       if (error) throw error;
                     }}
@@ -828,12 +830,12 @@ const Configuracoes = () => {
 
                   <ImageUploader
                     label="Imagem de Destaque do Blog"
-                    description="Aparece grandão no topo da página do Blog (1920x1080px horizontal)"
+                    description="Aparece no topo da página do Blog (1920x1080px horizontal)"
                     currentUrl={settings.blog_hero_url}
                     bucket="configuracoes"
                     path="blog-hero"
                     customUpdater={async (url) => {
-                      const combined = `${settings.packages_hero_url}|${url}`;
+                      const combined = `${settings.packages_hero_url}|${url}|${settings.ranchos_hero_url}`;
                       const { error } = await supabase.from('site_settings').update({ reserva_button_text: combined }).eq('id', '00000000-0000-0000-0000-000000000001');
                       if (error) throw error;
                     }}

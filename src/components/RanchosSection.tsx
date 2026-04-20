@@ -1,10 +1,38 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import RanchCard from './RanchCard';
 import { MapPin, Star, Loader2 } from 'lucide-react';
 import { useRanchos } from '@/hooks/useOptimizedData';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 const RanchosSection = () => {
   const { data: ranchosData, isLoading } = useRanchos(true);
+  const [heroImage, setHeroImage] = useState('');
+
+  // Fetch ranchos hero image from site mappings
+  const { data: heroData } = useQuery({
+    queryKey: ['ranchos-hero'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('site_settings_public')
+        .select('reserva_button_text')
+        .eq('id', '00000000-0000-0000-0000-000000000001')
+        .single();
+      
+      if (error) return null;
+      if (data?.reserva_button_text) {
+        const url = data.reserva_button_text.split('|')[2];
+        if (url) return url;
+      }
+      return null;
+    }
+  });
+
+  useEffect(() => {
+    if (heroData) {
+      setHeroImage(heroData);
+    }
+  }, [heroData]);
 
   // Transform data to expected format
   const ranchos = React.useMemo(() => {
@@ -36,18 +64,33 @@ const RanchosSection = () => {
   }, [ranchosData]);
 
   return (
-    <section id="ranchos" className="py-20 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+    <section id="ranchos" className="bg-gray-50 pb-20">
+      {/* Header / Hero Section */}
+      <div 
+        className="relative bg-cover bg-center py-24 mb-16 text-white"
+        style={heroImage ? { backgroundImage: `url('${heroImage}')` } : {}}
+      >
+        {heroImage ? (
+          <>
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-gray-50 via-gray-50/20 to-transparent bottom-[-1px]"></div>
+          </>
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary/80"></div>
+        )}
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center drop-shadow-lg">
+          <h2 className="text-4xl md:text-5xl font-bold mb-4">
             Ranchos para Aluguel
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-lg md:text-xl opacity-90 max-w-3xl mx-auto">
             Escolha o rancho perfeito para sua estadia no Rio São Francisco. 
             Todos com localização privilegiada e estrutura completa para pescarias.
           </p>
         </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Ranchos Grid */}
         {isLoading ? (
