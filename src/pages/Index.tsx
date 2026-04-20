@@ -65,7 +65,7 @@ const Index = () => {
       </LazySection>
 
       {/* Dados em tempo real - defer until near viewport */}
-      <LazySection fallback={<SectionSkeleton />} rootMargin="300px">
+      <LazySection fallback={<SectionSkeleton />} rootMargin="300px" id="represa">
         <Suspense fallback={<SectionSkeleton />}>
           <DamInfo />
         </Suspense>
@@ -90,7 +90,7 @@ const Index = () => {
       </LazySection>
 
       {/* Conteúdo principal - defer */}
-      <LazySection fallback={<SectionSkeleton />} rootMargin="300px">
+      <LazySection fallback={<SectionSkeleton />} rootMargin="300px" id="ranchos">
         <Suspense fallback={<SectionSkeleton />}>
           <RanchosSection />
         </Suspense>

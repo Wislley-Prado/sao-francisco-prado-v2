@@ -4,6 +4,7 @@ interface LazySectionProps {
   children: React.ReactNode;
   fallback?: React.ReactNode;
   rootMargin?: string;
+  id?: string;
 }
 
 /**
@@ -13,7 +14,8 @@ interface LazySectionProps {
 const LazySection: React.FC<LazySectionProps> = ({ 
   children, 
   fallback = null,
-  rootMargin = '200px' 
+  rootMargin = '200px',
+  id
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -37,7 +39,7 @@ const LazySection: React.FC<LazySectionProps> = ({
   }, [rootMargin]);
 
   return (
-    <div ref={ref}>
+    <div ref={ref} id={id}>
       {isVisible ? children : fallback}
     </div>
   );
