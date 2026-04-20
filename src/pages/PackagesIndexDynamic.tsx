@@ -39,7 +39,7 @@ const PackagesIndexDynamic = () => {
     const fetchSettings = async () => {
       try {
         const { data } = await supabase
-          .from('site_settings')
+          .from('site_settings_public')
           .select('reserva_button_text')
           .eq('id', '00000000-0000-0000-0000-000000000001')
           .single();
