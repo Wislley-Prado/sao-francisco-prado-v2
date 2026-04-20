@@ -70,12 +70,12 @@ const PackagesIndex = () => {
       try {
         const { data } = await supabase
           .from('site_settings')
-          .select('packages_hero_url')
+          .select('reserva_button_text')
           .eq('id', '00000000-0000-0000-0000-000000000001')
           .single();
         
-        if (data && (data as any).packages_hero_url) {
-          setHeroImage((data as any).packages_hero_url);
+        if (data && data.reserva_button_text) {
+          setHeroImage(data.reserva_button_text);
         }
       } catch (err) {
         // Silencioso

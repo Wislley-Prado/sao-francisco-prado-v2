@@ -102,7 +102,7 @@ const Configuracoes = () => {
           youtube_live_url: (settingsData.youtube_live_url as string) || '',
           youtube_video_url: (settingsData.youtube_video_url as string) || '',
           youtube_institucional_url: (settingsData.youtube_institucional_url as string) || '',
-          packages_hero_url: (settingsData.packages_hero_url as string) || ''
+          packages_hero_url: (settingsData.reserva_button_text as string) || ''
         });
       }
     } catch (error) {
@@ -812,7 +812,7 @@ const Configuracoes = () => {
                   currentUrl={settings.packages_hero_url}
                   bucket="configuracoes"
                   path="packages-hero"
-                  field="packages_hero_url"
+                  field="reserva_button_text"
                   maxWidth={1920}
                   maxHeight={1080}
                   onUpdate={fetchSettings}
