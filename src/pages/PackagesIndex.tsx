@@ -63,8 +63,26 @@ interface FormattedPackage {
 const PackagesIndex = () => {
   const [packages, setPackages] = useState<FormattedPackage[]>([]);
   const [loading, setLoading] = useState(true);
+  const [heroImage, setHeroImage] = useState('https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&q=80&w=2000');
 
   useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const { data } = await supabase
+          .from('site_settings')
+          .select('packages_hero_url')
+          .eq('id', '00000000-0000-0000-0000-000000000001')
+          .single();
+        
+        if (data && (data as any).packages_hero_url) {
+          setHeroImage((data as any).packages_hero_url);
+        }
+      } catch (err) {
+        // Silencioso
+      }
+    };
+    fetchSettings();
+
     const fetchPackages = async () => {
       try {
         const { data, error } = await supabase
@@ -140,7 +158,7 @@ const PackagesIndex = () => {
       {/* Hero Section */}
       <section 
         className="relative py-28 md:py-36 bg-cover bg-center text-white" 
-        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&q=80&w=2000')" }}
+        style={{ backgroundImage: `url('${heroImage}')` }}
       >
         <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]"></div>
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent bottom-[-1px]"></div>

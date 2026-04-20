@@ -6,8 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Save, Code2, TrendingUp, Webhook, AlertCircle, RefreshCw, Database, Clock, User, Share2, Phone, Mail, Facebook, Instagram, Youtube, Calendar, FileText, Link2, Trash2, HardDrive, Pause, Play } from 'lucide-react';
-import { BrandImagesCard } from '@/components/admin/configuracoes/BrandImagesCard';
+import { Loader2, Save, Code2, TrendingUp, Webhook, AlertCircle, RefreshCw, Database, Clock, User, Share2, Phone, Mail, Facebook, Instagram, Youtube, Calendar, FileText, Link2, Trash2, HardDrive, Pause, Play, Image } from 'lucide-react';
+import { BrandImagesCard, ImageUploader } from '@/components/admin/configuracoes/BrandImagesCard';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -56,7 +56,8 @@ const Configuracoes = () => {
     reserva_button_link: '',
     youtube_live_url: '',
     youtube_video_url: '',
-    youtube_institucional_url: ''
+    youtube_institucional_url: '',
+    packages_hero_url: ''
   });
 
   useEffect(() => {
@@ -100,7 +101,8 @@ const Configuracoes = () => {
           reserva_button_link: (settingsData.reserva_button_link as string) || '',
           youtube_live_url: (settingsData.youtube_live_url as string) || '',
           youtube_video_url: (settingsData.youtube_video_url as string) || '',
-          youtube_institucional_url: (settingsData.youtube_institucional_url as string) || ''
+          youtube_institucional_url: (settingsData.youtube_institucional_url as string) || '',
+          packages_hero_url: (settingsData.packages_hero_url as string) || ''
         });
       }
     } catch (error) {
@@ -796,6 +798,28 @@ const Configuracoes = () => {
                   URL de destino ao clicar no botão "Reservar" no cabeçalho. Pode ser WhatsApp, formulário, etc.
                 </p>
               </div>
+              <Separator />
+
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Image className="w-5 h-5 text-muted-foreground" />
+                  <h4 className="font-medium text-sm text-muted-foreground">Banner Principal: Pacotes de Pesca</h4>
+                </div>
+                
+                <ImageUploader
+                  label="Imagem de Destaque dos Pacotes"
+                  description="Aparece grandão no topo da página de todos os Pacotes  (recomendado: 1920x1080px horizontal)"
+                  currentUrl={settings.packages_hero_url}
+                  bucket="configuracoes"
+                  path="packages-hero"
+                  field="packages_hero_url"
+                  maxWidth={1920}
+                  maxHeight={1080}
+                  onUpdate={fetchSettings}
+                  previewSize="h-32 w-auto object-cover"
+                />
+              </div>
+
             </div>
 
             <Alert>

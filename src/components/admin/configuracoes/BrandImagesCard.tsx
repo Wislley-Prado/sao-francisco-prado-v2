@@ -16,7 +16,7 @@ interface BrandImagesCardProps {
   onUpdate: () => void;
 }
 
-interface ImageUploaderProps {
+export interface ImageUploaderProps {
   label: string;
   description: string;
   currentUrl: string;
@@ -29,7 +29,7 @@ interface ImageUploaderProps {
   previewSize?: string;
 }
 
-const ImageUploader = ({ label, description, currentUrl, bucket, path, field, maxWidth, maxHeight, onUpdate, previewSize = 'w-16 h-16' }: ImageUploaderProps) => {
+export const ImageUploader = ({ label, description, currentUrl, bucket, path, field, maxWidth, maxHeight, onUpdate, previewSize = 'w-16 h-16' }: ImageUploaderProps) => {
   const [uploading, setUploading] = useState(false);
   const [removing, setRemoving] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
