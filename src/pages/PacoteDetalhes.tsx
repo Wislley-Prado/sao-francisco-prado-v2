@@ -223,6 +223,7 @@ const PacoteDetalhes = () => {
   const heroImage = pacote.imagens.find(img => img.principal)?.url || pacote.imagens[0]?.url || '/og-image.png';
   // Always use production domain for sharing URLs
   const pageUrl = `${SITE_CONFIG.PRODUCTION_DOMAIN}/pacote/${pacote.slug}`;
+  const isShorts = pacote.video_youtube?.includes('/shorts/');
 
   return (
     <>
@@ -336,7 +337,7 @@ const PacoteDetalhes = () => {
                     </div>
                   </div>
                   <CardContent className="p-0">
-                    <div className="relative w-full aspect-video md:aspect-[9/16] max-w-lg mx-auto overflow-hidden">
+                    <div className={`relative w-full mx-auto overflow-hidden bg-black ${isShorts ? 'aspect-[9/16] max-w-sm' : 'aspect-video max-w-4xl'}`}>
                       {getYouTubeEmbedUrl(pacote.video_youtube) ? (
                         <iframe
                           src={getYouTubeEmbedUrl(pacote.video_youtube) || ''}
