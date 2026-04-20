@@ -70,12 +70,10 @@ const pacoteSchema = z.object({
     .refine(
       (val) => {
         if (!val || val === '') return true;
-        // Validate YouTube URLs (Shorts, regular videos, youtu.be)
-        const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(shorts\/|watch\?v=)|youtu\.be\/)[a-zA-Z0-9_-]{11}.*$/;
-        return youtubeRegex.test(val);
+        return val.includes('youtube.com') || val.includes('youtu.be');
       },
       {
-        message: 'URL inválida. Use um link válido do YouTube (Shorts, vídeo normal ou youtu.be)',
+        message: 'URL inválida. Cole um link oficial do YouTube.',
       }
     ),
 });
