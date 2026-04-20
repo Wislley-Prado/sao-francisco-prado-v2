@@ -63,7 +63,7 @@ interface FormattedPackage {
 const PackagesIndex = () => {
   const [packages, setPackages] = useState<FormattedPackage[]>([]);
   const [loading, setLoading] = useState(true);
-  const [heroImage, setHeroImage] = useState('https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&q=80&w=2000');
+  const [heroImage, setHeroImage] = useState('');
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -76,9 +76,11 @@ const PackagesIndex = () => {
         
         if (data && data.reserva_button_text) {
           setHeroImage(data.reserva_button_text);
+        } else {
+          setHeroImage('https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&q=80&w=2000');
         }
       } catch (err) {
-        // Silencioso
+        setHeroImage('https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&q=80&w=2000');
       }
     };
     fetchSettings();
