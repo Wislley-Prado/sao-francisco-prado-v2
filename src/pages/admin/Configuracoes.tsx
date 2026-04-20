@@ -844,6 +844,23 @@ const Configuracoes = () => {
                     onUpdate={fetchSettings}
                     previewSize="h-32 w-auto object-cover"
                   />
+
+                  <ImageUploader
+                    label="Imagem de Destaque dos Ranchos"
+                    description="Aparece no topo da seção Ranchos (1920x1080px horizontal)"
+                    currentUrl={settings.ranchos_hero_url}
+                    bucket="configuracoes"
+                    path="ranchos-hero"
+                    customUpdater={async (url) => {
+                      const combined = `${settings.packages_hero_url}|${settings.blog_hero_url}|${url}`;
+                      const { error } = await supabase.from('site_settings').update({ reserva_button_text: combined }).eq('id', '00000000-0000-0000-0000-000000000001');
+                      if (error) throw error;
+                    }}
+                    maxWidth={1920}
+                    maxHeight={1080}
+                    onUpdate={fetchSettings}
+                    previewSize="h-32 w-auto object-cover"
+                  />
                 </div>
               </div>
 
