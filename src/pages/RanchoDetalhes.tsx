@@ -74,6 +74,7 @@ const RanchoDetalhes = () => {
       telefone_whatsapp: ranchoData.telefone_whatsapp,
       mensagem_whatsapp: ranchoData.mensagem_whatsapp,
       typebot_url: ranchoData.typebot_url,
+      texto_botao_whatsapp: ranchoData.texto_botao_whatsapp,
       video_youtube: ranchoData.video_youtube,
       google_calendar_url: ranchoData.google_calendar_url,
       tracking_code: ranchoData.tracking_code,
@@ -501,7 +502,7 @@ const RanchoDetalhes = () => {
                     size="lg"
                   >
                     <MessageCircle className="h-5 w-5 mr-2" />
-                    Reservar via WhatsApp
+                    {rancho.texto_botao_whatsapp || 'Reservar via WhatsApp'}
                   </Button>
 
                   <p className="text-xs text-center text-muted-foreground">

@@ -58,6 +58,7 @@ const ranchoSchema = z.object({
   telefone_whatsapp: z.string().regex(/^\d+$/, 'Apenas números').min(10, 'Mínimo 10 dígitos').optional().or(z.literal('')),
   mensagem_whatsapp: z.string().optional(),
   typebot_url: z.string().optional().or(z.literal('')),
+  texto_botao_whatsapp: z.string().optional().or(z.literal('')),
   video_youtube: z
     .string()
     .optional()
@@ -114,6 +115,7 @@ export interface RanchoData {
   telefone_whatsapp?: string;
   mensagem_whatsapp?: string;
   typebot_url?: string;
+  texto_botao_whatsapp?: string;
   video_youtube?: string;
   google_calendar_url?: string;
   tracking_code?: string;
@@ -251,6 +253,7 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
       telefone_whatsapp: rancho?.telefone_whatsapp || '',
       mensagem_whatsapp: rancho?.mensagem_whatsapp || '',
       typebot_url: rancho?.typebot_url || '',
+      texto_botao_whatsapp: rancho?.texto_botao_whatsapp || '',
       video_youtube: rancho?.video_youtube || '',
       google_calendar_url: rancho?.google_calendar_url || '',
       tracking_code: rancho?.tracking_code || '',
@@ -301,6 +304,7 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
         telefone_whatsapp: data.telefone_whatsapp || null,
         mensagem_whatsapp: data.mensagem_whatsapp || null,
         typebot_url: data.typebot_url || null,
+        texto_botao_whatsapp: data.texto_botao_whatsapp || null,
         video_youtube: data.video_youtube || null,
         google_calendar_url: data.google_calendar_url || null,
         tracking_code: data.tracking_code || null,
@@ -760,6 +764,23 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
                   </FormControl>
                   <FormDescription>
                     Se preenchido, os usuários serão redirecionados para o Typebot ao invés do WhatsApp direto.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="texto_botao_whatsapp"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Texto do Botão de Reserva</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Ex: Reservar via WhatsApp" />
+                  </FormControl>
+                  <FormDescription>
+                    Personalize o texto do botão de reserva na página do rancho (Deixe vazio para usar o padrão).
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

@@ -28,6 +28,7 @@ export interface RanchoWithImages {
   telefone_whatsapp?: string;
   mensagem_whatsapp?: string;
   typebot_url?: string;
+  texto_botao_whatsapp?: string;
   video_youtube?: string;
   google_calendar_url?: string;
   tracking_code?: string;
@@ -213,6 +214,7 @@ export const useRanchos = (onlyAvailable = true) => {
           telefone_whatsapp: rancho.telefone_whatsapp,
           mensagem_whatsapp: rancho.mensagem_whatsapp,
           typebot_url: rancho.typebot_url,
+          texto_botao_whatsapp: rancho.texto_botao_whatsapp,
           video_youtube: rancho.video_youtube,
           google_calendar_url: rancho.google_calendar_url,
           tracking_code: rancho.tracking_code,
@@ -296,6 +298,7 @@ export const useRanchoBySlug = (slug: string | undefined) => {
           telefone_whatsapp: data.telefone_whatsapp,
           mensagem_whatsapp: data.mensagem_whatsapp,
           typebot_url: data.typebot_url,
+          texto_botao_whatsapp: data.texto_botao_whatsapp,
           video_youtube: data.video_youtube,
           google_calendar_url: data.google_calendar_url,
           tracking_code: data.tracking_code,
