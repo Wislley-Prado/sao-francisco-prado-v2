@@ -4,6 +4,14 @@
 RewriteEngine On
 RewriteBase /
 
+# --- BOT PROXY START ---
+# Se a requisição for para o /blog/ e vier de um bot conhecido (WhatsApp, Facebook, etc), envia para o bot.php
+RewriteCond %{REQUEST_URI} ^/blog/ [NC]
+RewriteCond %{HTTP_USER_AGENT} (facebookexternalhit|whatsapp|twitterbot|pinterest|linkedinbot|vkShare|W3C_Validator|baiduspider|googlebot|bingbot|yandexbot|slackbot|discordbot|telegrambot) [NC]
+RewriteCond %{QUERY_STRING} !no_bot=1 [NC]
+RewriteRule ^ bot.php [L]
+# --- BOT PROXY END ---
+
 # If the request is for an existing file or directory, serve it directly
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d

@@ -27,6 +27,7 @@ export interface RanchoWithImages {
   destaque: boolean;
   telefone_whatsapp?: string;
   mensagem_whatsapp?: string;
+  typebot_url?: string;
   video_youtube?: string;
   google_calendar_url?: string;
   tracking_code?: string;
@@ -211,6 +212,7 @@ export const useRanchos = (onlyAvailable = true) => {
           destaque: rancho.destaque,
           telefone_whatsapp: rancho.telefone_whatsapp,
           mensagem_whatsapp: rancho.mensagem_whatsapp,
+          typebot_url: rancho.typebot_url,
           video_youtube: rancho.video_youtube,
           google_calendar_url: rancho.google_calendar_url,
           tracking_code: rancho.tracking_code,
@@ -293,6 +295,7 @@ export const useRanchoBySlug = (slug: string | undefined) => {
           destaque: data.destaque,
           telefone_whatsapp: data.telefone_whatsapp,
           mensagem_whatsapp: data.mensagem_whatsapp,
+          typebot_url: data.typebot_url,
           video_youtube: data.video_youtube,
           google_calendar_url: data.google_calendar_url,
           tracking_code: data.tracking_code,
@@ -694,33 +697,44 @@ export const useFAQs = (pacoteId?: string, ranchoId?: string) => {
 
 // ============= SITE SETTINGS =============
 
-export const useSiteSettings = () => {
+export const useSiteSettings = (isAdmin = false) => {
   return useQuery(
-    ['site-settings'],
+    ['site-settings', isAdmin],
     () => cachedQuery<SiteSettings | null>(
-      'site_settings',
-      TTL.SETTINGS,
+      isAdmin ? 'site_settings_admin' : 'site_settings',
+      isAdmin ? 1000 : TTL.SETTINGS, // TTL muito curto para admin para garantir dados frescos
       async () => {
-        // Usar view pública que não expõe tracking codes sensíveis
-        const { data, error } = await supabase
-          .from('site_settings_public')
-          .select('*')
-          .maybeSingle();
-
-        if (error) throw error;
-        return data as unknown as SiteSettings | null;
+        // Para admin, usamos a tabela base para garantir dados atualizados e acesso total
+        // Para público, usamos a view pública que protege dados sensíveis
+        if (isAdmin) {
+          const { data, error } = await supabase
+            .from('site_settings')
+            .select('*')
+            .maybeSingle();
+          if (error) throw error;
+          return data as unknown as SiteSettings | null;
+        } else {
+          const { data, error } = await supabase
+            .from('site_settings_public')
+            .select('*')
+            .maybeSingle();
+          if (error) throw error;
+          return data as unknown as SiteSettings | null;
+        }
       }
+
     ),
     {
-      staleTime: TTL.SETTINGS,
-      cacheTime: TTL.STATIC,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      refetchOnMount: false,
+      staleTime: isAdmin ? 0 : TTL.SETTINGS,
+      cacheTime: isAdmin ? 0 : TTL.STATIC,
+      refetchOnWindowFocus: isAdmin,
+      refetchOnReconnect: isAdmin,
+      refetchOnMount: true,
       retry: 1,
     }
   );
 };
+
 
 // ============= ADMIN STATISTICS (1 hora de cache) =============
 

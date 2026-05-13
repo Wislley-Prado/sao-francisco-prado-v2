@@ -166,8 +166,10 @@ const Configuracoes = () => {
       if (error) throw error;
 
       invalidateCache('site_settings');
+      invalidateCache('site_settings_admin');
       queryClient.invalidateQueries({ queryKey: ['site-settings'] });
       toast.success('Configurações salvas com sucesso!');
+
     } catch (error) {
       console.error('Erro ao salvar configurações:', error);
       toast.error('Erro ao salvar configurações');

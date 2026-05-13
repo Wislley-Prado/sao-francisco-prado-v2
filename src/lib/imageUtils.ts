@@ -1,35 +1,21 @@
 /**
  * Otimiza URLs de imagens do Supabase Storage usando o endpoint de transformação.
- * O Supabase usa /render/image/ ao invés de /object/ para servir imagens transformadas.
- * Se a transformação não estiver disponível (plano free), retorna a URL original.
+ * Como a transformação não está disponível no servidor atual (causando erros 403/400),
+ * retornamos a URL original garantindo o uso do endpoint /object/.
  */
-export const getOptimizedUrl = (url: string, width: number, quality = 80): string => {
-  if (!url) return url;
-  
-  // Só otimiza URLs do Supabase Storage
-  if (!url.includes('supabase.co/storage')) return url;
-  
-  // Avoid adding duplicate params
-  if (url.includes('width=') || url.includes('quality=')) return url;
-  
-  // Supabase image transformations require changing /object/ to /render/image/
-  // URL format: https://xxx.supabase.co/storage/v1/object/public/bucket/file.jpg
-  // Becomes:    https://xxx.supabase.co/storage/v1/render/image/public/bucket/file.jpg?width=400&quality=80
-  const transformedUrl = url.replace(
-    '/storage/v1/object/',
-    '/storage/v1/render/image/'
-  );
-  
-  const separator = transformedUrl.includes('?') ? '&' : '?';
-  return `${transformedUrl}${separator}width=${width}&quality=${quality}`;
+export const getOptimizedUrl = (url: string, width?: number, quality?: number): string => {
+  return getOriginalUrl(url);
 };
 
 /**
- * Retorna a URL original (sem transformação) para uso como fallback.
- * Útil quando o plano não suporta transformações de imagem.
+ * Retorna a URL original (sem transformação) para uso principal e fallback.
+ * Substitui ativamente /render/image/ por /object/ caso a URL no banco tenha sido
+ * salva com o caminho de renderização.
  */
 export const getOriginalUrl = (url: string): string => {
   if (!url) return url;
-  // Reverte /render/image/ para /object/ se necessário
-  return url.replace('/storage/v1/render/image/', '/storage/v1/object/');
+  // Reverte /render/image/ para /object/ para evitar quebras
+  const objectUrl = url.replace('/storage/v1/render/image/', '/storage/v1/object/');
+  // Remove parâmetros de query (?width=...) que não são suportados pelo endpoint /object/ e podem causar erros
+  return objectUrl.split('?')[0];
 };

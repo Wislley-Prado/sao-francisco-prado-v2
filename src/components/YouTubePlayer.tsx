@@ -12,25 +12,10 @@ export const YouTubePlayer = ({ videoUrl, title = 'Vídeo', className = '' }: Yo
   // Extrair ID do vídeo de diferentes formatos de URL do YouTube
   const getVideoId = (url: string): string | null => {
     if (!url) return null;
-
-    // youtube.com/watch?v=VIDEO_ID
-    const watchMatch = url.match(/(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/);
-    if (watchMatch) return watchMatch[1];
-
-    // youtube.com/shorts/VIDEO_ID
-    const shortsMatch = url.match(/(?:youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/);
-    if (shortsMatch) return shortsMatch[1];
-
-    // youtube.com/live/VIDEO_ID
-    const liveMatch = url.match(/(?:youtube\.com\/live\/)([a-zA-Z0-9_-]{11})/);
-    if (liveMatch) return liveMatch[1];
-
-    // youtu.be/VIDEO_ID
-    const youtuBeMatch = url.match(/(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-    if (youtuBeMatch) return youtuBeMatch[1];
-
-    return null;
+    const match = url.match(/(?:v=|v\/|embed\/|shorts\/|live\/|^|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    return match ? match[1] : null;
   };
+
 
   // Verificar se é um Short
   const isShorts = videoUrl.includes('/shorts/');
@@ -81,16 +66,10 @@ export const YouTubePlayer = ({ videoUrl, title = 'Vídeo', className = '' }: Yo
 export const YouTubePreview = ({ videoUrl, className = '' }: { videoUrl: string; className?: string }) => {
   const getVideoId = (url: string): string | null => {
     if (!url) return null;
-    const watchMatch = url.match(/(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/);
-    if (watchMatch) return watchMatch[1];
-    const shortsMatch = url.match(/(?:youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/);
-    if (shortsMatch) return shortsMatch[1];
-    const liveMatch = url.match(/(?:youtube\.com\/live\/)([a-zA-Z0-9_-]{11})/);
-    if (liveMatch) return liveMatch[1];
-    const youtuBeMatch = url.match(/(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-    if (youtuBeMatch) return youtuBeMatch[1];
-    return null;
+    const match = url.match(/(?:v=|v\/|embed\/|shorts\/|live\/|^|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    return match ? match[1] : null;
   };
+
 
   const isShorts = videoUrl.includes('/shorts/');
   const videoId = getVideoId(videoUrl);

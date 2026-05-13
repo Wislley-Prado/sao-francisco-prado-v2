@@ -25,6 +25,7 @@ import { Loader2, X, Plus } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { CoordenadasHelper } from '@/components/admin/shared/CoordenadasHelper';
 import { invalidateCacheByPrefix } from '@/lib/cacheService';
+import { isValidYouTubeUrl } from '@/hooks/useVideoSettings';
 
 const COMODIDADES_PADRAO = [
   'WiFi',
@@ -56,17 +57,13 @@ const ranchoSchema = z.object({
   comodidadeCustom: z.string().optional(),
   telefone_whatsapp: z.string().regex(/^\d+$/, 'Apenas números').min(10, 'Mínimo 10 dígitos').optional().or(z.literal('')),
   mensagem_whatsapp: z.string().optional(),
+  typebot_url: z.string().optional().or(z.literal('')),
   video_youtube: z
     .string()
     .optional()
     .or(z.literal(''))
     .refine(
-      (val) => {
-        if (!val || val === '') return true;
-        // Validate YouTube URLs (Shorts, regular videos, youtu.be)
-        const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(shorts\/|watch\?v=)|youtu\.be\/)[a-zA-Z0-9_-]{11}.*$/;
-        return youtubeRegex.test(val);
-      },
+      (val) => isValidYouTubeUrl(val),
       {
         message: 'URL inválida. Use um link válido do YouTube (Shorts, vídeo normal ou youtu.be)',
       }
@@ -116,6 +113,7 @@ export interface RanchoData {
   comodidades?: string[];
   telefone_whatsapp?: string;
   mensagem_whatsapp?: string;
+  typebot_url?: string;
   video_youtube?: string;
   google_calendar_url?: string;
   tracking_code?: string;
@@ -252,6 +250,7 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
       comodidadeCustom: '',
       telefone_whatsapp: rancho?.telefone_whatsapp || '',
       mensagem_whatsapp: rancho?.mensagem_whatsapp || '',
+      typebot_url: rancho?.typebot_url || '',
       video_youtube: rancho?.video_youtube || '',
       google_calendar_url: rancho?.google_calendar_url || '',
       tracking_code: rancho?.tracking_code || '',
@@ -301,6 +300,7 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
         comodidades: comodidadesFinal,
         telefone_whatsapp: data.telefone_whatsapp || null,
         mensagem_whatsapp: data.mensagem_whatsapp || null,
+        typebot_url: data.typebot_url || null,
         video_youtube: data.video_youtube || null,
         google_calendar_url: data.google_calendar_url || null,
         tracking_code: data.tracking_code || null,
@@ -743,6 +743,23 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
                   <FormDescription>
                     Use <code className="bg-muted px-1 rounded">{'{nome}'}</code> e <code className="bg-muted px-1 rounded">{'{localizacao}'}</code> como variáveis dinâmicas.
                     Se vazio, usa mensagem padrão.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="typebot_url"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>URL do Typebot</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="https://typebot.co/seu-bot" />
+                  </FormControl>
+                  <FormDescription>
+                    Se preenchido, os usuários serão redirecionados para o Typebot ao invés do WhatsApp direto.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

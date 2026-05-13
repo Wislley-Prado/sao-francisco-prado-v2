@@ -27,6 +27,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Loader2, Plus, X } from 'lucide-react';
 import { invalidateCacheByPrefix } from '@/lib/cacheService';
+import { isValidYouTubeUrl } from '@/hooks/useVideoSettings';
 
 const pacoteSchema = z.object({
   nome: z.string().min(3, 'Nome deve ter no mínimo 3 caracteres'),
@@ -68,12 +69,9 @@ const pacoteSchema = z.object({
     .optional()
     .or(z.literal(''))
     .refine(
-      (val) => {
-        if (!val || val === '') return true;
-        return val.includes('youtube.com') || val.includes('youtu.be');
-      },
+      (val) => isValidYouTubeUrl(val),
       {
-        message: 'URL inválida. Cole um link oficial do YouTube.',
+        message: 'URL inválida. Cole um link oficial do YouTube (vídeo, shorts ou live).',
       }
     ),
 });

@@ -73,6 +73,7 @@ const RanchoDetalhes = () => {
       disponivel: ranchoData.disponivel,
       telefone_whatsapp: ranchoData.telefone_whatsapp,
       mensagem_whatsapp: ranchoData.mensagem_whatsapp,
+      typebot_url: ranchoData.typebot_url,
       video_youtube: ranchoData.video_youtube,
       google_calendar_url: ranchoData.google_calendar_url,
       tracking_code: ranchoData.tracking_code,
@@ -133,8 +134,14 @@ const RanchoDetalhes = () => {
   const handleWhatsAppReserva = () => {
     if (!rancho) return;
 
-    // Registrar clique no WhatsApp
+    // Registrar clique no WhatsApp / Typebot
     registrarEvento(rancho.id, "clique_whatsapp");
+
+    // Se houver Typebot, redireciona pra ele direto
+    if (rancho.typebot_url) {
+      window.open(rancho.typebot_url, '_blank');
+      return;
+    }
 
     const phone = rancho.telefone_whatsapp || "5531999999999";
 

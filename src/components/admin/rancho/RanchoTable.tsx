@@ -13,6 +13,7 @@ import {
 import { Edit, Trash2, Star, Users, BedDouble } from 'lucide-react';
 import { DeleteRanchoDialog } from './DeleteRanchoDialog';
 import { useState } from 'react';
+import { getOriginalUrl } from '@/lib/imageUtils';
 
 interface RanchoImage {
   url: string;
@@ -65,7 +66,8 @@ export const RanchoTable = ({ ranchos, isLoading, onUpdate }: RanchoTableProps) 
 
   const getMainImage = (rancho: Rancho) => {
     const mainImage = rancho.rancho_imagens?.find(img => img.principal);
-    return mainImage?.url || rancho.rancho_imagens?.[0]?.url || '/placeholder.svg';
+    const rawUrl = mainImage?.url || rancho.rancho_imagens?.[0]?.url;
+    return rawUrl ? getOriginalUrl(rawUrl) : '/placeholder.svg';
   };
 
   return (

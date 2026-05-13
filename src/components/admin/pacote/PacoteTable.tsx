@@ -13,6 +13,7 @@ import {
 import { Edit, Trash2, Star, Users, Calendar } from 'lucide-react';
 import { DeletePacoteDialog } from './DeletePacoteDialog';
 import { useState } from 'react';
+import { getOriginalUrl } from '@/lib/imageUtils';
 
 interface PacoteImage {
   url: string;
@@ -66,7 +67,8 @@ export const PacoteTable = ({ pacotes, isLoading, onUpdate }: PacoteTableProps) 
 
   const getMainImage = (pacote: Pacote) => {
     const mainImage = pacote.pacote_imagens?.find(img => img.principal);
-    return mainImage?.url || pacote.pacote_imagens?.[0]?.url || '/placeholder.svg';
+    const rawUrl = mainImage?.url || pacote.pacote_imagens?.[0]?.url;
+    return rawUrl ? getOriginalUrl(rawUrl) : '/placeholder.svg';
   };
 
   const getTipoBadge = (tipo: string) => {
