@@ -208,6 +208,8 @@ const Ajuda = () => {
               </li>
               <li>Configure a aba <strong>Mídia</strong>:
                 <ul className="list-disc list-inside ml-4">
+                  <li>URL do Typebot para fluxo automático de atendimento</li>
+                  <li>Texto do botão de reserva (ex: "Falar com Consultor")</li>
                   <li>Link do YouTube para vídeo (opcional)</li>
                   <li>Link do Google Calendar para disponibilidade</li>
                   <li>Código de tracking específico (opcional)</li>
