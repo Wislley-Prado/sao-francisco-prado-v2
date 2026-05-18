@@ -140,11 +140,16 @@ const RanchoDetalhes = () => {
 
     // Se houver Typebot, redireciona pra ele direto
     if (rancho.typebot_url) {
+      let finalUrl = rancho.typebot_url;
+      if (!finalUrl.startsWith('http://') && !finalUrl.startsWith('https://')) {
+        finalUrl = 'https://' + finalUrl;
+      }
+      
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
       if (isMobile) {
-        window.location.href = rancho.typebot_url;
+        window.location.href = finalUrl;
       } else {
-        window.open(rancho.typebot_url, '_blank', 'noopener,noreferrer');
+        window.open(finalUrl, '_blank', 'noopener,noreferrer');
       }
       return;
     }
