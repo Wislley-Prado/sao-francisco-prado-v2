@@ -13,8 +13,8 @@ export const TTL = {
   DYNAMIC: 60 * 1000,
   // Configurações do site - 1 hora
   SETTINGS: 60 * 60 * 1000,
-  // Listas principais - 15 minutos
-  LISTS: 15 * 60 * 1000,
+  // Listas principais - 3 minutos (antes era 15, reduzido para atualizar mais rápido)
+  LISTS: 3 * 60 * 1000,
   // Estatísticas admin - 1 hora (economia máxima)
   ADMIN_STATS: 60 * 60 * 1000,
 } as const;
