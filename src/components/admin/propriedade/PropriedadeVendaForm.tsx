@@ -30,6 +30,7 @@ import { Loader2, X, Plus, Upload, Sparkles } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { compressImages } from '@/utils/imageCompression';
 import { invalidateCacheByPrefix } from '@/lib/cacheService';
+import { CoordenadasHelper } from '@/components/admin/shared/CoordenadasHelper';
 
 const propriedadeSchema = z.object({
   titulo: z.string().min(3, 'Título deve ter no mínimo 3 caracteres'),
@@ -46,6 +47,9 @@ const propriedadeSchema = z.object({
   destaque: z.boolean().default(false),
   ordem: z.number().default(0),
   caracteristicaCustom: z.string().optional(),
+  latitude: z.string().optional().or(z.literal('')),
+  longitude: z.string().optional().or(z.literal('')),
+  video_youtube: z.string().optional().or(z.literal('')),
 });
 
 type PropriedadeFormData = z.infer<typeof propriedadeSchema>;
@@ -67,6 +71,9 @@ export interface PropriedadeVendaData {
   ordem?: number;
   imagens?: string[] | null;
   caracteristicas?: string[] | null;
+  latitude?: string | number | null;
+  longitude?: string | number | null;
+  video_youtube?: string | null;
 }
 
 interface PropriedadeVendaFormProps {
@@ -97,6 +104,9 @@ export const PropriedadeVendaForm = ({ propriedade, onSuccess }: PropriedadeVend
       destaque: propriedade?.destaque ?? false,
       ordem: propriedade?.ordem ?? 0,
       caracteristicaCustom: '',
+      latitude: propriedade?.latitude?.toString() || '',
+      longitude: propriedade?.longitude?.toString() || '',
+      video_youtube: propriedade?.video_youtube || '',
     },
   });
 
@@ -192,6 +202,9 @@ export const PropriedadeVendaForm = ({ propriedade, onSuccess }: PropriedadeVend
         ordem: data.ordem,
         imagens: imagens,
         caracteristicas: caracteristicas,
+        latitude: data.latitude && data.latitude.trim() !== '' ? parseFloat(data.latitude) : null,
+        longitude: data.longitude && data.longitude.trim() !== '' ? parseFloat(data.longitude) : null,
+        video_youtube: data.video_youtube || null,
       };
 
       if (propriedade?.id) {
@@ -429,6 +442,62 @@ export const PropriedadeVendaForm = ({ propriedade, onSuccess }: PropriedadeVend
                     <FormControl>
                       <Input {...field} placeholder="Ex: (38) 3754-0000" />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t pt-4">
+              <FormField
+                control={form.control}
+                name="latitude"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Latitude</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Ex: -16.12345" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="longitude"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Longitude</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Ex: -45.67890" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <CoordenadasHelper
+              onCoordinatesExtracted={(lat, lng) => {
+                form.setValue('latitude', lat.toString());
+                form.setValue('longitude', lng.toString());
+              }}
+            />
+
+            <div className="border-t pt-4">
+              <FormField
+                control={form.control}
+                name="video_youtube"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Vídeo YouTube (Shorts)</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="https://youtube.com/shorts/..." />
+                    </FormControl>
+                    <FormDescription>
+                      Cole o link completo do YouTube Shorts para mostrar o vídeo do imóvel
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

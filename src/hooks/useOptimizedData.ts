@@ -185,6 +185,7 @@ export interface PropriedadeVenda {
   caracteristicas: string[] | null;
   telefone_contato: string | null;
   whatsapp_contato: string | null;
+  video_youtube: string | null;
   ativo: boolean;
   destaque: boolean;
   ordem: number;

@@ -763,6 +763,7 @@ export type Database = {
           unidade_area: string | null
           updated_at: string
           whatsapp_contato: string | null
+          video_youtube: string | null
         }
         Insert: {
           area?: number | null
@@ -785,6 +786,7 @@ export type Database = {
           unidade_area?: string | null
           updated_at?: string
           whatsapp_contato?: string | null
+          video_youtube?: string | null
         }
         Update: {
           area?: number | null
@@ -807,6 +809,7 @@ export type Database = {
           unidade_area?: string | null
           updated_at?: string
           whatsapp_contato?: string | null
+          video_youtube?: string | null
         }
         Relationships: []
       }
