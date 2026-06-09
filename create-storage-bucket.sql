@@ -5,8 +5,17 @@
 -- ================================================================
 
 -- ========================
--- 1. TABELA propriedades_venda
+-- 1. TABELA propriedades_venda (Estrutura e Colunas)
 -- ========================
+
+-- Garantir que as colunas necessárias existam na tabela
+ALTER TABLE public.propriedades_venda ADD COLUMN IF NOT EXISTS video_youtube TEXT;
+ALTER TABLE public.propriedades_venda ADD COLUMN IF NOT EXISTS texto_botao_whatsapp TEXT;
+ALTER TABLE public.propriedades_venda ADD COLUMN IF NOT EXISTS mensagem_whatsapp TEXT;
+
+COMMENT ON COLUMN public.propriedades_venda.video_youtube IS 'URL do vídeo do YouTube (Shorts) da propriedade à venda';
+COMMENT ON COLUMN public.propriedades_venda.texto_botao_whatsapp IS 'Texto personalizado para o botão do WhatsApp';
+COMMENT ON COLUMN public.propriedades_venda.mensagem_whatsapp IS 'Mensagem padrão personalizada ao clicar no botão do WhatsApp';
 
 -- Verificar se RLS está habilitado
 ALTER TABLE public.propriedades_venda ENABLE ROW LEVEL SECURITY;
