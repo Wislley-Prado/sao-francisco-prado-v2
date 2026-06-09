@@ -169,7 +169,74 @@ export interface FAQ {
   rancho_id?: string;
 }
 
+export interface PropriedadeVenda {
+  id: string;
+  titulo: string;
+  slug: string;
+  descricao: string | null;
+  tipo: string;
+  localizacao: string;
+  preco: number;
+  area: number | null;
+  unidade_area: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  imagens: string[] | null;
+  caracteristicas: string[] | null;
+  telefone_contato: string | null;
+  whatsapp_contato: string | null;
+  ativo: boolean;
+  destaque: boolean;
+  ordem: number;
+  created_at: string;
+  updated_at: string;
+}
+
+// ============= PROPRIEDADES VENDA =============
+
+export const usePropriedadesVenda = (onlyActive = true) => {
+  return useQuery(
+    ['propriedades_venda', onlyActive ? 'active' : 'all'],
+    () => cachedQuery<PropriedadeVenda[]>(
+      `propriedades_venda_${onlyActive ? 'active' : 'all'}`,
+      TTL.LISTS,
+      async () => {
+        let query = supabase
+          .from('propriedades_venda')
+          .select('*')
+          .order('destaque', { ascending: false })
+          .order('ordem', { ascending: true })
+          .order('created_at', { ascending: false });
+
+        if (onlyActive) {
+          query = query.eq('ativo', true);
+        }
+
+        const { data, error } = await query;
+        if (error) throw error;
+
+        return (data || []).map(p => ({
+          ...p,
+          preco: Number(p.preco),
+          area: p.area ? Number(p.area) : null,
+          imagens: p.imagens || [],
+          caracteristicas: p.caracteristicas || []
+        }));
+      }
+    ),
+    {
+      staleTime: TTL.LISTS,
+      cacheTime: TTL.STATIC,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchOnMount: false,
+      retry: 1,
+    }
+  );
+};
+
 // ============= RANCHOS =============
+
 
 export const useRanchos = (onlyAvailable = true) => {
   return useQuery(

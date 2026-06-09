@@ -274,6 +274,63 @@ const Ajuda = () => {
       )
     },
 
+    // ===== SEÇÃO: PROPRIEDADES À VENDA =====
+    {
+      id: 'propriedades-venda',
+      icon: Building2,
+      title: 'Oportunidades (Venda)',
+      color: 'text-emerald-600',
+      category: 'Admin',
+      content: (
+        <div className="space-y-4">
+          <p className="text-muted-foreground">
+            Gerencie lotes, terrenos e ranchos disponíveis para venda que aparecem na dobra de oportunidades da homepage.
+          </p>
+          
+          <div className="space-y-2">
+            <h4 className="font-semibold flex items-center gap-2">
+              <Info className="w-4 h-4" /> Informações do Módulo de Vendas:
+            </h4>
+            <p className="text-sm text-muted-foreground">
+              Este módulo permite cadastrar propriedades que estão à venda diretamente pelo painel do Supabase na tabela <strong>propriedades_venda</strong>. Cada imóvel cadastrado e ativo será exibido em destaque na página inicial.
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <h4 className="font-semibold flex items-center gap-2">
+              <Edit className="w-4 h-4" /> Campos do Cadastro:
+            </h4>
+            <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+              <li><strong>Título:</strong> Nome de identificação (ex: "Loteamento Portal do Sol - Quadra B")</li>
+              <li><strong>Slug:</strong> Identificador único gerado a partir do título para a URL</li>
+              <li><strong>Tipo:</strong> Tipo do imóvel (ex: "Lote", "Terreno", "Rancho")</li>
+              <li><strong>Localização:</strong> Onde fica (ex: "Represa de Três Marias - Margem Direita")</li>
+              <li><strong>Preço:</strong> Valor integral de venda do imóvel</li>
+              <li><strong>Área e Unidade:</strong> Tamanho (ex: 1200 m² ou 1.5 Hectares)</li>
+              <li><strong>Imagens:</strong> Lista de URLs das fotos do imóvel (exibidas em carrossel/capa)</li>
+              <li><strong>Características:</strong> Array de facilidades (ex: "Água encanada", "Energia elétrica", "Acesso ao Rio")</li>
+              <li><strong>Contato WhatsApp:</strong> Telefone do responsável para o qual o lead será direcionado</li>
+              <li><strong>Ativo:</strong> Switch para publicar ou pausar a exibição da oportunidade no site</li>
+            </ul>
+          </div>
+
+          <div className="space-y-2">
+            <h4 className="font-semibold flex items-center gap-2">
+              <MessageSquare className="w-4 h-4" /> Fluxo de Atendimento (WhatsApp):
+            </h4>
+            <p className="text-sm text-muted-foreground">
+              Quando um visitante clica em <strong>"Saber Mais"</strong> no card de uma oportunidade, o sistema gera automaticamente uma mensagem formatada e a envia para o número cadastrado no campo <strong>whatsapp_contato</strong> (ou no telefone padrão do site). A mensagem já vem pronta:
+              <span className="block italic bg-muted p-2 rounded mt-2 border text-xs text-muted-foreground">
+                "Olá! Vi o anúncio da propriedade [Nome] em [Localização] no site PradoAqui e gostaria de saber mais informações."
+              </span>
+            </p>
+          </div>
+
+          <Badge variant="secondary">Módulo de Venda e Investimento</Badge>
+        </div>
+      )
+    },
+
     // ===== SEÇÃO: PACOTES =====
     {
       id: 'pacotes',
