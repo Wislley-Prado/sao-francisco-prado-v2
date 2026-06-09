@@ -1,10 +1,38 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import PropriedadeCard from './PropriedadeCard';
 import { MapPin, Loader2, Sparkles, Handshake, Landmark } from 'lucide-react';
 import { usePropriedadesVenda } from '@/hooks/useOptimizedData';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 const PropriedadesVendaSection = () => {
   const { data: propriedades, isLoading } = usePropriedadesVenda(true);
+  const [heroImage, setHeroImage] = useState('');
+
+  // Fetch sales hero image from site mappings
+  const { data: heroData } = useQuery({
+    queryKey: ['vendas-hero'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('site_settings_public')
+        .select('reserva_button_text')
+        .eq('id', '00000000-0000-0000-0000-000000000001')
+        .single();
+      
+      if (error) return null;
+      if (data?.reserva_button_text) {
+        const url = data.reserva_button_text.split('|')[3];
+        if (url) return url;
+      }
+      return null;
+    }
+  });
+
+  useEffect(() => {
+    if (heroData) {
+      setHeroImage(heroData);
+    }
+  }, [heroData]);
 
   // Calculate stats
   const lowestPrice = React.useMemo(() => {
@@ -21,10 +49,22 @@ const PropriedadesVendaSection = () => {
   return (
     <section id="venda" className="bg-gray-50 pb-20">
       {/* Header / Hero Section */}
-      <div className="relative bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 py-24 mb-16 text-white overflow-hidden">
-        {/* Subtle decorative background pattern/radial gradient */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(16,185,129,0.1),transparent_50%)]"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-50 via-transparent to-transparent bottom-[-1px]"></div>
+      <div 
+        className="relative bg-cover bg-center py-24 mb-16 text-white overflow-hidden"
+        style={heroImage ? { backgroundImage: `url('${heroImage}')` } : {}}
+      >
+        {heroImage ? (
+          <>
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-gray-50 via-gray-50/20 to-transparent bottom-[-1px]"></div>
+          </>
+        ) : (
+          <>
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900"></div>
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(16,185,129,0.1),transparent_50%)]"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-gray-50 via-transparent to-transparent bottom-[-1px]"></div>
+          </>
+        )}
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center drop-shadow-lg">
           <div className="inline-flex items-center gap-2 px-3 py-1 mb-4 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-medium">
