@@ -89,44 +89,4 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (id.includes('node_modules')) {
-            if (id.includes('@radix-ui') || id.includes('@radix-ui/react-')) {
-              return 'vendor-radix';
-            }
-            if (id.includes('lucide-react')) {
-              return 'vendor-lucide';
-            }
-            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router-dom')) {
-              return 'vendor-react-core';
-            }
-            if (id.includes('@supabase') || id.includes('supabase-js')) {
-              return 'vendor-supabase';
-            }
-            if (id.includes('@tanstack') || id.includes('react-query')) {
-              return 'vendor-react-query';
-            }
-            if (id.includes('embla-carousel')) {
-              return 'vendor-embla';
-            }
-            if (id.includes('recharts') || id.includes('d3')) {
-              return 'vendor-recharts';
-            }
-            if (id.includes('jspdf')) {
-              return 'vendor-pdf';
-            }
-            if (id.includes('mapbox-gl')) {
-              return 'vendor-mapbox';
-            }
-            return 'vendor-others';
-          }
-        }
-      }
-    },
-    chunkSizeWarningLimit: 1000,
-    cssCodeSplit: true,
-  },
 }));
