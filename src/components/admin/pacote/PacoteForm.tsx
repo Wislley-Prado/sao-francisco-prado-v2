@@ -26,7 +26,7 @@ import { CoordenadasHelper } from './CoordenadasHelper';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Loader2, Plus, X } from 'lucide-react';
-import { invalidateCacheByPrefix } from '@/lib/cacheService';
+import { useInvalidateCache } from '@/hooks/useOptimizedData';
 import { isValidYouTubeUrl } from '@/hooks/useVideoSettings';
 
 const pacoteSchema = z.object({
@@ -118,6 +118,7 @@ interface PacoteFormProps {
 }
 
 export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
+  const { invalidatePacotes, invalidateAdminPacotes } = useInvalidateCache();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [images, setImages] = useState<ImageFile[]>(
     pacote?.pacote_imagens?.map((img: { id: string; url: string; principal: boolean; alt_text?: string; ordem?: number }, index: number) => ({
@@ -337,8 +338,8 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
       }
 
       // Invalida cache para refletir as mudanças imediatamente
-      invalidateCacheByPrefix('pacote');
-      invalidateCacheByPrefix('pacotes');
+      invalidatePacotes();
+      invalidateAdminPacotes();
 
       onSuccess();
     } catch (error) {

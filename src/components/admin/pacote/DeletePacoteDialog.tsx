@@ -12,6 +12,7 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
+import { useInvalidateCache } from '@/hooks/useOptimizedData';
 
 interface DeletePacoteDialogProps {
   open: boolean;
@@ -27,6 +28,7 @@ export const DeletePacoteDialog = ({
   onSuccess,
 }: DeletePacoteDialogProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
+  const { invalidatePacotes, invalidateAdminPacotes } = useInvalidateCache();
 
   const handleDelete = async () => {
     if (!pacote) return;
@@ -69,6 +71,10 @@ export const DeletePacoteDialog = ({
         .eq('id', pacote.id);
 
       if (pacoteError) throw pacoteError;
+
+      // Invalida cache para refletir as mudanças imediatamente
+      invalidatePacotes();
+      invalidateAdminPacotes();
 
       toast.success('Pacote excluído com sucesso!');
       onSuccess();

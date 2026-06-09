@@ -28,6 +28,10 @@ const PackagesSection = () => {
     });
   }, [pacotesData]);
 
+  if (!isLoading && packages.length === 0) {
+    return null;
+  }
+
   return (
     <section id="pacotes" className="py-20 bg-sand-beige">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
