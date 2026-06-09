@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Package, Home, FileText, Plus, TrendingUp, Star, RefreshCw } from 'lucide-react';
+import { Package, Home, FileText, Plus, TrendingUp, Star, RefreshCw, Tag } from 'lucide-react';
 import { useDashboardStats, useInvalidateCache } from '@/hooks/useOptimizedData';
 
 const AdminDashboard = () => {
@@ -30,7 +30,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total de Ranchos</CardTitle>
@@ -47,6 +47,27 @@ const AdminDashboard = () => {
                 <Skeleton className="h-3 w-24 mt-1" />
               ) : (
                 `${stats?.ranchosDisponiveis || 0} disponíveis`
+              )}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Oportunidades (Venda)</CardTitle>
+            <Tag className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <Skeleton className="h-8 w-12" />
+            ) : (
+              <div className="text-2xl font-bold">{stats?.totalVendas || 0}</div>
+            )}
+            <p className="text-xs text-muted-foreground">
+              {isLoading ? (
+                <Skeleton className="h-3 w-24 mt-1" />
+              ) : (
+                `${stats?.vendasAtivas || 0} ativas`
               )}
             </p>
           </CardContent>
@@ -124,11 +145,17 @@ const AdminDashboard = () => {
             Acesso rápido às principais funcionalidades
           </CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-4 md:grid-cols-3">
+        <CardContent className="grid gap-4 grid-cols-2 lg:grid-cols-4">
           <Button asChild className="h-24 flex-col gap-2">
             <Link to="/admin/ranchos/novo">
               <Plus className="w-6 h-6" />
               Novo Rancho
+            </Link>
+          </Button>
+          <Button asChild className="h-24 flex-col gap-2">
+            <Link to="/admin/vendas/nova">
+              <Plus className="w-6 h-6" />
+              Nova Oportunidade
             </Link>
           </Button>
           <Button asChild className="h-24 flex-col gap-2">

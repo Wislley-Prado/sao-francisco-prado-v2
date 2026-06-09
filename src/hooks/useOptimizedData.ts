@@ -1018,6 +1018,8 @@ export interface DashboardStats {
   postsPublicados: number;
   totalDepoimentos: number;
   depoimentosAtivos: number;
+  totalVendas: number;
+  vendasAtivas: number;
 }
 
 export const useDashboardStats = () => {
@@ -1027,11 +1029,12 @@ export const useDashboardStats = () => {
       'dashboard_stats',
       TTL.ADMIN_STATS,
       async () => {
-        const [ranchos, pacotes, blog, depoimentos] = await Promise.all([
+        const [ranchos, pacotes, blog, depoimentos, vendas] = await Promise.all([
           supabase.from('ranchos').select('disponivel'),
           supabase.from('pacotes').select('ativo'),
           supabase.from('blog_posts').select('publicado'),
           supabase.from('depoimentos').select('ativo'),
+          supabase.from('propriedades_venda').select('ativo'),
         ]);
 
         return {
@@ -1043,6 +1046,8 @@ export const useDashboardStats = () => {
           postsPublicados: blog.data?.filter(b => b.publicado).length || 0,
           totalDepoimentos: depoimentos.data?.length || 0,
           depoimentosAtivos: depoimentos.data?.filter(d => d.ativo).length || 0,
+          totalVendas: vendas.data?.length || 0,
+          vendasAtivas: vendas.data?.filter(v => v.ativo).length || 0,
         };
       }
     ),

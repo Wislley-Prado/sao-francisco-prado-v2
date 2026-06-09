@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import PropriedadeCard from './PropriedadeCard';
-import { MapPin, Loader2, Sparkles, Handshake, Landmark } from 'lucide-react';
+import { MapPin, Loader2, Sparkles, Handshake, Landmark, ArrowRight, Building2 } from 'lucide-react';
 import { usePropriedadesVenda } from '@/hooks/useOptimizedData';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
+
+const MAX_HOME_ITEMS = 6;
 
 const PropriedadesVendaSection = () => {
   const { data: propriedades, isLoading } = usePropriedadesVenda(true);
@@ -33,6 +37,14 @@ const PropriedadesVendaSection = () => {
       setHeroImage(heroData);
     }
   }, [heroData]);
+
+  // Limit to MAX_HOME_ITEMS when on home page
+  const displayedPropriedades = React.useMemo(() => {
+    if (!propriedades) return [];
+    return propriedades.slice(0, MAX_HOME_ITEMS);
+  }, [propriedades]);
+
+  const hasMore = (propriedades?.length ?? 0) > MAX_HOME_ITEMS;
 
   // Calculate stats
   const lowestPrice = React.useMemo(() => {
@@ -78,6 +90,18 @@ const PropriedadesVendaSection = () => {
             Adquira o seu próprio lote, terreno ou rancho pronto na região do Rio São Francisco e Represa de Três Marias. 
             Excelente potencial de valorização e contato direto para negociação.
           </p>
+          <div className="mt-8">
+            <Link to="/vendas">
+              <Button
+                size="lg"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-8 py-3 rounded-xl shadow-lg shadow-emerald-900/30 transition-all hover:scale-105"
+              >
+                <Building2 className="h-5 w-5 mr-2" />
+                Ver Todas as Oportunidades
+                <ArrowRight className="h-5 w-5 ml-2" />
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -87,21 +111,45 @@ const PropriedadesVendaSection = () => {
           <div className="flex justify-center py-16">
             <Loader2 className="h-12 w-12 animate-spin text-rio-blue" />
           </div>
-        ) : propriedades && propriedades.length > 0 ? (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {propriedades.map((propriedade) => (
-              <PropriedadeCard key={propriedade.id} propriedade={propriedade} />
-            ))}
-          </div>
+        ) : displayedPropriedades.length > 0 ? (
+          <>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {displayedPropriedades.map((propriedade) => (
+                <PropriedadeCard key={propriedade.id} propriedade={propriedade} />
+              ))}
+            </div>
+
+            {/* "Ver mais" button */}
+            {hasMore && (
+              <div className="mt-10 text-center">
+                <Link to="/vendas">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="border-2 border-rio-blue text-rio-blue hover:bg-rio-blue hover:text-white font-semibold px-8 py-3 rounded-xl transition-all hover:scale-105"
+                  >
+                    Ver todas as {propriedades?.length} oportunidades
+                    <ArrowRight className="h-5 w-5 ml-2" />
+                  </Button>
+                </Link>
+              </div>
+            )}
+          </>
         ) : (
           <div className="text-center py-16 bg-white rounded-xl shadow-sm border border-gray-100 p-8">
             <MapPin className="h-16 w-16 text-gray-400 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-gray-600 mb-2">
               Nenhuma oportunidade à venda cadastrada no momento
             </h3>
-            <p className="text-gray-500 max-w-md mx-auto">
+            <p className="text-gray-500 max-w-md mx-auto mb-6">
               Em breve teremos novas opções de lotes, terrenos e ranchos para você. Entre em contato conosco para encomendar seu imóvel.
             </p>
+            <Link to="/vendas">
+              <Button variant="outline" className="border-emerald-500 text-emerald-600 hover:bg-emerald-50">
+                Ver página de oportunidades
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            </Link>
           </div>
         )}
 

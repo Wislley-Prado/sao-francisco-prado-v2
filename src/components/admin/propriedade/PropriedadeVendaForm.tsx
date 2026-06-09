@@ -163,7 +163,22 @@ export const PropriedadeVendaForm = ({ propriedade, onSuccess }: PropriedadeVend
       toast.success(`${compressedFiles.length} imagem(ns) enviada(s) com sucesso!`);
     } catch (error) {
       console.error('Error uploading images:', error);
-      toast.error('Erro ao enviar imagens.');
+      const errMsg = (error as { message?: string })?.message || '';
+      if (errMsg.toLowerCase().includes('bucket not found') || errMsg.toLowerCase().includes('no such bucket')) {
+        toast.error(
+          '⚠️ Bucket de armazenamento "propriedades-venda" não encontrado. Execute o SQL "create-storage-bucket.sql" no Supabase Dashboard.',
+          { duration: 10000 }
+        );
+      } else if (errMsg.includes('403') || errMsg.toLowerCase().includes('unauthorized') || errMsg.toLowerCase().includes('policy')) {
+        toast.error(
+          '⚠️ Sem permissão para enviar imagens. Crie as políticas RLS do bucket "propriedades-venda" no Supabase.',
+          { duration: 8000 }
+        );
+      } else if (errMsg.toLowerCase().includes('size') || errMsg.toLowerCase().includes('exceeded')) {
+        toast.error('Imagem muito grande. Tamanho máximo: 10MB.', { duration: 5000 });
+      } else {
+        toast.error(`Erro ao enviar imagem: ${errMsg || 'Erro desconhecido. Veja o console.'}`, { duration: 6000 });
+      }
     } finally {
       setIsUploading(false);
       e.target.value = '';
