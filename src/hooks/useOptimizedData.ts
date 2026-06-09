@@ -186,6 +186,8 @@ export interface PropriedadeVenda {
   telefone_contato: string | null;
   whatsapp_contato: string | null;
   video_youtube: string | null;
+  texto_botao_whatsapp: string | null;
+  mensagem_whatsapp: string | null;
   ativo: boolean;
   destaque: boolean;
   ordem: number;

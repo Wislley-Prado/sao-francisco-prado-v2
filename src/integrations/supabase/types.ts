@@ -764,6 +764,8 @@ export type Database = {
           updated_at: string
           whatsapp_contato: string | null
           video_youtube: string | null
+          texto_botao_whatsapp: string | null
+          mensagem_whatsapp: string | null
         }
         Insert: {
           area?: number | null
@@ -787,6 +789,8 @@ export type Database = {
           updated_at?: string
           whatsapp_contato?: string | null
           video_youtube?: string | null
+          texto_botao_whatsapp?: string | null
+          mensagem_whatsapp?: string | null
         }
         Update: {
           area?: number | null
@@ -810,6 +814,8 @@ export type Database = {
           updated_at?: string
           whatsapp_contato?: string | null
           video_youtube?: string | null
+          texto_botao_whatsapp?: string | null
+          mensagem_whatsapp?: string | null
         }
         Relationships: []
       }

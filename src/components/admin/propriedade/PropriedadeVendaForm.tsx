@@ -50,6 +50,8 @@ const propriedadeSchema = z.object({
   latitude: z.string().optional().or(z.literal('')),
   longitude: z.string().optional().or(z.literal('')),
   video_youtube: z.string().optional().or(z.literal('')),
+  texto_botao_whatsapp: z.string().optional().or(z.literal('')),
+  mensagem_whatsapp: z.string().optional().or(z.literal('')),
 });
 
 type PropriedadeFormData = z.infer<typeof propriedadeSchema>;
@@ -74,6 +76,8 @@ export interface PropriedadeVendaData {
   latitude?: string | number | null;
   longitude?: string | number | null;
   video_youtube?: string | null;
+  texto_botao_whatsapp?: string | null;
+  mensagem_whatsapp?: string | null;
 }
 
 interface PropriedadeVendaFormProps {
@@ -107,6 +111,8 @@ export const PropriedadeVendaForm = ({ propriedade, onSuccess }: PropriedadeVend
       latitude: propriedade?.latitude?.toString() || '',
       longitude: propriedade?.longitude?.toString() || '',
       video_youtube: propriedade?.video_youtube || '',
+      texto_botao_whatsapp: propriedade?.texto_botao_whatsapp || '',
+      mensagem_whatsapp: propriedade?.mensagem_whatsapp || '',
     },
   });
 
@@ -205,6 +211,8 @@ export const PropriedadeVendaForm = ({ propriedade, onSuccess }: PropriedadeVend
         latitude: data.latitude && data.latitude.trim() !== '' ? parseFloat(data.latitude) : null,
         longitude: data.longitude && data.longitude.trim() !== '' ? parseFloat(data.longitude) : null,
         video_youtube: data.video_youtube || null,
+        texto_botao_whatsapp: data.texto_botao_whatsapp || null,
+        mensagem_whatsapp: data.mensagem_whatsapp || null,
       };
 
       if (propriedade?.id) {
@@ -442,6 +450,38 @@ export const PropriedadeVendaForm = ({ propriedade, onSuccess }: PropriedadeVend
                     <FormControl>
                       <Input {...field} placeholder="Ex: (38) 3754-0000" />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t pt-4">
+              <FormField
+                control={form.control}
+                name="texto_botao_whatsapp"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Texto do Botão do WhatsApp</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Ex: Saber Mais, Falar com Corretor" />
+                    </FormControl>
+                    <FormDescription>Texto exibido nos botões do WhatsApp da propriedade (padrão: "WhatsApp" ou "Saber Mais")</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="mensagem_whatsapp"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Mensagem Personalizada do WhatsApp</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Ex: Olá! Tenho interesse no {titulo}" />
+                    </FormControl>
+                    <FormDescription>Mensagem pré-preenchida no WhatsApp. Use tags de auto-preenchimento como <strong>{"{titulo}"}</strong> ou <strong>{"{localizacao}"}</strong>.</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

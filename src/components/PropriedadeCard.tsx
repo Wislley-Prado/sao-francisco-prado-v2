@@ -31,7 +31,15 @@ const PropriedadeCard = ({ propriedade }: PropriedadeCardProps) => {
   // Clean phone number to contain only digits
   const phone = rawPhone.replace(/\D/g, '');
 
-  const message = `Olá! Vi o anúncio da propriedade "${propriedade.titulo}" em "${propriedade.localizacao}" no site PradoAqui e gostaria de saber mais informações.`;
+  const message = React.useMemo(() => {
+    if (propriedade.mensagem_whatsapp) {
+      return propriedade.mensagem_whatsapp
+        .replace(/{titulo}/g, propriedade.titulo)
+        .replace(/{localizacao}/g, propriedade.localizacao);
+    }
+    return `Olá! Vi o anúncio da propriedade "${propriedade.titulo}" em "${propriedade.localizacao}" no site PradoAqui e gostaria de saber mais informações.`;
+  }, [propriedade.mensagem_whatsapp, propriedade.titulo, propriedade.localizacao]);
+
   const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 
   // Mapping common characteristics to icons
@@ -193,7 +201,7 @@ const PropriedadeCard = ({ propriedade }: PropriedadeCardProps) => {
                 <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="w-full">
                   <Button className="w-full bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-1.5 font-medium transition-all shadow-sm">
                     <MessageSquare className="h-4 w-4" />
-                    WhatsApp
+                    {propriedade.texto_botao_whatsapp || 'WhatsApp'}
                   </Button>
                 </a>
               </div>
@@ -302,7 +310,7 @@ const PropriedadeCard = ({ propriedade }: PropriedadeCardProps) => {
                     <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="block">
                       <Button className="w-full bg-green-600 hover:bg-green-700 text-white shadow-md shadow-green-600/10 py-5 text-base font-semibold transition-all">
                         <MessageSquare className="mr-2 h-5 w-5 fill-white" />
-                        Falar no WhatsApp
+                        {propriedade.texto_botao_whatsapp || 'Falar no WhatsApp'}
                       </Button>
                     </a>
                   </div>
