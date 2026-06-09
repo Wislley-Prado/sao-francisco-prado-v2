@@ -16,7 +16,8 @@ import {
   MessageCircle,
   BookOpen,
   Megaphone,
-  Video
+  Video,
+  Building2
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -25,6 +26,7 @@ import { Separator } from '@/components/ui/separator';
 const navigation = [
   { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
   { name: 'Ranchos', href: '/admin/ranchos', icon: Home },
+  { name: 'Oportunidades (Venda)', href: '/admin/vendas', icon: Building2 },
   { name: 'Pacotes', href: '/admin/pacotes', icon: Package },
   { name: 'Anúncios', href: '/admin/anuncios', icon: Megaphone },
   { name: 'Avaliações', href: '/admin/avaliacoes', icon: Star },

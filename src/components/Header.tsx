@@ -17,6 +17,7 @@ const Header = () => {
     { name: 'Blog', href: '/blog', hash: '' },
     { name: 'Transmissão', href: '/live', hash: '' },
     { name: 'Represa', href: '/', hash: 'represa' },
+    { name: 'Venda', href: '/', hash: 'venda' },
   ];
 
   const handleNavClick = (href: string, hash: string) => {

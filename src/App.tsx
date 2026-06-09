@@ -38,6 +38,9 @@ const AdminDashboard = React.lazy(() => import("./pages/admin/Dashboard"));
 const AdminRanchos = React.lazy(() => import("./pages/admin/Ranchos"));
 const RanchoNovo = React.lazy(() => import("./pages/admin/RanchoNovo"));
 const RanchoEditar = React.lazy(() => import("./pages/admin/RanchoEditar"));
+const AdminPropriedadesVenda = React.lazy(() => import("./pages/admin/PropriedadesVenda"));
+const PropriedadeVendaNova = React.lazy(() => import("./pages/admin/PropriedadeVendaNova"));
+const PropriedadeVendaEditar = React.lazy(() => import("./pages/admin/PropriedadeVendaEditar"));
 const AdminPacotes = React.lazy(() => import("./pages/admin/Pacotes"));
 const PacoteNovo = React.lazy(() => import("./pages/admin/PacoteNovo"));
 const PacoteEditar = React.lazy(() => import("./pages/admin/PacoteEditar"));
@@ -130,6 +133,9 @@ const App = () => {
                   <Route path="ranchos" element={<AdminRanchos />} />
                   <Route path="ranchos/novo" element={<RanchoNovo />} />
                   <Route path="ranchos/editar/:id" element={<RanchoEditar />} />
+                  <Route path="vendas" element={<AdminPropriedadesVenda />} />
+                  <Route path="vendas/nova" element={<PropriedadeVendaNova />} />
+                  <Route path="vendas/editar/:id" element={<PropriedadeVendaEditar />} />
                   <Route path="pacotes" element={<AdminPacotes />} />
                   <Route path="pacotes/novo" element={<PacoteNovo />} />
                   <Route path="pacotes/:id/editar" element={<PacoteEditar />} />
