@@ -255,7 +255,25 @@ export const PropriedadeVendaForm = ({ propriedade, onSuccess }: PropriedadeVend
       onSuccess();
     } catch (error) {
       console.error('Error saving property:', error);
-      toast.error('Erro ao salvar propriedade.');
+      const err = error as { message?: string; code?: string; details?: string; hint?: string };
+      const code = err?.code || '';
+      const msg = err?.message || '';
+      const hint = err?.hint || '';
+
+      if (code === '42501' || msg.toLowerCase().includes('policy') || msg.toLowerCase().includes('permission')) {
+        toast.error(
+          '⚠️ Sem permissão para salvar. Execute o SQL de políticas RLS da tabela no Supabase Dashboard.',
+          { duration: 10000 }
+        );
+      } else if (code === '23505') {
+        toast.error('⚠️ Já existe uma oportunidade com este slug. Altere o título ou o slug e tente novamente.');
+      } else if (code === '23502') {
+        toast.error(`⚠️ Campo obrigatório faltando: ${msg}`);
+      } else if (msg.toLowerCase().includes('rls') || msg.toLowerCase().includes('row level')) {
+        toast.error('⚠️ Bloqueado por RLS. Verifique as políticas da tabela propriedades_venda no Supabase.', { duration: 8000 });
+      } else {
+        toast.error(`Erro ao salvar: ${msg || 'Erro desconhecido'} ${hint ? '(' + hint + ')' : ''}`, { duration: 8000 });
+      }
     } finally {
       setIsSubmitting(false);
     }
