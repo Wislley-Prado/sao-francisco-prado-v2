@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export default function DepoimentoEditar() {
   const { id } = useParams();
-  const [depoimento, setDepoimento] = useState<{ id: string;[key: string]: unknown } | null>(null);
+  const [depoimento, setDepoimento] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

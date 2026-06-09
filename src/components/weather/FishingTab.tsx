@@ -3,15 +3,10 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
+import { CurrentWeather } from '@/hooks/useWeatherData';
+
 interface FishingTabProps {
-  current: {
-    temperature: number;
-    sunrise: number;
-    wind_speed: number;
-    clouds: number;
-    pressure: number;
-    [key: string]: unknown;
-  };
+  current: CurrentWeather;
   fishingCondition: { text: string; color: string };
 }
 

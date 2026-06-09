@@ -17,7 +17,7 @@ import { useInvalidateCache } from '@/hooks/useOptimizedData';
 interface DeletePacoteDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  pacote: { id: string; nome: string; pacote_imagens?: Array<{ id: string; url: string }> } | null;
+  pacote: { id: string; nome: string; pacote_imagens?: Array<{ id?: string; url: string }> } | null;
   onSuccess: () => void;
 }
 

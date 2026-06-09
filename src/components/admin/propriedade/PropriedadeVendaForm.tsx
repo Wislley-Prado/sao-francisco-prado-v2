@@ -519,7 +519,7 @@ export const PropriedadeVendaForm = ({ propriedade, onSuccess }: PropriedadeVend
             </div>
 
             <CoordenadasHelper
-              onCoordinatesExtracted={(lat, lng) => {
+              onCoordenadasExtraidas={(lat, lng) => {
                 form.setValue('latitude', lat.toString());
                 form.setValue('longitude', lng.toString());
               }}

@@ -3,15 +3,10 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Wind, Droplets, Gauge, Eye } from 'lucide-react';
 
+import { CurrentWeather } from '@/hooks/useWeatherData';
+
 interface WeatherMetricsProps {
-  current: {
-    wind_speed: number;
-    wind_direction: number;
-    humidity: number;
-    pressure: number;
-    visibility: number;
-    [key: string]: unknown;
-  };
+  current: CurrentWeather;
 }
 
 const WeatherMetrics = ({ current }: WeatherMetricsProps) => {

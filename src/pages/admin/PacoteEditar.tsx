@@ -95,7 +95,7 @@ const PacoteEditar = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <PacoteForm pacote={pacote} onSuccess={handleSuccess} />
+          <PacoteForm pacote={pacote as any} onSuccess={handleSuccess} />
         </CardContent>
       </Card>
     </div>

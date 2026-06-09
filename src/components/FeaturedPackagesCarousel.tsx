@@ -36,7 +36,7 @@ interface FeaturedPackagesCarouselProps {
 
 const FeaturedPackagesCarousel = ({ packages }: FeaturedPackagesCarouselProps) => {
   const plugin = React.useRef(
-    Autoplay({ delay: 4000, stopOnInteraction: true })
+    Autoplay({ delay: 4000, stopOnInteraction: true }) as any
   );
 
   // Filtrar apenas pacotes populares ou em destaque

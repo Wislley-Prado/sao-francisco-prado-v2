@@ -4,16 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Sunrise, Sunset } from 'lucide-react';
 
+import { CurrentWeather } from '@/hooks/useWeatherData';
+
 interface CurrentWeatherCardProps {
-  current: {
-    weather_icon: string;
-    weather_description: string;
-    temperature: number;
-    feels_like: number;
-    sunrise: number;
-    sunset: number;
-    [key: string]: unknown;
-  };
+  current: CurrentWeather;
   getWeatherIcon: (iconCode: string) => React.ReactNode;
   fishingCondition: { text: string; color: string };
   now: Date;

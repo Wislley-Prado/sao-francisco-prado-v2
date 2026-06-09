@@ -933,6 +933,8 @@ export type Database = {
           tracking_code: string | null
           updated_at: string
           video_youtube: string | null
+          typebot_url: string | null
+          texto_botao_whatsapp: string | null
         }
         Insert: {
           area?: number | null
@@ -960,6 +962,8 @@ export type Database = {
           tracking_code?: string | null
           updated_at?: string
           video_youtube?: string | null
+          typebot_url?: string | null
+          texto_botao_whatsapp?: string | null
         }
         Update: {
           area?: number | null
@@ -987,6 +991,8 @@ export type Database = {
           tracking_code?: string | null
           updated_at?: string
           video_youtube?: string | null
+          typebot_url?: string | null
+          texto_botao_whatsapp?: string | null
         }
         Relationships: []
       }
