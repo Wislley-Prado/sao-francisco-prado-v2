@@ -67,6 +67,14 @@ const Footer = () => {
               </li>
               <li>
                 <button 
+                  onClick={() => handleNavClick('/vendas', '')}
+                  className="text-gray-300 hover:text-rio-blue transition-colors bg-transparent border-none cursor-pointer"
+                >
+                  Venda
+                </button>
+              </li>
+              <li>
+                <button 
                   onClick={() => handleNavClick('/pacotes', '')}
                   className="text-gray-300 hover:text-rio-blue transition-colors bg-transparent border-none cursor-pointer"
                 >

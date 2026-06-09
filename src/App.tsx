@@ -31,6 +31,7 @@ const PacoteDetalhes = React.lazy(() => import("./pages/PacoteDetalhes"));
 const PrivacyPolicy = React.lazy(() => import("./pages/PrivacyPolicy"));
 const Blog = React.lazy(() => import("./pages/Blog"));
 const BlogPost = React.lazy(() => import("./pages/BlogPost"));
+const VendasIndex = React.lazy(() => import("./pages/VendasIndex"));
 
 // Lazy load - admin pages
 const AdminLogin = React.lazy(() => import("./pages/admin/Login"));
@@ -117,6 +118,7 @@ const App = () => {
                 <Route path="/politica-privacidade" element={<PrivacyPolicy />} />
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/blog/:slug" element={<BlogPost />} />
+                <Route path="/vendas" element={<VendasIndex />} />
                 <Route path="/pacote-vip" element={<PackageVip />} />
                 
                 {/* Admin Routes */}
