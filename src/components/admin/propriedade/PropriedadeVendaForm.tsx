@@ -90,6 +90,7 @@ export const PropriedadeVendaForm = ({ propriedade, onSuccess }: PropriedadeVend
   const [isUploading, setIsUploading] = useState(false);
   const [imagens, setImagens] = useState<string[]>(propriedade?.imagens || []);
   const [caracteristicas, setCaracteristicas] = useState<string[]>(propriedade?.caracteristicas || []);
+  const [activeTab, setActiveTab] = useState("basico");
 
   const form = useForm<PropriedadeFormData>({
     resolver: zodResolver(propriedadeSchema),
@@ -279,10 +280,41 @@ export const PropriedadeVendaForm = ({ propriedade, onSuccess }: PropriedadeVend
     }
   };
 
+  const onError = (errors: any) => {
+    console.error('Validation errors:', errors);
+    
+    // Get list of fields with errors
+    const errorFields = Object.keys(errors);
+    const basicFields = ['titulo', 'slug', 'descricao', 'tipo', 'localizacao'];
+    
+    // Map internal names to user-friendly names
+    const fieldNamesMap: Record<string, string> = {
+      titulo: 'Título',
+      slug: 'Slug',
+      tipo: 'Tipo de Propriedade',
+      localizacao: 'Localização',
+      preco: 'Preço de Venda',
+    };
+    
+    const friendlyNames = errorFields
+      .map(field => fieldNamesMap[field] || field)
+      .join(', ');
+      
+    toast.error(`⚠️ Erro de validação nos campos: ${friendlyNames || 'Verifique o formulário'}.`);
+
+    // Auto-switch to the first tab with an error
+    const hasBasicError = errorFields.some(field => basicFields.includes(field));
+    if (hasBasicError) {
+      setActiveTab('basico');
+    } else {
+      setActiveTab('detalhes');
+    }
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <Tabs defaultValue="basico" className="w-full">
+      <form onSubmit={form.handleSubmit(onSubmit, onError)} className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-4 h-auto gap-1">
             <TabsTrigger value="basico">Básico</TabsTrigger>
             <TabsTrigger value="detalhes">Detalhes</TabsTrigger>
