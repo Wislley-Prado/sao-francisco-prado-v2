@@ -24,7 +24,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Switch } from '@/components/ui/switch';
-import { Plus, Search, Edit2, Trash2, Landmark, DollarSign, Sparkles, AlertCircle } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, Landmark, DollarSign, Sparkles, AlertCircle, ExternalLink } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
@@ -286,6 +286,18 @@ const PropriedadesVenda = () => {
                           <Button
                             variant="ghost"
                             size="icon"
+                            title="Ver no site público"
+                            onClick={() => {
+                              window.open(`/vendas?propriedade=${prop.slug}`, '_blank');
+                            }}
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                          </Button>
+
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            title="Editar"
                             onClick={() => navigate(`/admin/vendas/editar/${prop.id}`)}
                           >
                             <Edit2 className="h-4 w-4" />

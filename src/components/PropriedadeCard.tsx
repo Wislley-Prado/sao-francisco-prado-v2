@@ -7,6 +7,7 @@ import {
   Droplets, Compass, Info, Play, Navigation, 
   ExternalLink, Copy, CheckCircle 
 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import { getOptimizedUrl, getOriginalUrl } from '@/lib/imageUtils';
 import { useSiteSettings, PropriedadeVenda } from '@/hooks/useOptimizedData';
 import { 
@@ -25,6 +26,14 @@ interface PropriedadeCardProps {
 const PropriedadeCard = ({ propriedade }: PropriedadeCardProps) => {
   const { data: siteSettings } = useSiteSettings();
   const [modalOpen, setModalOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const propParam = params.get('propriedade');
+    if (propParam && propParam === propriedade.slug) {
+      setModalOpen(true);
+    }
+  }, [propriedade.slug]);
 
   const defaultNumber = siteSettings?.whatsapp_numero || "5538988320108";
   const rawPhone = propriedade.whatsapp_contato || propriedade.telefone_contato || defaultNumber;
@@ -189,18 +198,32 @@ const PropriedadeCard = ({ propriedade }: PropriedadeCardProps) => {
                 </Badge>
               </div>
               
-              <div className="grid grid-cols-2 gap-2 w-full">
+              <div className="grid grid-cols-3 gap-1.5 w-full">
                 <Button 
                   variant="outline" 
                   onClick={() => setModalOpen(true)}
-                  className="w-full border-rio-blue text-rio-blue hover:bg-blue-50/50 flex items-center justify-center gap-1.5 font-medium transition-all"
+                  className="w-full border-rio-blue text-rio-blue hover:bg-blue-50/50 flex items-center justify-center gap-1 px-1 text-xs font-semibold transition-all"
+                  title="Ver Detalhes"
                 >
-                  <Info className="h-4 w-4" />
-                  Ver Detalhes
+                  <Info className="h-3.5 w-3.5" />
+                  Detalhes
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={() => {
+                    const shareUrl = `${window.location.origin}/vendas?propriedade=${propriedade.slug}`;
+                    navigator.clipboard.writeText(shareUrl);
+                    toast.success('Link copiado!');
+                  }}
+                  className="w-full border-gray-200 text-gray-600 hover:bg-gray-50 flex items-center justify-center gap-1 px-1 text-xs font-semibold transition-all"
+                  title="Copiar Link de Compartilhamento"
+                >
+                  <Copy className="h-3.5 w-3.5" />
+                  Copiar
                 </Button>
                 <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="w-full">
-                  <Button className="w-full bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-1.5 font-medium transition-all shadow-sm">
-                    <MessageSquare className="h-4 w-4" />
+                  <Button className="w-full bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-1 px-1 text-xs font-semibold transition-all shadow-sm">
+                    <MessageSquare className="h-3.5 w-3.5" />
                     {propriedade.texto_botao_whatsapp || 'WhatsApp'}
                   </Button>
                 </a>
@@ -313,6 +336,45 @@ const PropriedadeCard = ({ propriedade }: PropriedadeCardProps) => {
                         {propriedade.texto_botao_whatsapp || 'Falar no WhatsApp'}
                       </Button>
                     </a>
+
+                    <div className="border-t border-emerald-100 pt-4 mt-4 text-left">
+                      <h6 className="text-xs font-bold text-emerald-900 mb-2 uppercase tracking-wider">Compartilhar anúncio:</h6>
+                      <div className="flex gap-2">
+                        <Input
+                          readOnly
+                          value={`${window.location.origin}/vendas?propriedade=${propriedade.slug}`}
+                          className="bg-white/80 text-xs border-emerald-200 h-9"
+                        />
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="border-emerald-200 hover:bg-emerald-100/50 text-emerald-800 h-9 shrink-0"
+                          onClick={() => {
+                            const shareUrl = `${window.location.origin}/vendas?propriedade=${propriedade.slug}`;
+                            navigator.clipboard.writeText(shareUrl);
+                            toast.success('Link copiado!');
+                          }}
+                          title="Copiar Link"
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                        <a
+                          href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Olha esse imóvel no PradoAqui: *${propriedade.titulo}* em ${propriedade.localizacao}. Veja os detalhes: ${window.location.origin}/vendas?propriedade=${propriedade.slug}`)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="shrink-0"
+                          title="Compartilhar no WhatsApp"
+                        >
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="border-green-200 hover:bg-green-100/50 text-green-800 h-9"
+                          >
+                            <MessageSquare className="h-4 w-4" />
+                          </Button>
+                        </a>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
