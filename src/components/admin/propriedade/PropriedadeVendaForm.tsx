@@ -30,6 +30,7 @@ import { Loader2, X, Plus, Upload, Sparkles } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { compressImages } from '@/utils/imageCompression';
 import { invalidateCacheByPrefix } from '@/lib/cacheService';
+import { useInvalidateCache } from '@/hooks/useOptimizedData';
 import { CoordenadasHelper } from '@/components/admin/shared/CoordenadasHelper';
 
 const propriedadeSchema = z.object({
@@ -86,6 +87,7 @@ interface PropriedadeVendaFormProps {
 }
 
 export const PropriedadeVendaForm = ({ propriedade, onSuccess }: PropriedadeVendaFormProps) => {
+  const { invalidatePropriedadesVenda } = useInvalidateCache();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [imagens, setImagens] = useState<string[]>(propriedade?.imagens || []);
@@ -251,7 +253,7 @@ export const PropriedadeVendaForm = ({ propriedade, onSuccess }: PropriedadeVend
       }
 
       // Invalidate frontend cache
-      invalidateCacheByPrefix('propriedades_venda');
+      invalidatePropriedadesVenda();
 
       onSuccess();
     } catch (error) {

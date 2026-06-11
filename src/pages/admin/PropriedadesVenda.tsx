@@ -29,6 +29,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { invalidateCacheByPrefix } from '@/lib/cacheService';
+import { useInvalidateCache } from '@/hooks/useOptimizedData';
 
 interface Propriedade {
   id: string;
@@ -46,6 +47,7 @@ interface Propriedade {
 
 const PropriedadesVenda = () => {
   const navigate = useNavigate();
+  const { invalidatePropriedadesVenda } = useInvalidateCache();
   const [search, setSearch] = useState('');
 
   // Fetch properties from supabase
@@ -88,7 +90,7 @@ const PropriedadesVenda = () => {
       if (error) throw error;
 
       toast.success('Status da propriedade atualizado!');
-      invalidateCacheByPrefix('propriedades_venda');
+      invalidatePropriedadesVenda();
       refetch();
     } catch (err) {
       console.error(err);
@@ -107,7 +109,7 @@ const PropriedadesVenda = () => {
       if (error) throw error;
 
       toast.success('Destaque atualizado!');
-      invalidateCacheByPrefix('propriedades_venda');
+      invalidatePropriedadesVenda();
       refetch();
     } catch (err) {
       console.error(err);
@@ -126,7 +128,7 @@ const PropriedadesVenda = () => {
       if (error) throw error;
 
       toast.success('Propriedade excluída com sucesso!');
-      invalidateCacheByPrefix('propriedades_venda');
+      invalidatePropriedadesVenda();
       refetch();
     } catch (err) {
       console.error(err);

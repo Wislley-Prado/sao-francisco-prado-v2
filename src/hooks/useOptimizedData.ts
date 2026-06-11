@@ -1110,6 +1110,13 @@ export const useInvalidateCache = () => {
       invalidateCacheByPrefix('dashboard_stats');
       queryClient.invalidateQueries(['dashboard-stats']);
     },
+    invalidatePropriedadesVenda: () => {
+      invalidateCacheByPrefix('propriedades_venda');
+      queryClient.invalidateQueries(['propriedades_venda']);
+      queryClient.invalidateQueries(['admin-propriedades-venda']);
+      queryClient.invalidateQueries(['admin-propriedade-venda']);
+      queryClient.invalidateQueries(['dashboard-stats']);
+    },
     invalidateAll: () => {
       invalidateCacheByPrefix('');
       queryClient.invalidateQueries();

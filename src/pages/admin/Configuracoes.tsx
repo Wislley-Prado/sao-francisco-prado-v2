@@ -68,6 +68,14 @@ const Configuracoes = () => {
     fetchLastDamUpdate();
   }, []);
 
+  const handleSettingsUpdate = () => {
+    invalidateCache('site_settings');
+    invalidateCache('site_settings_admin');
+    queryClient.invalidateQueries({ queryKey: ['site-settings'] });
+    queryClient.invalidateQueries({ queryKey: ['vendas-hero'] });
+    fetchSettings();
+  };
+
   const fetchSettings = async () => {
     try {
       const { data, error } = await supabase
@@ -280,7 +288,7 @@ const Configuracoes = () => {
           faviconUrl={brandImages.favicon_url}
           ogImageUrl={brandImages.og_image_url}
           pwaIconUrl={brandImages.pwa_icon_url}
-          onUpdate={fetchSettings}
+          onUpdate={handleSettingsUpdate}
         />
 
         <Card>
@@ -828,7 +836,7 @@ const Configuracoes = () => {
                     }}
                     maxWidth={1920}
                     maxHeight={1080}
-                    onUpdate={fetchSettings}
+                    onUpdate={handleSettingsUpdate}
                     previewSize="h-32 w-auto object-cover"
                   />
 
@@ -845,7 +853,7 @@ const Configuracoes = () => {
                     }}
                     maxWidth={1920}
                     maxHeight={1080}
-                    onUpdate={fetchSettings}
+                    onUpdate={handleSettingsUpdate}
                     previewSize="h-32 w-auto object-cover"
                   />
 
@@ -862,7 +870,7 @@ const Configuracoes = () => {
                     }}
                     maxWidth={1920}
                     maxHeight={1080}
-                    onUpdate={fetchSettings}
+                    onUpdate={handleSettingsUpdate}
                     previewSize="h-32 w-auto object-cover"
                   />
 
@@ -879,7 +887,7 @@ const Configuracoes = () => {
                     }}
                     maxWidth={1920}
                     maxHeight={1080}
-                    onUpdate={fetchSettings}
+                    onUpdate={handleSettingsUpdate}
                     previewSize="h-32 w-auto object-cover"
                   />
                 </div>
@@ -1016,6 +1024,20 @@ const Configuracoes = () => {
                 >
                   <RefreshCw className="w-4 h-4 mr-2" />
                   Limpar Blog
+                </Button>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    invalidateCacheByPrefix('propriedades_venda');
+                    queryClient.invalidateQueries({ queryKey: ['propriedades_venda'] });
+                    queryClient.invalidateQueries({ queryKey: ['admin-propriedades-venda'] });
+                    toast.success('Cache de vendas limpo!');
+                  }}
+                >
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Limpar Vendas
                 </Button>
               </div>
 

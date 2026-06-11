@@ -60,7 +60,7 @@ export const ImageGallery = ({ images, title }: ImageGalleryProps) => {
             <img
               src={getOptimizedUrl(images[selectedIndex]?.url, 800)}
               alt={images[selectedIndex]?.alt_text || title || 'Imagem'}
-              className="w-full h-[400px] lg:h-[500px] object-cover transition-transform duration-500 group-hover:scale-105"
+              className="w-full h-[400px] lg:h-[500px] object-contain bg-slate-900 transition-transform duration-500 group-hover:scale-102"
               loading="eager"
               fetchPriority="high"
               onError={(e) => {
