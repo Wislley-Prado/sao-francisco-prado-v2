@@ -238,6 +238,52 @@ export const usePropriedadesVenda = (onlyActive = true) => {
   );
 };
 
+export const usePropriedadeVendaBySlug = (slug: string | undefined) => {
+  const { data: propriedades } = usePropriedadesVenda(false);
+
+  return useQuery(
+    ['propriedade_venda', slug],
+    () => cachedQuery<PropriedadeVenda | null>(
+      `propriedade_venda_${slug}`,
+      TTL.LISTS,
+      async () => {
+        // First check if we already have it from the list
+        if (propriedades) {
+          const found = propriedades.find(p => p.slug === slug);
+          if (found) return found;
+        }
+
+        // Fetch individually if not in list
+        const { data, error } = await supabase
+          .from('propriedades_venda')
+          .select('*')
+          .eq('slug', slug)
+          .maybeSingle();
+
+        if (error) throw error;
+        if (!data) return null;
+
+        return {
+          ...data,
+          preco: Number(data.preco),
+          area: data.area ? Number(data.area) : null,
+          imagens: data.imagens || [],
+          caracteristicas: data.caracteristicas || []
+        };
+      }
+    ),
+    {
+      enabled: !!slug,
+      staleTime: TTL.LISTS,
+      cacheTime: TTL.STATIC,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchOnMount: false,
+      retry: 1,
+    }
+  );
+};
+
 // ============= RANCHOS =============
 
 
@@ -1112,7 +1158,9 @@ export const useInvalidateCache = () => {
     },
     invalidatePropriedadesVenda: () => {
       invalidateCacheByPrefix('propriedades_venda');
+      invalidateCacheByPrefix('propriedade_venda_');
       queryClient.invalidateQueries(['propriedades_venda']);
+      queryClient.invalidateQueries(['propriedade_venda']);
       queryClient.invalidateQueries(['admin-propriedades-venda']);
       queryClient.invalidateQueries(['admin-propriedade-venda']);
       queryClient.invalidateQueries(['dashboard-stats']);
