@@ -54,13 +54,21 @@ export const ImageGallery = ({ images, title }: ImageGalleryProps) => {
         {/* Main Image with Navigation */}
         <div className="relative group">
           <div 
-            className="relative overflow-hidden rounded-2xl cursor-pointer"
+            className="relative overflow-hidden rounded-2xl cursor-pointer h-[400px] lg:h-[500px] bg-slate-950 flex items-center justify-center"
             onClick={() => setLightboxOpen(true)}
           >
+            {/* Blurred background image to eliminate solid bars */}
+            <img
+              src={getOptimizedUrl(images[selectedIndex]?.url, 400)}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover blur-2xl opacity-40 scale-110 pointer-events-none"
+              aria-hidden="true"
+            />
+            {/* Main Foreground Image */}
             <img
               src={getOptimizedUrl(images[selectedIndex]?.url, 800)}
               alt={images[selectedIndex]?.alt_text || title || 'Imagem'}
-              className="w-full h-[400px] lg:h-[500px] object-contain bg-slate-900 transition-transform duration-500 group-hover:scale-102"
+              className="relative max-w-full max-h-full object-contain transition-transform duration-500 group-hover:scale-102 z-10"
               loading="eager"
               fetchPriority="high"
               onError={(e) => {

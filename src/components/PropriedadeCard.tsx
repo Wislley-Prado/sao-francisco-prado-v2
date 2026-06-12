@@ -106,8 +106,8 @@ const PropriedadeCard = ({ propriedade }: PropriedadeCardProps) => {
                 loading="lazy"
                 decoding="async"
                 width={400}
-                height={192}
-                className="h-48 w-full object-cover cursor-pointer"
+                height={225}
+                className="aspect-video w-full object-cover cursor-pointer"
                 onClick={() => setModalOpen(true)}
                 onError={(e) => {
                   const original = getOriginalUrl(propriedade.imagens[0]);
@@ -118,7 +118,7 @@ const PropriedadeCard = ({ propriedade }: PropriedadeCardProps) => {
               />
             ) : (
               <div 
-                className="h-48 bg-gradient-to-br from-rio-blue to-water-green cursor-pointer" 
+                className="aspect-video bg-gradient-to-br from-rio-blue to-water-green cursor-pointer" 
                 onClick={() => setModalOpen(true)}
               />
             )}

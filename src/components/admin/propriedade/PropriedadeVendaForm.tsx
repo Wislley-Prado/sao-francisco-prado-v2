@@ -135,10 +135,10 @@ export const PropriedadeVendaForm = ({ propriedade, onSuccess }: PropriedadeVend
     setIsUploading(true);
     try {
       const compressedFiles = await compressImages(files, {
-        maxWidth: 1920,
-        maxHeight: 1920,
-        quality: 0.85,
-        maxSizeMB: 1,
+        maxWidth: 1200,
+        maxHeight: 1200,
+        quality: 0.75,
+        maxSizeMB: 0.4,
       });
 
       const uploadedUrls: string[] = [];
