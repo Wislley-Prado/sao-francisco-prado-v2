@@ -214,6 +214,7 @@ const PropriedadeCard = ({ propriedade }: PropriedadeCardProps) => {
         </div>
       </CardContent>
     </Card>
+  );
 };
 
 export default PropriedadeCard;
