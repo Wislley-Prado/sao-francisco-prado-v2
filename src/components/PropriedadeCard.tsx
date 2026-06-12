@@ -235,12 +235,12 @@ const PropriedadeCard = ({ propriedade }: PropriedadeCardProps) => {
 
       {/* Modal de Detalhes da Propriedade */}
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 rounded-2xl border-0 shadow-2xl bg-white">
+        <DialogContent className="max-w-[95vw] md:max-w-4xl max-h-[90vh] overflow-y-auto p-0 rounded-2xl border-0 shadow-2xl bg-white">
           <div className="flex flex-col">
             {/* Header decorativo com imagem de capa/título */}
             <div className="p-6 bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white relative overflow-hidden">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(16,185,129,0.08),transparent_50%)]"></div>
-              <div className="relative flex justify-between items-start gap-4">
+              <div className="relative flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
                 <div>
                   <Badge className="bg-sunset-orange hover:bg-sunset-orange/95 text-white mb-2 uppercase text-xs font-semibold">
                     {propriedade.tipo || 'Oportunidade'}
@@ -253,7 +253,7 @@ const PropriedadeCard = ({ propriedade }: PropriedadeCardProps) => {
                     <span>{propriedade.localizacao}</span>
                   </div>
                 </div>
-                <div className="text-right shrink-0">
+                <div className="text-left sm:text-right shrink-0">
                   <div className="text-xs text-gray-400 font-medium">Valor de Venda</div>
                   <div className="text-2xl md:text-3xl font-extrabold text-emerald-400">
                     R$ {propriedade.preco.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -400,7 +400,7 @@ const PropriedadeCard = ({ propriedade }: PropriedadeCardProps) => {
                         const embedUrl = getYouTubeEmbedUrl(propriedade.video_youtube);
                         if (isShorts) {
                           return (
-                            <div className="relative w-full max-w-[220px] mx-auto" style={{ paddingBottom: '177.78%' /* 9:16 vertical */ }}>
+                            <div className="relative w-full max-w-[290px] sm:max-w-[340px] mx-auto" style={{ paddingBottom: '177.78%' /* 9:16 vertical */ }}>
                               <iframe
                                 src={embedUrl || ''}
                                 className="absolute top-0 left-0 w-full h-full border-0"

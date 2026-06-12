@@ -54,7 +54,7 @@ export const ImageGallery = ({ images, title }: ImageGalleryProps) => {
         {/* Main Image with Navigation */}
         <div className="relative group">
           <div 
-            className="relative overflow-hidden rounded-2xl cursor-pointer h-[400px] lg:h-[500px] bg-slate-950 flex items-center justify-center"
+            className="relative overflow-hidden rounded-2xl cursor-pointer h-[240px] sm:h-[350px] md:h-[400px] lg:h-[500px] bg-slate-950 flex items-center justify-center"
             onClick={() => setLightboxOpen(true)}
           >
             {/* Blurred background image to eliminate solid bars */}
