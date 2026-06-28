@@ -126,6 +126,7 @@ export interface SiteSettings {
   facebook_pixel?: string;
   google_analytics?: string;
   google_tag_manager?: string;
+  custom_head_scripts?: string;
   whatsapp_numero?: string;
   whatsapp_titulo?: string;
   whatsapp_mensagem_padrao?: string;

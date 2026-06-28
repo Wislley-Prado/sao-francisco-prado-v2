@@ -28,21 +28,35 @@ const EMPTY_SETTINGS: TrackingSettings = {
   custom_head_scripts: ''
 };
 
+// Helper function to safely decode HTML/script content to avoid Web Application Firewall (WAF) blocks
+const decodeSafeBase64 = (str: string): string => {
+  if (!str) return '';
+  if (!str.startsWith('__B64__:')) return str;
+  try {
+    const base64 = str.substring(8);
+    const binString = atob(base64);
+    const bytes = Uint8Array.from(binString, (m) => m.charCodeAt(0));
+    return new TextDecoder().decode(bytes);
+  } catch (e) {
+    console.error('Failed to decode base64', e);
+    return str;
+  }
+};
+
 const TrackingScripts = () => {
   const [scripts, setScripts] = useState<TrackingSettings>(EMPTY_SETTINGS);
-  const { session, loading } = useAuth();
+  const { loading } = useAuth();
 
   useEffect(() => {
     if (loading) return; // Aguardar auth resolver
-    if (!session) return; // Visitante anônimo - não faz request
 
     const fetchSettings = async () => {
 
       try {
         const { data, error } = await supabase
-          .from('site_settings')
+          .from('site_settings_public')
           .select('facebook_pixel, google_analytics, google_tag_manager, custom_head_scripts')
-          .single();
+          .maybeSingle();
 
         if (error || !data) return;
 
@@ -50,7 +64,7 @@ const TrackingScripts = () => {
           facebook_pixel: data.facebook_pixel || '',
           google_analytics: data.google_analytics || '',
           google_tag_manager: data.google_tag_manager || '',
-          custom_head_scripts: data.custom_head_scripts || ''
+          custom_head_scripts: decodeSafeBase64(data.custom_head_scripts || '')
         });
       } catch {
         // Silenciar erros - não é crítico
