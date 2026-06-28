@@ -195,8 +195,16 @@ const Configuracoes = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
+      const {
+        packages_hero_url,
+        blog_hero_url,
+        ranchos_hero_url,
+        vendas_hero_url,
+        ...allowedSettings
+      } = settings;
+
       const settingsToSave = {
-        ...settings,
+        ...allowedSettings,
         custom_head_scripts: encodeSafeBase64(settings.custom_head_scripts)
       };
 
