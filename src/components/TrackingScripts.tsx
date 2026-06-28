@@ -72,7 +72,7 @@ const TrackingScripts = () => {
     };
 
     fetchSettings();
-  }, [session, loading]);
+  }, [loading]);
 
   useEffect(() => {
     // Facebook Pixel
