@@ -27,6 +27,9 @@ if ($slug) {
     
     $ch = curl_init($endpoint);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
         'apikey: ' . $supabaseKey,
         'Authorization: Bearer ' . $supabaseKey
@@ -34,6 +37,7 @@ if ($slug) {
     
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlError = curl_error($ch);
     curl_close($ch);
     
     if ($httpCode == 200 && $response) {
@@ -71,6 +75,15 @@ if ($slug) {
     <meta name="twitter:title" content="<?php echo htmlspecialchars($title); ?>">
     <meta name="twitter:description" content="<?php echo htmlspecialchars($description); ?>">
     <meta name="twitter:image" content="<?php echo htmlspecialchars($image); ?>">
+
+    <!-- 
+      Debug Info:
+      Slug: <?php echo htmlspecialchars($slug ?? 'Nenhum'); ?>
+      Endpoint: <?php echo htmlspecialchars($endpoint ?? 'Nenhum'); ?>
+      HTTP Code: <?php echo htmlspecialchars($httpCode ?? 'Nenhum'); ?>
+      Curl Error: <?php echo htmlspecialchars($curlError ?? 'Nenhum'); ?>
+      Response: <?php echo htmlspecialchars($response ?? 'Nenhum'); ?>
+    -->
 </head>
 <body>
     <script>
