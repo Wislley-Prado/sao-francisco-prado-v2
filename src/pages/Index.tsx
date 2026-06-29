@@ -72,7 +72,7 @@ const Index = () => {
         </Suspense>
       </LazySection>
 
-      <LazySection fallback={<SectionSkeleton />} rootMargin="200px">
+      <LazySection fallback={<SectionSkeleton />} rootMargin="200px" id="calendario-lunar">
         <Suspense fallback={<SectionSkeleton />}>
           <LunarCalendar />
         </Suspense>

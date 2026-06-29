@@ -79,7 +79,13 @@ const HeroSection = () => {
             <div className="grid grid-cols-3 gap-3 sm:gap-4 pt-6 sm:pt-8">
               <button
                 type="button"
-                onClick={() => navigate('/live')}
+                onClick={() => {
+                  setShowVideo(true);
+                  const el = document.getElementById('live-video-card');
+                  if (el) {
+                    el.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
                 className="text-center group cursor-pointer"
                 aria-label="Ir para Transmissão Ao Vivo"
               >
@@ -114,7 +120,7 @@ const HeroSection = () => {
           </div>
 
           <div className="animate-fade-in order-1 lg:order-2">
-            <Card className="bg-white bg-opacity-10 backdrop-blur-md border-white border-opacity-20">
+            <Card id="live-video-card" className="bg-white bg-opacity-10 backdrop-blur-md border-white border-opacity-20">
               <CardContent className="p-4 sm:p-6">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
