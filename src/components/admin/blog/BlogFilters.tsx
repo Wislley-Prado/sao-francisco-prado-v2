@@ -53,10 +53,28 @@ export const BlogFilters = ({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Todas as Categorias</SelectItem>
-            <SelectItem value="dicas">Dicas de Pesca</SelectItem>
-            <SelectItem value="noticias">Notícias</SelectItem>
-            <SelectItem value="especies">Espécies</SelectItem>
-            <SelectItem value="equipamentos">Equipamentos</SelectItem>
+            <SelectItem value="Barcos">Barcos</SelectItem>
+            <SelectItem value="Cachoeiras">Cachoeiras</SelectItem>
+            <SelectItem value="Camping">Camping</SelectItem>
+            <SelectItem value="Ecoturismo">Ecoturismo</SelectItem>
+            <SelectItem value="Eventos">Eventos</SelectItem>
+            <SelectItem value="Fauna">Fauna</SelectItem>
+            <SelectItem value="Flora">Flora</SelectItem>
+            <SelectItem value="Guias">Guias</SelectItem>
+            <SelectItem value="História">História</SelectItem>
+            <SelectItem value="Hotéis">Hotéis</SelectItem>
+            <SelectItem value="Lanchas">Lanchas</SelectItem>
+            <SelectItem value="Mapas">Mapas</SelectItem>
+            <SelectItem value="Marinas">Marinas</SelectItem>
+            <SelectItem value="Notícias">Notícias</SelectItem>
+            <SelectItem value="Passeios">Passeios</SelectItem>
+            <SelectItem value="Pesca Esportiva">Pesca Esportiva</SelectItem>
+            <SelectItem value="Pousadas">Pousadas</SelectItem>
+            <SelectItem value="Praias">Praias</SelectItem>
+            <SelectItem value="Ranchos">Ranchos</SelectItem>
+            <SelectItem value="Represa de Três Marias">Represa de Três Marias</SelectItem>
+            <SelectItem value="Restaurantes">Restaurantes</SelectItem>
+            <SelectItem value="Rio São Francisco">Rio São Francisco</SelectItem>
           </SelectContent>
         </Select>
 
