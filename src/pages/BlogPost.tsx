@@ -45,7 +45,10 @@ const BlogPost = () => {
   // Sanitize HTML content
   const sanitizedContent = React.useMemo(() => {
     if (!post?.conteudo) return '';
-    return DOMPurify.sanitize(post.conteudo);
+    return DOMPurify.sanitize(post.conteudo, {
+      ADD_TAGS: ['iframe'],
+      ADD_ATTR: ['src', 'width', 'height', 'frameborder', 'allow', 'allowfullscreen', 'class', 'style'],
+    });
   }, [post?.conteudo]);
 
   if (isLoading) {

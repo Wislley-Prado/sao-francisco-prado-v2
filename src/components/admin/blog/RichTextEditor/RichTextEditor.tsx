@@ -3,6 +3,7 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
+import { Youtube } from './YoutubeExtension';
 import Placeholder from '@tiptap/extension-placeholder';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -33,6 +34,7 @@ const RichTextEditorComponent = ({ value, onChange, placeholder }: RichTextEdito
           class: 'max-w-full h-auto rounded-lg',
         },
       }),
+      Youtube,
       Placeholder.configure({
         placeholder: placeholder || 'Escreva o conteúdo do post...',
       }),

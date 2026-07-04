@@ -12,6 +12,7 @@ import {
   Undo,
   Redo,
   Quote,
+  Youtube,
 } from 'lucide-react';
 import type { Editor } from '@tiptap/react';
 
@@ -99,6 +100,19 @@ export const TOOLBAR_ACTIONS: ToolbarButton[] = [
       const url = window.prompt('Digite a URL da imagem:');
       if (url) {
         editor.chain().focus().setImage({ src: url }).run();
+      }
+    },
+  },
+  {
+    icon: Youtube,
+    title: 'Adicionar Vídeo do YouTube',
+    action: (editor) => {
+      const url = window.prompt('Digite a URL do vídeo do YouTube:');
+      if (url) {
+        // @ts-ignore - The extension extends Editor commands dynamically
+        editor.commands.setYoutubeVideo({
+          src: url,
+        });
       }
     },
   },
