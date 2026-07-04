@@ -562,7 +562,7 @@ const Ajuda = () => {
                   <li>Negrito, itálico, sublinhado</li>
                   <li>Títulos (H1, H2, H3)</li>
                   <li>Listas numeradas e com marcadores</li>
-                  <li>Links e imagens</li>
+                  <li>Links, imagens, vídeos do YouTube e mapas do Google Maps</li>
                   <li>Citações e código</li>
                 </ul>
               </li>
@@ -571,6 +571,16 @@ const Ajuda = () => {
               <li>Upload de imagem de destaque (capa)</li>
               <li>Configure data de publicação ou agende</li>
             </ol>
+          </div>
+
+          <div className="space-y-2">
+            <h4 className="font-semibold flex items-center gap-2">
+              <Play className="w-4 h-4" /> Vídeos e Mapas no Post:
+            </h4>
+            <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+              <li><strong>Vídeo do YouTube:</strong> Clique no ícone do YouTube no editor e cole a URL do vídeo (ex: <code>https://www.youtube.com/watch?v=...</code> ou <code>https://youtu.be/...</code>).</li>
+              <li><strong>Localização (Google Maps):</strong> Clique no ícone de alfinete (MapPin) no editor. No Google Maps, clique em "Compartilhar", selecione a aba "Incorporar um mapa", clique em "Copiar HTML", cole o código copiado no prompt do editor e confirme.</li>
+            </ul>
           </div>
 
           <div className="space-y-2">
