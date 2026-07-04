@@ -68,12 +68,26 @@ const Blog = () => {
     },
   });
 
-  // Get unique categories
+  // Fetch all unique categories from published posts
+  const { data: allCategoriesData } = useQuery({
+    queryKey: ['blog-categories-list'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .select('categoria')
+        .eq('publicado', true);
+      
+      if (error) throw error;
+      return data;
+    }
+  });
+
+  // Get unique categories list sorted
   const categories = React.useMemo(() => {
-    if (!posts) return [];
-    const cats = new Set(posts.map(p => p.categoria).filter(Boolean));
-    return Array.from(cats);
-  }, [posts]);
+    if (!allCategoriesData) return [];
+    const cats = new Set(allCategoriesData.map(p => p.categoria).filter(Boolean));
+    return Array.from(cats).sort();
+  }, [allCategoriesData]);
 
   // Pagination
   const totalPages = Math.ceil((posts?.length || 0) / POSTS_PER_PAGE);
