@@ -13,6 +13,7 @@ import {
   Redo,
   Quote,
   Youtube,
+  MapPin,
 } from 'lucide-react';
 import type { Editor } from '@tiptap/react';
 
@@ -112,6 +113,23 @@ export const TOOLBAR_ACTIONS: ToolbarButton[] = [
         // @ts-ignore - The extension extends Editor commands dynamically
         editor.commands.setYoutubeVideo({
           src: url,
+        });
+      }
+    },
+  },
+  {
+    icon: MapPin,
+    title: 'Adicionar Mapa (Google Maps)',
+    action: (editor) => {
+      const input = window.prompt('Cole o código de incorporação (iframe) ou link do Google Maps:');
+      if (input) {
+        // Extract src URL from iframe tag if pasted
+        const match = input.match(/src=["']([^"']+)["']/);
+        const src = match ? match[1] : input;
+
+        // @ts-ignore - The extension extends Editor commands dynamically
+        editor.commands.setIframe({
+          src: src,
         });
       }
     },
