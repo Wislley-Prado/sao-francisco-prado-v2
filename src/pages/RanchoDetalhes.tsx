@@ -481,7 +481,7 @@ const RanchoDetalhes = () => {
                     <div className="text-3xl font-bold text-foreground">
                       R$ {rancho.preco.toFixed(2)}
                     </div>
-                    <div className="text-muted-foreground">por dia</div>
+                    <div className="text-muted-foreground">por dia por pessoa</div>
                   </div>
 
                   <Separator />

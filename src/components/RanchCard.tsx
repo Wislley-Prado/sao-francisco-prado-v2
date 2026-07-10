@@ -139,7 +139,7 @@ const RanchCard = ({ ranch }: RanchCardProps) => {
           <div className="flex justify-between items-center">
             <div>
               <div className="text-2xl font-bold text-rio-blue">R$ {ranch.price.toFixed(2)}</div>
-              <div className="text-xs text-gray-500">por dia</div>
+              <div className="text-xs text-gray-500">por dia por pessoa</div>
             </div>
           </div>
           {ranch.slug && (
