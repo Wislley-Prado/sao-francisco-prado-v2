@@ -48,6 +48,7 @@ const BlogPost = () => {
     return DOMPurify.sanitize(post.conteudo, {
       ADD_TAGS: ['iframe'],
       ADD_ATTR: ['src', 'width', 'height', 'frameborder', 'allow', 'allowfullscreen', 'class', 'style'],
+      ALLOW_DATA_ATTR: true,
     });
   }, [post?.conteudo]);
 

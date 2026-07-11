@@ -578,7 +578,7 @@ const Ajuda = () => {
               <Play className="w-4 h-4" /> Vídeos, Mapas e Instagram no Post:
             </h4>
             <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
-              <li><strong>Vídeo do YouTube:</strong> Clique no ícone do YouTube no editor e cole a URL do vídeo (ex: <code>https://www.youtube.com/watch?v=...</code> ou <code>https://youtu.be/...</code>).</li>
+              <li><strong>Vídeo / Shorts do YouTube:</strong> Clique no ícone do YouTube no editor e cole a URL do vídeo ou Shorts (ex: <code>https://www.youtube.com/watch?v=...</code> ou <code>https://www.youtube.com/shorts/...</code>). Se for Shorts, o sistema ajusta o player para formato vertical automaticamente.</li>
               <li><strong>Localização (Google Maps):</strong> Clique no ícone de alfinete (MapPin) no editor. No Google Maps, clique em "Compartilhar", selecione a aba "Incorporar um mapa", clique em "Copiar HTML", cole o código copiado no prompt do editor e confirme.</li>
               <li><strong>Post / Reel do Instagram:</strong> Clique no ícone do Instagram no editor e cole a URL do post ou Reel (ex: <code>https://www.instagram.com/reel/...</code> ou <code>https://www.instagram.com/p/...</code>). O sistema ajustará a exibição vertical automaticamente.</li>
             </ul>

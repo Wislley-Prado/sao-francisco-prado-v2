@@ -12,6 +12,16 @@ export const Youtube = Node.create({
       src: {
         default: null,
       },
+      isShort: {
+        default: false,
+        parseHTML: (element) => element.hasAttribute('data-youtube-short'),
+        renderHTML: (attributes) => {
+          if (attributes.isShort) {
+            return { 'data-youtube-short': '' };
+          }
+          return {};
+        },
+      },
     };
   },
 
@@ -19,20 +29,31 @@ export const Youtube = Node.create({
     return [
       {
         tag: 'div[data-youtube-video] iframe',
-        getAttrs: (node) => ({
-          src: (node as HTMLElement).getAttribute('src'),
-        }),
+        getAttrs: (node) => {
+          const iframe = node as HTMLElement;
+          const parent = iframe.parentElement;
+          return {
+            src: iframe.getAttribute('src'),
+            isShort: parent ? parent.hasAttribute('data-youtube-short') : false,
+          };
+        },
       },
       {
         tag: 'iframe[src*="youtube.com"]',
-        getAttrs: (node) => ({
-          src: (node as HTMLElement).getAttribute('src'),
-        }),
+        getAttrs: (node) => {
+          const iframe = node as HTMLElement;
+          const src = iframe.getAttribute('src') || '';
+          return {
+            src,
+            isShort: src.includes('/shorts/'),
+          };
+        },
       },
       {
         tag: 'iframe[src*="youtu.be"]',
         getAttrs: (node) => ({
           src: (node as HTMLElement).getAttribute('src'),
+          isShort: false,
         }),
       },
     ];
@@ -40,8 +61,16 @@ export const Youtube = Node.create({
 
   renderHTML({ HTMLAttributes }) {
     let src = HTMLAttributes.src || '';
+    let isShort = HTMLAttributes.isShort || false;
+
     // Normalize YouTube URL to embed format if needed
-    if (src.includes('watch?v=')) {
+    if (src.includes('/shorts/')) {
+      const videoId = src.split('/shorts/')[1]?.split('?')[0];
+      if (videoId) {
+        src = `https://www.youtube.com/embed/${videoId}`;
+        isShort = true;
+      }
+    } else if (src.includes('watch?v=')) {
       const videoId = src.split('v=')[1]?.split('&')[0];
       if (videoId) {
         src = `https://www.youtube.com/embed/${videoId}`;
@@ -51,6 +80,29 @@ export const Youtube = Node.create({
       if (videoId) {
         src = `https://www.youtube.com/embed/${videoId}`;
       }
+    }
+
+    if (isShort) {
+      return [
+        'div',
+        {
+          'data-youtube-video': '',
+          'data-youtube-short': '',
+          class: 'w-full max-w-[400px] mx-auto my-6 overflow-hidden rounded-lg border border-muted shadow-sm aspect-[9/16] bg-background',
+        },
+        [
+          'iframe',
+          {
+            src: src,
+            width: '100%',
+            height: '100%',
+            allowfullscreen: 'true',
+            frameborder: '0',
+            allow: 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture',
+            style: 'width: 100%; height: 100%; border: none; min-height: 500px;',
+          },
+        ],
+      ];
     }
 
     return [
@@ -80,8 +132,16 @@ export const Youtube = Node.create({
         (options: { src: string }) =>
         ({ commands }) => {
           let src = options.src;
+          let isShort = false;
+
           // Normalize YouTube URL to embed format if needed
-          if (src.includes('watch?v=')) {
+          if (src.includes('/shorts/')) {
+            const videoId = src.split('/shorts/')[1]?.split('?')[0];
+            if (videoId) {
+              src = `https://www.youtube.com/embed/${videoId}`;
+              isShort = true;
+            }
+          } else if (src.includes('watch?v=')) {
             const videoId = src.split('v=')[1]?.split('&')[0];
             if (videoId) {
               src = `https://www.youtube.com/embed/${videoId}`;
@@ -95,7 +155,7 @@ export const Youtube = Node.create({
 
           return commands.insertContent({
             type: this.name,
-            attrs: { src },
+            attrs: { src, isShort },
           });
         },
     };
