@@ -14,6 +14,7 @@ import {
   Quote,
   Youtube,
   MapPin,
+  Instagram,
 } from 'lucide-react';
 import type { Editor } from '@tiptap/react';
 
@@ -130,6 +131,19 @@ export const TOOLBAR_ACTIONS: ToolbarButton[] = [
         // @ts-ignore - The extension extends Editor commands dynamically
         editor.commands.setIframe({
           src: src,
+        });
+      }
+    },
+  },
+  {
+    icon: Instagram,
+    title: 'Adicionar Instagram',
+    action: (editor) => {
+      const url = window.prompt('Digite a URL do post ou Reel do Instagram:');
+      if (url) {
+        // @ts-ignore - The extension extends Editor commands dynamically
+        editor.commands.setInstagramPost({
+          src: url,
         });
       }
     },
