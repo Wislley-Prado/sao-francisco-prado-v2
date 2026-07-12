@@ -165,7 +165,7 @@ const PropriedadesVenda = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Cadastrado</CardTitle>
@@ -185,19 +185,6 @@ const PropriedadesVenda = () => {
           <CardContent>
             <div className="text-2xl font-bold text-emerald-600">{stats.ativos}</div>
             <p className="text-xs text-muted-foreground">visíveis para os visitantes</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Valor Médio</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              R$ {stats.valorMedio.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}
-            </div>
-            <p className="text-xs text-muted-foreground">média aritmética dos preços</p>
           </CardContent>
         </Card>
       </div>
