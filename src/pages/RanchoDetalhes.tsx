@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import DOMPurify from 'dompurify';
 import { toast } from 'sonner';
@@ -15,14 +15,16 @@ import {
   MapPin, Users, Bed, Bath, Maximize, Star,
   Wifi, Car, Waves, Utensils, Wind, Tv,
   ArrowLeft, MessageCircle, Loader2, CheckCircle,
-  Calendar, Play, CalendarDays, Navigation, Compass, ExternalLink, Copy
+  Calendar, Play, CalendarDays, Navigation, Compass, ExternalLink, Copy,
+  ArrowRight
 } from 'lucide-react';
 import { ReviewsList } from "@/components/reviews/ReviewsList";
 import { ReviewForm } from "@/components/reviews/ReviewForm";
 import { useRanchoAnalytics, registrarEvento } from "@/hooks/useRanchoAnalytics";
 import { RanchoFAQs } from '@/components/RanchoFAQs';
-import { useRanchoBySlug } from '@/hooks/useOptimizedData';
+import { useRanchoBySlug, useRanchos } from '@/hooks/useOptimizedData';
 import { ShareButtons } from '@/components/ShareButtons';
+import RanchCard from '@/components/RanchCard';
 import { SITE_CONFIG } from '@/lib/constants';
 import { invalidateCache } from '@/lib/cacheService';
 
@@ -88,6 +90,43 @@ const RanchoDetalhes = () => {
       })),
     };
   }, [ranchoData]);
+
+  // Fetch active ranchos to suggest similar ones
+  const { data: allRanchosData } = useRanchos(true);
+
+  // Transform and filter out current rancho
+  const suggestedRanchos = React.useMemo(() => {
+    if (!allRanchosData || !rancho) return [];
+    
+    // Filter out current rancho
+    const filtered = allRanchosData.filter(r => r.id !== rancho.id);
+
+    // Map to the format RanchCard expects
+    return filtered.slice(0, 3).map(ranchoItem => ({
+      id: ranchoItem.id,
+      name: ranchoItem.nome,
+      slug: ranchoItem.slug,
+      description: ranchoItem.descricao || '',
+      location: ranchoItem.localizacao,
+      capacity: ranchoItem.capacidade,
+      price: ranchoItem.preco,
+      rating: ranchoItem.rating,
+      images: [...ranchoItem.imagens]
+        .sort((a, b) => {
+          if (a.principal && !b.principal) return -1;
+          if (!a.principal && b.principal) return 1;
+          return a.ordem - b.ordem;
+        })
+        .map(img => img.url),
+      amenities: ranchoItem.comodidades,
+      available: ranchoItem.disponivel,
+      features: {
+        bedrooms: ranchoItem.quartos,
+        bathrooms: ranchoItem.banheiros,
+        area: ranchoItem.area ? `${ranchoItem.area}m²` : '0m²'
+      }
+    }));
+  }, [allRanchosData, rancho]);
 
   const whatsappNumber = rancho?.telefone_whatsapp || "5531999999999";
 
@@ -663,6 +702,41 @@ const RanchoDetalhes = () => {
                 <RanchoFAQs ranchoId={rancho.id} />
               </CardContent>
             </Card>
+          </div>
+        </section>
+      )}
+
+      {/* Seção de Ranchos Sugeridos (Outros Ranchos para Locação) */}
+      {suggestedRanchos.length > 0 && (
+        <section className="py-16 bg-background">
+          <div className="container max-w-7xl mx-auto px-4">
+            <div className="flex justify-between items-end mb-8">
+              <div>
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground">Outros Ranchos para Locação</h2>
+                <p className="text-sm text-muted-foreground mt-1">Conheça outras excelentes opções no Rio São Francisco</p>
+              </div>
+              <Button variant="outline" asChild className="hidden sm:inline-flex border-rio-blue text-rio-blue hover:bg-rio-blue hover:text-white rounded-xl">
+                <Link to="/ranchos">
+                  Ver Todos
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {suggestedRanchos.map((item) => (
+                <RanchCard key={item.id} ranch={item} />
+              ))}
+            </div>
+
+            <div className="mt-8 text-center sm:hidden">
+              <Button variant="outline" asChild className="w-full border-rio-blue text-rio-blue hover:bg-rio-blue hover:text-white rounded-xl">
+                <Link to="/ranchos">
+                  Ver Todos os Ranchos
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
           </div>
         </section>
       )}
