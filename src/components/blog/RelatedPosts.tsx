@@ -19,11 +19,11 @@ const RelatedPosts = ({ currentPostId, categoria, tags }: RelatedPostsProps) => 
     queryFn: async () => {
       let query = supabase
         .from('blog_posts')
-        .select('id, titulo, slug, resumo, imagem_destaque, categoria, data_publicacao, created_at, visualizacoes')
+        .select('id, titulo, slug, resumo, imagem_destaque, categoria, data_publicacao, created_at, visualizacoes, tags')
         .eq('publicado', true)
         .neq('id', currentPostId)
         .order('data_publicacao', { ascending: false })
-        .limit(6);
+        .limit(10); // Fetch a slightly larger pool to find good matches
 
       // Filter by category if available
       if (categoria) {
@@ -34,16 +34,20 @@ const RelatedPosts = ({ currentPostId, categoria, tags }: RelatedPostsProps) => 
 
       if (error) throw error;
 
-      // If we have tags, sort by relevance (posts with matching tags first)
-      if (tags && tags.length > 0 && data) {
-        return data.sort((a, b) => {
-          const aMatchingTags = ((a as unknown) as { tags?: string[] }).tags?.filter((tag: string) => tags.includes(tag)).length || 0;
-          const bMatchingTags = ((b as unknown) as { tags?: string[] }).tags?.filter((tag: string) => tags.includes(tag)).length || 0;
+      // Sort by relevance (number of matching tags)
+      if (data) {
+        const sortedData = [...data].sort((a, b) => {
+          if (!tags || tags.length === 0) return 0;
+          const aMatchingTags = a.tags?.filter((tag: string) => tags.includes(tag)).length || 0;
+          const bMatchingTags = b.tags?.filter((tag: string) => tags.includes(tag)).length || 0;
           return bMatchingTags - aMatchingTags;
-        }).slice(0, 6);
+        });
+        
+        // Return up to 3 posts for a single clean row
+        return sortedData.slice(0, 3);
       }
 
-      return data;
+      return [];
     },
   });
 

@@ -17,7 +17,6 @@ import { SocialShareButtons } from '@/components/blog/SocialShareButtons';
 import { AutoShareButtons } from '@/components/blog/AutoShareButtons';
 import { PaidMediaBannerDisplay } from '@/components/blog/PaidMediaBannerDisplay';
 import RelatedPosts from '@/components/blog/RelatedPosts';
-import RecentPostsCarousel from '@/components/blog/RecentPostsCarousel';
 import { SITE_CONFIG } from '@/lib/constants';
 
 const BlogPost = () => {
@@ -231,9 +230,6 @@ const BlogPost = () => {
           tags={post.tags}
         />
       </main>
-
-      {/* Recent Posts Carousel */}
-      <RecentPostsCarousel currentPostId={post.id} />
 
       <Footer />
     </div>
