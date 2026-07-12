@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { toast } from 'sonner';
 import Header from '@/components/Header';
@@ -13,10 +13,12 @@ import { Input } from '@/components/ui/input';
 import { 
   MapPin, Maximize, MessageSquare, Waves, Zap, 
   Droplets, Compass, Play, Navigation, 
-  ExternalLink, Copy, CheckCircle, ArrowLeft, Loader2
+  ExternalLink, Copy, CheckCircle, ArrowLeft, Loader2,
+  ArrowRight
 } from 'lucide-react';
-import { usePropriedadeVendaBySlug, useSiteSettings } from '@/hooks/useOptimizedData';
+import { usePropriedadeVendaBySlug, useSiteSettings, usePropriedadesVenda } from '@/hooks/useOptimizedData';
 import { ShareButtons } from '@/components/ShareButtons';
+import PropriedadeCard from '@/components/PropriedadeCard';
 import { SITE_CONFIG } from '@/lib/constants';
 
 // Mapping common characteristics to icons
@@ -59,6 +61,17 @@ const PropriedadeDetalhes = () => {
 
   const { data: propriedade, isLoading: loading } = usePropriedadeVendaBySlug(slug);
   const { data: siteSettings } = useSiteSettings();
+
+  // Fetch active sales properties to suggest similar ones
+  const { data: allPropriedades } = usePropriedadesVenda(true);
+
+  // Filter out current property and take up to 3 items
+  const suggestedPropriedades = React.useMemo(() => {
+    if (!allPropriedades || !propriedade) return [];
+    return allPropriedades
+      .filter((p) => p.id !== propriedade.id)
+      .slice(0, 3);
+  }, [allPropriedades, propriedade]);
 
   // Redirect if not found
   useEffect(() => {
@@ -403,6 +416,39 @@ const PropriedadeDetalhes = () => {
               descricao={`Excelente oportunidade: ${propriedade.titulo} em ${propriedade.localizacao} - PradoAqui`}
             />
           </div>
+
+          {/* Outras Oportunidades Section */}
+          {suggestedPropriedades.length > 0 && (
+            <div className="mt-16 pt-12 border-t border-border/50">
+              <div className="flex justify-between items-end mb-8">
+                <div>
+                  <h2 className="text-2xl sm:text-3xl font-bold text-foreground">Outras Oportunidades à Venda</h2>
+                  <p className="text-muted-foreground text-sm mt-1">Imóveis similares na região do Rio São Francisco</p>
+                </div>
+                <Button variant="outline" asChild className="hidden sm:inline-flex border-rio-blue text-rio-blue hover:bg-rio-blue hover:text-white rounded-xl">
+                  <Link to="/vendas">
+                    Ver Todas
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {suggestedPropriedades.map((item) => (
+                  <PropriedadeCard key={item.id} propriedade={item} />
+                ))}
+              </div>
+
+              <div className="mt-8 text-center sm:hidden">
+                <Button variant="outline" asChild className="w-full border-rio-blue text-rio-blue hover:bg-rio-blue hover:text-white rounded-xl">
+                  <Link to="/vendas">
+                    Ver Todas as Oportunidades
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </main>
 
