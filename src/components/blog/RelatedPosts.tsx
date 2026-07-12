@@ -17,37 +17,60 @@ const RelatedPosts = ({ currentPostId, categoria, tags }: RelatedPostsProps) => 
   const { data: posts, isLoading } = useQuery({
     queryKey: ['related-posts', currentPostId, categoria, tags],
     queryFn: async () => {
+      // 1. Fetch posts of the same category (excluding current post)
       let query = supabase
         .from('blog_posts')
         .select('id, titulo, slug, resumo, imagem_destaque, categoria, data_publicacao, created_at, visualizacoes, tags')
         .eq('publicado', true)
         .neq('id', currentPostId)
         .order('data_publicacao', { ascending: false })
-        .limit(10); // Fetch a slightly larger pool to find good matches
+        .limit(10); // Fetch a slightly larger pool to sort
 
-      // Filter by category if available
       if (categoria) {
         query = query.eq('categoria', categoria);
       }
 
       const { data, error } = await query;
-
       if (error) throw error;
 
-      // Sort by relevance (number of matching tags)
-      if (data) {
-        const sortedData = [...data].sort((a, b) => {
-          if (!tags || tags.length === 0) return 0;
+      let finalPosts = data || [];
+
+      // Sort by tag relevance if there are tags
+      if (finalPosts.length > 0 && tags && tags.length > 0) {
+        finalPosts = [...finalPosts].sort((a, b) => {
           const aMatchingTags = a.tags?.filter((tag: string) => tags.includes(tag)).length || 0;
           const bMatchingTags = b.tags?.filter((tag: string) => tags.includes(tag)).length || 0;
           return bMatchingTags - aMatchingTags;
         });
-        
-        // Return up to 3 posts for a single clean row
-        return sortedData.slice(0, 3);
       }
 
-      return [];
+      // Slice to maximum of 3 items initially
+      finalPosts = finalPosts.slice(0, 3);
+
+      // 2. If we have less than 3 posts, fill the list with latest general posts from other categories
+      if (finalPosts.length < 3) {
+        const excludeIds = [currentPostId, ...finalPosts.map(p => p.id)];
+        
+        let fallbackQuery = supabase
+          .from('blog_posts')
+          .select('id, titulo, slug, resumo, imagem_destaque, categoria, data_publicacao, created_at, visualizacoes, tags')
+          .eq('publicado', true)
+          .order('data_publicacao', { ascending: false })
+          .limit(3 - finalPosts.length);
+
+        if (excludeIds.length > 0) {
+          fallbackQuery = fallbackQuery.not('id', 'in', `(${excludeIds.join(',')})`);
+        }
+
+        const { data: fallbackPosts, error: fallbackError } = await fallbackQuery;
+        if (fallbackError) throw fallbackError;
+
+        if (fallbackPosts) {
+          finalPosts = [...finalPosts, ...fallbackPosts];
+        }
+      }
+
+      return finalPosts.slice(0, 3);
     },
   });
 
