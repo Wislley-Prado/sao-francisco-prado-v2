@@ -58,9 +58,10 @@ const RelatedPosts = ({ currentPostId, categoria, tags }: RelatedPostsProps) => 
           .order('data_publicacao', { ascending: false })
           .limit(3 - finalPosts.length);
 
-        if (excludeIds.length > 0) {
-          fallbackQuery = fallbackQuery.not('id', 'in', `(${excludeIds.join(',')})`);
-        }
+        // Apply individual inequality filters to completely exclude matching posts
+        excludeIds.forEach(id => {
+          fallbackQuery = fallbackQuery.neq('id', id);
+        });
 
         const { data: fallbackPosts, error: fallbackError } = await fallbackQuery;
         if (fallbackError) throw fallbackError;
