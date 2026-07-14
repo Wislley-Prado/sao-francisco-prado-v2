@@ -14,11 +14,15 @@ const BlogNovo = () => {
     try {
       const { error } = await supabase.from('blog_posts').insert({
         titulo: data.titulo,
+        titulo_en: data.titulo_en || null,
         slug: data.slug,
         categoria: data.categoria || null,
+        categoria_en: data.categoria_en || null,
         tags: data.tags || null,
         resumo: data.resumo || null,
+        resumo_en: data.resumo_en || null,
         conteudo: data.conteudo,
+        conteudo_en: data.conteudo_en || null,
         imagem_destaque: data.imagem_destaque || null,
         publicado: data.publicado,
         data_publicacao: data.data_publicacao?.toISOString() || null,

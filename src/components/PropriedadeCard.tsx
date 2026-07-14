@@ -12,13 +12,20 @@ import { getOptimizedUrl, getOriginalUrl } from '@/lib/imageUtils';
 import { useSiteSettings, PropriedadeVenda } from '@/hooks/useOptimizedData';
 import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 interface PropriedadeCardProps {
   propriedade: PropriedadeVenda;
 }
 
 const PropriedadeCard = ({ propriedade }: PropriedadeCardProps) => {
+  const { t, i18n } = useTranslation();
+  const isEn = i18n.language.startsWith('en');
   const { data: siteSettings } = useSiteSettings();
+
+  const titulo = (isEn && propriedade.titulo_en) ? propriedade.titulo_en : propriedade.titulo;
+  const descricao = (isEn && propriedade.descricao_en) ? propriedade.descricao_en : propriedade.descricao;
+  const localizacao = (isEn && propriedade.localizacao_en) ? propriedade.localizacao_en : propriedade.localizacao;
 
   const defaultNumber = siteSettings?.whatsapp_numero || "5538988320108";
   const rawPhone = propriedade.whatsapp_contato || propriedade.telefone_contato || defaultNumber;
@@ -28,11 +35,13 @@ const PropriedadeCard = ({ propriedade }: PropriedadeCardProps) => {
   const message = React.useMemo(() => {
     if (propriedade.mensagem_whatsapp) {
       return propriedade.mensagem_whatsapp
-        .replace(/{titulo}/g, propriedade.titulo)
-        .replace(/{localizacao}/g, propriedade.localizacao);
+        .replace(/{titulo}/g, titulo)
+        .replace(/{localizacao}/g, localizacao);
     }
-    return `Olá! Vi o anúncio da propriedade "${propriedade.titulo}" em "${propriedade.localizacao}" no site PradoAqui e gostaria de saber mais informações.`;
-  }, [propriedade.mensagem_whatsapp, propriedade.titulo, propriedade.localizacao]);
+    return isEn 
+      ? `Hello! I saw the property "${titulo}" listing in "${localizacao}" on the PradoAqui site and would like more information.`
+      : `Olá! Vi o anúncio da propriedade "${titulo}" em "${localizacao}" no site PradoAqui e gostaria de saber mais informações.`;
+  }, [propriedade.mensagem_whatsapp, titulo, localizacao, isEn]);
 
   const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 
@@ -87,7 +96,7 @@ const PropriedadeCard = ({ propriedade }: PropriedadeCardProps) => {
             {propriedade.imagens && propriedade.imagens.length > 0 ? (
               <img 
                 src={getOptimizedUrl(propriedade.imagens[0], 800)} 
-                alt={propriedade.titulo}
+                alt={titulo}
                 loading="lazy"
                 decoding="async"
                 width={400}
@@ -107,15 +116,15 @@ const PropriedadeCard = ({ propriedade }: PropriedadeCardProps) => {
           <div className="absolute inset-0 bg-black bg-opacity-20 pointer-events-none"></div>
           <div className="absolute top-4 right-4 flex flex-col gap-2 items-end">
             <Badge className="bg-sunset-orange hover:bg-sunset-orange/95 text-white shadow-md uppercase text-xs font-semibold">
-              {propriedade.tipo || 'Oportunidade'}
+              {propriedade.tipo || t('labels.opportunity')}
             </Badge>
             
             {/* Localização Badge */}
-            {propriedade.localizacao?.toLowerCase().includes('represa') && (
-              <Badge className="bg-blue-600 hover:bg-blue-700 text-white shadow-md">Represa</Badge>
+            {localizacao?.toLowerCase().includes('represa') && (
+              <Badge className="bg-blue-600 hover:bg-blue-700 text-white shadow-md">{t('labels.represa')}</Badge>
             )}
-            {propriedade.localizacao?.toLowerCase().includes('rio') && (
-              <Badge className="bg-cyan-600 hover:bg-cyan-700 text-white shadow-md">Rio</Badge>
+            {localizacao?.toLowerCase().includes('rio') && (
+              <Badge className="bg-cyan-600 hover:bg-cyan-700 text-white shadow-md">{t('labels.rio')}</Badge>
             )}
           </div>
         </div>
@@ -125,17 +134,17 @@ const PropriedadeCard = ({ propriedade }: PropriedadeCardProps) => {
         <div className="mb-4">
           <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-1 hover:text-rio-blue transition-colors">
             <Link to={`/venda/${propriedade.slug}`}>
-              {propriedade.titulo}
+              {titulo}
             </Link>
           </h3>
           
           <div className="flex items-center text-gray-600 mb-2">
             <MapPin className="h-4 w-4 mr-1 shrink-0 text-emerald-500" />
-            <span className="text-sm line-clamp-1">{propriedade.localizacao}</span>
+            <span className="text-sm line-clamp-1">{localizacao}</span>
           </div>
 
           <p className="text-gray-600 text-sm line-clamp-2 mb-4">
-            {propriedade.descricao || 'Excelente oportunidade para investimento ou lazer na região do Rio São Francisco.'}
+            {descricao || (isEn ? 'Excellent opportunity for investment or leisure in the São Francisco River region.' : 'Excelente oportunidade para investimento ou lazer na região do Rio São Francisco.')}
           </p>
         </div>
 
@@ -145,7 +154,7 @@ const PropriedadeCard = ({ propriedade }: PropriedadeCardProps) => {
             <div className="flex items-center mb-4 p-3 bg-gray-50 rounded-lg border border-gray-100/50">
               <Maximize className="h-4 w-4 mr-2 text-water-green" />
               <span className="text-sm font-semibold text-gray-700">
-                Área Total: {propriedade.area} {propriedade.unidade_area || 'hectares'}
+                {t('labels.totalArea')} {propriedade.area} {propriedade.unidade_area || t('labels.hectares')}
               </span>
             </div>
           )}
@@ -160,7 +169,7 @@ const PropriedadeCard = ({ propriedade }: PropriedadeCardProps) => {
                 </div>
               ))}
               {propriedade.caracteristicas.length > 3 && (
-                <span className="text-xs text-gray-500 font-medium">+{propriedade.caracteristicas.length - 3} mais</span>
+                <span className="text-xs text-gray-500 font-medium">+{propriedade.caracteristicas.length - 3} {t('labels.more')}</span>
               )}
             </div>
           )}
@@ -169,13 +178,13 @@ const PropriedadeCard = ({ propriedade }: PropriedadeCardProps) => {
           <div className="flex flex-col gap-3 pt-3 border-t border-gray-100">
             <div className="flex justify-between items-center">
               <div>
-                <div className="text-xs text-gray-500">Valor de Venda</div>
+                <div className="text-xs text-gray-500">{t('labels.saleValue')}</div>
                 <div className="text-xl font-bold text-rio-blue whitespace-nowrap">
                   R$ {propriedade.preco.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </div>
               </div>
               <Badge variant="outline" className="border-rio-blue text-rio-blue text-xs font-semibold">
-                À Venda
+                {t('labels.forSale')}
               </Badge>
             </div>
             
@@ -184,10 +193,10 @@ const PropriedadeCard = ({ propriedade }: PropriedadeCardProps) => {
                 <Button 
                   variant="outline" 
                   className="w-full border-rio-blue text-rio-blue hover:bg-blue-50/50 flex items-center justify-center gap-1 px-1 text-xs font-semibold transition-all h-full"
-                  title="Ver Detalhes"
+                  title={isEn ? "See Details" : "Ver Detalhes"}
                 >
                   <Info className="h-3.5 w-3.5" />
-                  Detalhes
+                  {t('buttons.seeDetails')}
                 </Button>
               </Link>
               <Button 
@@ -195,18 +204,18 @@ const PropriedadeCard = ({ propriedade }: PropriedadeCardProps) => {
                 onClick={() => {
                   const shareUrl = `${window.location.origin}/venda/${propriedade.slug}`;
                   navigator.clipboard.writeText(shareUrl);
-                  toast.success('Link copiado!');
+                  toast.success(t('labels.linkCopied', 'Link copiado!'));
                 }}
                 className="w-full border-gray-200 text-gray-600 hover:bg-gray-50 flex items-center justify-center gap-1 px-1 text-xs font-semibold transition-all"
-                title="Copiar Link de Compartilhamento"
+                title={isEn ? "Copy Sharing Link" : "Copiar Link de Compartilhamento"}
               >
                 <Copy className="h-3.5 w-3.5" />
-                Copiar
+                {t('buttons.copiar')}
               </Button>
               <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="w-full">
                 <Button className="w-full bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-1 px-1 text-xs font-semibold transition-all shadow-sm">
                   <MessageSquare className="h-3.5 w-3.5" />
-                  {propriedade.texto_botao_whatsapp || 'WhatsApp'}
+                  {propriedade.texto_botao_whatsapp || t('buttons.contactWhatsApp')}
                 </Button>
               </a>
             </div>

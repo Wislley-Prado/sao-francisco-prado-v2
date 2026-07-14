@@ -31,8 +31,10 @@ import { isValidYouTubeUrl } from '@/hooks/useVideoSettings';
 
 const pacoteSchema = z.object({
   nome: z.string().min(3, 'Nome deve ter no mínimo 3 caracteres'),
+  nome_en: z.string().optional().nullable(),
   slug: z.string().min(3, 'Slug deve ter no mínimo 3 caracteres'),
   descricao: z.string().optional(),
+  descricao_en: z.string().optional().nullable(),
   preco: z.number().min(0.01, 'Preço deve ser maior que zero'),
   duracao: z.string().min(1, 'Duração é obrigatória'),
   pessoas: z.number().min(1, 'Mínimo 1 pessoa'),
@@ -81,8 +83,10 @@ type PacoteFormData = z.infer<typeof pacoteSchema>;
 export interface PacoteData {
   id: string;
   nome?: string;
+  nome_en?: string | null;
   slug?: string;
   descricao?: string;
+  descricao_en?: string | null;
   preco?: number;
   duracao?: string;
   pessoas?: number;
@@ -142,8 +146,10 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
     reValidateMode: 'onChange',
     defaultValues: {
       nome: pacote?.nome || '',
+      nome_en: pacote?.nome_en || '',
       slug: pacote?.slug || '',
       descricao: pacote?.descricao || '',
+      descricao_en: pacote?.descricao_en || '',
       preco: pacote?.preco ? Number(pacote.preco) : 0,
       duracao: pacote?.duracao || '',
       pessoas: pacote?.pessoas || 2,
@@ -290,8 +296,10 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
     try {
       const pacoteData = {
         nome: data.nome,
+        nome_en: data.nome_en || null,
         slug: data.slug,
         descricao: data.descricao || null,
+        descricao_en: data.descricao_en || null,
         preco: data.preco,
         duracao: data.duracao,
         pessoas: data.pessoas,
@@ -363,61 +371,104 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
           </TabsList>
 
           <TabsContent value="basico" className="space-y-4">
-            <FormField
-              control={form.control}
-              name="nome"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nome do Pacote</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      onChange={(e) => handleNomeChange(e.target.value)}
-                      placeholder="Ex: Pacote Pescaria VIP"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid gap-4 md:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="nome"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nome do Pacote (Português) *</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        onChange={(e) => handleNomeChange(e.target.value)}
+                        placeholder="Ex: Pacote Pescaria VIP"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="nome_en"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nome do Pacote (Inglês) - Opcional</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        value={field.value || ''}
+                        placeholder="Ex: VIP Fishing Package"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <FormField
               control={form.control}
               name="slug"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Slug (URL)</FormLabel>
+                  <FormLabel>Slug (URL) *</FormLabel>
                   <FormControl>
                     <Input {...field} placeholder="pacote-pescaria-vip" />
                   </FormControl>
                   <FormDescription>
-                    Usado na URL do pacote
+                    Usado na URL do pacote (gerado automaticamente)
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="descricao"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Descrição</FormLabel>
-                  <FormControl>
-                    <RichTextEditor
-                      value={field.value || ''}
-                      onChange={field.onChange}
-                      placeholder="Descreva o pacote com formatação rica..."
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Use a barra de ferramentas para formatar o texto, adicionar listas, links e mais
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid gap-4 md:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="descricao"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Descrição (Português)</FormLabel>
+                    <FormControl>
+                      <RichTextEditor
+                        value={field.value || ''}
+                        onChange={field.onChange}
+                        placeholder="Descreva o pacote com formatação rica..."
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Use a barra de ferramentas para formatar o texto em português
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="descricao_en"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Descrição (Inglês) - Opcional</FormLabel>
+                    <FormControl>
+                      <RichTextEditor
+                        value={field.value || ''}
+                        onChange={field.onChange}
+                        placeholder="Describe the package with rich formatting in English..."
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Use the toolbar to format the text in English
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             {/* Seção de Preços e Parcelamento */}
             <div className="rounded-lg border p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 border-green-200 dark:border-green-800">

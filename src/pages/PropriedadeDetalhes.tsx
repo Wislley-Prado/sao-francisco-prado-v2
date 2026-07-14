@@ -20,6 +20,7 @@ import { usePropriedadeVendaBySlug, useSiteSettings, usePropriedadesVenda } from
 import { ShareButtons } from '@/components/ShareButtons';
 import PropriedadeCard from '@/components/PropriedadeCard';
 import { SITE_CONFIG } from '@/lib/constants';
+import { useTranslation } from 'react-i18next';
 
 // Mapping common characteristics to icons
 const charIcons: { [key: string]: React.ReactNode } = {
@@ -56,11 +57,17 @@ const getYouTubeEmbedUrl = (url: string | null) => {
 };
 
 const PropriedadeDetalhes = () => {
+  const { t, i18n } = useTranslation();
+  const isEn = i18n.language.startsWith('en');
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
 
   const { data: propriedade, isLoading: loading } = usePropriedadeVendaBySlug(slug);
   const { data: siteSettings } = useSiteSettings();
+
+  const titulo = (isEn && propriedade?.titulo_en) ? propriedade.titulo_en : propriedade?.titulo || '';
+  const descricao = (isEn && propriedade?.descricao_en) ? propriedade.descricao_en : propriedade?.descricao || '';
+  const localizacao = (isEn && propriedade?.localizacao_en) ? propriedade.localizacao_en : propriedade?.localizacao || '';
 
   // Fetch active sales properties to suggest similar ones
   const { data: allPropriedades } = usePropriedadesVenda(true);
@@ -88,11 +95,13 @@ const PropriedadeDetalhes = () => {
     if (!propriedade) return '';
     if (propriedade.mensagem_whatsapp) {
       return propriedade.mensagem_whatsapp
-        .replace(/{titulo}/g, propriedade.titulo)
-        .replace(/{localizacao}/g, propriedade.localizacao);
+        .replace(/{titulo}/g, titulo)
+        .replace(/{localizacao}/g, localizacao);
     }
-    return `Olá! Vi o anúncio da propriedade "${propriedade.titulo}" em "${propriedade.localizacao}" no site PradoAqui e gostaria de saber mais informações.`;
-  }, [propriedade]);
+    return isEn
+      ? `Hello! I saw the property "${titulo}" listing in "${localizacao}" on the PradoAqui site and would like more information.`
+      : `Olá! Vi o anúncio da propriedade "${titulo}" em "${localizacao}" no site PradoAqui e gostaria de saber mais informações.`;
+  }, [propriedade, titulo, localizacao, isEn]);
 
   const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 
@@ -100,10 +109,10 @@ const PropriedadeDetalhes = () => {
     if (!propriedade || !propriedade.imagens || propriedade.imagens.length === 0) return [];
     return propriedade.imagens.map((imgUrl, idx) => ({
       url: imgUrl,
-      alt_text: `${propriedade.titulo} - Imagem ${idx + 1}`,
+      alt_text: `${titulo} - Imagem ${idx + 1}`,
       principal: idx === 0
     }));
-  }, [propriedade]);
+  }, [propriedade, titulo]);
 
   if (loading) {
     return (
@@ -123,14 +132,14 @@ const PropriedadeDetalhes = () => {
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>{propriedade.titulo} | Imóvel à Venda em {propriedade.localizacao} - PradoAqui</title>
-        <meta name="description" content={propriedade.descricao?.substring(0, 160) || `Excelente oportunidade: ${propriedade.titulo} em ${propriedade.localizacao}.`} />
-        <meta property="og:title" content={`${propriedade.titulo} | PradoAqui`} />
-        <meta property="og:description" content={propriedade.descricao?.substring(0, 160) || `Imóvel à Venda em ${propriedade.localizacao}`} />
+        <title>{isEn ? `${titulo} | Property for Sale in ${localizacao} - PradoAqui` : `${titulo} | Imóvel à Venda em ${localizacao} - PradoAqui`}</title>
+        <meta name="description" content={descricao?.substring(0, 160) || (isEn ? `Excellent opportunity: ${titulo} in ${localizacao}.` : `Excelente oportunidade: ${titulo} em ${localizacao}.`)} />
+        <meta property="og:title" content={`${titulo} | PradoAqui`} />
+        <meta property="og:description" content={descricao?.substring(0, 160) || (isEn ? `Property for Sale in ${localizacao}` : `Imóvel à Venda em ${localizacao}`)} />
         <meta property="og:image" content={mainImage} />
         <meta property="og:url" content={pageUrl} />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${propriedade.titulo} | PradoAqui`} />
+        <meta name="twitter:title" content={`${titulo} | PradoAqui`} />
         <meta name="twitter:image" content={mainImage} />
         <link rel="canonical" href={pageUrl} />
       </Helmet>
@@ -146,18 +155,18 @@ const PropriedadeDetalhes = () => {
             className="mb-4"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Voltar para Vendas
+            {t('buttons.voltarVendas')}
           </Button>
         </div>
 
         {/* Image Gallery */}
         <div className="max-w-7xl mx-auto px-4 mb-8">
           {galleryImages.length > 0 ? (
-            <ImageGallery images={galleryImages} title={propriedade.titulo} />
+            <ImageGallery images={galleryImages} title={titulo} />
           ) : (
             <div className="w-full h-[300px] bg-slate-100 dark:bg-slate-800 rounded-2xl flex flex-col items-center justify-center text-muted-foreground border border-dashed">
               <Play className="h-12 w-12 text-slate-300 mb-2" />
-              <span>Sem imagens cadastradas para esta propriedade</span>
+              <span>{t('labels.noPropertyImages')}</span>
             </div>
           )}
         </div>
@@ -171,16 +180,16 @@ const PropriedadeDetalhes = () => {
               <div>
                 <div className="flex items-start justify-between flex-wrap gap-4 mb-2">
                   <h1 className="text-3xl lg:text-4xl font-bold text-foreground">
-                    {propriedade.titulo}
+                    {titulo}
                   </h1>
                   <Badge className="bg-sunset-orange hover:bg-sunset-orange/95 text-white uppercase text-xs font-semibold px-3 py-1">
-                    {propriedade.tipo || 'Oportunidade'}
+                    {propriedade.tipo || t('labels.opportunity')}
                   </Badge>
                 </div>
 
                 <div className="flex items-center text-muted-foreground mb-4">
                   <MapPin className="h-5 w-5 mr-2 text-emerald-500 shrink-0" />
-                  <span className="text-lg">{propriedade.localizacao}</span>
+                  <span className="text-lg">{localizacao}</span>
                 </div>
               </div>
 
@@ -193,9 +202,9 @@ const PropriedadeDetalhes = () => {
                     <Maximize className="h-6 w-6" />
                   </div>
                   <div>
-                    <div className="text-xs text-muted-foreground">Área Total</div>
+                    <div className="text-xs text-muted-foreground">{t('labels.totalArea')}</div>
                     <div className="text-lg font-bold text-foreground">
-                      {propriedade.area} {propriedade.unidade_area || 'hectares'}
+                      {propriedade.area} {propriedade.unidade_area || t('labels.hectares')}
                     </div>
                   </div>
                 </div>
@@ -203,9 +212,9 @@ const PropriedadeDetalhes = () => {
 
               {/* Description */}
               <div>
-                <h2 className="text-2xl font-bold mb-4">Sobre o Imóvel</h2>
+                <h2 className="text-2xl font-bold mb-4">{t('labels.description')}</h2>
                 <p className="text-muted-foreground leading-relaxed whitespace-pre-line text-base">
-                  {propriedade.descricao || 'Excelente oportunidade para investimento ou lazer na região do Rio São Francisco.'}
+                  {descricao || (isEn ? 'Excellent opportunity for investment or leisure in the São Francisco River region.' : 'Excelente oportunidade para investimento ou lazer na região do Rio São Francisco.')}
                 </p>
               </div>
 
@@ -213,7 +222,7 @@ const PropriedadeDetalhes = () => {
 
               {/* Characteristics */}
               <div>
-                <h2 className="text-2xl font-bold mb-4">Características</h2>
+                <h2 className="text-2xl font-bold mb-4">{t('labels.characteristics')}</h2>
                 {propriedade.caracteristicas && propriedade.caracteristicas.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {propriedade.caracteristicas.map((char, index) => (
@@ -226,7 +235,7 @@ const PropriedadeDetalhes = () => {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-muted-foreground italic">Nenhuma característica cadastrada para este imóvel.</p>
+                  <p className="text-sm text-muted-foreground italic">{t('labels.noCharacteristics', 'Nenhuma característica cadastrada para este imóvel.')}</p>
                 )}
               </div>
             </div>
@@ -236,7 +245,7 @@ const PropriedadeDetalhes = () => {
               <Card className="sticky top-24 shadow-lg border-border/50">
                 <CardContent className="p-6 space-y-6">
                   <div>
-                    <div className="text-xs text-muted-foreground">Valor de Venda</div>
+                    <div className="text-xs text-muted-foreground">{t('labels.saleValue')}</div>
                     <div className="text-3xl font-extrabold text-rio-blue dark:text-emerald-400 mt-1">
                       R$ {propriedade.preco.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </div>
@@ -245,19 +254,19 @@ const PropriedadeDetalhes = () => {
                   <Separator />
 
                   <div className="bg-emerald-50/50 dark:bg-emerald-950/10 border border-emerald-100 dark:border-emerald-900/30 rounded-2xl p-4 text-center space-y-3">
-                    <p className="text-sm font-semibold text-emerald-950 dark:text-emerald-300">Gostou deste imóvel?</p>
-                    <p className="text-xs text-emerald-800 dark:text-emerald-400">Entre em contato agora mesmo para agendar uma visita ou negociar.</p>
+                    <p className="text-sm font-semibold text-emerald-950 dark:text-emerald-300">{t('labels.likeThisProperty')}</p>
+                    <p className="text-xs text-emerald-800 dark:text-emerald-400">{t('labels.contactToVisit')}</p>
                     
                     <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="block">
                       <Button className="w-full bg-green-600 hover:bg-green-700 text-white shadow-md py-6 text-base font-semibold transition-all">
                         <MessageSquare className="mr-2 h-5 w-5 fill-white" />
-                        {propriedade.texto_botao_whatsapp || 'Falar no WhatsApp'}
+                        {propriedade.texto_botao_whatsapp || t('buttons.contactWhatsApp')}
                       </Button>
                     </a>
                   </div>
 
                   <div className="pt-2">
-                    <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Copiar Link do Anúncio:</h4>
+                    <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('labels.copyListingLink', 'Copiar Link do Anúncio:')}</h4>
                     <div className="flex gap-2">
                       <Input
                         readOnly
@@ -270,9 +279,9 @@ const PropriedadeDetalhes = () => {
                         className="h-9 shrink-0"
                         onClick={() => {
                           navigator.clipboard.writeText(pageUrl);
-                          toast.success('Link copiado!');
+                          toast.success(t('labels.linkCopied'));
                         }}
-                        title="Copiar Link"
+                        title={isEn ? "Copy Link" : "Copiar Link"}
                       >
                         <Copy className="h-4 w-4" />
                       </Button>
@@ -292,8 +301,8 @@ const PropriedadeDetalhes = () => {
                   <Play className="h-6 w-6 text-white fill-white" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-xl text-foreground">Vídeo de Apresentação</h3>
-                  <p className="text-xs text-muted-foreground">Conheça o imóvel em detalhes</p>
+                  <h3 className="font-bold text-xl text-foreground">{t('labels.presentationVideo')}</h3>
+                  <p className="text-xs text-muted-foreground">{t('labels.knowPropertyDetails')}</p>
                 </div>
               </div>
 
@@ -311,7 +320,7 @@ const PropriedadeDetalhes = () => {
                               className="absolute top-0 left-0 w-full h-full border-0"
                               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                               allowFullScreen
-                              title={`Vídeo Shorts ${propriedade.titulo}`}
+                              title={`Vídeo Shorts ${titulo}`}
                             />
                           </div>
                         );
@@ -323,7 +332,7 @@ const PropriedadeDetalhes = () => {
                               className="absolute top-0 left-0 w-full h-full border-0"
                               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                               allowFullScreen
-                              title={`Vídeo ${propriedade.titulo}`}
+                              title={`Vídeo ${titulo}`}
                             />
                           </div>
                         );
@@ -334,8 +343,8 @@ const PropriedadeDetalhes = () => {
               ) : (
                 <div className="bg-muted/30 dark:bg-muted/10 rounded-2xl p-6 flex flex-col items-center justify-center text-center border border-dashed border-border min-h-[250px]">
                   <Play className="h-10 w-10 text-muted-foreground/30 mb-3" />
-                  <h4 className="font-semibold text-muted-foreground mb-1">Vídeo Indisponível</h4>
-                  <p className="text-xs text-muted-foreground/70 max-w-[260px]">Nenhum vídeo de tour ou Shorts foi cadastrado pelo administrador para este imóvel.</p>
+                  <h4 className="font-semibold text-muted-foreground mb-1">{t('labels.videoUnavailable')}</h4>
+                  <p className="text-xs text-muted-foreground/70 max-w-[260px]">{t('labels.noVideoMessage')}</p>
                 </div>
               )}
             </div>
@@ -348,8 +357,8 @@ const PropriedadeDetalhes = () => {
                 </div>
                 <div className="flex-1 flex justify-between items-center">
                   <div>
-                    <h3 className="font-bold text-xl text-foreground">Mapa de Localização</h3>
-                    <p className="text-xs text-muted-foreground">Veja no Google Maps</p>
+                    <h3 className="font-bold text-xl text-foreground">{t('labels.locationMap')}</h3>
+                    <p className="text-xs text-muted-foreground">{t('labels.seeGoogleMaps')}</p>
                   </div>
                   {propriedade.latitude && propriedade.longitude && (
                     <div className="flex gap-1.5">
@@ -363,7 +372,7 @@ const PropriedadeDetalhes = () => {
                         }}
                       >
                         <ExternalLink className="h-3.5 w-3.5 mr-1" />
-                        Rotas
+                        {t('buttons.rotas')}
                       </Button>
                       <Button
                         size="sm"
@@ -371,11 +380,11 @@ const PropriedadeDetalhes = () => {
                         className="h-8 px-3 border-blue-200 text-blue-600 dark:border-blue-800 dark:text-blue-400 hover:bg-blue-50/50 text-xs"
                         onClick={() => {
                           navigator.clipboard.writeText(`${propriedade.latitude}, ${propriedade.longitude}`);
-                          toast.success('Coordenadas copiadas!');
+                          toast.success(t('labels.coordsCopied'));
                         }}
                       >
                         <Copy className="h-3.5 w-3.5 mr-1" />
-                        Coordenadas
+                        {t('labels.coordenadas')}
                       </Button>
                     </div>
                   )}
@@ -386,14 +395,14 @@ const PropriedadeDetalhes = () => {
                 <Card className="overflow-hidden shadow-lg border border-border/50 rounded-2xl">
                   <div className="relative w-full h-[320px] md:h-[350px]">
                     <iframe
-                      src={`https://www.google.com/maps?q=${propriedade.latitude},${propriedade.longitude}&hl=pt-BR&z=14&output=embed`}
+                      src={`https://www.google.com/maps?q=${propriedade.latitude},${propriedade.longitude}&hl=${isEn ? 'en' : 'pt-BR'}&z=14&output=embed`}
                       width="100%"
                       height="100%"
                       style={{ border: 0 }}
                       allowFullScreen
                       loading="lazy"
                       referrerPolicy="no-referrer-when-downgrade"
-                      title={`Mapa de ${propriedade.titulo}`}
+                      title={`Mapa de ${titulo}`}
                       className="absolute inset-0"
                     />
                   </div>
@@ -401,8 +410,8 @@ const PropriedadeDetalhes = () => {
               ) : (
                 <div className="bg-muted/30 dark:bg-muted/10 rounded-2xl p-6 flex flex-col items-center justify-center text-center border border-dashed border-border min-h-[250px]">
                   <MapPin className="h-10 w-10 text-muted-foreground/30 mb-3" />
-                  <h4 className="font-semibold text-muted-foreground mb-1">Mapa Indisponível</h4>
-                  <p className="text-xs text-muted-foreground/70 max-w-[260px]">As coordenadas geográficas exatas (latitude/longitude) não foram cadastradas.</p>
+                  <h4 className="font-semibold text-muted-foreground mb-1">{t('labels.mapUnavailable')}</h4>
+                  <p className="text-xs text-muted-foreground/70 max-w-[260px]">{t('labels.noCoordinatesMessage')}</p>
                 </div>
               )}
             </div>
@@ -411,9 +420,9 @@ const PropriedadeDetalhes = () => {
           {/* Share Section */}
           <div className="mt-16 bg-muted/20 dark:bg-muted/5 rounded-2xl p-8 border border-border/30">
             <ShareButtons
-              titulo={propriedade.titulo}
+              titulo={titulo}
               url={pageUrl}
-              descricao={`Excelente oportunidade: ${propriedade.titulo} em ${propriedade.localizacao} - PradoAqui`}
+              descricao={isEn ? `Excellent opportunity: ${titulo} in ${localizacao} - PradoAqui` : `Excelente oportunidade: ${titulo} em ${localizacao} - PradoAqui`}
             />
           </div>
 
@@ -422,12 +431,12 @@ const PropriedadeDetalhes = () => {
             <div className="mt-16 pt-12 border-t border-border/50">
               <div className="flex justify-between items-end mb-8">
                 <div>
-                  <h2 className="text-2xl sm:text-3xl font-bold text-foreground">Outras Oportunidades à Venda</h2>
-                  <p className="text-muted-foreground text-sm mt-1">Imóveis similares na região do Rio São Francisco</p>
+                  <h2 className="text-2xl sm:text-3xl font-bold text-foreground">{t('labels.suggestedVendas')}</h2>
+                  <p className="text-muted-foreground text-sm mt-1">{t('labels.suggestedVendasSub')}</p>
                 </div>
                 <Button variant="outline" asChild className="hidden sm:inline-flex border-rio-blue text-rio-blue hover:bg-rio-blue hover:text-white rounded-xl">
                   <Link to="/vendas">
-                    Ver Todas
+                    {t('buttons.verTodas')}
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
@@ -442,7 +451,7 @@ const PropriedadeDetalhes = () => {
               <div className="mt-8 text-center sm:hidden">
                 <Button variant="outline" asChild className="w-full border-rio-blue text-rio-blue hover:bg-rio-blue hover:text-white rounded-xl">
                   <Link to="/vendas">
-                    Ver Todas as Oportunidades
+                    {t('buttons.verTodasOportunidades')}
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>

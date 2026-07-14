@@ -8,12 +8,15 @@ import { Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { supabase } from '@/integrations/supabase/client';
+import { useTranslation } from 'react-i18next';
 
 interface Pacote {
   id: string;
   nome: string;
+  nome_en?: string | null;
   slug: string;
   descricao: string;
+  descricao_en?: string | null;
   preco: number;
   duracao: string;
   pessoas: number;
@@ -31,6 +34,8 @@ interface Pacote {
 }
 
 const PackagesIndexDynamic = () => {
+  const { t, i18n } = useTranslation();
+  const isEn = i18n.language.startsWith('en');
   const [pacotes, setPacotes] = useState<Pacote[]>([]);
   const [loading, setLoading] = useState(true);
   const [heroImage, setHeroImage] = useState('');
@@ -108,13 +113,13 @@ const PackagesIndexDynamic = () => {
         
         <div className="relative container mx-auto px-4 text-center">
           <Badge className="bg-primary/20 text-primary-foreground border-primary/30 mb-6 px-4 py-1.5 backdrop-blur-md">
-            Experiências Inesquecíveis
+            {t('labels.experiencesBadge')}
           </Badge>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 tracking-tight drop-shadow-lg">
-            Pacotes de Pescaria <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-primary">Personalizados</span>
+            {t('labels.packagesTitle')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-primary">{t('labels.packagesTitleHighlight')}</span>
           </h1>
           <p className="text-lg md:text-2xl max-w-3xl mx-auto text-white/90 drop-shadow flex flex-col sm:flex-row items-center justify-center gap-2">
-            Escolha o pacote perfeito para sua aventura no maravilhoso Rio São Francisco
+            {t('labels.packagesSubtitle')}
           </p>
         </div>
       </section>
@@ -139,15 +144,17 @@ const PackagesIndexDynamic = () => {
           ) : pacotes.length === 0 ? (
             <div className="text-center py-16">
               <Package className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-2xl font-semibold mb-2">Nenhum pacote disponível</h3>
+              <h3 className="text-2xl font-semibold mb-2">{t('labels.noPackages')}</h3>
               <p className="text-muted-foreground">
-                Em breve teremos novos pacotes de pescaria disponíveis
+                {t('labels.noPackagesSub')}
               </p>
             </div>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {pacotes.map((pacote) => {
                 const Icon = getTipoIcon(pacote.tipo);
+                const nome = (isEn && pacote.nome_en) ? pacote.nome_en : pacote.nome;
+                const descricao = (isEn && pacote.descricao_en) ? pacote.descricao_en : pacote.descricao;
 
                 return (
                   <Card key={pacote.id} className="overflow-hidden hover:shadow-xl transition-all duration-300 group">
@@ -155,7 +162,7 @@ const PackagesIndexDynamic = () => {
                     <div className="relative h-64 overflow-hidden">
                       <img
                         src={getMainImage(pacote)}
-                        alt={pacote.nome}
+                        alt={nome}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                       />
 
@@ -164,11 +171,11 @@ const PackagesIndexDynamic = () => {
                         {pacote.popular && (
                           <Badge className="gap-1">
                             <Sparkles className="h-3 w-3" />
-                            Popular
+                            {t('labels.popular')}
                           </Badge>
                         )}
                         {pacote.destaque && (
-                          <Badge variant="secondary">Destaque</Badge>
+                          <Badge variant="secondary">{t('labels.featured')}</Badge>
                         )}
                       </div>
 
@@ -187,13 +194,13 @@ const PackagesIndexDynamic = () => {
                           <Badge variant="outline" className="capitalize">{pacote.tipo}</Badge>
                         </div>
                         <h3 className="text-2xl font-bold text-foreground group-hover:text-primary transition-colors">
-                          {pacote.nome}
+                          {nome}
                         </h3>
                       </div>
 
                       {/* Descrição */}
                       <p className="text-muted-foreground line-clamp-2">
-                        {pacote.descricao}
+                        {descricao}
                       </p>
 
                       {/* Info */}
@@ -204,7 +211,7 @@ const PackagesIndexDynamic = () => {
                         </div>
                         <div className="flex items-center gap-1">
                           <Users className="h-4 w-4" />
-                          {pacote.pessoas} pessoa{pacote.pessoas > 1 ? 's' : ''}
+                          {t('labels.peopleCount', { count: pacote.pessoas })}
                         </div>
                       </div>
 
@@ -219,7 +226,7 @@ const PackagesIndexDynamic = () => {
                           ))}
                           {pacote.inclusos.length > 3 && (
                             <p className="text-xs text-muted-foreground">
-                              + {pacote.inclusos.length - 3} itens inclusos
+                              {t('labels.itemsIncludedCount', { count: pacote.inclusos.length - 3 })}
                             </p>
                           )}
                         </div>
@@ -228,16 +235,16 @@ const PackagesIndexDynamic = () => {
                       {/* Preço e CTA */}
                       <div className="pt-4 border-t space-y-3">
                         <div>
-                          <p className="text-sm text-muted-foreground">A partir de</p>
+                          <p className="text-sm text-muted-foreground">{t('labels.fromPrice')}</p>
                           <p className="text-3xl font-bold text-foreground">
                             R$ {pacote.preco.toFixed(2)}
                           </p>
-                          <p className="text-xs text-muted-foreground">por pessoa</p>
+                          <p className="text-xs text-muted-foreground">{t('labels.perPerson')}</p>
                         </div>
 
                         <Button asChild className="w-full" size="lg">
                           <Link to={`/pacote/${pacote.slug}`}>
-                            Ver Detalhes
+                            {t('buttons.seeDetails')}
                           </Link>
                         </Button>
                       </div>
@@ -253,13 +260,13 @@ const PackagesIndexDynamic = () => {
       {/* CTA Section */}
       <section className="py-16 bg-muted/50">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4">Não encontrou o pacote ideal?</h2>
+          <h2 className="text-3xl font-bold mb-4">{t('labels.customPackageTitle')}</h2>
           <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Criamos pacotes personalizados de acordo com suas necessidades e preferências
+            {t('labels.customPackageSub')}
           </p>
           <Button size="lg" asChild>
             <Link to="/#contato">
-              Solicitar Pacote Personalizado
+              {t('labels.requestCustomPackage')}
             </Link>
           </Button>
         </div>

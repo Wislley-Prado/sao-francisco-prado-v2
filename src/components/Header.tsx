@@ -3,21 +3,23 @@ import { Button } from '@/components/ui/button';
 import { Menu, X, Calendar, Fish } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useSiteSettings } from '@/hooks/useOptimizedData';
+import { useTranslation } from 'react-i18next';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { data: settings } = useSiteSettings();
+  const { t, i18n } = useTranslation();
 
   const navItems = [
-    { name: 'Início', href: '/', hash: '' },
-    { name: 'Ranchos', href: '/ranchos', hash: '' },
-    { name: 'Pacotes', href: '/pacotes', hash: '' },
-    { name: 'Blog', href: '/blog', hash: '' },
-    { name: 'Transmissão', href: '/live', hash: '' },
-    { name: 'Represa', href: '/', hash: 'represa' },
-    { name: 'Venda', href: '/vendas', hash: '' },
+    { name: t('nav.home'), href: '/', hash: '' },
+    { name: t('nav.ranchos'), href: '/ranchos', hash: '' },
+    { name: t('nav.pacotes'), href: '/pacotes', hash: '' },
+    { name: t('nav.blog'), href: '/blog', hash: '' },
+    { name: t('nav.live'), href: '/live', hash: '' },
+    { name: t('nav.dam'), href: '/', hash: 'represa' },
+    { name: t('nav.venda'), href: '/vendas', hash: '' },
   ];
 
   const handleNavClick = (href: string, hash: string) => {
@@ -67,6 +69,14 @@ const Header = () => {
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center space-x-4">
+            <button
+              onClick={() => i18n.changeLanguage(i18n.language.startsWith('pt') ? 'en' : 'pt')}
+              className="text-white hover:text-sand-beige transition-colors duration-200 bg-transparent border border-white/20 rounded-xl px-3 py-1.5 text-sm font-semibold flex items-center gap-1.5 cursor-pointer hover:border-white/40"
+              title={i18n.language.startsWith('pt') ? "Change language to English" : "Mudar idioma para Português"}
+            >
+              <span>{i18n.language.startsWith('pt') ? '🇺🇸 EN' : '🇧🇷 PT'}</span>
+            </button>
+
             <Button
               variant="outline"
               size="sm"
@@ -77,7 +87,7 @@ const Header = () => {
               }}
             >
               <Calendar className="h-4 w-4 mr-2" />
-              Reservar
+              {t('buttons.reservar')}
             </Button>
           </div>
 
@@ -108,6 +118,16 @@ const Header = () => {
                 </button>
               ))}
               <div className="flex flex-col space-y-2 pt-4">
+                <button
+                  onClick={() => {
+                    i18n.changeLanguage(i18n.language.startsWith('pt') ? 'en' : 'pt');
+                    setIsMenuOpen(false);
+                  }}
+                  className="text-white hover:text-sand-beige transition-colors duration-200 py-2 bg-transparent border border-white/20 rounded-xl px-3 text-sm font-semibold flex items-center justify-center gap-1.5 cursor-pointer hover:border-white/40"
+                >
+                  <span>{i18n.language.startsWith('pt') ? '🇺🇸 English' : '🇧🇷 Português'}</span>
+                </button>
+
                 <Button
                   variant="outline"
                   size="sm"
@@ -118,7 +138,7 @@ const Header = () => {
                   }}
                 >
                   <Calendar className="h-4 w-4 mr-2" />
-                  Reservar
+                  {t('buttons.reservar')}
                 </Button>
               </div>
             </nav>

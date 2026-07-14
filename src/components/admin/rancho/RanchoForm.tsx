@@ -42,9 +42,12 @@ const COMODIDADES_PADRAO = [
 
 const ranchoSchema = z.object({
   nome: z.string().min(3, 'Nome deve ter no mínimo 3 caracteres'),
+  nome_en: z.string().optional().nullable(),
   slug: z.string().min(3, 'Slug deve ter no mínimo 3 caracteres'),
   descricao: z.string().optional(),
+  descricao_en: z.string().optional().nullable(),
   localizacao: z.string().min(3, 'Localização é obrigatória'),
+  localizacao_en: z.string().optional().nullable(),
   capacidade: z.number().min(1, 'Capacidade mínima é 1'),
   quartos: z.number().min(0, 'Número de quartos inválido'),
   banheiros: z.number().min(0, 'Número de banheiros inválido'),
@@ -100,9 +103,12 @@ type RanchoFormData = z.infer<typeof ranchoSchema>;
 export interface RanchoData {
   id: string;
   nome?: string;
+  nome_en?: string | null;
   slug?: string;
   descricao?: string;
+  descricao_en?: string | null;
   localizacao?: string;
+  localizacao_en?: string | null;
   capacidade?: number;
   quartos?: number;
   banheiros?: number;
@@ -151,36 +157,55 @@ const LocationFieldWithTags = memo(({ control }: { control: Control<RanchoFormDa
   }, [localizacao, destaque]);
 
   return (
-    <FormField
-      control={control}
-      name="localizacao"
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>Localização *</FormLabel>
-          <FormControl>
-            <Input {...field} placeholder="Ex: Rio São Francisco, Prado, MG" />
-          </FormControl>
-          <FormDescription>
-            Use "Rio" ou "Represa" para exibir tags automáticas
-          </FormDescription>
-          {(tags.isRio || tags.isRepresa || tags.isDestaque) && (
-            <div className="flex flex-wrap gap-2 pt-2">
-              <span className="text-xs text-muted-foreground">Tags:</span>
-              {tags.isDestaque && (
-                <Badge className="bg-amber-500 text-white text-xs">Destaque</Badge>
-              )}
-              {tags.isRepresa && (
-                <Badge className="bg-blue-500 text-white text-xs">Represa</Badge>
-              )}
-              {tags.isRio && (
-                <Badge className="bg-green-500 text-white text-xs">Rio</Badge>
-              )}
-            </div>
-          )}
-          <FormMessage />
-        </FormItem>
-      )}
-    />
+    <div className="grid gap-4 md:grid-cols-2">
+      <FormField
+        control={control}
+        name="localizacao"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Localização (Português) *</FormLabel>
+            <FormControl>
+              <Input {...field} placeholder="Ex: Rio São Francisco, Prado, MG" />
+            </FormControl>
+            <FormDescription>
+              Use "Rio" ou "Represa" para exibir tags automáticas
+            </FormDescription>
+            {(tags.isRio || tags.isRepresa || tags.isDestaque) && (
+              <div className="flex flex-wrap gap-2 pt-2">
+                <span className="text-xs text-muted-foreground">Tags:</span>
+                {tags.isDestaque && (
+                  <Badge className="bg-amber-500 text-white text-xs">Destaque</Badge>
+                )}
+                {tags.isRepresa && (
+                  <Badge className="bg-blue-500 text-white text-xs">Represa</Badge>
+                )}
+                {tags.isRio && (
+                  <Badge className="bg-green-500 text-white text-xs">Rio</Badge>
+                )}
+              </div>
+            )}
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={control}
+        name="localizacao_en"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Localização (Inglês) - Opcional</FormLabel>
+            <FormControl>
+              <Input {...field} value={field.value || ''} placeholder="Ex: São Francisco River, Prado, MG" />
+            </FormControl>
+            <FormDescription>
+              English localization for the maps cards and listings
+            </FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+    </div>
   );
 });
 LocationFieldWithTags.displayName = 'LocationFieldWithTags';
@@ -237,9 +262,12 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
     resolver: zodResolver(ranchoSchema),
     defaultValues: {
       nome: rancho?.nome || '',
+      nome_en: rancho?.nome_en || '',
       slug: rancho?.slug || '',
       descricao: rancho?.descricao || '',
+      descricao_en: rancho?.descricao_en || '',
       localizacao: rancho?.localizacao || '',
+      localizacao_en: rancho?.localizacao_en || '',
       capacidade: rancho?.capacidade || 2,
       quartos: rancho?.quartos || 0,
       banheiros: rancho?.banheiros || 0,
@@ -289,9 +317,12 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
 
       const ranchoData = {
         nome: data.nome,
+        nome_en: data.nome_en || null,
         slug: data.slug,
         descricao: data.descricao || null,
+        descricao_en: data.descricao_en || null,
         localizacao: data.localizacao,
+        localizacao_en: data.localizacao_en || null,
         capacidade: data.capacidade,
         quartos: data.quartos,
         banheiros: data.banheiros,
@@ -434,27 +465,43 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
           </TabsList>
 
           <TabsContent value="basico" className="space-y-4 mt-6">
-            <FormField
-              control={form.control}
-              name="nome"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nome *</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      onChange={(e) => {
-                        field.onChange(e);
-                        if (!rancho) {
-                          form.setValue('slug', generateSlug(e.target.value));
-                        }
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid gap-4 md:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="nome"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nome (Português) *</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        onChange={(e) => {
+                          field.onChange(e);
+                          if (!rancho) {
+                            form.setValue('slug', generateSlug(e.target.value));
+                          }
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="nome_en"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nome (Inglês) - Opcional</FormLabel>
+                    <FormControl>
+                      <Input {...field} value={field.value || ''} placeholder="Rancho Name in English" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <FormField
               control={form.control}
@@ -471,19 +518,35 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="descricao"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Descrição</FormLabel>
-                  <FormControl>
-                    <Textarea {...field} rows={4} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid gap-4 md:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="descricao"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Descrição (Português)</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} rows={4} placeholder="Descreva o rancho em português" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="descricao_en"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Descrição (Inglês) - Opcional</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} value={field.value || ''} rows={4} placeholder="Describe the rancho in English" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <LocationFieldWithTags control={form.control} />
           </TabsContent>

@@ -30,11 +30,15 @@ import { PaidMediaBanner } from './PaidMediaBanner';
 
 const blogFormSchema = z.object({
   titulo: z.string().min(1, 'Título é obrigatório'),
+  titulo_en: z.string().optional().nullable(),
   slug: z.string().min(1, 'Slug é obrigatório'),
   categoria: z.string().optional(),
+  categoria_en: z.string().optional().nullable(),
   tags: z.array(z.string()).default([]),
   resumo: z.string().optional(),
+  resumo_en: z.string().optional().nullable(),
   conteudo: z.string().min(1, 'Conteúdo é obrigatório'),
+  conteudo_en: z.string().optional().nullable(),
   imagem_destaque: z.string().optional(),
   publicado: z.boolean().default(false),
   data_publicacao: z.date().optional(),
@@ -56,11 +60,15 @@ export const BlogForm = ({ initialData, onSubmit, onCancel, isSubmitting }: Blog
     resolver: zodResolver(blogFormSchema),
     defaultValues: {
       titulo: initialData?.titulo || '',
+      titulo_en: initialData?.titulo_en || '',
       slug: initialData?.slug || '',
       categoria: initialData?.categoria || '',
+      categoria_en: initialData?.categoria_en || '',
       tags: initialData?.tags || [],
       resumo: initialData?.resumo || '',
+      resumo_en: initialData?.resumo_en || '',
       conteudo: initialData?.conteudo || '',
+      conteudo_en: initialData?.conteudo_en || '',
       imagem_destaque: initialData?.imagem_destaque || '',
       publicado: initialData?.publicado || false,
       data_publicacao: initialData?.data_publicacao || undefined,
@@ -129,7 +137,7 @@ export const BlogForm = ({ initialData, onSubmit, onCancel, isSubmitting }: Blog
               name="titulo"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Título</FormLabel>
+                  <FormLabel>Título (Português)</FormLabel>
                   <FormControl>
                     <Input placeholder="Digite o título do post" {...field} />
                   </FormControl>
@@ -138,6 +146,22 @@ export const BlogForm = ({ initialData, onSubmit, onCancel, isSubmitting }: Blog
               )}
             />
 
+            <FormField
+              control={form.control}
+              name="titulo_en"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Título (Inglês) - Opcional</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter post title in English" {...field} value={field.value || ''} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2 mt-4">
             <FormField
               control={form.control}
               name="slug"
@@ -153,47 +177,91 @@ export const BlogForm = ({ initialData, onSubmit, onCancel, isSubmitting }: Blog
             />
           </div>
 
-          <FormField
-            control={form.control}
-            name="categoria"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Categoria</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione uma categoria" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="Barcos">Barcos</SelectItem>
-                    <SelectItem value="Cachoeiras">Cachoeiras</SelectItem>
-                    <SelectItem value="Camping">Camping</SelectItem>
-                    <SelectItem value="Ecoturismo">Ecoturismo</SelectItem>
-                    <SelectItem value="Eventos">Eventos</SelectItem>
-                    <SelectItem value="Fauna">Fauna</SelectItem>
-                    <SelectItem value="Flora">Flora</SelectItem>
-                    <SelectItem value="Guias">Guias</SelectItem>
-                    <SelectItem value="História">História</SelectItem>
-                    <SelectItem value="Hotéis">Hotéis</SelectItem>
-                    <SelectItem value="Lanchas">Lanchas</SelectItem>
-                    <SelectItem value="Mapas">Mapas</SelectItem>
-                    <SelectItem value="Marinas">Marinas</SelectItem>
-                    <SelectItem value="Notícias">Notícias</SelectItem>
-                    <SelectItem value="Passeios">Passeios</SelectItem>
-                    <SelectItem value="Pesca Esportiva">Pesca Esportiva</SelectItem>
-                    <SelectItem value="Pousadas">Pousadas</SelectItem>
-                    <SelectItem value="Praias">Praias</SelectItem>
-                    <SelectItem value="Ranchos">Ranchos</SelectItem>
-                    <SelectItem value="Represa de Três Marias">Represa de Três Marias</SelectItem>
-                    <SelectItem value="Restaurantes">Restaurantes</SelectItem>
-                    <SelectItem value="Rio São Francisco">Rio São Francisco</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="grid gap-4 md:grid-cols-2 mt-4">
+            <FormField
+              control={form.control}
+              name="categoria"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Categoria (Português)</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione uma categoria" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Barcos">Barcos</SelectItem>
+                      <SelectItem value="Cachoeiras">Cachoeiras</SelectItem>
+                      <SelectItem value="Camping">Camping</SelectItem>
+                      <SelectItem value="Ecoturismo">Ecoturismo</SelectItem>
+                      <SelectItem value="Eventos">Eventos</SelectItem>
+                      <SelectItem value="Fauna">Fauna</SelectItem>
+                      <SelectItem value="Flora">Flora</SelectItem>
+                      <SelectItem value="Guias">Guias</SelectItem>
+                      <SelectItem value="História">História</SelectItem>
+                      <SelectItem value="Hotéis">Hotéis</SelectItem>
+                      <SelectItem value="Lanchas">Lanchas</SelectItem>
+                      <SelectItem value="Mapas">Mapas</SelectItem>
+                      <SelectItem value="Marinas">Marinas</SelectItem>
+                      <SelectItem value="Notícias">Notícias</SelectItem>
+                      <SelectItem value="Passeios">Passeios</SelectItem>
+                      <SelectItem value="Pesca Esportiva">Pesca Esportiva</SelectItem>
+                      <SelectItem value="Pousadas">Pousadas</SelectItem>
+                      <SelectItem value="Praias">Praias</SelectItem>
+                      <SelectItem value="Ranchos">Ranchos</SelectItem>
+                      <SelectItem value="Represa de Três Marias">Represa de Três Marias</SelectItem>
+                      <SelectItem value="Restaurantes">Restaurantes</SelectItem>
+                      <SelectItem value="Rio São Francisco">Rio São Francisco</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="categoria_en"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Categoria (Inglês) - Opcional</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a category" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Boats">Boats</SelectItem>
+                      <SelectItem value="Waterfalls">Waterfalls</SelectItem>
+                      <SelectItem value="Camping">Camping</SelectItem>
+                      <SelectItem value="Ecotourism">Ecotourism</SelectItem>
+                      <SelectItem value="Events">Events</SelectItem>
+                      <SelectItem value="Fauna">Fauna</SelectItem>
+                      <SelectItem value="Flora">Flora</SelectItem>
+                      <SelectItem value="Guides">Guides</SelectItem>
+                      <SelectItem value="History">History</SelectItem>
+                      <SelectItem value="Hotels">Hotels</SelectItem>
+                      <SelectItem value="Speedboats">Speedboats</SelectItem>
+                      <SelectItem value="Maps">Maps</SelectItem>
+                      <SelectItem value="Marinas">Marinas</SelectItem>
+                      <SelectItem value="News">News</SelectItem>
+                      <SelectItem value="Tours">Tours</SelectItem>
+                      <SelectItem value="Sport Fishing">Sport Fishing</SelectItem>
+                      <SelectItem value="Guesthouses">Guesthouses</SelectItem>
+                      <SelectItem value="Beaches">Beaches</SelectItem>
+                      <SelectItem value="Ranches">Ranches</SelectItem>
+                      <SelectItem value="Três Marias Dam">Três Marias Dam</SelectItem>
+                      <SelectItem value="Restaurants">Restaurants</SelectItem>
+                      <SelectItem value="São Francisco River">São Francisco River</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
           <FormField
             control={form.control}
@@ -215,41 +283,82 @@ export const BlogForm = ({ initialData, onSubmit, onCancel, isSubmitting }: Blog
         </FormSection>
 
         <FormSection title="Conteúdo">
-          <FormField
-            control={form.control}
-            name="resumo"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Resumo</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Digite um resumo do post"
-                    className="min-h-[100px]"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="resumo"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Resumo (Português)</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Digite um resumo do post"
+                      className="min-h-[100px]"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name="conteudo"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Conteúdo</FormLabel>
-                <FormControl>
-                  <RichTextEditor
-                    value={field.value}
-                    onChange={field.onChange}
-                    placeholder="Escreva o conteúdo completo do post..."
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name="resumo_en"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Resumo (Inglês) - Opcional</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Enter post excerpt in English"
+                      className="min-h-[100px]"
+                      {...field}
+                      value={field.value || ''}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="space-y-4 mt-6">
+            <FormField
+              control={form.control}
+              name="conteudo"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Conteúdo (Português)</FormLabel>
+                  <FormControl>
+                    <RichTextEditor
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Escreva o conteúdo completo do post..."
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="conteudo_en"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Conteúdo (Inglês) - Opcional</FormLabel>
+                  <FormControl>
+                    <RichTextEditor
+                      value={field.value || ''}
+                      onChange={field.onChange}
+                      placeholder="Write the full post content in English..."
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
         </FormSection>
 
         <FormSection title="Imagem de Destaque">

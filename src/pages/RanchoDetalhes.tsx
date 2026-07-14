@@ -11,6 +11,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useTranslation } from 'react-i18next';
 import {
   MapPin, Users, Bed, Bath, Maximize, Star,
   Wifi, Car, Waves, Utensils, Wind, Tv,
@@ -42,6 +43,8 @@ const amenityIcons: { [key: string]: React.ReactNode } = {
 const RanchoDetalhes = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
+  const isEn = i18n.language.startsWith('en');
 
   // Use optimized hook with cache
   const { data: ranchoData, isLoading: loading, refetch } = useRanchoBySlug(slug);
@@ -63,8 +66,11 @@ const RanchoDetalhes = () => {
     return {
       id: ranchoData.id,
       nome: ranchoData.nome,
+      nome_en: ranchoData.nome_en,
       descricao: ranchoData.descricao,
+      descricao_en: ranchoData.descricao_en,
       localizacao: ranchoData.localizacao,
+      localizacao_en: ranchoData.localizacao_en,
       capacidade: ranchoData.capacidade,
       preco: ranchoData.preco,
       rating: ranchoData.rating,
@@ -91,6 +97,10 @@ const RanchoDetalhes = () => {
     };
   }, [ranchoData]);
 
+  const nome = (isEn && rancho?.nome_en) ? rancho.nome_en : rancho?.nome || '';
+  const descricao = (isEn && rancho?.descricao_en) ? rancho.descricao_en : rancho?.descricao || '';
+  const localizacao = (isEn && rancho?.localizacao_en) ? rancho.localizacao_en : rancho?.localizacao || '';
+
   // Fetch active ranchos to suggest similar ones
   const { data: allRanchosData } = useRanchos(true);
 
@@ -105,9 +115,12 @@ const RanchoDetalhes = () => {
     return filtered.slice(0, 3).map(ranchoItem => ({
       id: ranchoItem.id,
       name: ranchoItem.nome,
+      name_en: ranchoItem.nome_en,
       slug: ranchoItem.slug,
       description: ranchoItem.descricao || '',
+      description_en: ranchoItem.descricao_en,
       location: ranchoItem.localizacao,
+      location_en: ranchoItem.localizacao_en,
       capacity: ranchoItem.capacidade,
       price: ranchoItem.preco,
       rating: ranchoItem.rating,
@@ -199,10 +212,12 @@ const RanchoDetalhes = () => {
     let message: string;
     if (rancho.mensagem_whatsapp) {
       message = rancho.mensagem_whatsapp
-        .replace(/{nome}/g, rancho.nome)
-        .replace(/{localizacao}/g, rancho.localizacao);
+        .replace(/{nome}/g, nome)
+        .replace(/{localizacao}/g, localizacao);
     } else {
-      message = `Olá! Gostaria de fazer uma reserva no ${rancho.nome} (${rancho.localizacao}). Pode me passar mais informações sobre disponibilidade e valores?`;
+      message = isEn 
+        ? `Hello! I would like to book a stay at ${nome} (${localizacao}). Could you please send me more information about availability and rates?`
+        : `Olá! Gostaria de fazer uma reserva no ${nome} (${localizacao}). Pode me passar mais informações sobre disponibilidade e valores?`;
     }
 
     const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
@@ -246,14 +261,14 @@ const RanchoDetalhes = () => {
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>{rancho.nome} | Rancho em {rancho.localizacao} - PradoAqui</title>
-        <meta name="description" content={rancho.descricao?.substring(0, 160) || `Rancho ${rancho.nome} em ${rancho.localizacao}. Capacidade para ${rancho.capacidade} pessoas.`} />
-        <meta property="og:title" content={`${rancho.nome} | PradoAqui`} />
-        <meta property="og:description" content={rancho.descricao?.substring(0, 160) || `Rancho para pesca em ${rancho.localizacao}`} />
+        <title>{nome} | {t('labels.location')} em {localizacao} - PradoAqui</title>
+        <meta name="description" content={descricao?.substring(0, 160) || `Rancho ${nome} em ${localizacao}.`} />
+        <meta property="og:title" content={`${nome} | PradoAqui`} />
+        <meta property="og:description" content={descricao?.substring(0, 160) || `Rancho para pesca em ${localizacao}`} />
         <meta property="og:image" content={mainImage} />
         <meta property="og:url" content={pageUrl} />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${rancho.nome} | PradoAqui`} />
+        <meta name="twitter:title" content={`${nome} | PradoAqui`} />
         <meta name="twitter:image" content={mainImage} />
         <link rel="canonical" href={pageUrl} />
       </Helmet>
@@ -269,13 +284,13 @@ const RanchoDetalhes = () => {
             className="mb-4"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Voltar para Ranchos
+            {t('labels.backToRanches')}
           </Button>
         </div>
 
         {/* Image Gallery */}
         <div className="max-w-7xl mx-auto px-4 mb-8">
-          <ImageGallery images={rancho.imagens} title={rancho.nome} />
+          <ImageGallery images={rancho.imagens} title={nome} />
         </div>
 
         {/* Content */}
@@ -287,22 +302,22 @@ const RanchoDetalhes = () => {
               <div>
                 <div className="flex items-start justify-between mb-2">
                   <h1 className="text-3xl lg:text-4xl font-bold text-foreground">
-                    {rancho.nome}
+                    {nome}
                   </h1>
                   {rancho.disponivel && (
-                    <Badge className="bg-green-500 text-white">Disponível</Badge>
+                    <Badge className="bg-green-500 text-white">{t('labels.available')}</Badge>
                   )}
                 </div>
 
                 <div className="flex items-center text-muted-foreground mb-4">
                   <MapPin className="h-5 w-5 mr-2" />
-                  <span className="text-lg">{rancho.localizacao}</span>
+                  <span className="text-lg">{localizacao}</span>
                 </div>
 
                 <div className="flex items-center space-x-2">
                   <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
                   <span className="font-semibold">{rancho.rating}</span>
-                  <span className="text-muted-foreground">• Avaliação</span>
+                  <span className="text-muted-foreground">• {t('labels.ratingLabel')}</span>
                 </div>
               </div>
 
@@ -314,7 +329,7 @@ const RanchoDetalhes = () => {
                   <CardContent className="pt-6 text-center">
                     <Users className="h-8 w-8 mx-auto mb-2 text-primary" />
                     <div className="font-semibold text-xl">{rancho.capacidade}</div>
-                    <div className="text-sm text-muted-foreground">Pessoas</div>
+                    <div className="text-sm text-muted-foreground">{t('labels.pessoas')}</div>
                   </CardContent>
                 </Card>
 
@@ -322,7 +337,7 @@ const RanchoDetalhes = () => {
                   <CardContent className="pt-6 text-center">
                     <Bed className="h-8 w-8 mx-auto mb-2 text-primary" />
                     <div className="font-semibold text-xl">{rancho.quartos}</div>
-                    <div className="text-sm text-muted-foreground">Quartos</div>
+                    <div className="text-sm text-muted-foreground">{t('labels.bedrooms')}</div>
                   </CardContent>
                 </Card>
 
@@ -330,7 +345,7 @@ const RanchoDetalhes = () => {
                   <CardContent className="pt-6 text-center">
                     <Bath className="h-8 w-8 mx-auto mb-2 text-primary" />
                     <div className="font-semibold text-xl">{rancho.banheiros}</div>
-                    <div className="text-sm text-muted-foreground">Banheiros</div>
+                    <div className="text-sm text-muted-foreground">{t('labels.bathrooms')}</div>
                   </CardContent>
                 </Card>
 
@@ -338,7 +353,7 @@ const RanchoDetalhes = () => {
                   <CardContent className="pt-6 text-center">
                     <Maximize className="h-8 w-8 mx-auto mb-2 text-primary" />
                     <div className="font-semibold text-xl">{rancho.area}m²</div>
-                    <div className="text-sm text-muted-foreground">Área</div>
+                    <div className="text-sm text-muted-foreground">{t('labels.area')}</div>
                   </CardContent>
                 </Card>
               </div>
@@ -347,9 +362,9 @@ const RanchoDetalhes = () => {
 
               {/* Description */}
               <div>
-                <h2 className="text-2xl font-bold mb-4">Sobre o Rancho</h2>
+                <h2 className="text-2xl font-bold mb-4">{t('labels.aboutRanch')}</h2>
                 <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
-                  {rancho.descricao}
+                  {descricao}
                 </p>
               </div>
 
@@ -509,10 +524,7 @@ const RanchoDetalhes = () => {
                     </Card>
                   </div>
                 </>
-              )}
-            </div>
-
-            {/* Sidebar - Booking Card */}
+                      {/* Sidebar - Booking Card */}
             <div className="lg:col-span-1">
               <Card className="sticky top-24 shadow-lg">
                 <CardContent className="p-6 space-y-6">
@@ -520,26 +532,26 @@ const RanchoDetalhes = () => {
                     <div className="text-3xl font-bold text-foreground">
                       R$ {rancho.preco.toFixed(2)}
                     </div>
-                    <div className="text-muted-foreground">por dia por pessoa</div>
+                    <div className="text-muted-foreground">{t('labels.pricePerPerson')}</div>
                   </div>
 
                   <Separator />
 
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <h3 className="font-semibold">Inclui:</h3>
+                      <h3 className="font-semibold">{t('labels.bookingDetails')}:</h3>
                       <ul className="space-y-2 text-sm text-muted-foreground">
                         <li className="flex items-start">
                           <CheckCircle className="h-4 w-4 mr-2 text-green-500 mt-0.5" />
-                          <span>Acomodação para até {rancho.capacidade} pessoas</span>
+                          <span>{t('labels.bookingIncludeCap', { count: rancho.capacidade })}</span>
                         </li>
                         <li className="flex items-start">
                           <CheckCircle className="h-4 w-4 mr-2 text-green-500 mt-0.5" />
-                          <span>{rancho.quartos} quartos e {rancho.banheiros} banheiros</span>
+                          <span>{t('labels.bookingIncludeRooms', { bedrooms: rancho.quartos, bathrooms: rancho.banheiros })}</span>
                         </li>
                         <li className="flex items-start">
                           <CheckCircle className="h-4 w-4 mr-2 text-green-500 mt-0.5" />
-                          <span>Todas as comodidades listadas</span>
+                          <span>{t('labels.bookingIncludeAmenities')}</span>
                         </li>
                       </ul>
                     </div>
@@ -551,11 +563,11 @@ const RanchoDetalhes = () => {
                     size="lg"
                   >
                     <MessageCircle className="h-5 w-5 mr-2" />
-                    {rancho.texto_botao_whatsapp || 'Reservar via WhatsApp'}
+                    {rancho.texto_botao_whatsapp || t('buttons.bookWhatsApp')}
                   </Button>
 
                   <p className="text-xs text-center text-muted-foreground">
-                    Entre em contato para consultar disponibilidade e confirmar sua reserva
+                    {t('labels.bookingDetailsText')}
                   </p>
                 </CardContent>
               </Card>
@@ -564,11 +576,11 @@ const RanchoDetalhes = () => {
 
           {/* Seção de Avaliações */}
           <div className="mt-12">
-            <h2 className="text-3xl font-bold mb-6">Avaliações dos Hóspedes</h2>
+            <h2 className="text-3xl font-bold mb-6">{t('labels.reviews')}</h2>
             <Tabs defaultValue="reviews" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="reviews">Ver Avaliações</TabsTrigger>
-                <TabsTrigger value="new">Deixar Avaliação</TabsTrigger>
+                <TabsTrigger value="reviews">{t('labels.viewReviews')}</TabsTrigger>
+                <TabsTrigger value="new">{t('labels.writeReview')}</TabsTrigger>
               </TabsList>
               <TabsContent value="reviews" className="mt-6">
                 <ReviewsList ranchoId={rancho.id} />
@@ -591,8 +603,8 @@ const RanchoDetalhes = () => {
                 <MapPin className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h2 className="text-2xl md:text-3xl font-bold text-foreground">Localização</h2>
-                <p className="text-sm text-muted-foreground">Veja como chegar ao local da pescaria</p>
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground">{t('labels.location')}</h2>
+                <p className="text-sm text-muted-foreground">{t('labels.howToGet')}</p>
               </div>
             </div>
 
@@ -606,29 +618,29 @@ const RanchoDetalhes = () => {
                       <p className="font-medium text-foreground">{rancho.endereco_completo}</p>
                       <div className="flex flex-wrap gap-2 mt-3">
                         <Button
-                          size="sm"
-                          variant="outline"
-                          className="border-blue-300 dark:border-blue-700 hover:bg-blue-100 dark:hover:bg-blue-900/30"
-                          onClick={() => {
-                            const queryStr = (rancho.latitude && rancho.longitude) ? `${rancho.latitude},${rancho.longitude}` : encodeURIComponent(rancho.endereco_completo || '');
-                            const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${queryStr}`;
-                            window.open(mapsUrl, '_blank');
-                          }}
+                           size="sm"
+                           variant="outline"
+                           className="border-blue-300 dark:border-blue-700 hover:bg-blue-100 dark:hover:bg-blue-900/30"
+                           onClick={() => {
+                             const queryStr = (rancho.latitude && rancho.longitude) ? `${rancho.latitude},${rancho.longitude}` : encodeURIComponent(rancho.endereco_completo || '');
+                             const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${queryStr}`;
+                             window.open(mapsUrl, '_blank');
+                           }}
                         >
                           <ExternalLink className="h-4 w-4 mr-2" />
-                          Abrir no Maps
+                          {t('buttons.abrirMaps')}
                         </Button>
                         <Button
-                          size="sm"
-                          variant="outline"
-                          className="border-blue-300 dark:border-blue-700 hover:bg-blue-100 dark:hover:bg-blue-900/30"
-                          onClick={() => {
-                            navigator.clipboard.writeText(rancho.endereco_completo || '');
-                            toast.success('Endereço copiado!');
-                          }}
+                           size="sm"
+                           variant="outline"
+                           className="border-blue-300 dark:border-blue-700 hover:bg-blue-100 dark:hover:bg-blue-900/30"
+                           onClick={() => {
+                             navigator.clipboard.writeText(rancho.endereco_completo || '');
+                             toast.success(t('labels.addressCopied'));
+                           }}
                         >
                           <Copy className="h-4 w-4 mr-2" />
-                          Copiar
+                          {t('buttons.copiar')}
                         </Button>
                       </div>
                     </div>
@@ -643,7 +655,7 @@ const RanchoDetalhes = () => {
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <span className="text-white text-sm font-medium flex items-center gap-2">
                     <Compass className="h-4 w-4" />
-                    {rancho.latitude && rancho.longitude ? `${Math.abs(rancho.latitude).toFixed(4)}°S, ${Math.abs(rancho.longitude).toFixed(4)}°W` : 'Localização'}
+                    {rancho.latitude && rancho.longitude ? `${Math.abs(rancho.latitude).toFixed(4)}°S, ${Math.abs(rancho.longitude).toFixed(4)}°W` : t('labels.location')}
                   </span>
                   <Badge
                     className="bg-white/20 text-white border-white/30 hover:bg-white/30 cursor-pointer transition-all hover:scale-105 active:scale-95"
@@ -651,26 +663,26 @@ const RanchoDetalhes = () => {
                       const queryStr = (rancho.latitude && rancho.longitude) ? `${rancho.latitude},${rancho.longitude}` : encodeURIComponent(rancho.endereco_completo || '');
                       window.open(`https://www.google.com/maps/search/?api=1&query=${queryStr}`, '_blank');
                     }}
-                    title="Ver localização no Google Maps"
+                    title={isEn ? "See location on Google Maps" : "Ver localização no Google Maps"}
                   >
                     <span className="relative flex h-2 w-2 mr-2">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
                       <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
                     </span>
-                    Localização exata
+                    {t('labels.exactLocation')}
                   </Badge>
                 </div>
               </div>
               <div className="relative w-full h-[400px]">
                 <iframe
-                  src={rancho.latitude && rancho.longitude ? `https://www.google.com/maps?q=${rancho.latitude},${rancho.longitude}&hl=pt-BR&z=14&output=embed` : `https://www.google.com/maps?q=${encodeURIComponent(rancho.endereco_completo || '')}&hl=pt-BR&z=14&output=embed`}
+                  src={rancho.latitude && rancho.longitude ? `https://www.google.com/maps?q=${rancho.latitude},${rancho.longitude}&hl=${isEn ? 'en' : 'pt-BR'}&z=14&output=embed` : `https://www.google.com/maps?q=${encodeURIComponent(rancho.endereco_completo || '')}&hl=${isEn ? 'en' : 'pt-BR'}&z=14&output=embed`}
                   width="100%"
                   height="100%"
                   style={{ border: 0 }}
                   allowFullScreen
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
-                  title={`Mapa - ${rancho.nome}`}
+                  title={`Mapa - ${nome}`}
                   className="absolute inset-0"
                 />
               </div>
@@ -684,9 +696,9 @@ const RanchoDetalhes = () => {
         <section className="py-8 bg-background">
           <div className="container mx-auto px-4 max-w-4xl">
             <ShareButtons
-              titulo={rancho.nome}
+              titulo={nome}
               url={pageUrl}
-              descricao={`Rancho em ${rancho.localizacao} para ${rancho.capacidade} pessoas`}
+              descricao={isEn ? `Ranch in ${localizacao} for up to ${rancho.capacidade} guests` : `Rancho em ${localizacao} para ${rancho.capacidade} pessoas`}
             />
           </div>
         </section>
@@ -698,7 +710,7 @@ const RanchoDetalhes = () => {
           <div className="container mx-auto px-4">
             <Card>
               <CardContent className="p-6">
-                <h2 className="text-2xl font-bold mb-6">Perguntas Frequentes</h2>
+                <h2 className="text-2xl font-bold mb-6">{t('labels.faq')}</h2>
                 <RanchoFAQs ranchoId={rancho.id} />
               </CardContent>
             </Card>
@@ -712,12 +724,12 @@ const RanchoDetalhes = () => {
           <div className="container max-w-7xl mx-auto px-4">
             <div className="flex justify-between items-end mb-8">
               <div>
-                <h2 className="text-2xl md:text-3xl font-bold text-foreground">Outros Ranchos para Locação</h2>
-                <p className="text-sm text-muted-foreground mt-1">Conheça outras excelentes opções no Rio São Francisco</p>
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground">{t('labels.suggestedRanchos')}</h2>
+                <p className="text-sm text-muted-foreground mt-1">{t('labels.suggestedRanchosSub')}</p>
               </div>
               <Button variant="outline" asChild className="hidden sm:inline-flex border-rio-blue text-rio-blue hover:bg-rio-blue hover:text-white rounded-xl">
                 <Link to="/ranchos">
-                  Ver Todos
+                  {t('buttons.verTodas')}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
@@ -732,7 +744,7 @@ const RanchoDetalhes = () => {
             <div className="mt-8 text-center sm:hidden">
               <Button variant="outline" asChild className="w-full border-rio-blue text-rio-blue hover:bg-rio-blue hover:text-white rounded-xl">
                 <Link to="/ranchos">
-                  Ver Todos os Ranchos
+                  {t('buttons.verTodosRanchos')}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>

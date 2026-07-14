@@ -3,8 +3,10 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Fish, Phone, Mail, MapPin, Facebook, Instagram, Youtube, Download } from 'lucide-react';
 import { useSiteSettings } from '@/hooks/useOptimizedData';
 import { usePWALifecycle } from '@/hooks/usePWALifecycle';
+import { useTranslation } from 'react-i18next';
 
 const Footer = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { data: settings } = useSiteSettings();
   const location = useLocation();
@@ -36,25 +38,24 @@ const Footer = () => {
               <Fish className="h-8 w-8 text-rio-blue" />
               <div>
                 <h3 className="text-xl font-bold">PradoAqui</h3>
-                <p className="text-sm text-gray-400">Rio São Francisco</p>
+                <p className="text-sm text-gray-400">{t('hero.titlePart2')}</p>
               </div>
             </div>
             <p className="text-gray-300 text-sm">
-              Sua experiência de pesca no Rio São Francisco começa aqui. 
-              Oferecemos os melhores ranchos e pacotes para uma pescaria inesquecível.
+              {t('footer.desc')}
             </p>
           </div>
 
           {/* Navigation Links */}
           <div className="space-y-4">
-            <h4 className="text-lg font-semibold">Navegação</h4>
+            <h4 className="text-lg font-semibold">{t('labels.navigation')}</h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <button 
                   onClick={() => handleNavClick('/', '')}
                   className="text-gray-300 hover:text-rio-blue transition-colors bg-transparent border-none cursor-pointer"
                 >
-                  Início
+                  {t('nav.home')}
                 </button>
               </li>
               <li>
@@ -62,7 +63,7 @@ const Footer = () => {
                   onClick={() => handleNavClick('/ranchos', '')}
                   className="text-gray-300 hover:text-rio-blue transition-colors bg-transparent border-none cursor-pointer"
                 >
-                  Ranchos
+                  {t('nav.ranchos')}
                 </button>
               </li>
               <li>
@@ -70,7 +71,7 @@ const Footer = () => {
                   onClick={() => handleNavClick('/vendas', '')}
                   className="text-gray-300 hover:text-rio-blue transition-colors bg-transparent border-none cursor-pointer"
                 >
-                  Venda
+                  {t('nav.venda')}
                 </button>
               </li>
               <li>
@@ -78,7 +79,7 @@ const Footer = () => {
                   onClick={() => handleNavClick('/pacotes', '')}
                   className="text-gray-300 hover:text-rio-blue transition-colors bg-transparent border-none cursor-pointer"
                 >
-                  Pacotes
+                  {t('nav.pacotes')}
                 </button>
               </li>
               <li>
@@ -86,7 +87,7 @@ const Footer = () => {
                   onClick={() => handleNavClick('/blog', '')}
                   className="text-gray-300 hover:text-rio-blue transition-colors bg-transparent border-none cursor-pointer"
                 >
-                  Blog
+                  {t('nav.blog')}
                 </button>
               </li>
               <li>
@@ -94,7 +95,7 @@ const Footer = () => {
                   onClick={() => handleNavClick('/live', '')}
                   className="text-gray-300 hover:text-rio-blue transition-colors bg-transparent border-none cursor-pointer"
                 >
-                  Transmissão Ao Vivo
+                  {t('nav.live')}
                 </button>
               </li>
             </ul>
@@ -102,7 +103,7 @@ const Footer = () => {
 
           {/* Contact Info */}
           <div className="space-y-4">
-            <h4 className="text-lg font-semibold">Contato</h4>
+            <h4 className="text-lg font-semibold">{t('labels.contact')}</h4>
             <div className="space-y-3 text-sm">
               <div className="flex items-center space-x-2">
                 <Phone className="h-4 w-4 text-rio-blue" />
@@ -124,7 +125,7 @@ const Footer = () => {
 
           {/* Social Media */}
           <div className="space-y-4">
-            <h4 className="text-lg font-semibold">Redes Sociais</h4>
+            <h4 className="text-lg font-semibold">{t('labels.socialMedia')}</h4>
             <div className="flex space-x-4">
               {settings?.facebook_url && (
                 <a href={settings.facebook_url} target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-rio-blue transition-colors" aria-label="Facebook">
@@ -157,7 +158,7 @@ const Footer = () => {
               )}
               {/* Fallback se nenhuma rede estiver configurada */}
               {!settings?.facebook_url && !settings?.instagram_url && !settings?.youtube_url && !settings?.tiktok_url && !settings?.twitter_url && (
-                <span className="text-gray-500 text-sm">Nenhuma rede social configurada</span>
+                <span className="text-gray-500 text-sm">{t('labels.noSocialMedia')}</span>
               )}
             </div>
             {/* Botão Instalar App - só aparece quando possível */}
@@ -167,7 +168,7 @@ const Footer = () => {
                 className="mt-4 flex items-center gap-2 text-sm text-gray-300 hover:text-rio-blue transition-colors bg-transparent border border-gray-700 rounded-lg px-4 py-2"
               >
                 <Download className="h-4 w-4" />
-                Instalar App
+                {t('buttons.installApp')}
               </button>
             )}
           </div>
@@ -177,22 +178,22 @@ const Footer = () => {
         <div className="border-t border-gray-800 mt-8 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="text-sm text-gray-400">
-              {settings?.copyright_text || '© 2025 PradoAqui. Todos os direitos reservados.'}
+              {settings?.copyright_text || `© 2026 PradoAqui. ${t('footer.copyright', 'Todos os direitos reservados.')}`}
             </div>
             <div className="flex flex-wrap justify-center md:justify-end space-x-6 text-sm">
               <Link to="/politica-privacidade" className="text-gray-300 hover:text-rio-blue transition-colors">
-                Política de Privacidade
+                {t('labels.privacyPolicy')}
               </Link>
               <a href="#termos" className="text-gray-300 hover:text-rio-blue transition-colors">
-                Termos de Uso
+                {t('labels.termsOfUse')}
               </a>
               <a href="#cookies" className="text-gray-300 hover:text-rio-blue transition-colors" onClick={e => {
-              e.preventDefault();
-              // Reset cookie consent to show banner again
-              localStorage.removeItem('cookie-consent');
-              window.location.reload();
-            }}>
-                Configurar Cookies
+                e.preventDefault();
+                // Reset cookie consent to show banner again
+                localStorage.removeItem('cookie-consent');
+                window.location.reload();
+              }}>
+                {t('labels.cookieSettings')}
               </a>
             </div>
           </div>

@@ -18,8 +18,11 @@ import { AutoShareButtons } from '@/components/blog/AutoShareButtons';
 import { PaidMediaBannerDisplay } from '@/components/blog/PaidMediaBannerDisplay';
 import RelatedPosts from '@/components/blog/RelatedPosts';
 import { SITE_CONFIG } from '@/lib/constants';
+import { useTranslation } from 'react-i18next';
 
 const BlogPost = () => {
+  const { t, i18n } = useTranslation();
+  const isEn = i18n.language.startsWith('en');
   const { slug } = useParams<{ slug: string }>();
   const { data: siteSettings } = useSiteSettings();
 
@@ -39,17 +42,20 @@ const BlogPost = () => {
     enabled: !!slug,
   });
 
-  // View count removed - using Google Analytics for accurate tracking
+  const postTitle = (isEn && post?.titulo_en) ? post.titulo_en : post?.titulo || '';
+  const postExcerpt = (isEn && post?.resumo_en) ? post.resumo_en : post?.resumo || '';
+  const postContent = (isEn && post?.conteudo_en) ? post.conteudo_en : post?.conteudo || '';
+  const postCategory = (isEn && post?.categoria_en) ? post.categoria_en : post?.categoria || '';
 
   // Sanitize HTML content
   const sanitizedContent = React.useMemo(() => {
-    if (!post?.conteudo) return '';
-    return DOMPurify.sanitize(post.conteudo, {
+    if (!postContent) return '';
+    return DOMPurify.sanitize(postContent, {
       ADD_TAGS: ['iframe'],
       ADD_ATTR: ['src', 'width', 'height', 'frameborder', 'allow', 'allowfullscreen', 'class', 'style'],
       ALLOW_DATA_ATTR: true,
     });
-  }, [post?.conteudo]);
+  }, [postContent]);
 
   if (isLoading) {
     return (
@@ -78,12 +84,12 @@ const BlogPost = () => {
         <Header />
         <main className="flex-1 flex items-center justify-center bg-background">
           <div className="text-center">
-            <h1 className="text-4xl font-bold mb-4">Post não encontrado</h1>
-            <p className="text-muted-foreground mb-8">O post que você está procurando não existe.</p>
+            <h1 className="text-4xl font-bold mb-4">{t('labels.postNotFound')}</h1>
+            <p className="text-muted-foreground mb-8">{t('labels.postNotFoundSub')}</p>
             <Button asChild>
               <Link to="/blog">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Voltar ao Blog
+                {t('buttons.backToBlog')}
               </Link>
             </Button>
           </div>
@@ -99,16 +105,16 @@ const BlogPost = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Helmet>
-        <title>{post.titulo} | Blog PradoAqui</title>
-        <meta name="description" content={post.resumo || post.titulo} />
-        <meta property="og:title" content={post.titulo} />
-        <meta property="og:description" content={post.resumo || post.titulo} />
+        <title>{isEn ? `${postTitle} | PradoAqui Blog` : `${postTitle} | Blog PradoAqui`}</title>
+        <meta name="description" content={postExcerpt || postTitle} />
+        <meta property="og:title" content={postTitle} />
+        <meta property="og:description" content={postExcerpt || postTitle} />
         <meta property="og:image" content={post.imagem_destaque || '/og-image.png'} />
         <meta property="og:url" content={pageUrl} />
         <meta property="og:type" content="article" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={post.titulo} />
-        <meta name="twitter:description" content={post.resumo || post.titulo} />
+        <meta name="twitter:title" content={postTitle} />
+        <meta name="twitter:description" content={postExcerpt || postTitle} />
         <meta name="twitter:image" content={post.imagem_destaque || '/og-image.png'} />
         <link rel="canonical" href={pageUrl} />
       </Helmet>
@@ -121,20 +127,20 @@ const BlogPost = () => {
           <Button variant="ghost" asChild>
             <Link to="/blog">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Voltar ao Blog
+              {t('buttons.backToBlog')}
             </Link>
           </Button>
         </div>
 
         <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Category Badge */}
-          {post.categoria && (
-            <Badge className="mb-4">{post.categoria}</Badge>
+          {postCategory && (
+            <Badge className="mb-4">{postCategory}</Badge>
           )}
 
           {/* Title */}
           <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-            {post.titulo}
+            {postTitle}
           </h1>
 
           {/* Meta Information */}
@@ -142,7 +148,7 @@ const BlogPost = () => {
             <div className="flex items-center gap-1">
               <Calendar className="h-4 w-4" />
               <time>
-                {new Date(post.data_publicacao || post.created_at).toLocaleDateString('pt-BR', {
+                {new Date(post.data_publicacao || post.created_at).toLocaleDateString(isEn ? 'en-US' : 'pt-BR', {
                   day: 'numeric',
                   month: 'long',
                   year: 'numeric'
@@ -163,16 +169,16 @@ const BlogPost = () => {
             <div className="aspect-video mb-8 rounded-lg overflow-hidden">
               <img
                 src={post.imagem_destaque}
-                alt={post.titulo}
+                alt={postTitle}
                 className="w-full h-full object-cover"
               />
             </div>
           )}
 
           {/* Excerpt */}
-          {post.resumo && (
+          {postExcerpt && (
             <div className="bg-muted/50 border-l-4 border-primary p-6 rounded-r-lg mb-8">
-              <p className="text-lg leading-relaxed">{post.resumo}</p>
+              <p className="text-lg leading-relaxed">{postExcerpt}</p>
             </div>
           )}
 
@@ -193,9 +199,9 @@ const BlogPost = () => {
           {/* Auto Share Buttons - Always visible */}
           <AutoShareButtons
             postId={post.id}
-            titulo={post.titulo}
+            titulo={postTitle}
             url={pageUrl}
-            resumo={post.resumo || undefined}
+            resumo={postExcerpt || undefined}
           />
 
           {/* Manual Social Media Links - Only if configured */}

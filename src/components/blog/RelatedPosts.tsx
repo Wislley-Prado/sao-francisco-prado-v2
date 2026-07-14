@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, ArrowRight } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useTranslation } from 'react-i18next';
 
 interface RelatedPostsProps {
   currentPostId: string;
@@ -14,13 +15,16 @@ interface RelatedPostsProps {
 }
 
 const RelatedPosts = ({ currentPostId, categoria, tags }: RelatedPostsProps) => {
+  const { t, i18n } = useTranslation();
+  const isEn = i18n.language.startsWith('en');
+
   const { data: posts, isLoading } = useQuery({
     queryKey: ['related-posts', currentPostId, categoria, tags],
     queryFn: async () => {
       // 1. Fetch posts of the same category (excluding current post)
       let query = supabase
         .from('blog_posts')
-        .select('id, titulo, slug, resumo, imagem_destaque, categoria, data_publicacao, created_at, visualizacoes, tags')
+        .select('id, titulo, slug, resumo, imagem_destaque, categoria, data_publicacao, created_at, visualizacoes, tags, titulo_en, resumo_en, categoria_en')
         .eq('publicado', true)
         .neq('id', currentPostId)
         .order('data_publicacao', { ascending: false })
@@ -53,7 +57,7 @@ const RelatedPosts = ({ currentPostId, categoria, tags }: RelatedPostsProps) => 
         
         let fallbackQuery = supabase
           .from('blog_posts')
-          .select('id, titulo, slug, resumo, imagem_destaque, categoria, data_publicacao, created_at, visualizacoes, tags')
+          .select('id, titulo, slug, resumo, imagem_destaque, categoria, data_publicacao, created_at, visualizacoes, tags, titulo_en, resumo_en, categoria_en')
           .eq('publicado', true)
           .order('data_publicacao', { ascending: false })
           .limit(3 - finalPosts.length);
@@ -97,57 +101,63 @@ const RelatedPosts = ({ currentPostId, categoria, tags }: RelatedPostsProps) => 
   return (
     <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 border-t">
       <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold mb-3">Continue Lendo</h2>
+        <h2 className="text-3xl font-bold mb-3">{t('labels.continueReading')}</h2>
         <p className="text-muted-foreground text-lg">
-          Artigos relacionados que você também pode gostar
+          {t('labels.relatedArticles')}
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {posts.map((post) => (
-          <Link
-            key={post.id}
-            to={`/blog/${post.slug}`}
-            className="group"
-          >
-            <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-300">
-              {post.imagem_destaque && (
-                <div className="aspect-video overflow-hidden">
-                  <img
-                    src={post.imagem_destaque}
-                    alt={post.titulo}
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
-                </div>
-              )}
-              <CardContent className="p-4">
-                {post.categoria && (
-                  <Badge className="mb-2">{post.categoria}</Badge>
-                )}
-                <h3 className="font-bold text-lg mb-2 line-clamp-2 group-hover:text-primary transition-colors">
-                  {post.titulo}
-                </h3>
-                {post.resumo && (
-                  <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-                    {post.resumo}
-                  </p>
-                )}
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <div className="flex items-center gap-1">
-                    <Calendar className="h-3 w-3" />
-                    <time>
-                      {new Date(post.data_publicacao || post.created_at).toLocaleDateString('pt-BR', {
-                        day: 'numeric',
-                        month: 'short',
-                      })}
-                    </time>
+        {posts.map((post) => {
+          const postTitle = (isEn && post.titulo_en) ? post.titulo_en : post.titulo;
+          const postExcerpt = (isEn && post.resumo_en) ? post.resumo_en : post.resumo;
+          const postCategory = (isEn && post.categoria_en) ? post.categoria_en : post.categoria;
+          
+          return (
+            <Link
+              key={post.id}
+              to={`/blog/${post.slug}`}
+              className="group"
+            >
+              <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                {post.imagem_destaque && (
+                  <div className="aspect-video overflow-hidden">
+                    <img
+                      src={post.imagem_destaque}
+                      alt={postTitle}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
                   </div>
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
-        ))}
+                )}
+                <CardContent className="p-4">
+                  {postCategory && (
+                    <Badge className="mb-2">{postCategory}</Badge>
+                  )}
+                  <h3 className="font-bold text-lg mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+                    {postTitle}
+                  </h3>
+                  {postExcerpt && (
+                    <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                      {postExcerpt}
+                    </p>
+                  )}
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      <Calendar className="h-3 w-3" />
+                      <time>
+                        {new Date(post.data_publicacao || post.created_at).toLocaleDateString(isEn ? 'en-US' : 'pt-BR', {
+                          day: 'numeric',
+                          month: 'short',
+                        })}
+                      </time>
+                    </div>
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          );
+        })}
       </div>
     </section>
   );

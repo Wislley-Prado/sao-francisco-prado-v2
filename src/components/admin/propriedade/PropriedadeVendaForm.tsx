@@ -35,10 +35,13 @@ import { CoordenadasHelper } from '@/components/admin/shared/CoordenadasHelper';
 
 const propriedadeSchema = z.object({
   titulo: z.string().min(3, 'Título deve ter no mínimo 3 caracteres'),
+  titulo_en: z.string().optional().nullable(),
   slug: z.string().min(3, 'Slug deve ter no mínimo 3 caracteres'),
   descricao: z.string().optional().or(z.literal('')),
+  descricao_en: z.string().optional().nullable(),
   tipo: z.string().min(1, 'Selecione o tipo de propriedade'),
   localizacao: z.string().min(3, 'Localização é obrigatória'),
+  localizacao_en: z.string().optional().nullable(),
   preco: z.number().min(0.01, 'Preço deve ser maior que zero'),
   area: z.number().optional().or(z.literal('')),
   unidade_area: z.string().default('hectares'),
@@ -60,10 +63,13 @@ type PropriedadeFormData = z.infer<typeof propriedadeSchema>;
 export interface PropriedadeVendaData {
   id?: string;
   titulo?: string;
+  titulo_en?: string | null;
   slug?: string;
   descricao?: string;
+  descricao_en?: string | null;
   tipo?: string;
   localizacao?: string;
+  localizacao_en?: string | null;
   preco?: number;
   area?: number | null;
   unidade_area?: string;
@@ -98,10 +104,13 @@ export const PropriedadeVendaForm = ({ propriedade, onSuccess }: PropriedadeVend
     resolver: zodResolver(propriedadeSchema),
     defaultValues: {
       titulo: propriedade?.titulo || '',
+      titulo_en: propriedade?.titulo_en || '',
       slug: propriedade?.slug || '',
       descricao: propriedade?.descricao || '',
+      descricao_en: propriedade?.descricao_en || '',
       tipo: propriedade?.tipo || 'lote',
       localizacao: propriedade?.localizacao || '',
+      localizacao_en: propriedade?.localizacao_en || '',
       preco: propriedade?.preco ? Number(propriedade.preco) : 0,
       area: propriedade?.area ? Number(propriedade.area) : '',
       unidade_area: propriedade?.unidade_area || 'hectares',
@@ -212,10 +221,13 @@ export const PropriedadeVendaForm = ({ propriedade, onSuccess }: PropriedadeVend
     try {
       const payload = {
         titulo: data.titulo,
+        titulo_en: data.titulo_en || null,
         slug: data.slug,
         descricao: data.descricao || null,
+        descricao_en: data.descricao_en || null,
         tipo: data.tipo,
         localizacao: data.localizacao,
+        localizacao_en: data.localizacao_en || null,
         preco: data.preco,
         area: data.area !== '' && data.area !== undefined ? Number(data.area) : null,
         unidade_area: data.unidade_area,
@@ -326,28 +338,48 @@ export const PropriedadeVendaForm = ({ propriedade, onSuccess }: PropriedadeVend
 
           {/* TAB: BÁSICO */}
           <TabsContent value="basico" className="space-y-4 mt-6">
-            <FormField
-              control={form.control}
-              name="titulo"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Título / Nome do Anúncio *</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      onChange={(e) => {
-                        field.onChange(e);
-                        if (!propriedade) {
-                          form.setValue('slug', generateSlug(e.target.value));
-                        }
-                      }}
-                      placeholder="Ex: Lote na Beira do Rio São Francisco"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid gap-4 md:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="titulo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Título / Nome do Anúncio (Português) *</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        onChange={(e) => {
+                          field.onChange(e);
+                          if (!propriedade) {
+                            form.setValue('slug', generateSlug(e.target.value));
+                          }
+                        }}
+                        placeholder="Ex: Lote na Beira do Rio São Francisco"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="titulo_en"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Título / Nome do Anúncio (Inglês) - Opcional</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        value={field.value || ''}
+                        placeholder="Ex: Lot on the banks of the São Francisco River"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <FormField
               control={form.control}
@@ -364,25 +396,46 @@ export const PropriedadeVendaForm = ({ propriedade, onSuccess }: PropriedadeVend
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="descricao"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Descrição Completa</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      {...field}
-                      rows={5}
-                      placeholder="Descreva detalhes como topografia, proximidade da água, infraestrutura..."
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid gap-4 md:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="descricao"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Descrição Completa (Português)</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        {...field}
+                        rows={5}
+                        placeholder="Descreva detalhes como topografia, proximidade da água, infraestrutura..."
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="descricao_en"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Descrição Completa (Inglês) - Opcional</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        {...field}
+                        value={field.value || ''}
+                        rows={5}
+                        placeholder="Describe details like topography, water proximity, infrastructure in English..."
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <FormField
                 control={form.control}
                 name="tipo"
@@ -413,11 +466,26 @@ export const PropriedadeVendaForm = ({ propriedade, onSuccess }: PropriedadeVend
                 name="localizacao"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Localização *</FormLabel>
+                    <FormLabel>Localização (Português) *</FormLabel>
                     <FormControl>
                       <Input {...field} placeholder="Ex: Represa de Três Marias, MG" />
                     </FormControl>
-                    <FormDescription>Use "Rio" ou "Represa" para as tags automáticas do card</FormDescription>
+                    <FormDescription>Use "Rio" ou "Represa" para as tags automáticas</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="localizacao_en"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Localização (Inglês) - Opcional</FormLabel>
+                    <FormControl>
+                      <Input {...field} value={field.value || ''} placeholder="Ex: Três Marias Dam, MG" />
+                    </FormControl>
+                    <FormDescription>English location tag</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

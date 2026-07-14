@@ -173,10 +173,13 @@ export interface FAQ {
 export interface PropriedadeVenda {
   id: string;
   titulo: string;
+  titulo_en: string | null;
   slug: string;
   descricao: string | null;
+  descricao_en: string | null;
   tipo: string;
   localizacao: string;
+  localizacao_en: string | null;
   preco: number;
   area: number | null;
   unidade_area: string | null;

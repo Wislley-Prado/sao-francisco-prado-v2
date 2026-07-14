@@ -4,8 +4,10 @@ import { MapPin, Star, Loader2 } from 'lucide-react';
 import { useRanchos } from '@/hooks/useOptimizedData';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useTranslation } from 'react-i18next';
 
 const RanchosSection = () => {
+  const { t } = useTranslation();
   const { data: ranchosData, isLoading } = useRanchos(true);
   const [heroImage, setHeroImage] = useState('');
 
@@ -40,9 +42,12 @@ const RanchosSection = () => {
     return ranchosData.map(rancho => ({
       id: rancho.id,
       name: rancho.nome,
+      name_en: rancho.nome_en,
       slug: rancho.slug,
       description: rancho.descricao,
+      description_en: rancho.descricao_en,
       location: rancho.localizacao,
+      location_en: rancho.localizacao_en,
       capacity: rancho.capacidade,
       price: rancho.preco,
       rating: rancho.rating,
@@ -81,11 +86,10 @@ const RanchosSection = () => {
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center drop-shadow-lg">
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            Ranchos para Aluguel
+            {t('ranchos.title')}
           </h2>
           <p className="text-lg md:text-xl opacity-90 max-w-3xl mx-auto">
-            Escolha o rancho perfeito para sua estadia no Rio São Francisco. 
-            Todos com localização privilegiada e estrutura completa para pescarias.
+            {t('ranchos.subtitle')}
           </p>
         </div>
       </div>

@@ -11,10 +11,13 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useTranslation } from 'react-i18next';
 
 const POSTS_PER_PAGE = 9;
 
 const Blog = () => {
+  const { t, i18n } = useTranslation();
+  const isEn = i18n.language.startsWith('en');
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
@@ -46,7 +49,7 @@ const Blog = () => {
   }, [heroData]);
 
   const { data: posts, isLoading } = useQuery({
-    queryKey: ['blog-posts', searchTerm, categoryFilter],
+    queryKey: ['blog-posts', searchTerm, categoryFilter, isEn],
     queryFn: async () => {
       let query = supabase
         .from('blog_posts')
@@ -55,11 +58,19 @@ const Blog = () => {
         .order('data_publicacao', { ascending: false });
 
       if (searchTerm) {
-        query = query.or(`titulo.ilike.%${searchTerm}%,resumo.ilike.%${searchTerm}%`);
+        if (isEn) {
+          query = query.or(`titulo_en.ilike.%${searchTerm}%,resumo_en.ilike.%${searchTerm}%`);
+        } else {
+          query = query.or(`titulo.ilike.%${searchTerm}%,resumo.ilike.%${searchTerm}%`);
+        }
       }
 
       if (categoryFilter && categoryFilter !== 'all') {
-        query = query.eq('categoria', categoryFilter);
+        if (isEn) {
+          query = query.eq('categoria_en', categoryFilter);
+        } else {
+          query = query.eq('categoria', categoryFilter);
+        }
       }
 
       const { data, error } = await query;
@@ -74,7 +85,7 @@ const Blog = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('blog_posts')
-        .select('categoria')
+        .select('categoria, categoria_en')
         .eq('publicado', true);
       
       if (error) throw error;
@@ -85,9 +96,9 @@ const Blog = () => {
   // Get unique categories list sorted
   const categories = React.useMemo(() => {
     if (!allCategoriesData) return [];
-    const cats = new Set(allCategoriesData.map(p => p.categoria).filter(Boolean));
+    const cats = new Set(allCategoriesData.map(p => (isEn && p.categoria_en) ? p.categoria_en : p.categoria).filter(Boolean));
     return Array.from(cats).sort();
-  }, [allCategoriesData]);
+  }, [allCategoriesData, isEn]);
 
   // Pagination
   const totalPages = Math.ceil((posts?.length || 0) / POSTS_PER_PAGE);
@@ -103,13 +114,13 @@ const Blog = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Helmet>
-        <title>Blog PradoAqui | Dicas de Pesca no Rio São Francisco</title>
-        <meta name="description" content="Dicas, novidades e informações sobre pesca no Rio São Francisco. Aprenda técnicas, conheça os melhores pontos e fique por dentro das novidades." />
-        <meta property="og:title" content="Blog PradoAqui | Dicas de Pesca" />
-        <meta property="og:description" content="Dicas, novidades e informações sobre pesca no Rio São Francisco." />
+        <title>{t('labels.blogHelmetTitle', 'Blog PradoAqui | Dicas de Pesca no Rio São Francisco')}</title>
+        <meta name="description" content={t('labels.blogHelmetDesc', 'Dicas, novidades e informações sobre pesca no Rio São Francisco. Aprenda técnicas, conheça os melhores pontos e fique por dentro das novidades.')} />
+        <meta property="og:title" content={t('labels.blogHelmetTitle', 'Blog PradoAqui | Dicas de Pesca')} />
+        <meta property="og:description" content={t('labels.blogHeroSub', 'Dicas, novidades e informações sobre pesca no Rio São Francisco')} />
         <meta property="og:image" content="/og-image.png" />
         <meta property="og:url" content="https://pradoaqui.com/blog" />
-        <meta name="twitter:title" content="Blog PradoAqui | Dicas de Pesca" />
+        <meta name="twitter:title" content={t('labels.blogHelmetTitle', 'Blog PradoAqui | Dicas de Pesca')} />
         <meta name="twitter:image" content="/og-image.png" />
       </Helmet>
 
@@ -131,9 +142,9 @@ const Blog = () => {
           )}
           
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 drop-shadow-lg">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Blog PradoAqui</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">{t('labels.blogHeroTitle', 'Blog PradoAqui')}</h1>
             <p className="text-lg md:text-xl opacity-90 max-w-2xl">
-              Dicas, novidades e informações sobre pesca no Rio São Francisco
+              {t('labels.blogHeroSub', 'Dicas, novidades e informações sobre pesca no Rio São Francisco')}
             </p>
           </div>
         </section>
@@ -145,7 +156,7 @@ const Blog = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 type="text"
-                placeholder="Buscar posts..."
+                placeholder={t('labels.searchPlaceholder', 'Buscar posts...')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -153,10 +164,10 @@ const Blog = () => {
             </div>
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
               <SelectTrigger className="w-full md:w-[200px]">
-                <SelectValue placeholder="Categoria" />
+                <SelectValue placeholder={t('labels.categorySelectPlaceholder', 'Categoria')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todas Categorias</SelectItem>
+                <SelectItem value="all">{t('labels.allCategories', 'Todas Categorias')}</SelectItem>
                 {categories.map((cat) => (
                   <SelectItem key={cat} value={cat}>
                     {cat}
@@ -183,31 +194,36 @@ const Blog = () => {
           ) : currentPosts.length === 0 ? (
             <div className="text-center py-16">
               <p className="text-lg text-muted-foreground">
-                Nenhum post encontrado com os filtros selecionados.
+                {t('labels.noPostsFound', 'Nenhum post encontrado com os filtros selecionados.')}
               </p>
             </div>
           ) : (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {currentPosts.map((post) => (
-                  <Link key={post.id} to={`/blog/${post.slug}`}>
-                    <BlogCard
-                      post={{
-                        id: post.id,
-                        title: post.titulo,
-                        excerpt: post.resumo || '',
-                        author: 'PradoAqui',
-                        date: new Date(post.data_publicacao || post.created_at).toLocaleDateString('pt-BR', {
-                          day: 'numeric',
-                          month: 'short',
-                          year: 'numeric'
-                        }),
-                        image: post.imagem_destaque || '/placeholder.svg',
-                        category: post.categoria || 'Geral'
-                      }}
-                    />
-                  </Link>
-                ))}
+                {currentPosts.map((post) => {
+                  const postTitle = (isEn && post.titulo_en) ? post.titulo_en : post.titulo;
+                  const postExcerpt = (isEn && post.resumo_en) ? post.resumo_en : (post.resumo || '');
+                  const postCategory = (isEn && post.categoria_en) ? post.categoria_en : (post.categoria || 'Geral');
+                  return (
+                    <Link key={post.id} to={`/blog/${post.slug}`}>
+                      <BlogCard
+                        post={{
+                          id: post.id,
+                          title: postTitle,
+                          excerpt: postExcerpt,
+                          author: t('labels.authorBy', 'Por PradoAqui'),
+                          date: new Date(post.data_publicacao || post.created_at).toLocaleDateString(isEn ? 'en-US' : 'pt-BR', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric'
+                          }),
+                          image: post.imagem_destaque || '/placeholder.svg',
+                          category: postCategory
+                        }}
+                      />
+                    </Link>
+                  );
+                })}
               </div>
 
               {/* Pagination */}

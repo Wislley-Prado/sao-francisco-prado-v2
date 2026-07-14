@@ -6,10 +6,12 @@ import { usePropriedadesVenda } from '@/hooks/useOptimizedData';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
 
 const MAX_HOME_ITEMS = 6;
 
 const PropriedadesVendaSection = () => {
+  const { t } = useTranslation();
   const { data: propriedades, isLoading } = usePropriedadesVenda(true);
   const [heroImage, setHeroImage] = useState('');
 
@@ -81,14 +83,13 @@ const PropriedadesVendaSection = () => {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center drop-shadow-lg">
           <div className="inline-flex items-center gap-2 px-3 py-1 mb-4 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-medium">
             <Sparkles className="h-4 w-4" />
-            <span>Invista no seu Lazer</span>
+            <span>{t('labels.investLeisure')}</span>
           </div>
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            Oportunidades à Venda
+            {t('labels.salesTitle')}
           </h2>
           <p className="text-lg md:text-xl opacity-90 max-w-3xl mx-auto">
-            Adquira o seu próprio lote, terreno ou rancho pronto na região do Rio São Francisco e Represa de Três Marias. 
-            Excelente potencial de valorização e contato direto para negociação.
+            {t('labels.salesSub')}
           </p>
           <div className="mt-8">
             <Link to="/vendas">
@@ -97,7 +98,7 @@ const PropriedadesVendaSection = () => {
                 className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-8 py-3 rounded-xl shadow-lg shadow-emerald-900/30 transition-all hover:scale-105"
               >
                 <Building2 className="h-5 w-5 mr-2" />
-                Ver Todas as Oportunidades
+                {t('labels.viewAllOpportunities')}
                 <ArrowRight className="h-5 w-5 ml-2" />
               </Button>
             </Link>
@@ -128,7 +129,7 @@ const PropriedadesVendaSection = () => {
                     size="lg"
                     className="border-2 border-rio-blue text-rio-blue hover:bg-rio-blue hover:text-white font-semibold px-8 py-3 rounded-xl transition-all hover:scale-105"
                   >
-                    Ver todas as {propriedades?.length} oportunidades
+                    {t('labels.viewAllCountOpportunities', { count: propriedades?.length })}
                     <ArrowRight className="h-5 w-5 ml-2" />
                   </Button>
                 </Link>
@@ -139,14 +140,14 @@ const PropriedadesVendaSection = () => {
           <div className="text-center py-16 bg-white rounded-xl shadow-sm border border-gray-100 p-8">
             <MapPin className="h-16 w-16 text-gray-400 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-gray-600 mb-2">
-              Nenhuma oportunidade à venda cadastrada no momento
+              {t('labels.noSales')}
             </h3>
             <p className="text-gray-500 max-w-md mx-auto mb-6">
-              Em breve teremos novas opções de lotes, terrenos e ranchos para você. Entre em contato conosco para encomendar seu imóvel.
+              {t('labels.noSalesSub')}
             </p>
             <Link to="/vendas">
               <Button variant="outline" className="border-emerald-500 text-emerald-600 hover:bg-emerald-50">
-                Ver página de oportunidades
+                {t('labels.viewOpportunitiesPage')}
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             </Link>
@@ -163,27 +164,27 @@ const PropriedadesVendaSection = () => {
                 </div>
                 <div className="text-gray-600 flex items-center justify-center gap-1.5">
                   <Landmark className="h-4 w-4 text-rio-blue" />
-                  Imóveis Disponíveis
+                  {t('labels.availableProperties')}
                 </div>
               </div>
               
               <div className="pt-6 md:pt-0">
                 <div className="text-3xl font-bold text-water-green mb-2">
-                  A partir de R$ {lowestPrice.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}
+                  {t('labels.fromPrice')} R$ {lowestPrice.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}
                 </div>
                 <div className="text-gray-600 flex items-center justify-center gap-1.5">
                   <Sparkles className="h-4 w-4 text-water-green" />
-                  Melhor Preço da Região
+                  {t('labels.bestPriceRegion')}
                 </div>
               </div>
               
               <div className="pt-6 md:pt-0">
                 <div className="text-3xl font-bold text-sunset-orange mb-2">
-                  {uniqueLocationsCount} {uniqueLocationsCount === 1 ? 'Região' : 'Regiões'}
+                  {t('labels.regionsCount', { count: uniqueLocationsCount })}
                 </div>
                 <div className="text-gray-600 flex items-center justify-center gap-1.5">
                   <Handshake className="h-4 w-4 text-sunset-orange" />
-                  Negociação Facilitada
+                  {t('labels.facilitatedNegotiation')}
                 </div>
               </div>
             </div>

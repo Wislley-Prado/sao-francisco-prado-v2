@@ -6,9 +6,11 @@ import { Play } from 'lucide-react';
 import { useWeatherData } from '@/hooks/useWeatherData';
 import { useDamData } from '@/hooks/useDamData';
 import { useVideoSettings, extractYouTubeId } from '@/hooks/useVideoSettings';
+import { useTranslation } from 'react-i18next';
 
 const HeroSection = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { data: weatherData } = useWeatherData();
   const { data: damData } = useDamData();
   const { settings } = useVideoSettings();
@@ -45,13 +47,12 @@ const HeroSection = () => {
           <div className="text-white space-y-6 sm:space-y-8 animate-fade-in order-2 lg:order-1">
             <div className="space-y-4">
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
-                Sua experiência de pesca no{' '}
-                <span className="text-sand-beige">Rio São Francisco</span>{' '}
-                começa aqui!
+                {t('hero.titlePart1')}
+                <span className="text-sand-beige">{t('hero.titlePart2')}</span>
+                {t('hero.titlePart3')}
               </h1>
               <p className="text-lg sm:text-xl text-blue-100 leading-relaxed">
-                Ranchos exclusivos, pacotes de pesca personalizados e a melhor estrutura 
-                às margens do Rio São Francisco em Três Marias/MG.
+                {t('hero.subtitle')}
               </p>
             </div>
 
@@ -64,7 +65,7 @@ const HeroSection = () => {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <h3 className="text-white text-lg sm:text-xl font-semibold">
-                      Rio São Francisco - Ao Vivo
+                      {t('hero.liveTitle')}
                     </h3>
                     <div className="flex items-center space-x-2">
                       <div className="w-2 h-2 sm:w-3 sm:h-3 bg-red-500 rounded-full animate-pulse"></div>
@@ -108,33 +109,33 @@ const HeroSection = () => {
                   <div className="mt-4">
                     <Button variant="outline" size="sm" className="w-full bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white" onClick={() => navigate('/live')}>
                       <Play className="mr-2 h-4 w-4" />
-                      Rio São Francisco Online
+                      {t('hero.liveButton')}
                     </Button>
                   </div>
 
                   <div className="grid grid-cols-2 gap-3 sm:gap-4 text-white text-xs sm:text-sm">
                     <div>
-                      <p className="opacity-80">Temperatura da Água</p>
+                      <p className="opacity-80">{t('labels.weatherWater')}</p>
                       <p className="font-semibold">{temperature}°C</p>
                     </div>
                     <div>
-                      <p className="opacity-80">Nível da Represa</p>
+                      <p className="opacity-80">{t('labels.weatherDam')}</p>
                       <p className="font-semibold">{damLevel}%</p>
                     </div>
                     <div>
-                      <p className="opacity-80">Condições</p>
-                      <p className="font-semibold text-sand-beige capitalize">{conditions}</p>
+                      <p className="opacity-80">{t('labels.weatherConditions')}</p>
+                      <p className="font-semibold text-sand-beige capitalize">{t(`conditions.${conditions.toLowerCase()}`, conditions)}</p>
                     </div>
                     <div>
-                      <p className="opacity-80">Vento</p>
+                      <p className="opacity-80">{t('labels.weatherWind')}</p>
                       <p className="font-semibold">{windSpeed} km/h</p>
                     </div>
                     <div>
-                      <p className="opacity-80">Nascer do Sol</p>
+                      <p className="opacity-80">{t('labels.weatherSunrise')}</p>
                       <p className="font-semibold text-sunset-orange">{sunrise}</p>
                     </div>
                     <div>
-                      <p className="opacity-80">Pôr do Sol</p>
+                      <p className="opacity-80">{t('labels.weatherSunset')}</p>
                       <p className="font-semibold text-sunset-orange">{sunset}</p>
                     </div>
                   </div>

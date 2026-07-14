@@ -2,6 +2,7 @@ import { Check, MessageCircle, Shield, TrendingUp, Percent } from 'lucide-react'
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { useTranslation } from 'react-i18next';
 
 interface PackagePricingProps {
   price: number;
@@ -39,6 +40,7 @@ export const PackagePricing = ({
   onWhatsAppClick,
   sticky = true,
 }: PackagePricingProps) => {
+  const { t } = useTranslation();
   const discountedPrice = discount ? price * (1 - discount / 100) : price;
   
   // Se não tem installments definido, calcular automaticamente 10x
@@ -55,7 +57,7 @@ export const PackagePricing = ({
           {spotsLeft && spotsLeft <= 5 && (
             <Badge variant="destructive" className="w-full justify-center py-2 text-sm animate-pulse">
               <TrendingUp className="w-4 h-4 mr-2" />
-              Últimas {spotsLeft} vagas disponíveis!
+              {t('labels.lastSpotsLeft', { count: spotsLeft })}
             </Badge>
           )}
 
@@ -63,11 +65,11 @@ export const PackagePricing = ({
           <div className="text-center space-y-2 py-4">
             {/* Parcelas - DESTAQUE PRINCIPAL */}
             <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl py-4 px-6 shadow-lg">
-              <div className="text-sm font-medium opacity-90">em até</div>
+              <div className="text-sm font-medium opacity-90">{t('labels.upTo')}</div>
               <div className="text-4xl font-extrabold tracking-tight">
                 {displayInstallments.count}x de R$ {displayInstallments.value.toFixed(2).replace('.', ',')}
               </div>
-              <div className="text-xs opacity-80 mt-1">sem juros no cartão</div>
+              <div className="text-xs opacity-80 mt-1">{t('labels.interestFree')}</div>
             </div>
             
             {/* Preço à vista */}
@@ -84,12 +86,12 @@ export const PackagePricing = ({
                     </Badge>
                   </div>
                   <div className="text-2xl font-bold text-foreground">
-                    R$ {discountedPrice.toFixed(2).replace('.', ',')} <span className="text-base font-normal text-muted-foreground">à vista</span>
+                    R$ {discountedPrice.toFixed(2).replace('.', ',')} <span className="text-base font-normal text-muted-foreground">{t('labels.cash')}</span>
                   </div>
                 </>
               ) : (
                 <div className="text-xl font-semibold text-foreground">
-                  ou R$ {price.toFixed(2).replace('.', ',')} à vista
+                  {t('labels.orCash', { price: price.toFixed(2).replace('.', ',') })}
                 </div>
               )}
             </div>
@@ -102,7 +104,7 @@ export const PackagePricing = ({
               className={`w-full font-bold text-lg py-6 ${tierButtonColors[tier]} text-white shadow-lg hover:shadow-xl transition-all`}
               onClick={onReserveClick}
             >
-              Reservar Agora
+              {t('buttons.reserveNow')}
             </Button>
             <Button 
               size="lg" 
@@ -111,7 +113,7 @@ export const PackagePricing = ({
               onClick={onWhatsAppClick}
             >
               <MessageCircle className="w-5 h-5 mr-2" />
-              Falar no WhatsApp
+              {t('buttons.contactWhatsApp')}
             </Button>
           </div>
 
@@ -121,19 +123,19 @@ export const PackagePricing = ({
               <div className="p-1 rounded-full bg-green-100 dark:bg-green-900/30">
                 <Check className="w-3 h-3 text-green-600 dark:text-green-400" />
               </div>
-              <span className="text-muted-foreground">Cancelamento grátis até 7 dias antes</span>
+              <span className="text-muted-foreground">{t('labels.freeCancellation')}</span>
             </div>
             <div className="flex items-start gap-3 text-sm">
               <div className="p-1 rounded-full bg-blue-100 dark:bg-blue-900/30">
                 <Shield className="w-3 h-3 text-blue-600 dark:text-blue-400" />
               </div>
-              <span className="text-muted-foreground">Melhor preço garantido</span>
+              <span className="text-muted-foreground">{t('labels.bestPrice')}</span>
             </div>
             <div className="flex items-start gap-3 text-sm">
               <div className="p-1 rounded-full bg-green-100 dark:bg-green-900/30">
                 <Check className="w-3 h-3 text-green-600 dark:text-green-400" />
               </div>
-              <span className="text-muted-foreground">Pagamento 100% seguro</span>
+              <span className="text-muted-foreground">{t('labels.securePayment')}</span>
             </div>
           </div>
         </div>

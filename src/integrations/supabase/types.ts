@@ -208,6 +208,10 @@ export type Database = {
           titulo: string
           updated_at: string
           visualizacoes: number
+          categoria_en: string | null
+          conteudo_en: string | null
+          resumo_en: string | null
+          titulo_en: string | null
         }
         Insert: {
           autor_id?: string | null
@@ -226,6 +230,10 @@ export type Database = {
           titulo: string
           updated_at?: string
           visualizacoes?: number
+          categoria_en?: string | null
+          conteudo_en?: string | null
+          resumo_en?: string | null
+          titulo_en?: string | null
         }
         Update: {
           autor_id?: string | null
@@ -244,6 +252,10 @@ export type Database = {
           titulo?: string
           updated_at?: string
           visualizacoes?: number
+          categoria_en?: string | null
+          conteudo_en?: string | null
+          resumo_en?: string | null
+          titulo_en?: string | null
         }
         Relationships: []
       }
@@ -585,6 +597,8 @@ export type Database = {
           updated_at: string
           vagas_disponiveis: number | null
           video_youtube: string | null
+          nome_en: string | null
+          descricao_en: string | null
         }
         Insert: {
           ativo?: boolean
@@ -613,6 +627,8 @@ export type Database = {
           updated_at?: string
           vagas_disponiveis?: number | null
           video_youtube?: string | null
+          nome_en?: string | null
+          descricao_en?: string | null
         }
         Update: {
           ativo?: boolean
@@ -641,6 +657,8 @@ export type Database = {
           updated_at?: string
           vagas_disponiveis?: number | null
           video_youtube?: string | null
+          nome_en?: string | null
+          descricao_en?: string | null
         }
         Relationships: []
       }
@@ -766,6 +784,9 @@ export type Database = {
           video_youtube: string | null
           texto_botao_whatsapp: string | null
           mensagem_whatsapp: string | null
+          titulo_en: string | null
+          descricao_en: string | null
+          localizacao_en: string | null
         }
         Insert: {
           area?: number | null
@@ -791,6 +812,9 @@ export type Database = {
           video_youtube?: string | null
           texto_botao_whatsapp?: string | null
           mensagem_whatsapp?: string | null
+          titulo_en?: string | null
+          descricao_en?: string | null
+          localizacao_en?: string | null
         }
         Update: {
           area?: number | null
@@ -816,6 +840,9 @@ export type Database = {
           video_youtube?: string | null
           texto_botao_whatsapp?: string | null
           mensagem_whatsapp?: string | null
+          titulo_en?: string | null
+          descricao_en?: string | null
+          localizacao_en?: string | null
         }
         Relationships: []
       }
@@ -935,6 +962,9 @@ export type Database = {
           video_youtube: string | null
           typebot_url: string | null
           texto_botao_whatsapp: string | null
+          nome_en: string | null
+          descricao_en: string | null
+          localizacao_en: string | null
         }
         Insert: {
           area?: number | null
@@ -964,6 +994,9 @@ export type Database = {
           video_youtube?: string | null
           typebot_url?: string | null
           texto_botao_whatsapp?: string | null
+          nome_en?: string | null
+          descricao_en?: string | null
+          localizacao_en?: string | null
         }
         Update: {
           area?: number | null
@@ -993,6 +1026,9 @@ export type Database = {
           video_youtube?: string | null
           typebot_url?: string | null
           texto_botao_whatsapp?: string | null
+          nome_en?: string | null
+          descricao_en?: string | null
+          localizacao_en?: string | null
         }
         Relationships: []
       }

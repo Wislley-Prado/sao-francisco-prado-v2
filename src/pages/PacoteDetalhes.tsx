@@ -24,8 +24,11 @@ import { usePacoteBySlug } from '@/hooks/useOptimizedData';
 import { ShareButtons } from '@/components/ShareButtons';
 import { SITE_CONFIG } from '@/lib/constants';
 import { invalidateCache } from '@/lib/cacheService';
+import { useTranslation } from 'react-i18next';
 
 const PacoteDetalhes = () => {
+  const { t, i18n } = useTranslation();
+  const isEn = i18n.language.startsWith('en');
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
 
@@ -49,8 +52,10 @@ const PacoteDetalhes = () => {
     return {
       id: pacoteData.id,
       nome: pacoteData.nome,
+      nome_en: pacoteData.nome_en,
       slug: pacoteData.slug,
       descricao: pacoteData.descricao,
+      descricao_en: pacoteData.descricao_en,
       preco: pacoteData.preco,
       duracao: pacoteData.duracao,
       pessoas: pacoteData.pessoas,
@@ -85,13 +90,16 @@ const PacoteDetalhes = () => {
   // Hook de analytics - SEMPRE deve ser chamado no nível superior
   usePacoteAnalytics(pacote?.id || '', 'visualizacao');
 
+  const nome = (isEn && pacote?.nome_en) ? pacote.nome_en : pacote?.nome || '';
+  const descricao = (isEn && pacote?.descricao_en) ? pacote.descricao_en : pacote?.descricao || '';
+
   // Registra visualização automaticamente quando o pacote for carregado
   useEffect(() => {
     if (pacote?.id) {
       // Disparar pixel personalizado se configurado
       if (pacote.tracking_code) {
         dispararPixel(pacote.tracking_code, 'ViewContent', {
-          content_name: pacote.nome,
+          content_name: nome,
           content_id: pacote.id,
           content_type: 'product',
           value: pacote.preco,
@@ -99,15 +107,15 @@ const PacoteDetalhes = () => {
         });
       }
     }
-  }, [pacote]);
+  }, [pacote, nome]);
 
   // Redirect if pacote not found
   useEffect(() => {
     if (!loading && !pacote) {
-      toast.error('Pacote não encontrado');
+      toast.error(t('labels.noPackages', 'Pacote não encontrado'));
       navigate('/pacotes');
     }
-  }, [loading, pacote, navigate]);
+  }, [loading, pacote, navigate, t]);
 
 
   const handleWhatsAppClick = () => {
@@ -115,7 +123,7 @@ const PacoteDetalhes = () => {
       // Disparar pixel personalizado se configurado
       if (pacote.tracking_code) {
         dispararPixel(pacote.tracking_code, 'Contact', {
-          content_name: pacote.nome,
+          content_name: nome,
           content_id: pacote.id,
           content_type: 'product'
         });
@@ -123,7 +131,9 @@ const PacoteDetalhes = () => {
     }
 
     const telefone = pacote?.telefone_whatsapp || whatsappPadrao;
-    const mensagem = `Olá! Gostaria de saber mais informações sobre o pacote "${pacote?.nome}"`;
+    const mensagem = isEn 
+      ? `Hello! I would like to get more information about the "${nome}" package`
+      : `Olá! Gostaria de saber mais informações sobre o pacote "${nome}"`;
     const whatsappUrl = `https://wa.me/${telefone}?text=${encodeURIComponent(mensagem)}`;
     window.open(whatsappUrl, '_blank');
   };
@@ -133,7 +143,7 @@ const PacoteDetalhes = () => {
       // Disparar pixel personalizado se configurado
       if (pacote.tracking_code) {
         dispararPixel(pacote.tracking_code, 'InitiateCheckout', {
-          content_name: pacote.nome,
+          content_name: nome,
           content_id: pacote.id,
           content_type: 'product',
           value: pacote.preco,
@@ -228,14 +238,14 @@ const PacoteDetalhes = () => {
   return (
     <>
       <Helmet>
-        <title>{pacote.nome} | Pacote de Pesca - PradoAqui</title>
-        <meta name="description" content={pacote.descricao?.substring(0, 160) || `Pacote ${pacote.nome}. ${pacote.duracao} para ${pacote.pessoas} pessoas.`} />
-        <meta property="og:title" content={`${pacote.nome} | PradoAqui`} />
-        <meta property="og:description" content={pacote.descricao?.substring(0, 160) || `Pacote de pesca: ${pacote.duracao}`} />
+        <title>{nome} | Pacote de Pesca - PradoAqui</title>
+        <meta name="description" content={descricao?.substring(0, 160) || `Pacote ${nome}. ${pacote.duracao} para ${pacote.pessoas} pessoas.`} />
+        <meta property="og:title" content={`${nome} | PradoAqui`} />
+        <meta property="og:description" content={descricao?.substring(0, 160) || `Pacote de pesca: ${pacote.duracao}`} />
         <meta property="og:image" content={heroImage} />
         <meta property="og:url" content={pageUrl} />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${pacote.nome} | PradoAqui`} />
+        <meta name="twitter:title" content={`${nome} | PradoAqui`} />
         <meta name="twitter:image" content={heroImage} />
         <link rel="canonical" href={pageUrl} />
       </Helmet>
@@ -244,7 +254,7 @@ const PacoteDetalhes = () => {
       <PackagePageLayout
         hero={
           <PackageHero
-            title={pacote.nome}
+            title={nome}
             subtitle={pacote.tipo}
             imageUrl={mainImage}
             rating={pacote.rating}
@@ -278,7 +288,7 @@ const PacoteDetalhes = () => {
         />
 
         <PackageAbout
-          description={pacote.descricao}
+          description={descricao}
           highlights={pacote.caracteristicas?.slice(0, 6)}
         />
 
@@ -299,7 +309,7 @@ const PacoteDetalhes = () => {
                     alt_text: img.alt_text,
                     principal: img.principal
                   }))}
-                  title={pacote.nome}
+                  title={nome}
                 />
               </div>
             </section>
@@ -319,8 +329,8 @@ const PacoteDetalhes = () => {
                     <Play className="h-6 w-6 text-white fill-white" />
                   </div>
                   <div>
-                    <h2 className="text-2xl md:text-3xl font-bold text-foreground">Conheça o Pacote</h2>
-                    <p className="text-sm text-muted-foreground">Assista ao vídeo e veja uma prévia exclusiva</p>
+                    <h2 className="text-2xl md:text-3xl font-bold text-foreground">{t('labels.knowPackage', 'Conheça o Pacote')}</h2>
+                    <p className="text-sm text-muted-foreground">{t('labels.watchVideoPackage', 'Assista ao vídeo e veja uma prévia exclusiva')}</p>
                   </div>
                 </div>
 
@@ -329,10 +339,10 @@ const PacoteDetalhes = () => {
                     <div className="flex items-center justify-between">
                       <span className="text-slate-200 text-sm font-medium flex items-center gap-2">
                         <Play className="h-4 w-4 fill-rio-blue text-rio-blue" />
-                        Apresentação Exclusiva
+                        {t('labels.exclusivePresentation', 'Apresentação Exclusiva')}
                       </span>
                       <Badge className="bg-rio-blue/20 text-rio-blue border-0 hover:bg-rio-blue/30 backdrop-blur-sm">
-                        🎬 Cinematográfico
+                        🎬 {t('labels.cinematic', 'Cinematográfico')}
                       </Badge>
                     </div>
                   </div>
@@ -344,10 +354,10 @@ const PacoteDetalhes = () => {
                           className="absolute inset-0 w-full h-full"
                           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                           allowFullScreen
-                          title={`Vídeo ${pacote.nome}`}
+                          title={`Vídeo ${nome}`}
                         />
                       ) : (
-                        <YouTubePlayer videoUrl={pacote.video_youtube} title={pacote.nome} />
+                        <YouTubePlayer videoUrl={pacote.video_youtube} title={nome} />
                       )}
                     </div>
                   </CardContent>
@@ -370,8 +380,8 @@ const PacoteDetalhes = () => {
                     <MapPin className="h-6 w-6 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-2xl md:text-3xl font-bold text-foreground">Localização</h2>
-                    <p className="text-sm text-muted-foreground">Veja como chegar ao local da pescaria</p>
+                    <h2 className="text-2xl md:text-3xl font-bold text-foreground">{t('labels.location')}</h2>
+                    <p className="text-sm text-muted-foreground">{t('labels.howToGet')}</p>
                   </div>
                 </div>
 
@@ -395,7 +405,7 @@ const PacoteDetalhes = () => {
                               }}
                             >
                               <ExternalLink className="h-4 w-4 mr-2" />
-                              Abrir no Maps
+                              {t('buttons.abrirMaps')}
                             </Button>
                             <Button
                               size="sm"
@@ -403,11 +413,11 @@ const PacoteDetalhes = () => {
                               className="border-blue-300 dark:border-blue-700 hover:bg-blue-100 dark:hover:bg-blue-900/30"
                               onClick={() => {
                                 navigator.clipboard.writeText(pacote.endereco_completo || '');
-                                toast.success('Endereço copiado!');
+                                toast.success(t('labels.addressCopied'));
                               }}
                             >
                               <Copy className="h-4 w-4 mr-2" />
-                              Copiar
+                              {t('buttons.copiar')}
                             </Button>
                           </div>
                         </div>
@@ -422,7 +432,7 @@ const PacoteDetalhes = () => {
                     <div className="flex items-center justify-between flex-wrap gap-2">
                       <span className="text-white text-sm font-medium flex items-center gap-2">
                         <Compass className="h-4 w-4" />
-                        {pacote.latitude && pacote.longitude ? `${Math.abs(pacote.latitude).toFixed(4)}°S, ${Math.abs(pacote.longitude).toFixed(4)}°W` : 'Localização'}
+                        {pacote.latitude && pacote.longitude ? `${Math.abs(pacote.latitude).toFixed(4)}°S, ${Math.abs(pacote.longitude).toFixed(4)}°W` : t('labels.location')}
                       </span>
                       <Badge
                         className="bg-white/20 text-white border-white/30 hover:bg-white/30 cursor-pointer transition-all hover:scale-105 active:scale-95"
@@ -430,26 +440,26 @@ const PacoteDetalhes = () => {
                           const queryStr = (pacote.latitude && pacote.longitude) ? `${pacote.latitude},${pacote.longitude}` : encodeURIComponent(pacote.endereco_completo || '');
                           window.open(`https://www.google.com/maps/search/?api=1&query=${queryStr}`, '_blank');
                         }}
-                        title="Ver localização no Google Maps"
+                        title={isEn ? "See location on Google Maps" : "Ver localização no Google Maps"}
                       >
                         <span className="relative flex h-2 w-2 mr-2">
                           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
                           <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
                         </span>
-                        Localização exata
+                        {t('labels.exactLocation')}
                       </Badge>
                     </div>
                   </div>
                   <div className="relative w-full h-[400px]">
                     <iframe
-                      src={pacote.latitude && pacote.longitude ? `https://www.google.com/maps?q=${pacote.latitude},${pacote.longitude}&hl=pt-BR&z=14&output=embed` : `https://www.google.com/maps?q=${encodeURIComponent(pacote.endereco_completo || '')}&hl=pt-BR&z=14&output=embed`}
+                      src={pacote.latitude && pacote.longitude ? `https://www.google.com/maps?q=${pacote.latitude},${pacote.longitude}&hl=${isEn ? 'en' : 'pt-BR'}&z=14&output=embed` : `https://www.google.com/maps?q=${encodeURIComponent(pacote.endereco_completo || '')}&hl=${isEn ? 'en' : 'pt-BR'}&z=14&output=embed`}
                       width="100%"
                       height="100%"
                       style={{ border: 0 }}
                       allowFullScreen
                       loading="lazy"
                       referrerPolicy="no-referrer-when-downgrade"
-                      title={`Mapa - ${pacote.nome}`}
+                      title={`Mapa - ${nome}`}
                       className="absolute inset-0"
                     />
                   </div>
@@ -464,10 +474,10 @@ const PacoteDetalhes = () => {
           <div className="container max-w-7xl mx-auto px-4">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                O Que Nossos Clientes Dizem
+                {t('labels.testimonialsTitle', 'O Que Nossos Clientes Dizem')}
               </h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                Experiências reais de quem já viveu momentos inesquecíveis
+                {t('labels.testimonialsSub', 'Experiências reais de quem já viveu momentos inesquecíveis')}
               </p>
             </div>
             <PackageTestimonials
@@ -482,9 +492,9 @@ const PacoteDetalhes = () => {
         <section className="py-8">
           <div className="container max-w-4xl mx-auto px-4">
             <ShareButtons
-              titulo={pacote.nome}
+              titulo={nome}
               url={pageUrl}
-              descricao={`Pacote ${pacote.duracao} para ${pacote.pessoas} pessoas`}
+              descricao={isEn ? `Package ${pacote.duracao} for ${pacote.pessoas} guests` : `Pacote ${pacote.duracao} para ${pacote.pessoas} pessoas`}
             />
           </div>
         </section>
@@ -492,7 +502,7 @@ const PacoteDetalhes = () => {
         <section className="py-12">
           <div className="container max-w-7xl mx-auto px-4">
             <h2 className="text-3xl font-bold text-foreground mb-8 text-center">
-              Perguntas Frequentes
+              {t('labels.faq')}
             </h2>
             <div className="max-w-3xl mx-auto">
               <PacoteFAQs pacoteId={pacote.id} />

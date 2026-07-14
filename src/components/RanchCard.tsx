@@ -6,13 +6,17 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Users, MapPin, Wifi, Car, Waves, Utensils, Star, Eye } from 'lucide-react';
 import { getOptimizedUrl, getOriginalUrl } from '@/lib/imageUtils';
+import { useTranslation } from 'react-i18next';
 
 interface Ranch {
   id: string | number;
   name: string;
+  name_en?: string | null;
   slug?: string;
   description: string;
+  description_en?: string | null;
   location: string;
+  location_en?: string | null;
   capacity: number;
   price: number;
   rating: number;
@@ -31,6 +35,13 @@ interface RanchCardProps {
 }
 
 const RanchCard = ({ ranch }: RanchCardProps) => {
+  const { t, i18n } = useTranslation();
+  const isEn = i18n.language.startsWith('en');
+
+  const name = (isEn && ranch.name_en) ? ranch.name_en : ranch.name;
+  const location = (isEn && ranch.location_en) ? ranch.location_en : ranch.location;
+  const description = (isEn && ranch.description_en) ? ranch.description_en : ranch.description;
+
   const amenityIcons: { [key: string]: React.ReactNode } = {
     'Wi-Fi': <Wifi className="h-4 w-4" />,
     'Estacionamento': <Car className="h-4 w-4" />,
@@ -47,7 +58,7 @@ const RanchCard = ({ ranch }: RanchCardProps) => {
           {ranch.images && ranch.images.length > 0 ? (
             <img 
               src={getOptimizedUrl(ranch.images[0], 800)} 
-              alt={ranch.name}
+              alt={name}
               loading="lazy"
               decoding="async"
               width={400}
@@ -66,17 +77,17 @@ const RanchCard = ({ ranch }: RanchCardProps) => {
           <div className="absolute inset-0 bg-black bg-opacity-20"></div>
           <div className="absolute top-4 right-4 flex flex-col gap-2 items-end">
             {ranch.available ? (
-              <Badge className="bg-green-500 hover:bg-green-600 text-white shadow-md">Disponível</Badge>
+              <Badge className="bg-green-500 hover:bg-green-600 text-white shadow-md">{t('labels.available')}</Badge>
             ) : (
-              <Badge className="bg-red-500 hover:bg-red-600 text-white shadow-md">Ocupado</Badge>
+              <Badge className="bg-red-500 hover:bg-red-600 text-white shadow-md">{t('labels.occupied')}</Badge>
             )}
             
             {/* Etiquetas de Localização Aquática */}
             {ranch.location?.toLowerCase().includes('represa') && (
-              <Badge className="bg-blue-600 hover:bg-blue-700 text-white shadow-md">Represa</Badge>
+              <Badge className="bg-blue-600 hover:bg-blue-700 text-white shadow-md">{t('labels.represa')}</Badge>
             )}
             {ranch.location?.toLowerCase().includes('rio') && (
-              <Badge className="bg-cyan-600 hover:bg-cyan-700 text-white shadow-md">Rio</Badge>
+              <Badge className="bg-cyan-600 hover:bg-cyan-700 text-white shadow-md">{t('labels.rio')}</Badge>
             )}
           </div>
           <div className="absolute bottom-4 left-4 text-white">
@@ -90,27 +101,27 @@ const RanchCard = ({ ranch }: RanchCardProps) => {
 
       <CardContent className="p-6">
         <div className="mb-4">
-          <h3 className="text-xl font-bold text-gray-900 mb-2">{ranch.name}</h3>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">{name}</h3>
           <div className="flex items-center text-gray-600 mb-2">
             <MapPin className="h-4 w-4 mr-1" />
-            <span className="text-sm">{ranch.location}</span>
+            <span className="text-sm">{location}</span>
           </div>
-          <p className="text-gray-600 text-sm">{ranch.description}</p>
+          <p className="text-gray-600 text-sm">{description}</p>
         </div>
 
         {/* Features */}
         <div className="grid grid-cols-3 gap-4 mb-4 p-3 bg-gray-50 rounded-lg">
           <div className="text-center">
             <div className="font-semibold text-gray-900">{ranch.features.bedrooms}</div>
-            <div className="text-xs text-gray-600">Quartos</div>
+            <div className="text-xs text-gray-600">{t('labels.bedrooms')}</div>
           </div>
           <div className="text-center">
             <div className="font-semibold text-gray-900">{ranch.features.bathrooms}</div>
-            <div className="text-xs text-gray-600">Banheiros</div>
+            <div className="text-xs text-gray-600">{t('labels.bathrooms')}</div>
           </div>
           <div className="text-center">
             <div className="font-semibold text-gray-900">{ranch.features.area}</div>
-            <div className="text-xs text-gray-600">Área</div>
+            <div className="text-xs text-gray-600">{t('labels.area')}</div>
           </div>
         </div>
 
@@ -118,18 +129,18 @@ const RanchCard = ({ ranch }: RanchCardProps) => {
         <div className="mb-4">
           <div className="flex items-center mb-3">
             <Users className="h-4 w-4 mr-2 text-water-green" />
-            <span className="text-sm text-gray-600">Até {ranch.capacity} pessoas</span>
+            <span className="text-sm text-gray-600">{t('labels.capacity', { count: ranch.capacity })}</span>
           </div>
           
           <div className="flex flex-wrap gap-2 mb-4">
             {ranch.amenities.slice(0, 4).map((amenity, index) => (
               <div key={index} className="flex items-center bg-blue-50 px-2 py-1 rounded text-xs text-rio-blue">
                 {amenityIcons[amenity] || <Wifi className="h-3 w-3 mr-1" />}
-                <span className="ml-1">{amenity}</span>
+                <span className="ml-1">{t(`amenities.${amenity}`, amenity)}</span>
               </div>
             ))}
             {ranch.amenities.length > 4 && (
-              <span className="text-xs text-gray-500">+{ranch.amenities.length - 4} mais</span>
+              <span className="text-xs text-gray-500">{t('labels.more', { count: ranch.amenities.length - 4 })}</span>
             )}
           </div>
         </div>
@@ -139,7 +150,7 @@ const RanchCard = ({ ranch }: RanchCardProps) => {
           <div className="flex justify-between items-center">
             <div>
               <div className="text-2xl font-bold text-rio-blue">R$ {ranch.price.toFixed(2)}</div>
-              <div className="text-xs text-gray-500">por dia por pessoa</div>
+              <div className="text-xs text-gray-500">{t('labels.pricePerPerson')}</div>
             </div>
           </div>
           {ranch.slug && (
@@ -149,7 +160,7 @@ const RanchCard = ({ ranch }: RanchCardProps) => {
                 disabled={!ranch.available}
               >
                 <Eye className="mr-2 h-4 w-4" />
-                Ver Detalhes
+                {t('buttons.seeDetails')}
               </Button>
             </Link>
           )}
