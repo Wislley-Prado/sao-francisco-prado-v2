@@ -524,7 +524,10 @@ const RanchoDetalhes = () => {
                     </Card>
                   </div>
                 </>
-                      {/* Sidebar - Booking Card */}
+              )}
+            </div>
+
+            {/* Sidebar - Booking Card */}
             <div className="lg:col-span-1">
               <Card className="sticky top-24 shadow-lg">
                 <CardContent className="p-6 space-y-6">
