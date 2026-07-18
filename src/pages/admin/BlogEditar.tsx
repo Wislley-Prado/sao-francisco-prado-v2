@@ -117,11 +117,15 @@ const BlogEditar = () => {
           <BlogForm
             initialData={{
               titulo: post.titulo,
+              titulo_en: post.titulo_en || undefined,
               slug: post.slug,
               categoria: post.categoria || undefined,
+              categoria_en: post.categoria_en || undefined,
               tags: post.tags || undefined,
               resumo: post.resumo || undefined,
+              resumo_en: post.resumo_en || undefined,
               conteudo: post.conteudo,
+              conteudo_en: post.conteudo_en || undefined,
               imagem_destaque: post.imagem_destaque || null,
               publicado: post.publicado,
               data_publicacao: post.data_publicacao ? new Date(post.data_publicacao) : null,
