@@ -12,9 +12,9 @@ export interface EphemerisEntry {
 // Mapeamento de fase principal para nome em português
 export const PHASE_NAMES: Record<PhaseType, string> = {
   new_moon: 'Nova',
-  first_quarter: 'Quarto Crescente',
+  first_quarter: 'Crescente',
   full_moon: 'Cheia',
-  last_quarter: 'Quarto Minguante',
+  last_quarter: 'Minguante',
 };
 
 // Fase intermediária entre duas fases principais
@@ -22,7 +22,7 @@ export const INTERMEDIATE_PHASES: Record<string, string> = {
   'new_moon->first_quarter': 'Crescente',
   'first_quarter->full_moon': 'Crescente Gibosa',
   'full_moon->last_quarter': 'Minguante Gibosa',
-  'last_quarter->new_moon': 'Minguante Crescente',
+  'last_quarter->new_moon': 'Minguante',
 };
 
 // Dados astronômicos precisos 2025-2028
@@ -264,22 +264,8 @@ export function getCurrentLunarPhase(now: Date = new Date()) {
   // Posição proporcional entre as duas fases (0 a 1)
   const progress = (nowMs - prevTime) / (nextTime - prevTime);
 
-  // Determinar nome da fase atual
-  const transitionKey = `${prev.phase}->${next.phase}`;
-  const intermediateName = INTERMEDIATE_PHASES[transitionKey];
-
-  // Se estamos muito perto de uma fase principal (< 12h), usar o nome principal
-  const hoursFromPrev = (nowMs - prevTime) / (1000 * 60 * 60);
-  const hoursToNext = (nextTime - nowMs) / (1000 * 60 * 60);
-
-  let currentPhaseName: string;
-  if (hoursFromPrev < 12) {
-    currentPhaseName = PHASE_NAMES[prev.phase];
-  } else if (hoursToNext < 12) {
-    currentPhaseName = PHASE_NAMES[next.phase];
-  } else {
-    currentPhaseName = intermediateName || PHASE_NAMES[prev.phase];
-  }
+  // A fase atual corresponde à última fase principal que entrou
+  const currentPhaseName = PHASE_NAMES[prev.phase];
 
   // Calcular iluminação por interpolação
   const illumination = calculateIllumination(prev.phase, next.phase, progress);
@@ -304,6 +290,30 @@ export function getCurrentLunarPhase(now: Date = new Date()) {
  * Nova=0%, Quarto Crescente=50%, Cheia=100%, Quarto Minguante=50%
  */
 function calculateIllumination(prevPhase: PhaseType, nextPhase: PhaseType, progress: number): number {
+  if (prevPhase === 'new_moon' && nextPhase === 'first_quarter') {
+    // 0% a 50%
+    const angle = progress * (Math.PI / 2);
+    return Math.round(((1 - Math.cos(angle)) / 2) * 100);
+  }
+  
+  if (prevPhase === 'first_quarter' && nextPhase === 'full_moon') {
+    // 50% a 100%
+    const angle = (Math.PI / 2) + progress * (Math.PI / 2);
+    return Math.round(((1 - Math.cos(angle)) / 2) * 100);
+  }
+  
+  if (prevPhase === 'full_moon' && nextPhase === 'last_quarter') {
+    // 100% a 50%
+    const angle = progress * (Math.PI / 2);
+    return Math.round(((1 + Math.cos(angle)) / 2) * 100);
+  }
+  
+  if (prevPhase === 'last_quarter' && nextPhase === 'new_moon') {
+    // 50% a 0%
+    const angle = (Math.PI / 2) + progress * (Math.PI / 2);
+    return Math.round(((1 + Math.cos(angle)) / 2) * 100);
+  }
+
   const phaseIllumination: Record<PhaseType, number> = {
     new_moon: 0,
     first_quarter: 50,
@@ -313,8 +323,5 @@ function calculateIllumination(prevPhase: PhaseType, nextPhase: PhaseType, progr
 
   const startIllum = phaseIllumination[prevPhase];
   const endIllum = phaseIllumination[nextPhase];
-
-  // Interpolação cossenoidal para transição suave
-  const t = (1 - Math.cos(Math.PI * progress)) / 2;
-  return Math.round(startIllum + (endIllum - startIllum) * t);
+  return Math.round(startIllum + (endIllum - startIllum) * progress);
 }
