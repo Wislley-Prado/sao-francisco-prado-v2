@@ -198,19 +198,29 @@ const fetchDamDataFromDB = async (): Promise<DamData> => {
       .single();
 
     if (!error && data?.data && Object.keys(data.data as object).length > 0) {
-      const responseData = data.data as { sucesso?: boolean; dados?: NewApiResponseItem[] } | NewApiResponseItem[];
+      const responseData = data.data as any;
+      let damDataResult: DamData | null = null;
+
       if (responseData && 'sucesso' in responseData && Array.isArray(responseData.dados)) {
-        return mapNewApiDataToDamData(responseData.dados);
+        damDataResult = mapNewApiDataToDamData(responseData.dados);
+      } else if (Array.isArray(responseData) && responseData.length > 0) {
+        damDataResult = mapNewApiDataToDamData(responseData);
+      } else if (responseData && responseData.nivel_atual) {
+        damDataResult = responseData as DamData;
       }
-      if (Array.isArray(responseData) && responseData.length > 0) {
-        return mapNewApiDataToDamData(responseData);
+
+      // Se o banco contiver histórico válido (pelo menos 1 dia), usa o dado do banco
+      if (damDataResult && Array.isArray(damDataResult.historico_dias) && damDataResult.historico_dias.length > 0) {
+        if (import.meta.env.DEV) console.log('✅ [FETCH] Dados do banco carregados com', damDataResult.historico_dias.length, 'dias de histórico');
+        return damDataResult;
       }
     }
   } catch (err) {
-    if (import.meta.env.DEV) console.warn('⚠️ [FETCH] Erro ou ausência de dados no banco. Usando busca direta da Cemig:', err);
+    if (import.meta.env.DEV) console.warn('⚠️ [FETCH] Erro no banco. Usando busca direta da Cemig:', err);
   }
 
-  // Fallback direto para a API da Cemig
+  // Fallback direto para a API da Cemig se o banco estiver sem histórico ou desatualizado
+  if (import.meta.env.DEV) console.log('⚡ [FETCH] Banco sem histórico. Carregando histórico de 7 dias direto da Cemig...');
   return await fetchCemigDirectly();
 };
 
