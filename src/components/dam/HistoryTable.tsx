@@ -20,27 +20,27 @@ const HistoryTable: React.FC<HistoryTableProps> = ({ historicoDias }) => {
         <Clock className="h-5 w-5 mr-2" />
         Histórico Recente
       </h4>
-      <div className="overflow-x-auto">
-        <Table>
+      <div className="overflow-x-auto -mx-3 px-3 sm:mx-0 sm:px-0">
+        <Table className="min-w-[480px] sm:min-w-full text-xs sm:text-sm">
           <TableHeader>
             <TableRow>
-              <TableHead>Data</TableHead>
-              <TableHead>Afluência</TableHead>
-              <TableHead>Defluência</TableHead>
-              <TableHead>Cota Final</TableHead>
-              <TableHead>Vol. Útil Final</TableHead>
+              <TableHead className="py-2 sm:py-3">Data</TableHead>
+              <TableHead className="py-2 sm:py-3">Afluência</TableHead>
+              <TableHead className="py-2 sm:py-3">Defluência</TableHead>
+              <TableHead className="py-2 sm:py-3">Cota Final</TableHead>
+              <TableHead className="py-2 sm:py-3">Vol. Útil Final</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {historicoDias.slice(0, 5).map((dia, index) => (
+            {historicoDias.slice(0, 7).map((dia, index) => (
               <TableRow key={index}>
-                <TableCell className="font-medium">
+                <TableCell className="font-medium py-2 sm:py-3">
                   {formatDate(dia.dia)}
                 </TableCell>
-                <TableCell>{dia.vazao_afl} m³/s</TableCell>
-                <TableCell>{dia.vazao_def} m³/s</TableCell>
-                <TableCell>{dia.cota_final} m</TableCell>
-                <TableCell>{dia.vol_util_final}%</TableCell>
+                <TableCell className="py-2 sm:py-3">{dia.vazao_afl} m³/s</TableCell>
+                <TableCell className="py-2 sm:py-3">{dia.vazao_def} m³/s</TableCell>
+                <TableCell className="py-2 sm:py-3">{dia.cota_final} m</TableCell>
+                <TableCell className="py-2 sm:py-3 font-semibold text-blue-600">{dia.vol_util_final}%</TableCell>
               </TableRow>
             ))}
           </TableBody>

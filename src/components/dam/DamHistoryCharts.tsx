@@ -22,13 +22,13 @@ const DamHistoryCharts: React.FC<DamHistoryChartsProps> = ({ chartData }) => {
     <>
       {/* Gráfico de Nível (Volume Útil) */}
       <div>
-        <h4 className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+        <h4 className="text-xs sm:text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+          <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-blue-500"></div>
           Volume Útil (%)
         </h4>
-        <div className="h-48">
+        <div className="h-44 sm:h-56 w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={chartData}>
+            <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="nivelGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
@@ -36,15 +36,15 @@ const DamHistoryCharts: React.FC<DamHistoryChartsProps> = ({ chartData }) => {
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-              <XAxis dataKey="data" fontSize={11} stroke="#6b7280" tickMargin={8} />
-              <YAxis fontSize={11} stroke="#6b7280" domain={['dataMin - 2', 'dataMax + 2']} tickFormatter={(value) => `${value}%`} />
+              <XAxis dataKey="data" fontSize={10} stroke="#6b7280" tickMargin={6} />
+              <YAxis fontSize={10} stroke="#6b7280" domain={['dataMin - 2', 'dataMax + 2']} tickFormatter={(value) => `${value}%`} />
               <Tooltip 
-                contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', fontSize: '12px' }}
                 formatter={(value: number) => [`${value.toFixed(1)}%`, 'Volume Útil']}
                 labelFormatter={(label) => `Data: ${label}`}
               />
               <Area type="monotone" dataKey="nivel" stroke="#3b82f6" fill="url(#nivelGradient)" strokeWidth={2} />
-              <Line type="monotone" dataKey="nivel" stroke="#3b82f6" strokeWidth={2} dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }} activeDot={{ r: 6, fill: '#2563eb' }} />
+              <Line type="monotone" dataKey="nivel" stroke="#3b82f6" strokeWidth={2} dot={{ fill: '#3b82f6', strokeWidth: 2, r: 3 }} activeDot={{ r: 5, fill: '#2563eb' }} />
             </ComposedChart>
           </ResponsiveContainer>
         </div>
@@ -52,53 +52,53 @@ const DamHistoryCharts: React.FC<DamHistoryChartsProps> = ({ chartData }) => {
 
       {/* Gráfico de Afluência e Defluência */}
       <div>
-        <h4 className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-4">
-          <span className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-green-500"></div>
+        <h4 className="text-xs sm:text-sm font-medium text-gray-700 mb-2 flex items-center gap-3 flex-wrap">
+          <span className="flex items-center gap-1.5">
+            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500"></div>
             Afluência
           </span>
-          <span className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-orange-500"></div>
+          <span className="flex items-center gap-1.5">
+            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-orange-500"></div>
             Defluência
           </span>
-          <span className="text-xs text-muted-foreground">(m³/s)</span>
+          <span className="text-[10px] sm:text-xs text-muted-foreground">(m³/s)</span>
         </h4>
-        <div className="h-48">
+        <div className="h-44 sm:h-56 w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={chartData}>
+            <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-              <XAxis dataKey="data" fontSize={11} stroke="#6b7280" tickMargin={8} />
-              <YAxis fontSize={11} stroke="#6b7280" tickFormatter={(value) => `${value}`} />
+              <XAxis dataKey="data" fontSize={10} stroke="#6b7280" tickMargin={6} />
+              <YAxis fontSize={10} stroke="#6b7280" tickFormatter={(value) => `${value}`} />
               <Tooltip 
-                contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', fontSize: '12px' }}
                 formatter={(value: number, name: string) => [`${value} m³/s`, name === 'afluencia' ? 'Afluência' : 'Defluência']}
                 labelFormatter={(label) => `Data: ${label}`}
               />
-              <Legend formatter={(value) => value === 'afluencia' ? 'Afluência' : 'Defluência'} />
+              <Legend formatter={(value) => value === 'afluencia' ? 'Afluência' : 'Defluência'} wrapperStyle={{ fontSize: '11px' }} />
               <Bar dataKey="afluencia" fill="#22c55e" radius={[4, 4, 0, 0]} opacity={0.8} />
-              <Line type="monotone" dataKey="defluencia" stroke="#f97316" strokeWidth={2} dot={{ fill: '#f97316', strokeWidth: 2, r: 4 }} />
+              <Line type="monotone" dataKey="defluencia" stroke="#f97316" strokeWidth={2} dot={{ fill: '#f97316', strokeWidth: 2, r: 3 }} />
             </ComposedChart>
           </ResponsiveContainer>
         </div>
       </div>
 
       {/* Resumo estatístico */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t">
-        <div className="text-center">
-          <p className="text-xs text-muted-foreground">Nível Mín</p>
-          <p className="text-lg font-semibold text-blue-600">{Math.min(...chartData.map(d => d.nivel)).toFixed(1)}%</p>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 pt-4 border-t">
+        <div className="text-center p-2 rounded-lg bg-gray-50/50">
+          <p className="text-[10px] sm:text-xs text-muted-foreground">Nível Mín</p>
+          <p className="text-sm sm:text-lg font-semibold text-blue-600">{Math.min(...chartData.map(d => d.nivel)).toFixed(1)}%</p>
         </div>
-        <div className="text-center">
-          <p className="text-xs text-muted-foreground">Nível Máx</p>
-          <p className="text-lg font-semibold text-blue-600">{Math.max(...chartData.map(d => d.nivel)).toFixed(1)}%</p>
+        <div className="text-center p-2 rounded-lg bg-gray-50/50">
+          <p className="text-[10px] sm:text-xs text-muted-foreground">Nível Máx</p>
+          <p className="text-sm sm:text-lg font-semibold text-blue-600">{Math.max(...chartData.map(d => d.nivel)).toFixed(1)}%</p>
         </div>
-        <div className="text-center">
-          <p className="text-xs text-muted-foreground">Média Afluência</p>
-          <p className="text-lg font-semibold text-green-600">{(chartData.reduce((acc, d) => acc + d.afluencia, 0) / chartData.length).toFixed(0)} m³/s</p>
+        <div className="text-center p-2 rounded-lg bg-gray-50/50">
+          <p className="text-[10px] sm:text-xs text-muted-foreground">Média Afluência</p>
+          <p className="text-sm sm:text-lg font-semibold text-green-600">{(chartData.reduce((acc, d) => acc + d.afluencia, 0) / chartData.length).toFixed(0)} m³/s</p>
         </div>
-        <div className="text-center">
-          <p className="text-xs text-muted-foreground">Média Defluência</p>
-          <p className="text-lg font-semibold text-orange-600">{(chartData.reduce((acc, d) => acc + d.defluencia, 0) / chartData.length).toFixed(0)} m³/s</p>
+        <div className="text-center p-2 rounded-lg bg-gray-50/50">
+          <p className="text-[10px] sm:text-xs text-muted-foreground">Média Defluência</p>
+          <p className="text-sm sm:text-lg font-semibold text-orange-600">{(chartData.reduce((acc, d) => acc + d.defluencia, 0) / chartData.length).toFixed(0)} m³/s</p>
         </div>
       </div>
     </>

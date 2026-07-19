@@ -64,14 +64,14 @@ const DamHistoryChart: React.FC<DamHistoryChartProps> = ({ damData }) => {
   }
 
   return (
-    <Card className="border-0 shadow-lg">
-      <CardHeader className="pb-2">
-        <CardTitle className="flex items-center justify-between">
+    <Card className="border-0 shadow-lg overflow-hidden">
+      <CardHeader className="pb-2 p-3 sm:p-6">
+        <CardTitle className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <BarChart3 className="h-5 w-5 text-blue-500" />
-            <span className="text-lg">Evolução da Represa</span>
+            <span className="text-base sm:text-lg">Evolução da Represa</span>
           </div>
-          <Badge variant="outline" className={`gap-1.5 ${getTrendColor()}`}>
+          <Badge variant="outline" className={`gap-1.5 text-xs ${getTrendColor()}`}>
             {getTrendIcon()}
             {nivelVariacao.tipo === 'estável' 
               ? 'Estável' 
@@ -79,12 +79,12 @@ const DamHistoryChart: React.FC<DamHistoryChartProps> = ({ damData }) => {
             }
           </Badge>
         </CardTitle>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-xs sm:text-sm text-muted-foreground">
           Últimos {chartData.length} dias de monitoramento
         </p>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <Suspense fallback={<div className="h-48 flex items-center justify-center text-sm text-muted-foreground">Carregando gráficos...</div>}>
+      <CardContent className="space-y-4 sm:space-y-6 p-3 sm:p-6">
+        <Suspense fallback={<div className="h-44 sm:h-56 flex items-center justify-center text-xs sm:text-sm text-muted-foreground">Carregando gráficos...</div>}>
           <LazyHistoryCharts chartData={chartData} />
         </Suspense>
       </CardContent>
