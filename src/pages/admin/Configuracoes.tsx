@@ -385,99 +385,38 @@ const Configuracoes = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Webhook className="w-5 h-5" />
-              Integrações Externas
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Database className="w-5 h-5 text-blue-600" />
+                Integração Oficial CEMIG
+              </div>
+              <Badge className="bg-green-100 text-green-700 border-green-300">
+                🟢 100% Automático
+              </Badge>
             </CardTitle>
             <CardDescription>
-              Configure URLs de webhooks e integrações com sistemas externos
+              Os dados da Usina Hidrelétrica de Três Marias são lidos em tempo real direto da API oficial da CEMIG.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="dam_webhook_url">URL do Webhook da Represa (n8n)</Label>
-              <Input
-                id="dam_webhook_url"
-                placeholder="https://webhook.exemplo.com/webhook/represa"
-                value={settings.dam_webhook_url}
-                onChange={(e) => setSettings({ ...settings, dam_webhook_url: e.target.value })}
-                className="font-mono text-sm"
-              />
-              <p className="text-xs text-muted-foreground">
-                URL do webhook n8n que retorna os dados da represa de Três Marias
-              </p>
-            </div>
-
-            <Alert>
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription className="text-xs">
-                <strong>Importante:</strong> O workflow no n8n deve estar <strong>ativo</strong> para funcionar.
-                Ative usando o toggle no canto superior direito do editor do n8n.
+            <Alert className="bg-blue-500/10 border-blue-500/20">
+              <RefreshCw className="h-4 w-4 text-blue-600" />
+              <AlertDescription className="text-xs text-blue-900 dark:text-blue-300">
+                <strong>Conexão Direta Ativa:</strong> Não é necessário configurar n8n ou webhooks externos. O site consulta as medições atualizadas automaticamente a cada 5 minutos.
               </AlertDescription>
             </Alert>
 
-            {/* Controle de Pausa do Webhook */}
-            <div className="mt-6 pt-4 border-t border-border">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  {webhookPausado ? (
-                    <Pause className="w-4 h-4 text-destructive" />
-                  ) : (
-                    <Play className="w-4 h-4 text-green-600" />
-                  )}
-                  <span className="font-medium text-sm">Controle do Webhook</span>
-                </div>
-                <Badge variant={webhookPausado ? 'destructive' : 'default'} className="text-xs">
-                  {webhookPausado ? '⏸️ PAUSADO' : '▶️ ATIVO'}
-                </Badge>
-              </div>
-
-              {webhookPausado && (
-                <Alert className="mb-4 border-destructive">
-                  <Pause className="h-4 w-4 text-destructive" />
-                  <AlertDescription className="text-xs text-destructive">
-                    <strong>Webhook PAUSADO</strong> — O cron job continua rodando mas NÃO sobrescreve os dados manuais.
-                    Clique em "Retomar Webhook" quando a automação estiver corrigida.
-                  </AlertDescription>
-                </Alert>
-              )}
-
-              <Button
-                variant={webhookPausado ? 'default' : 'destructive'}
-                onClick={handleToggleWebhookPause}
-                disabled={togglingPause}
-                className="flex items-center gap-2"
-              >
-                {togglingPause ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Alterando...
-                  </>
-                ) : webhookPausado ? (
-                  <>
-                    <Play className="w-4 h-4" />
-                    Retomar Webhook
-                  </>
-                ) : (
-                  <>
-                    <Pause className="w-4 h-4" />
-                    Pausar Webhook
-                  </>
-                )}
-              </Button>
-            </div>
-
             {/* Seção de Dados da Represa */}
-            <div className="mt-6 pt-4 border-t border-border">
+            <div className="pt-2">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <Database className="w-4 h-4 text-muted-foreground" />
-                  <span className="font-medium text-sm">Dados da Represa no Banco</span>
+                  <span className="font-medium text-sm">Status da Consulta</span>
                 </div>
                 {lastUpdate && (
                   <Badge variant="outline" className="text-xs">
                     <Clock className="w-3 h-3 mr-1" />
-                    Atualizado: {formatLastUpdate(lastUpdate)}
+                    Última Checagem: {formatLastUpdate(lastUpdate)}
                   </Badge>
                 )}
               </div>
@@ -486,7 +425,7 @@ const Configuracoes = () => {
                 <Button
                   variant="outline"
                   onClick={handleRefreshDamData}
-                  disabled={refreshing || webhookPausado}
+                  disabled={refreshing}
                   className="flex items-center gap-2"
                 >
                   {refreshing ? (
@@ -497,36 +436,27 @@ const Configuracoes = () => {
                   ) : (
                     <>
                       <RefreshCw className="w-4 h-4" />
-                      Atualizar Agora
+                      Forçar Atualização Agora
                     </>
                   )}
                 </Button>
                 <span className="text-xs text-muted-foreground">
-                  {webhookPausado ? 'Desabilitado enquanto o webhook está pausado' : 'Força uma atualização imediata dos dados da represa'}
+                  Força uma consulta imediata aos servidores da CEMIG
                 </span>
               </div>
-
-              <Alert className="mt-4">
-                <Database className="h-4 w-4" />
-                <AlertDescription className="text-xs">
-                  Os dados são atualizados automaticamente <strong>4x ao dia</strong> (06h, 12h, 18h, 00h).
-                  Use o botão acima apenas para atualizações emergenciais.
-                </AlertDescription>
-              </Alert>
             </div>
 
             {/* Formulário de Entrada Manual */}
             <div className="mt-6 pt-4 border-t border-border">
               <div className="flex items-center gap-2 mb-4">
                 <HardDrive className="w-4 h-4 text-muted-foreground" />
-                <span className="font-medium text-sm">Entrada Manual de Dados</span>
+                <span className="font-medium text-sm">Override Manual de Dados (Opcional)</span>
               </div>
 
               <Alert className="mb-4">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription className="text-xs">
-                  Use este formulário para inserir dados manualmente enquanto o webhook não estiver funcionando.
-                  Quando o webhook voltar, os dados automáticos substituirão os manuais.
+                  Use este formulário apenas se desejar cadastrar dados específicos manualmente no banco de dados.
                 </AlertDescription>
               </Alert>
 
