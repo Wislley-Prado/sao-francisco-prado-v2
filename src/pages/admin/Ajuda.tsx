@@ -971,47 +971,85 @@ const Ajuda = () => {
     {
       id: 'represa',
       icon: Waves,
-      title: 'Informações da Represa',
+      title: 'Informações da Represa (API Cemig)',
       color: 'text-blue-700',
       category: 'Funcionalidades Públicas',
       content: (
         <div className="space-y-4">
           <p className="text-muted-foreground">
-            Exibe dados em tempo real da Usina de Três Marias/CEMIG, essenciais para 
-            pescadores que precisam saber as condições da água.
+            Manual de funcionamento da integração automática com os dados oficiais da Usina Hidrelétrica de Três Marias (CEMIG) e seu gráfico de 7 dias.
           </p>
           
-          <div className="space-y-2">
-            <h4 className="font-semibold">💧 Dados Exibidos:</h4>
-            <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
-              <li><strong>Nível da Água:</strong> Cota atual em metros</li>
-              <li><strong>Vazão Defluente:</strong> Volume de água liberada (m³/s)</li>
-              <li><strong>Status do Vertedouro:</strong> Aberto ou fechado</li>
-              <li><strong>Tendência:</strong> Subindo, descendo ou estável</li>
-              <li><strong>Volume Útil:</strong> Percentual do reservatório</li>
-            </ul>
-          </div>
-
-          <div className="space-y-2">
-            <h4 className="font-semibold flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4" /> Impacto na Pesca:
+          <div className="bg-blue-500/10 border border-blue-500/20 p-4 rounded-lg space-y-2">
+            <h4 className="font-semibold text-blue-900 dark:text-blue-300 flex items-center gap-2">
+              <Zap className="w-5 h-5 text-blue-600" /> Como Funciona a Automação (Explicação Simples):
             </h4>
-            <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
-              <li><strong>Vertedouro Aberto:</strong> Água mais turva, peixes mais difíceis</li>
-              <li><strong>Nível Baixo:</strong> Peixes concentrados em locais específicos</li>
-              <li><strong>Vazão Alta:</strong> Corrente forte, ajustar técnicas de pesca</li>
-            </ul>
-          </div>
-
-          <div className="space-y-2">
-            <h4 className="font-semibold">🔄 Atualização:</h4>
             <p className="text-sm text-muted-foreground">
-              Dados buscados automaticamente de fonte oficial (CEMIG). 
-              Atualização a cada hora com cache local.
+              O site possui uma conexão direta com o servidor oficial da <strong>CEMIG</strong>. Toda vez que um visitante entra na página da represa, o site busca os números atualizados automaticamente. 
+              <strong> Não é necessário usar n8n ou nenhuma ferramenta paga externa.</strong>
             </p>
           </div>
 
-          <Badge variant="secondary">Dados Oficiais da CEMIG</Badge>
+          <div className="space-y-2">
+            <h4 className="font-semibold text-foreground">📊 Dados Medidos e Exibidos:</h4>
+            <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+              <li><strong>Nível / Cota Atual (m):</strong> A altura exata da água na barragem em metros (ex: 571,58 m).</li>
+              <li><strong>Volume Útil (%):</strong> A porcentagem de capacidade da represa (ex: 93.6%).</li>
+              <li><strong>Afluência (m³/s):</strong> A quantidade de água em metros cúbicos que está <em>entrando</em> na represa pelos rios a cada segundo.</li>
+              <li><strong>Defluência (m³/s):</strong> A quantidade de água em metros cúbicos que está <em>saindo</em> da represa pelas turbinas e comportas a cada segundo.</li>
+              <li><strong>Histórico dos Útimos 7 Dias:</strong> Gráfico interativo que mostra a evolução da água ao longo da última semana.</li>
+            </ul>
+          </div>
+
+          <div className="space-y-2">
+            <h4 className="font-semibold text-foreground flex items-center gap-2">
+              <BarChart3 className="w-4 h-4 text-blue-600" /> O Gráfico de 7 Dias:
+            </h4>
+            <p className="text-sm text-muted-foreground">
+              O gráfico desenhado na tela cruza duas informações importantes para o pescador:
+            </p>
+            <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground ml-2">
+              <li><strong>Linha de Volume Útil (%):</strong> Mostra a tendência (se a represa está subindo, baixando ou estável).</li>
+              <li><strong>Barras de Afluência x Defluência:</strong> Compara se está entrando mais água do que saindo. Se a afluência for maior que a defluência, o nível da água irá subir.</li>
+            </ul>
+          </div>
+
+          <div className="space-y-2">
+            <h4 className="font-semibold text-foreground flex items-center gap-2">
+              <Clock className="w-4 h-4 text-green-600" /> Frequência de Atualização:
+            </h4>
+            <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+              <li><strong>No Navegador (Automático):</strong> O site verifica novas medições na Cemig a cada <strong>5 minutos</strong> enquanto o usuário navega.</li>
+              <li><strong>Sem Telas Vazias (Garantia):</strong> O sistema possui um histórico seguro pré-carregado. Mesmo que a internet do visitante oscile, a tela nunca fica em branco ou com "0 dias".</li>
+            </ul>
+          </div>
+
+          <div className="space-y-2">
+            <h4 className="font-semibold text-foreground flex items-center gap-2">
+              <Settings className="w-4 h-4 text-amber-600" /> Caso Precise Inserir Dados Manuais (Controle Admin):
+            </h4>
+            <p className="text-sm text-muted-foreground">
+              Se algum dia o servidor da CEMIG passar por manutenção prolongada e você desejar cadastrar dados manuais:
+            </p>
+            <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground ml-2">
+              <li>Acesse o painel do <strong>Supabase</strong> da aplicação.</li>
+              <li>Vá na tabela <code>dam_data</code> (linha id = 1).</li>
+              <li>Edite os valores numéricos no campo JSON. O site passará a ler prioritariamente esses valores mantidos por você.</li>
+            </ol>
+          </div>
+
+          <div className="space-y-2">
+            <h4 className="font-semibold text-foreground flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-amber-500" /> Por que isso é importante para os Pescadores?
+            </h4>
+            <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+              <li><strong>Água Subindo:</strong> Os peixes costumam se aproximar da vegetação nas margens.</li>
+              <li><strong>Vazão Alta (Defluência Elevada):</strong> Correnteza mais forte no rio São Francisco, exigindo chumbadas mais pesadas e cuidado na navegação.</li>
+              <li><strong>Estabilidade:</strong> Condição excelente para pesca de tucunarés e surubins.</li>
+            </ul>
+          </div>
+
+          <Badge variant="secondary">Conexão Direta CEMIG • Sem Custos de API • 100% Automático</Badge>
         </div>
       )
     },
