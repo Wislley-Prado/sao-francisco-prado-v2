@@ -55,13 +55,18 @@ const loadStats = (): CacheStats => {
   return { hits: 0, misses: 0, supabaseCalls: 0 };
 };
 
-// Save stats to localStorage
+// Save stats to localStorage (debounced to avoid thread blocking during page navigation)
+let saveStatsTimeout: ReturnType<typeof setTimeout> | null = null;
 const saveStats = (): void => {
-  try {
-    localStorage.setItem(STATS_KEY, JSON.stringify(stats));
-  } catch {
-    // Ignore storage errors
-  }
+  if (saveStatsTimeout) return;
+  saveStatsTimeout = setTimeout(() => {
+    try {
+      localStorage.setItem(STATS_KEY, JSON.stringify(stats));
+    } catch {
+      // Ignore storage errors
+    }
+    saveStatsTimeout = null;
+  }, 2000);
 };
 
 // Initialize stats on load
