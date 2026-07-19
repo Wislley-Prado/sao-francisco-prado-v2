@@ -30,8 +30,30 @@ const DamLevelCard: React.FC<DamLevelCardProps> = ({
       return [];
     }
 
+    const parseTs = (str: string) => {
+      if (!str) return 0;
+      if (str.includes('-')) {
+        const parts = str.split('T')[0].split('-').map(Number);
+        if (parts.length === 3 && !parts.some(isNaN)) {
+          return parts[0] > 1900 
+            ? new Date(parts[0], parts[1] - 1, parts[2]).getTime() 
+            : new Date(parts[2], parts[1] - 1, parts[0]).getTime();
+        }
+      }
+      if (str.includes('/')) {
+        const parts = str.split('/').map(Number);
+        if (parts.length === 3 && !parts.some(isNaN)) {
+          return parts[2] > 1900 
+            ? new Date(parts[2], parts[1] - 1, parts[0]).getTime() 
+            : new Date(parts[0], parts[1] - 1, parts[2]).getTime();
+        }
+      }
+      const t = new Date(str).getTime();
+      return isNaN(t) ? 0 : t;
+    };
+
     const sortedData = [...damData.historico_dias]
-      .sort((a, b) => new Date(a.dia).getTime() - new Date(b.dia).getTime());
+      .sort((a, b) => parseTs(a.dia || a.data_original) - parseTs(b.dia || b.data_original));
 
     const last7Days = sortedData.slice(-7);
 

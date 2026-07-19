@@ -1,18 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { DamData } from '@/types/damData';
+import { DamData, DamHistoryDay } from '@/types/damData';
 import { supabase } from '@/integrations/supabase/client';
-
-// Interface para o formato da API do n8n
-interface NewApiResponseItem {
-  tipo: 'tempo_real' | 'historico';
-  data_leitura: string;
-  afluencia: string;
-  nivel_inicial: string;
-  volume_inicial: string;
-  defluencia: string;
-  nivel_atual: string;
-  volume_percentual: string;
-}
 
 // Dados padrão iniciais contendo o histórico consolidado recente da represa
 export const DEFAULT_FALLBACK_DAM_DATA: DamData = {
@@ -36,21 +24,79 @@ export const DEFAULT_FALLBACK_DAM_DATA: DamData = {
   usando_dados_historicos: false
 };
 
-// Converter número brasileiro para float (564,24 → 564.24)
-const parseNumberBR = (value: string): number => {
-  if (!value || value === '--' || 
-      value.toLowerCase().includes('verificar') || 
-      value.toLowerCase().includes('detectado')) {
-    return 0;
+// Padronizar qualquer data para YYYY-MM-DD
+const standardizeDateToISO = (dateStr: string): string => {
+  if (!dateStr) return '';
+  if (dateStr.includes('-')) {
+    const parts = dateStr.split('T')[0].split('-');
+    if (parts.length === 3) {
+      if (parts[0].length === 4) return `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
+      return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+    }
   }
-  return parseFloat(value.replace(',', '.')) || 0;
+  if (dateStr.includes('/')) {
+    const parts = dateStr.split('/');
+    if (parts.length === 3) {
+      if (parts[2].length === 4) return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+      return `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
+    }
+  }
+  return dateStr;
 };
 
-// Converter data BR para ISO (01/12/2025 → 2025-12-01)
-const parseDateBR = (dateStr: string): string => {
-  if (!dateStr || !dateStr.includes('/')) return dateStr;
-  const [day, month, year] = dateStr.split('/');
-  return `${year}-${month}-${day}`;
+// Converter data ISO YYYY-MM-DD para DD/MM/YYYY
+const dateISOToBR = (isoStr: string): string => {
+  if (!isoStr || !isoStr.includes('-')) return isoStr;
+  const parts = isoStr.split('-');
+  if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  return isoStr;
+};
+
+// Mesclar e garantir um histórico completo de 7 a 9 dias
+const ensureCompleteHistory = (data: DamData): DamData => {
+  if (!data) return DEFAULT_FALLBACK_DAM_DATA;
+  
+  const historyMap: Record<string, DamHistoryDay> = {};
+  
+  // 1. Inserir dias de fallback como base
+  if (DEFAULT_FALLBACK_DAM_DATA?.historico_dias) {
+    DEFAULT_FALLBACK_DAM_DATA.historico_dias.forEach(item => {
+      const stdDia = standardizeDateToISO(item.dia || item.data_original);
+      if (stdDia) {
+        historyMap[stdDia] = { 
+          ...item, 
+          dia: stdDia,
+          data_original: item.data_original || dateISOToBR(stdDia)
+        };
+      }
+    });
+  }
+  
+  // 2. Sobrescrever ou adicionar os dias recebidos do Supabase/API
+  if (Array.isArray(data.historico_dias)) {
+    data.historico_dias.forEach(item => {
+      const stdDia = standardizeDateToISO(item.dia || item.data_original);
+      if (stdDia) {
+        historyMap[stdDia] = {
+          ...item,
+          dia: stdDia,
+          data_original: item.data_original || dateISOToBR(stdDia)
+        };
+      }
+    });
+  }
+  
+  const sortedDates = Object.keys(historyMap).sort();
+  const todayStr = new Date().toISOString().split('T')[0];
+  const validDates = sortedDates.filter(d => d <= todayStr);
+  const recentDates = validDates.length >= 7 ? validDates.slice(-9) : sortedDates.slice(-9);
+  
+  const mergedHistory = recentDates.map(d => historyMap[d]);
+  
+  return {
+    ...data,
+    historico_dias: mergedHistory.length > 0 ? mergedHistory : DEFAULT_FALLBACK_DAM_DATA.historico_dias
+  };
 };
 
 // Processar dados brutos do JSON da Cemig com ultra-resiliência contra erros
@@ -127,7 +173,7 @@ const processCemigRawData = (raw: any): DamData => {
       }
     });
 
-    // Mapear dados históricos consolidados de fallback para preenchimento de lacunas de vazão
+    // Mapear dados históricos consolidados de fallback para preenchimento de lacunas
     const fallbackMap: Record<string, any> = {};
     if (DEFAULT_FALLBACK_DAM_DATA?.historico_dias) {
       DEFAULT_FALLBACK_DAM_DATA.historico_dias.forEach(fb => {
@@ -178,16 +224,18 @@ const processCemigRawData = (raw: any): DamData => {
       };
     });
 
-    return {
+    const parsedData: DamData = {
       nivel_atual: nivelAtual,
       volume_util_percentual: volumeUtilPercentual,
       afluencia: afluencia,
       defluencia: defluencia,
       data_atualizacao: new Date().toLocaleDateString("pt-BR"),
       hora_atualizacao: new Date().toLocaleTimeString("pt-BR"),
-      historico_dias: historico_dias.length > 0 ? historico_dias : DEFAULT_FALLBACK_DAM_DATA.historico_dias,
+      historico_dias: historico_dias,
       usando_dados_historicos: false
     };
+
+    return ensureCompleteHistory(parsedData);
   } catch (err) {
     if (import.meta.env.DEV) console.error('⚠️ [PROCESS] Erro ao processar dados da CEMIG, usando fallback:', err);
     return DEFAULT_FALLBACK_DAM_DATA;
@@ -239,10 +287,10 @@ const fetchDamDataFromDB = async (): Promise<DamData> => {
         
         if (responseData?.raw_cemig) {
           const processed = processCemigRawData(responseData.raw_cemig);
-          if (processed && processed.nivel_atual) return processed;
+          if (processed && processed.nivel_atual) return ensureCompleteHistory(processed);
         }
-        if (responseData && responseData.nivel_atual && Array.isArray(responseData.historico_dias)) {
-          return responseData as DamData;
+        if (responseData && responseData.nivel_atual) {
+          return ensureCompleteHistory(responseData as DamData);
         }
       }
     } catch (err) {
@@ -254,7 +302,7 @@ const fetchDamDataFromDB = async (): Promise<DamData> => {
       const { data: edgeData, error: edgeErr } = await supabase.functions.invoke('dam-data-proxy');
       if (!edgeErr && edgeData?.raw_cemig) {
         const processed = processCemigRawData(edgeData.raw_cemig);
-        if (processed && processed.nivel_atual) return processed;
+        if (processed && processed.nivel_atual) return ensureCompleteHistory(processed);
       }
     } catch (edgeErr) {
       if (import.meta.env.DEV) console.warn('⚠️ [FETCH] Erro na Edge Function:', edgeErr);
@@ -265,14 +313,14 @@ const fetchDamDataFromDB = async (): Promise<DamData> => {
       if (import.meta.env.DEV) console.log('⚡ [FETCH] Tentando busca direta na Cemig...');
       const cemigData = await fetchCemigDirectly();
       if (cemigData && Array.isArray(cemigData.historico_dias) && cemigData.historico_dias.length > 0) {
-        return cemigData;
+        return ensureCompleteHistory(cemigData);
       }
     } catch (cemigErr) {
       if (import.meta.env.DEV) console.warn('⚠️ [FETCH] Erro ou bloqueio CORS no fetch direto da Cemig:', cemigErr);
     }
 
     // 4. Fallback de segurança contendo a medição mais recente (19/07/2026)
-    return DEFAULT_FALLBACK_DAM_DATA;
+    return ensureCompleteHistory(DEFAULT_FALLBACK_DAM_DATA);
   } catch (globalErr) {
     if (import.meta.env.DEV) console.error('❌ [FETCH] Erro global na busca de dados da represa:', globalErr);
     return DEFAULT_FALLBACK_DAM_DATA;
