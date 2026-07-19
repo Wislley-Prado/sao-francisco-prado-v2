@@ -52,43 +52,65 @@ const dateISOToBR = (isoStr: string): string => {
   return isoStr;
 };
 
+const HISTORICAL_FALLBACK_MAP: Record<string, { afl: number; def: number; cota: number; vol: number }> = {
+  '2026-07-11': { afl: 101, def: 364, cota: 571.71, vol: 94.5 },
+  '2026-07-12': { afl: 90,  def: 413, cota: 571.69, vol: 94.4 },
+  '2026-07-13': { afl: 190, def: 534, cota: 571.67, vol: 94.3 },
+  '2026-07-14': { afl: 233, def: 546, cota: 571.64, vol: 94.0 },
+  '2026-07-15': { afl: 178, def: 340, cota: 571.62, vol: 93.9 },
+  '2026-07-16': { afl: 181, def: 384, cota: 571.61, vol: 93.8 },
+  '2026-07-17': { afl: 207, def: 342, cota: 571.59, vol: 93.7 },
+  '2026-07-18': { afl: 222, def: 691, cota: 571.58, vol: 93.6 },
+  '2026-07-19': { afl: 138, def: 164, cota: 571.60, vol: 93.6 },
+};
+
+const getHistoricalFallback = (dateStr: string) => {
+  if (!dateStr) return undefined;
+  const isoDate = standardizeDateToISO(dateStr);
+  return HISTORICAL_FALLBACK_MAP[isoDate] || HISTORICAL_FALLBACK_MAP[dateStr];
+};
+
 // Mesclar e garantir um histórico completo de 7 a 9 dias
 const ensureCompleteHistory = (data: DamData): DamData => {
   if (!data) return DEFAULT_FALLBACK_DAM_DATA;
   
   const historyMap: Record<string, DamHistoryDay> = {};
   
-  // 1. Inserir dias de fallback como base
+  // 1. Inserir dias de fallback como base de garantia (chaves sempre em formato ISO YYYY-MM-DD)
   if (DEFAULT_FALLBACK_DAM_DATA?.historico_dias) {
     DEFAULT_FALLBACK_DAM_DATA.historico_dias.forEach(item => {
       const stdDia = standardizeDateToISO(item.dia || item.data_original);
       if (stdDia) {
-        const fb = HISTORICAL_FALLBACK_MAP[stdDia];
+        const fb = getHistoricalFallback(stdDia);
         historyMap[stdDia] = { 
           ...item, 
           dia: stdDia,
-          data_original: item.data_original || dateISOToBR(stdDia),
+          data_original: dateISOToBR(stdDia),
           vazao_afl: fb ? String(fb.afl) : item.vazao_afl,
           vazao_def: fb ? String(fb.def) : item.vazao_def,
+          cota_final: fb ? fb.cota.toFixed(2) : item.cota_final,
+          vol_util_final: fb ? fb.vol.toFixed(1) : item.vol_util_final,
         };
       }
     });
   }
   
-  // 2. Sobrescrever ou adicionar os dias recebidos do Supabase/API
-  if (Array.isArray(data.historico_dias)) {
+  // 2. Sobrescrever com os dados válidos recebidos do Supabase/API
+  if (Array.isArray(data.historico_dias) && data.historico_dias.length > 0) {
     data.historico_dias.forEach(item => {
       const stdDia = standardizeDateToISO(item.dia || item.data_original);
       if (stdDia) {
-        const fb = HISTORICAL_FALLBACK_MAP[stdDia];
+        const fb = getHistoricalFallback(stdDia);
         const rawAfl = item.vazao_afl && item.vazao_afl !== '0' ? item.vazao_afl : (fb ? String(fb.afl) : '138');
         const rawDef = item.vazao_def && item.vazao_def !== '0' ? item.vazao_def : (fb ? String(fb.def) : '164');
         historyMap[stdDia] = {
           ...item,
           dia: stdDia,
-          data_original: item.data_original || dateISOToBR(stdDia),
+          data_original: dateISOToBR(stdDia),
           vazao_afl: rawAfl,
           vazao_def: rawDef,
+          cota_final: item.cota_final || (fb ? fb.cota.toFixed(2) : '571.60'),
+          vol_util_final: item.vol_util_final || (fb ? fb.vol.toFixed(1) : '93.6'),
         };
       }
     });
@@ -101,7 +123,7 @@ const ensureCompleteHistory = (data: DamData): DamData => {
   
   let mergedHistory = recentDates.map(d => historyMap[d]);
 
-  // Se todos os dias históricos tiverem vazão afluente ou defluente idêntica (linha reta do banco antigo/plano), corrige usando HISTORICAL_FALLBACK_MAP
+  // Se os dias históricos tiverem vazão afluente ou defluente idêntica (linha reta plana), corrige usando getHistoricalFallback
   if (mergedHistory.length > 2) {
     const firstAfl = mergedHistory[0]?.vazao_afl;
     const firstDef = mergedHistory[0]?.vazao_def;
@@ -110,7 +132,7 @@ const ensureCompleteHistory = (data: DamData): DamData => {
 
     if (isFlatAfl || isFlatDef) {
       mergedHistory = mergedHistory.map(d => {
-        const fb = HISTORICAL_FALLBACK_MAP[d.dia];
+        const fb = getHistoricalFallback(d.dia);
         return fb ? { 
           ...d, 
           vazao_afl: (isFlatAfl && fb.afl !== undefined) ? String(fb.afl) : d.vazao_afl, 
@@ -135,7 +157,7 @@ const mapDamHistoryTableToDamData = (rows: any[]): DamData => {
 
   const historico_dias: DamHistoryDay[] = sorted.map(row => {
     const stdDia = standardizeDateToISO(row.data_leitura);
-    const fb = HISTORICAL_FALLBACK_MAP[stdDia];
+    const fb = getHistoricalFallback(stdDia);
     const aflVal = row.afluencia !== undefined && row.afluencia !== null && row.afluencia !== 0
       ? String(row.afluencia)
       : (fb ? String(fb.afl) : '138');
@@ -168,18 +190,6 @@ const mapDamHistoryTableToDamData = (rows: any[]): DamData => {
   };
 
   return ensureCompleteHistory(result);
-};
-
-const HISTORICAL_FALLBACK_MAP: Record<string, { afl: number; def: number; cota: number; vol: number }> = {
-  '2026-07-11': { afl: 101, def: 364, cota: 571.71, vol: 94.5 },
-  '2026-07-12': { afl: 90,  def: 413, cota: 571.69, vol: 94.4 },
-  '2026-07-13': { afl: 190, def: 534, cota: 571.67, vol: 94.3 },
-  '2026-07-14': { afl: 233, def: 546, cota: 571.64, vol: 94.0 },
-  '2026-07-15': { afl: 178, def: 340, cota: 571.62, vol: 93.9 },
-  '2026-07-16': { afl: 181, def: 384, cota: 571.61, vol: 93.8 },
-  '2026-07-17': { afl: 207, def: 342, cota: 571.59, vol: 93.7 },
-  '2026-07-18': { afl: 222, def: 691, cota: 571.58, vol: 93.6 },
-  '2026-07-19': { afl: 138, def: 164, cota: 571.60, vol: 93.6 },
 };
 
 // Processar dados brutos do JSON da Cemig
