@@ -10,9 +10,16 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
 
-    <!-- Script de emergencia contra telas brancas (Limpeza Automatica de Cache Pos-Deploy) -->
+    <!-- Script de desregistro automatico de Service Worker e limpeza de CacheStorage -->
     <script>
       (function() {
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            for (var i = 0; i < registrations.length; i++) {
+              registrations[i].unregister();
+            }
+          });
+        }
         var hasReloaded = sessionStorage.getItem('app_auto_reloaded_on_error');
         
         window.addEventListener('error', function(e) {

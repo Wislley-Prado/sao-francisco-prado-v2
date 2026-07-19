@@ -366,11 +366,11 @@ export const useRanchos = (onlyAvailable = true) => {
       }
     ),
     {
-      staleTime: TTL.LISTS,
-      cacheTime: TTL.STATIC,
+      staleTime: 30 * 1000,
+      cacheTime: 10 * 60 * 1000,
       refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      refetchOnMount: false,
+      refetchOnReconnect: true,
+      refetchOnMount: true,
       retry: 1,
     }
   );
@@ -454,11 +454,11 @@ export const useRanchoBySlug = (slug: string | undefined) => {
     ),
     {
       enabled: !!slug,
-      staleTime: TTL.LISTS,
-      cacheTime: TTL.STATIC,
+      staleTime: 30 * 1000,
+      cacheTime: 10 * 60 * 1000,
       refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      refetchOnMount: false,
+      refetchOnReconnect: true,
+      refetchOnMount: true,
       retry: 1,
     }
   );

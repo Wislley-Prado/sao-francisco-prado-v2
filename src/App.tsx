@@ -75,11 +75,11 @@ const DepoimentoEditar = lazyWithRetry(() => import("./pages/admin/DepoimentoEdi
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 15 * 60 * 1000,
-      cacheTime: 60 * 60 * 1000,
+      staleTime: 1 * 60 * 1000, // 1 minuto para atualização rápida
+      cacheTime: 15 * 60 * 1000,
       refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      refetchOnMount: false,
+      refetchOnReconnect: true,
+      refetchOnMount: true, // Atualizar dados ao montar cada página/componente
       retry: 1,
     },
   },
