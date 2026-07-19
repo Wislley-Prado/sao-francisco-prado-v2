@@ -173,10 +173,10 @@ const fetchCemigDirectly = async (): Promise<DamData> => {
   });
 
   const allDates = Object.keys(dailyMap).filter(d => dailyMap[d].cota !== undefined || dailyMap[d].afl !== undefined).sort();
-  // Pegar os últimos 7 dias históricos consolidados (excluindo o dia de hoje que está em andamento)
+  // Pegar os últimos 7 a 9 dias consolidados (incluindo a data de hoje)
   const todayStr = new Date().toISOString().split("T")[0];
-  const historicalDates = allDates.filter(d => d < todayStr);
-  const recentDates = historicalDates.length >= 7 ? historicalDates.slice(-7) : allDates.slice(-7);
+  const historicalDates = allDates.filter(d => d <= todayStr);
+  const recentDates = historicalDates.length >= 7 ? historicalDates.slice(-9) : allDates.slice(-9);
 
   const historico_dias = recentDates.map(dateStr => {
     const item = dailyMap[dateStr] || {};
@@ -239,8 +239,13 @@ const fetchDamDataFromDB = async (): Promise<DamData> => {
   }
 
   // Fallback direto para a API da Cemig se o banco estiver sem histórico ou desatualizado
-  if (import.meta.env.DEV) console.log('⚡ [FETCH] Banco sem histórico. Carregando histórico de 7 dias direto da Cemig...');
-  return await fetchCemigDirectly();
+  try {
+    if (import.meta.env.DEV) console.log('⚡ [FETCH] Banco sem histórico. Carregando histórico direto da Cemig...');
+    return await fetchCemigDirectly();
+  } catch (cemigErr) {
+    if (import.meta.env.DEV) console.warn('⚠️ [FETCH] Erro na requisição Cemig. Usando DEFAULT_FALLBACK_DAM_DATA de segurança:', cemigErr);
+    return DEFAULT_FALLBACK_DAM_DATA;
+  }
 };
 
 // Dados padrão iniciais contendo o histórico consolidado recente da represa

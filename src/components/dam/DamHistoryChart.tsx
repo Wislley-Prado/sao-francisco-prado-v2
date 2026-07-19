@@ -12,6 +12,24 @@ interface DamHistoryChartProps {
   damData: DamData | undefined;
 }
 
+// Converter string de data para timestamp sem sofre alteração de fuso horário UTC ou NaN
+const parseDateToTimestamp = (dateStr: string): number => {
+  if (!dateStr) return 0;
+  if (dateStr.includes('-')) {
+    const [y, m, d] = dateStr.split('-').map(Number);
+    if (!isNaN(y) && !isNaN(m) && !isNaN(d)) {
+      return new Date(y, m - 1, d).getTime();
+    }
+  }
+  if (dateStr.includes('/')) {
+    const [d, m, y] = dateStr.split('/').map(Number);
+    if (!isNaN(y) && !isNaN(m) && !isNaN(d)) {
+      return new Date(y, m - 1, d).getTime();
+    }
+  }
+  return 0;
+};
+
 const DamHistoryChart: React.FC<DamHistoryChartProps> = ({ damData }) => {
   const chartData = useMemo(() => {
     if (!damData?.historico_dias || damData.historico_dias.length === 0) {
@@ -19,15 +37,20 @@ const DamHistoryChart: React.FC<DamHistoryChartProps> = ({ damData }) => {
     }
 
     const sortedData = [...damData.historico_dias]
-      .sort((a, b) => new Date(a.dia).getTime() - new Date(b.dia).getTime())
+      .sort((a, b) => parseDateToTimestamp(a.dia || a.data_original) - parseDateToTimestamp(b.dia || b.data_original))
       .slice(-7);
 
     return sortedData.map(dia => {
-      const parts = dia.dia ? dia.dia.split('-') : [];
-      const formattedDate = parts.length === 3 ? `${parts[2]}/${parts[1]}` : (dia.data_original ? dia.data_original.slice(0, 5) : dia.dia);
+      let formattedDate = dia.data_original ? dia.data_original.slice(0, 5) : dia.dia;
+      if (dia.dia && dia.dia.includes('-')) {
+        const parts = dia.dia.split('-');
+        if (parts.length === 3) {
+          formattedDate = `${parts[2]}/${parts[1]}`;
+        }
+      }
       return {
         data: formattedDate,
-        dataCompleta: dia.dia,
+        dataCompleta: dia.dia || dia.data_original,
         nivel: parseFloat(dia.vol_util_final) || 0,
         cota: parseFloat(dia.cota_final) || 0,
         afluencia: parseFloat(dia.vazao_afl) || 0,

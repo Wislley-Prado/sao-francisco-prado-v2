@@ -4,63 +4,27 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Droplets, TrendingUp, Activity, RefreshCw } from 'lucide-react';
-import { useDamData } from '@/hooks/useDamData';
+import { useDamData, DEFAULT_FALLBACK_DAM_DATA } from '@/hooks/useDamData';
 import { getStatusFromLevel } from '@/utils/damStatus';
 import { Condition } from '@/types/damData';
 import DamHeader from './dam/DamHeader';
-import ConditionsGrid from './dam/ConditionsGrid';
 import HistoryTable from './dam/HistoryTable';
 import DamDashboard from './dam/DamDashboard';
 import DamHistoryChart from './dam/DamHistoryChart';
 
 const DamInfo = () => {
-  const { data: damData, isLoading, error, refetch, dataUpdatedAt } = useDamData();
+  const { data: damDataRaw, isLoading, error, refetch, dataUpdatedAt } = useDamData();
   const renderCount = useRef(0);
   renderCount.current += 1;
 
-  const nivelAtualMetros = damData?.nivel_atual ? parseFloat(damData.nivel_atual) : 569.8;
-  const volumePercentual = damData?.volume_util_percentual ? parseFloat(damData.volume_util_percentual) : 82;
-  const afluencia = damData?.afluencia || '--';
-  const defluencia = damData?.defluencia || '--';
-
-  const levelStatus = getStatusFromLevel(volumePercentual);
-
-  const conditions: Condition[] = [
-    {
-      label: "Nível da Represa",
-      value: `${nivelAtualMetros.toFixed(1)}m`,
-      status: levelStatus.status,
-      icon: <Droplets className="h-5 w-5" />,
-      trend: "stable"
-    },
-    {
-      label: "Volume Útil",
-      value: `${volumePercentual.toFixed(1)}%`,
-      status: levelStatus.status,
-      icon: <TrendingUp className="h-5 w-5" />,
-      trend: "stable"
-    },
-    {
-      label: "Afluência",
-      value: `${afluencia} m³/s`,
-      status: "good",
-      icon: <Activity className="h-5 w-5" />,
-      trend: "stable"
-    },
-    {
-      label: "Defluência",
-      value: `${defluencia} m³/s`,
-      status: "good",
-      icon: <Activity className="h-5 w-5" />,
-      trend: "stable"
-    }
-  ];
+  // Garantir que mesmo ao limpar o cache a aplicação NUNCA fique com dados undefined ou cause tela branca
+  const damData = damDataRaw || DEFAULT_FALLBACK_DAM_DATA;
 
   const handleRefetch = () => {
     refetch();
   };
 
-  const errorForComponents = error instanceof Error ? error : new Error('Unknown error occurred');
+  const errorForComponents = error instanceof Error ? error : undefined;
 
   return (
     <section id="represa" className="py-10 sm:py-16 bg-gradient-to-br from-blue-50 to-green-50">
@@ -68,14 +32,14 @@ const DamInfo = () => {
         <DamHeader 
           damData={damData}
           isLoading={isLoading}
-          error={error ? errorForComponents : undefined}
+          error={errorForComponents}
           refetch={handleRefetch}
         />
 
         <DamDashboard
           damData={damData}
           isLoading={isLoading}
-          error={error ? errorForComponents : undefined}
+          error={errorForComponents}
           dataUpdatedAt={dataUpdatedAt}
           renderCount={renderCount.current}
           onRefresh={handleRefetch}
