@@ -101,19 +101,22 @@ const ensureCompleteHistory = (data: DamData): DamData => {
   
   let mergedHistory = recentDates.map(d => historyMap[d]);
 
-  // Se todos os dias históricos tiverem vazão afluente idêntica (linha reta do banco antigo), corrige usando HISTORICAL_FALLBACK_MAP
+  // Se todos os dias históricos tiverem vazão afluente ou defluente idêntica (linha reta do banco antigo/plano), corrige usando HISTORICAL_FALLBACK_MAP
   if (mergedHistory.length > 2) {
-    const firstAfl = mergedHistory[0].vazao_afl;
+    const firstAfl = mergedHistory[0]?.vazao_afl;
+    const firstDef = mergedHistory[0]?.vazao_def;
     const isFlatAfl = mergedHistory.every(d => d.vazao_afl === firstAfl);
-    if (isFlatAfl) {
+    const isFlatDef = mergedHistory.every(d => d.vazao_def === firstDef);
+
+    if (isFlatAfl || isFlatDef) {
       mergedHistory = mergedHistory.map(d => {
         const fb = HISTORICAL_FALLBACK_MAP[d.dia];
         return fb ? { 
           ...d, 
-          vazao_afl: String(fb.afl), 
-          vazao_def: String(fb.def),
-          cota_final: fb.cota ? fb.cota.toFixed(2) : d.cota_final,
-          vol_util_final: fb.vol ? fb.vol.toFixed(1) : d.vol_util_final,
+          vazao_afl: (isFlatAfl && fb.afl !== undefined) ? String(fb.afl) : d.vazao_afl, 
+          vazao_def: (isFlatDef && fb.def !== undefined) ? String(fb.def) : d.vazao_def,
+          cota_final: (isFlatAfl && fb.cota !== undefined) ? fb.cota.toFixed(2) : d.cota_final,
+          vol_util_final: (isFlatAfl && fb.vol !== undefined) ? fb.vol.toFixed(1) : d.vol_util_final,
         } : d;
       });
     }
