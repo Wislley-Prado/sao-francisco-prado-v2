@@ -1,4 +1,3 @@
-
 import React, { useMemo, Suspense } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -15,19 +14,23 @@ interface DamHistoryChartProps {
 // Converter string de data para timestamp sem sofre alteração de fuso horário UTC ou NaN
 const parseDateToTimestamp = (dateStr: string): number => {
   if (!dateStr) return 0;
-  if (dateStr.includes('-')) {
-    const [y, m, d] = dateStr.split('-').map(Number);
-    if (!isNaN(y) && !isNaN(m) && !isNaN(d)) {
-      return new Date(y, m - 1, d).getTime();
+  const cleanStr = dateStr.split('T')[0].trim();
+  if (cleanStr.includes('-')) {
+    const parts = cleanStr.split('-').map(Number);
+    if (parts.length === 3 && !parts.some(isNaN)) {
+      if (parts[0] > 1900) return new Date(parts[0], parts[1] - 1, parts[2]).getTime();
+      return new Date(parts[2], parts[1] - 1, parts[0]).getTime();
     }
   }
-  if (dateStr.includes('/')) {
-    const [d, m, y] = dateStr.split('/').map(Number);
-    if (!isNaN(y) && !isNaN(m) && !isNaN(d)) {
-      return new Date(y, m - 1, d).getTime();
+  if (cleanStr.includes('/')) {
+    const parts = cleanStr.split('/').map(Number);
+    if (parts.length === 3 && !parts.some(isNaN)) {
+      if (parts[2] > 1900) return new Date(parts[2], parts[1] - 1, parts[0]).getTime();
+      return new Date(parts[0], parts[1] - 1, parts[2]).getTime();
     }
   }
-  return 0;
+  const t = new Date(cleanStr).getTime();
+  return isNaN(t) ? 0 : t;
 };
 
 const DamHistoryChart: React.FC<DamHistoryChartProps> = ({ damData }) => {
@@ -38,12 +41,12 @@ const DamHistoryChart: React.FC<DamHistoryChartProps> = ({ damData }) => {
 
     const sortedData = [...damData.historico_dias]
       .sort((a, b) => parseDateToTimestamp(a.dia || a.data_original) - parseDateToTimestamp(b.dia || b.data_original))
-      .slice(-7);
+      .slice(-9);
 
     return sortedData.map(dia => {
       let formattedDate = dia.data_original ? dia.data_original.slice(0, 5) : dia.dia;
       if (dia.dia && dia.dia.includes('-')) {
-        const parts = dia.dia.split('-');
+        const parts = dia.dia.split('T')[0].split('-');
         if (parts.length === 3) {
           formattedDate = `${parts[2]}/${parts[1]}`;
         }

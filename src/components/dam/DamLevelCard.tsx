@@ -1,4 +1,3 @@
-
 import React, { useMemo, Suspense } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -32,33 +31,34 @@ const DamLevelCard: React.FC<DamLevelCardProps> = ({
 
     const parseTs = (str: string) => {
       if (!str) return 0;
-      if (str.includes('-')) {
-        const parts = str.split('T')[0].split('-').map(Number);
+      const cleanStr = str.split('T')[0].trim();
+      if (cleanStr.includes('-')) {
+        const parts = cleanStr.split('-').map(Number);
         if (parts.length === 3 && !parts.some(isNaN)) {
           return parts[0] > 1900 
             ? new Date(parts[0], parts[1] - 1, parts[2]).getTime() 
             : new Date(parts[2], parts[1] - 1, parts[0]).getTime();
         }
       }
-      if (str.includes('/')) {
-        const parts = str.split('/').map(Number);
+      if (cleanStr.includes('/')) {
+        const parts = cleanStr.split('/').map(Number);
         if (parts.length === 3 && !parts.some(isNaN)) {
           return parts[2] > 1900 
             ? new Date(parts[2], parts[1] - 1, parts[0]).getTime() 
             : new Date(parts[0], parts[1] - 1, parts[2]).getTime();
         }
       }
-      const t = new Date(str).getTime();
+      const t = new Date(cleanStr).getTime();
       return isNaN(t) ? 0 : t;
     };
 
     const sortedData = [...damData.historico_dias]
       .sort((a, b) => parseTs(a.dia || a.data_original) - parseTs(b.dia || b.data_original));
 
-    const last7Days = sortedData.slice(-7);
+    const last9Days = sortedData.slice(-9);
 
-    return last7Days.map((dia) => {
-      const parts = dia.dia ? dia.dia.split('-') : [];
+    return last9Days.map((dia) => {
+      const parts = dia.dia ? dia.dia.split('T')[0].split('-') : [];
       const dataFormatada = parts.length === 3 ? `${parts[2]}/${parts[1]}` : (dia.data_original ? dia.data_original.slice(0, 5) : dia.dia);
       
       return {

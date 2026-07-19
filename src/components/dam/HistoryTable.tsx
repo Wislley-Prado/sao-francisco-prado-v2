@@ -10,21 +10,22 @@ interface HistoryTableProps {
 
 const parseDateToTimestamp = (dateStr: string): number => {
   if (!dateStr) return 0;
-  if (dateStr.includes('-')) {
-    const parts = dateStr.split('T')[0].split('-').map(Number);
+  const cleanStr = dateStr.split('T')[0].trim();
+  if (cleanStr.includes('-')) {
+    const parts = cleanStr.split('-').map(Number);
     if (parts.length === 3 && !parts.some(isNaN)) {
       if (parts[0] > 1900) return new Date(parts[0], parts[1] - 1, parts[2]).getTime();
       return new Date(parts[2], parts[1] - 1, parts[0]).getTime();
     }
   }
-  if (dateStr.includes('/')) {
-    const parts = dateStr.split('/').map(Number);
+  if (cleanStr.includes('/')) {
+    const parts = cleanStr.split('/').map(Number);
     if (parts.length === 3 && !parts.some(isNaN)) {
       if (parts[2] > 1900) return new Date(parts[2], parts[1] - 1, parts[0]).getTime();
       return new Date(parts[0], parts[1] - 1, parts[2]).getTime();
     }
   }
-  const t = new Date(dateStr).getTime();
+  const t = new Date(cleanStr).getTime();
   return isNaN(t) ? 0 : t;
 };
 
