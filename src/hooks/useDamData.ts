@@ -134,33 +134,51 @@ const fetchCemigDirectly = async (): Promise<DamData> => {
     if (!Array.isArray(arr)) return;
     arr.forEach(item => {
       if (!item || !item.Timestamp) return;
+      const val = item.Value;
+      if (typeof val !== 'number' || isNaN(val)) return;
       const dateStr = item.Timestamp.split("T")[0];
       if (!dailyMap[dateStr]) dailyMap[dateStr] = {};
-      dailyMap[dateStr][key] = item.Value;
+      dailyMap[dateStr][key] = val;
     });
   };
 
+  // 1. Processar dados de tempo real
   processSeries(raw.VAL_NIVEL, "cota");
   processSeries(raw.VAL_VOLUTIL, "vol");
   processSeries(raw.VAL_VAZAOAFLU, "afl");
   processSeries(raw.VAL_VAZAODEFLU, "def");
 
+  // 2. Processar séries sumarizadas históricas diárias (chaves corretas da Cemig)
+  const sumarizados = raw.VAL_SUMARIZADOS || {};
+  processSeries(sumarizados.VazaoAfluente, "afl");
+  processSeries(sumarizados.VazaoDefluente, "def");
+  processSeries(sumarizados.NivelMontante, "cota");
+  processSeries(sumarizados.VolumeUtil, "vol");
+
+  // 3. Processar fechamento diário
   const fech = raw.VAL_FECHAMENTO || {};
   const cotas = (fech.CotaFinal || {}) as Record<string, number>;
   const vols = (fech.VolumeFinal || {}) as Record<string, number>;
   Object.keys(cotas).forEach(d => {
-    if (!dailyMap[d]) dailyMap[d] = {};
-    dailyMap[d].cota = cotas[d];
+    if (typeof cotas[d] === 'number') {
+      if (!dailyMap[d]) dailyMap[d] = {};
+      dailyMap[d].cota = cotas[d];
+    }
   });
   Object.keys(vols).forEach(d => {
-    if (!dailyMap[d]) dailyMap[d] = {};
-    dailyMap[d].vol = vols[d];
+    if (typeof vols[d] === 'number') {
+      if (!dailyMap[d]) dailyMap[d] = {};
+      dailyMap[d].vol = vols[d];
+    }
   });
 
-  const allDates = Object.keys(dailyMap).sort();
-  const recent7 = allDates.slice(-7);
+  const allDates = Object.keys(dailyMap).filter(d => dailyMap[d].cota !== undefined || dailyMap[d].afl !== undefined).sort();
+  // Pegar os últimos 7 dias com dados históricos consolidados (excluindo hoje se for parcial)
+  const todayStr = new Date().toISOString().split("T")[0];
+  const historicalDates = allDates.filter(d => d < todayStr);
+  const recentDates = historicalDates.length >= 7 ? historicalDates.slice(-7) : allDates.slice(-7);
 
-  const historico_dias = recent7.map(dateStr => {
+  const historico_dias = recentDates.map(dateStr => {
     const item = dailyMap[dateStr];
     return {
       dia: dateStr,

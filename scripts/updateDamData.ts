@@ -50,33 +50,50 @@ async function fetchCemigData() {
     if (!Array.isArray(arr)) return;
     arr.forEach(item => {
       if (!item || !item.Timestamp) return;
+      const val = item.Value;
+      if (typeof val !== 'number' || isNaN(val)) return;
       const dateStr = item.Timestamp.split('T')[0];
       if (!dailyMap[dateStr]) dailyMap[dateStr] = {};
-      dailyMap[dateStr][key] = item.Value;
+      dailyMap[dateStr][key] = val;
     });
   };
 
+  // 1. Tempo real
   processSeries(raw.VAL_NIVEL, 'cota');
   processSeries(raw.VAL_VOLUTIL, 'vol');
   processSeries(raw.VAL_VAZAOAFLU, 'afl');
   processSeries(raw.VAL_VAZAODEFLU, 'def');
 
+  // 2. Séries sumarizadas diárias
+  const sumarizados = raw.VAL_SUMARIZADOS || {};
+  processSeries(sumarizados.VazaoAfluente, 'afl');
+  processSeries(sumarizados.VazaoDefluente, 'def');
+  processSeries(sumarizados.NivelMontante, 'cota');
+  processSeries(sumarizados.VolumeUtil, 'vol');
+
+  // 3. Fechamento diário
   const fech = raw.VAL_FECHAMENTO || {};
   const cotas = fech.CotaFinal || {};
   const vols = fech.VolumeFinal || {};
   Object.keys(cotas).forEach(d => {
-    if (!dailyMap[d]) dailyMap[d] = {};
-    dailyMap[d].cota = cotas[d];
+    if (typeof cotas[d] === 'number') {
+      if (!dailyMap[d]) dailyMap[d] = {};
+      dailyMap[d].cota = cotas[d];
+    }
   });
   Object.keys(vols).forEach(d => {
-    if (!dailyMap[d]) dailyMap[d] = {};
-    dailyMap[d].vol = vols[d];
+    if (typeof vols[d] === 'number') {
+      if (!dailyMap[d]) dailyMap[d] = {};
+      dailyMap[d].vol = vols[d];
+    }
   });
 
-  const allDates = Object.keys(dailyMap).sort();
-  const recent7 = allDates.slice(-7);
+  const allDates = Object.keys(dailyMap).filter(d => dailyMap[d].cota !== undefined || dailyMap[d].afl !== undefined).sort();
+  const todayStr = new Date().toISOString().split('T')[0];
+  const historicalDates = allDates.filter(d => d < todayStr);
+  const recentDates = historicalDates.length >= 7 ? historicalDates.slice(-7) : allDates.slice(-7);
 
-  const historico_dias = recent7.map(dateStr => {
+  const historico_dias = recentDates.map(dateStr => {
     const item = dailyMap[dateStr];
     return {
       dia: dateStr,
