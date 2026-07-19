@@ -121,6 +121,8 @@ const fetchCemigDirectly = async (): Promise<DamData> => {
 
   const raw = await response.json();
 
+// Processar dados brutos do JSON da Cemig (usado pelo fetch direto e pelo banco)
+const processCemigRawData = (raw: any): DamData => {
   const getLast = <T>(arr: T[] | undefined): T | null => (Array.isArray(arr) && arr.length > 0 ? arr[arr.length - 1] : null);
 
   const nivelObj = getLast(raw.VAL_NIVEL as Array<{ Value: number }>);
@@ -128,10 +130,10 @@ const fetchCemigDirectly = async (): Promise<DamData> => {
   const aflObj = getLast(raw.VAL_VAZAOAFLU as Array<{ Value: number }>);
   const defObj = getLast(raw.VAL_VAZAODEFLU as Array<{ Value: number }>);
 
-  const nivelAtual = nivelObj ? nivelObj.Value.toFixed(2) : "571.58";
+  const nivelAtual = nivelObj ? nivelObj.Value.toFixed(2) : "571.60";
   const volumeUtilPercentual = volObj ? volObj.Value.toFixed(1) : "93.6";
-  const afluencia = aflObj ? Math.round(aflObj.Value).toString() : "222";
-  const defluencia = defObj ? Math.round(defObj.Value).toString() : "691";
+  const afluencia = aflObj ? Math.round(aflObj.Value).toString() : "138";
+  const defluencia = defObj ? Math.round(defObj.Value).toString() : "164";
 
   const dailyMap: Record<string, { cota?: number; vol?: number; afl?: number; def?: number }> = {};
 
@@ -147,20 +149,17 @@ const fetchCemigDirectly = async (): Promise<DamData> => {
     });
   };
 
-  // 1. Processar dados de tempo real
   processSeries(raw.VAL_NIVEL, "cota");
   processSeries(raw.VAL_VOLUTIL, "vol");
   processSeries(raw.VAL_VAZAOAFLU, "afl");
   processSeries(raw.VAL_VAZAODEFLU, "def");
 
-  // 2. Processar séries sumarizadas históricas diárias (chaves corretas da Cemig)
   const sumarizados = raw.VAL_SUMARIZADOS || {};
   processSeries(sumarizados.VazaoAfluente, "afl");
   processSeries(sumarizados.VazaoDefluente, "def");
   processSeries(sumarizados.NivelMontante, "cota");
   processSeries(sumarizados.VolumeUtil, "vol");
 
-  // 3. Processar fechamento diário
   const fech = raw.VAL_FECHAMENTO || {};
   const cotas = (fech.CotaFinal || {}) as Record<string, number>;
   const vols = (fech.VolumeFinal || {}) as Record<string, number>;
@@ -178,7 +177,6 @@ const fetchCemigDirectly = async (): Promise<DamData> => {
   });
 
   const allDates = Object.keys(dailyMap).filter(d => dailyMap[d].cota !== undefined || dailyMap[d].afl !== undefined).sort();
-  // Pegar os últimos 7 a 9 dias consolidados (incluindo a data de hoje)
   const todayStr = new Date().toISOString().split("T")[0];
   const historicalDates = allDates.filter(d => d <= todayStr);
   const recentDates = historicalDates.length >= 7 ? historicalDates.slice(-9) : allDates.slice(-9);
@@ -210,21 +208,48 @@ const fetchCemigDirectly = async (): Promise<DamData> => {
   };
 };
 
-// Buscar dados diretamente da API oficial da Cemig com fallback resiliente para banco e dados padrão
+// Buscar da API da Cemig diretamente com trava anti-cache móbile
+const fetchCemigDirectly = async (): Promise<DamData> => {
+  if (import.meta.env.DEV) console.log('🔄 [FETCH] Buscando dados diretamente da API Cemig...');
+  const timestamp = Date.now();
+  const formData = new URLSearchParams();
+  formData.append('action', 'buscar_dados_usina');
+  formData.append('usina_id', 'UHE_TRES_MARIAS');
+  formData.append('_t', timestamp.toString());
+
+  const response = await fetch(`https://www.cemig.com.br/wp-json/api-busca-usinas/v1/send-form?_t=${timestamp}`, {
+    method: 'POST',
+    cache: 'no-cache',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache'
+    },
+    body: formData.toString(),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Erro HTTP Cemig: ${response.status}`);
+  }
+
+  const raw = await response.json();
+  return processCemigRawData(raw);
+};
+
+// Buscar dados com suporte total ao modo anônimo/privado
 const fetchDamDataFromDB = async (): Promise<DamData> => {
-  // 1. Tentar busca direta na API oficial da Cemig (100% independente do n8n)
+  // 1. Tentar busca direta na API oficial da Cemig
   try {
     if (import.meta.env.DEV) console.log('⚡ [FETCH] Carregando dados oficiais diretamente da API da Cemig...');
     const cemigData = await fetchCemigDirectly();
     if (cemigData && Array.isArray(cemigData.historico_dias) && cemigData.historico_dias.length > 0) {
-      if (import.meta.env.DEV) console.log('✅ [FETCH] Dados da Cemig obtidos com sucesso:', cemigData.historico_dias.length, 'dias de histórico');
       return cemigData;
     }
   } catch (cemigErr) {
-    if (import.meta.env.DEV) console.warn('⚠️ [FETCH] Instabilidade temporária na Cemig. Verificando override do banco/fallback:', cemigErr);
+    if (import.meta.env.DEV) console.warn('⚠️ [FETCH] Erro de rede ou modo privado no fetch da Cemig:', cemigErr);
   }
 
-  // 2. Se a API da Cemig falhar, verifica se existe override manual gravado no Supabase
+  // 2. Se a busca direta na Cemig for bloqueada pelo modo anônimo, usa o Supabase
   try {
     const { data, error } = await supabase
       .from('dam_data')
@@ -234,6 +259,9 @@ const fetchDamDataFromDB = async (): Promise<DamData> => {
 
     if (!error && data?.data) {
       const responseData = data.data as any;
+      if (responseData?.raw_cemig) {
+        return processCemigRawData(responseData.raw_cemig);
+      }
       if (responseData && responseData.nivel_atual && Array.isArray(responseData.historico_dias)) {
         return responseData as DamData;
       }
@@ -242,20 +270,19 @@ const fetchDamDataFromDB = async (): Promise<DamData> => {
     if (import.meta.env.DEV) console.warn('⚠️ [FETCH] Erro na leitura do Supabase:', err);
   }
 
-  // 3. Fallback de segurança garantido com os dados mais recentes de 10/07 a 18/07
+  // 3. Fallback de segurança contendo a medição mais recente (19/07/2026)
   return DEFAULT_FALLBACK_DAM_DATA;
 };
 
 // Dados padrão iniciais contendo o histórico consolidado recente da represa
 export const DEFAULT_FALLBACK_DAM_DATA: DamData = {
-  nivel_atual: "571.58",
+  nivel_atual: "571.60",
   volume_util_percentual: "93.6",
-  afluencia: "222",
-  defluencia: "691",
-  data_atualizacao: "18/07/2026",
-  hora_atualizacao: "21:00:00",
+  afluencia: "138",
+  defluencia: "164",
+  data_atualizacao: "19/07/2026",
+  hora_atualizacao: "09:26:02",
   historico_dias: [
-    { dia: "2026-07-10", data_original: "10/07/2026", vazao_afl: "186", cota_inicial: "571.72", vol_util_inicial: "94.5", vazao_def: "288", cota_final: "571.72", vol_util_final: "94.5" },
     { dia: "2026-07-11", data_original: "11/07/2026", vazao_afl: "101", cota_inicial: "571.71", vol_util_inicial: "94.5", vazao_def: "364", cota_final: "571.71", vol_util_final: "94.5" },
     { dia: "2026-07-12", data_original: "12/07/2026", vazao_afl: "90",  cota_inicial: "571.69", vol_util_inicial: "94.4", vazao_def: "413", cota_final: "571.69", vol_util_final: "94.4" },
     { dia: "2026-07-13", data_original: "13/07/2026", vazao_afl: "190", cota_inicial: "571.67", vol_util_inicial: "94.3", vazao_def: "534", cota_final: "571.67", vol_util_final: "94.3" },
@@ -263,7 +290,8 @@ export const DEFAULT_FALLBACK_DAM_DATA: DamData = {
     { dia: "2026-07-15", data_original: "15/07/2026", vazao_afl: "178", cota_inicial: "571.62", vol_util_inicial: "93.9", vazao_def: "340", cota_final: "571.62", vol_util_final: "93.9" },
     { dia: "2026-07-16", data_original: "16/07/2026", vazao_afl: "181", cota_inicial: "571.61", vol_util_inicial: "93.8", vazao_def: "384", cota_final: "571.61", vol_util_final: "93.8" },
     { dia: "2026-07-17", data_original: "17/07/2026", vazao_afl: "207", cota_inicial: "571.59", vol_util_inicial: "93.7", vazao_def: "342", cota_final: "571.59", vol_util_final: "93.7" },
-    { dia: "2026-07-18", data_original: "18/07/2026", vazao_afl: "222", cota_inicial: "571.58", vol_util_inicial: "93.6", vazao_def: "691", cota_final: "571.58", vol_util_final: "93.6" }
+    { dia: "2026-07-18", data_original: "18/07/2026", vazao_afl: "222", cota_inicial: "571.58", vol_util_inicial: "93.6", vazao_def: "691", cota_final: "571.58", vol_util_final: "93.6" },
+    { dia: "2026-07-19", data_original: "19/07/2026", vazao_afl: "138", cota_inicial: "571.60", vol_util_inicial: "93.6", vazao_def: "164", cota_final: "571.60", vol_util_final: "93.6" }
   ],
   usando_dados_historicos: false
 };
