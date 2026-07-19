@@ -19,7 +19,8 @@ const DamHistoryChart: React.FC<DamHistoryChartProps> = ({ damData }) => {
     }
 
     const sortedData = [...damData.historico_dias]
-      .sort((a, b) => new Date(a.dia).getTime() - new Date(b.dia).getTime());
+      .sort((a, b) => new Date(a.dia).getTime() - new Date(b.dia).getTime())
+      .slice(-7);
 
     return sortedData.map(dia => ({
       data: new Date(dia.dia).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
