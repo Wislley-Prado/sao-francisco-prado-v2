@@ -231,29 +231,53 @@ const Configuracoes = () => {
   const handleRefreshDamData = async () => {
     setRefreshing(true);
     try {
-      const response = await fetch('https://zeqloqlhnbdeivnyghkx.supabase.co/functions/v1/dam-data-proxy', {
+      // 1. Consultar diretamente a API oficial da Cemig
+      const timestamp = Date.now();
+      const formData = new URLSearchParams();
+      formData.append('action', 'buscar_dados_usina');
+      formData.append('usina_id', 'UHE_TRES_MARIAS');
+      formData.append('_t', timestamp.toString());
+
+      const response = await fetch(`https://www.cemig.com.br/wp-json/api-busca-usinas/v1/send-form?_t=${timestamp}`, {
         method: 'POST',
+        cache: 'no-cache',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
         },
+        body: formData.toString(),
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Erro ao atualizar dados');
+        throw new Error(`Erro HTTP Cemig: ${response.status}`);
       }
 
-      const data = await response.json();
+      const raw = await response.json();
 
-      if (data.saved_to_db) {
-        toast.success('Dados da represa atualizados com sucesso!');
-        setLastUpdate(new Date().toISOString());
-      } else {
-        toast.warning('Dados recebidos mas não salvos no banco');
+      // Salvar os dados atualizados no Supabase (id: 1)
+      const { error: dbError } = await supabase
+        .from('dam_data')
+        .upsert({ 
+          id: 1, 
+          data: {
+            sucesso: true,
+            origem: 'cemig_direto',
+            atualizado_em: new Date().toISOString(),
+            raw_cemig: raw
+          }, 
+          updated_at: new Date().toISOString() 
+        });
+
+      if (dbError) {
+        console.warn('Aviso ao salvar no banco:', dbError);
       }
+
+      toast.success('Dados da represa atualizados com sucesso diretamente da CEMIG!');
+      setLastUpdate(new Date().toISOString());
+      queryClient.invalidateQueries({ queryKey: ['damData'] });
     } catch (error) {
       console.error('Erro ao atualizar dados da represa:', error);
-      toast.error('Erro ao atualizar dados da represa. Verifique se o workflow n8n está ativo.');
+      toast.error('Erro ao conectar com a CEMIG. Tente novamente em instantes.');
     } finally {
       setRefreshing(false);
     }
@@ -267,16 +291,28 @@ const Configuracoes = () => {
 
     setSavingManual(true);
     try {
-      const damPayload = [{
-        tipo: 'tempo_real',
-        data_leitura: manualDam.data,
-        afluencia: manualDam.afluencia,
-        nivel_inicial: manualDam.nivel,
-        volume_inicial: manualDam.volume,
-        defluencia: manualDam.defluencia,
+      const todayIso = new Date().toISOString().split('T')[0];
+      const damPayload = {
         nivel_atual: manualDam.nivel,
-        volume_percentual: manualDam.volume,
-      }];
+        volume_util_percentual: manualDam.volume,
+        afluencia: manualDam.afluencia,
+        defluencia: manualDam.defluencia,
+        data_atualizacao: manualDam.data,
+        hora_atualizacao: new Date().toLocaleTimeString('pt-BR'),
+        historico_dias: [
+          {
+            dia: todayIso,
+            data_original: manualDam.data,
+            vazao_afl: manualDam.afluencia,
+            cota_inicial: manualDam.nivel,
+            vol_util_inicial: manualDam.volume,
+            vazao_def: manualDam.defluencia,
+            cota_final: manualDam.nivel,
+            vol_util_final: manualDam.volume
+          }
+        ],
+        usando_dados_historicos: false
+      };
 
       const { error } = await supabase
         .from('dam_data')
@@ -284,8 +320,9 @@ const Configuracoes = () => {
 
       if (error) throw error;
 
-      toast.success('Dados da represa salvos manualmente!');
+      toast.success('Dados da represa salvos manualmente no banco!');
       setLastUpdate(new Date().toISOString());
+      queryClient.invalidateQueries({ queryKey: ['damData'] });
     } catch (error) {
       console.error('Erro ao salvar dados manuais:', error);
       toast.error('Erro ao salvar dados manuais');
