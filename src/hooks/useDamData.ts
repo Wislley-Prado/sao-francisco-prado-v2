@@ -205,47 +205,40 @@ const fetchCemigDirectly = async (): Promise<DamData> => {
   };
 };
 
-// Buscar dados do banco com fallback resiliente para a API Cemig
+// Buscar dados diretamente da API oficial da Cemig com fallback resiliente para banco e dados padrão
 const fetchDamDataFromDB = async (): Promise<DamData> => {
+  // 1. Tentar busca direta na API oficial da Cemig (100% independente do n8n)
   try {
-    if (import.meta.env.DEV) console.log('🔧 [FETCH] Buscando dados da represa do banco...');
-    
+    if (import.meta.env.DEV) console.log('⚡ [FETCH] Carregando dados oficiais diretamente da API da Cemig...');
+    const cemigData = await fetchCemigDirectly();
+    if (cemigData && Array.isArray(cemigData.historico_dias) && cemigData.historico_dias.length > 0) {
+      if (import.meta.env.DEV) console.log('✅ [FETCH] Dados da Cemig obtidos com sucesso:', cemigData.historico_dias.length, 'dias de histórico');
+      return cemigData;
+    }
+  } catch (cemigErr) {
+    if (import.meta.env.DEV) console.warn('⚠️ [FETCH] Instabilidade temporária na Cemig. Verificando override do banco/fallback:', cemigErr);
+  }
+
+  // 2. Se a API da Cemig falhar, verifica se existe override manual gravado no Supabase
+  try {
     const { data, error } = await supabase
       .from('dam_data')
-      .select('data, updated_at')
+      .select('data')
       .eq('id', 1)
       .single();
 
-    if (!error && data?.data && Object.keys(data.data as object).length > 0) {
+    if (!error && data?.data) {
       const responseData = data.data as any;
-      let damDataResult: DamData | null = null;
-
-      if (responseData && 'sucesso' in responseData && Array.isArray(responseData.dados)) {
-        damDataResult = mapNewApiDataToDamData(responseData.dados);
-      } else if (Array.isArray(responseData) && responseData.length > 0) {
-        damDataResult = mapNewApiDataToDamData(responseData);
-      } else if (responseData && responseData.nivel_atual) {
-        damDataResult = responseData as DamData;
-      }
-
-      // Se o banco contiver histórico válido (pelo menos 1 dia), usa o dado do banco
-      if (damDataResult && Array.isArray(damDataResult.historico_dias) && damDataResult.historico_dias.length > 0) {
-        if (import.meta.env.DEV) console.log('✅ [FETCH] Dados do banco carregados com', damDataResult.historico_dias.length, 'dias de histórico');
-        return damDataResult;
+      if (responseData && responseData.nivel_atual && Array.isArray(responseData.historico_dias)) {
+        return responseData as DamData;
       }
     }
   } catch (err) {
-    if (import.meta.env.DEV) console.warn('⚠️ [FETCH] Erro no banco. Usando busca direta da Cemig:', err);
+    if (import.meta.env.DEV) console.warn('⚠️ [FETCH] Erro na leitura do Supabase:', err);
   }
 
-  // Fallback direto para a API da Cemig se o banco estiver sem histórico ou desatualizado
-  try {
-    if (import.meta.env.DEV) console.log('⚡ [FETCH] Banco sem histórico. Carregando histórico direto da Cemig...');
-    return await fetchCemigDirectly();
-  } catch (cemigErr) {
-    if (import.meta.env.DEV) console.warn('⚠️ [FETCH] Erro na requisição Cemig. Usando DEFAULT_FALLBACK_DAM_DATA de segurança:', cemigErr);
-    return DEFAULT_FALLBACK_DAM_DATA;
-  }
+  // 3. Fallback de segurança garantido com os dados mais recentes de 10/07 a 18/07
+  return DEFAULT_FALLBACK_DAM_DATA;
 };
 
 // Dados padrão iniciais contendo o histórico consolidado recente da represa
