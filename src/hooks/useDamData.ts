@@ -150,23 +150,54 @@ const processCemigRawData = (raw: any): DamData => {
     }
   });
 
-  const allDates = Object.keys(dailyMap).filter(d => dailyMap[d].cota !== undefined || dailyMap[d].afl !== undefined).sort();
+  // Mapear dados históricos consolidados de fallback para preenchimento de lacunas de vazão
+  const fallbackMap: Record<string, any> = {};
+  if (DEFAULT_FALLBACK_DAM_DATA?.historico_dias) {
+    DEFAULT_FALLBACK_DAM_DATA.historico_dias.forEach(fb => {
+      if (fb.dia) fallbackMap[fb.dia] = fb;
+    });
+  }
+
+  // Garantir que as datas recentes de fallback estejam no dailyMap
+  Object.keys(fallbackMap).forEach(d => {
+    if (!dailyMap[d]) dailyMap[d] = {};
+  });
+
+  const allDates = Object.keys(dailyMap).sort();
   const todayStr = new Date().toISOString().split("T")[0];
   const historicalDates = allDates.filter(d => d <= todayStr);
   const recentDates = historicalDates.length >= 7 ? historicalDates.slice(-9) : allDates.slice(-9);
 
   const historico_dias = recentDates.map(dateStr => {
     const item = dailyMap[dateStr] || {};
+    const fallbackItem = fallbackMap[dateStr] || {};
     const formattedDataOriginal = dateStr && dateStr.includes("-") ? dateStr.split("-").reverse().join("/") : (dateStr || "");
+
+    const aflVal = item.afl !== undefined 
+      ? Math.round(item.afl).toString() 
+      : (fallbackItem.vazao_afl || afluencia);
+
+    const defVal = item.def !== undefined 
+      ? Math.round(item.def).toString() 
+      : (fallbackItem.vazao_def || defluencia);
+
+    const cotaVal = item.cota !== undefined 
+      ? item.cota.toFixed(2) 
+      : (fallbackItem.cota_final || nivelAtual);
+
+    const volVal = item.vol !== undefined 
+      ? item.vol.toFixed(1) 
+      : (fallbackItem.vol_util_final || volumeUtilPercentual);
+
     return {
       dia: dateStr || "",
       data_original: formattedDataOriginal,
-      vazao_afl: item.afl !== undefined ? Math.round(item.afl).toString() : afluencia,
-      cota_inicial: item.cota !== undefined ? item.cota.toFixed(2) : nivelAtual,
-      vol_util_inicial: item.vol !== undefined ? item.vol.toFixed(1) : volumeUtilPercentual,
-      vazao_def: item.def !== undefined ? Math.round(item.def).toString() : defluencia,
-      cota_final: item.cota !== undefined ? item.cota.toFixed(2) : nivelAtual,
-      vol_util_final: item.vol !== undefined ? item.vol.toFixed(1) : volumeUtilPercentual,
+      vazao_afl: aflVal,
+      cota_inicial: cotaVal,
+      vol_util_inicial: volVal,
+      vazao_def: defVal,
+      cota_final: cotaVal,
+      vol_util_final: volVal,
     };
   });
 
