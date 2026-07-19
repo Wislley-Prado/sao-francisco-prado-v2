@@ -21,10 +21,24 @@ export default defineConfig(({ mode }) => ({
       workbox: {
         skipWaiting: true,
         clientsClaim: true,
-        globPatterns: ['**/*.{js,css,html,ico,png,jpg,jpeg,svg,woff,woff2}'],
+        globPatterns: ['**/*.{js,css,ico,png,jpg,jpeg,svg,woff,woff2}'], // Removido 'html' para nao congelar index.html antigo no cache do SW
         cleanupOutdatedCaches: true,
         maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 10 MB
+        navigateFallback: '/index.html',
+        navigateFallbackDenylist: [/^\/api/, /^\/bot\.php/],
         runtimeCaching: [
+          {
+            urlPattern: ({ request }) => request.mode === 'navigate',
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'pages-cache',
+              networkTimeoutSeconds: 3,
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24 // 24 horas
+              }
+            }
+          },
           {
             urlPattern: /^https:\/\/api\./,
             handler: 'NetworkFirst',
