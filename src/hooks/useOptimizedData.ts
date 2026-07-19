@@ -13,9 +13,12 @@ import { cachedQuery, TTL, invalidateCacheByPrefix } from '@/lib/cacheService';
 export interface RanchoWithImages {
   id: string;
   nome: string;
+  nome_en?: string | null;
   slug: string;
   descricao: string;
+  descricao_en?: string | null;
   localizacao: string;
+  localizacao_en?: string | null;
   capacidade: number;
   preco: number;
   rating: number;
@@ -319,9 +322,12 @@ export const useRanchos = (onlyAvailable = true) => {
         return (data || []).map(rancho => ({
           id: rancho.id,
           nome: rancho.nome,
+          nome_en: rancho.nome_en,
           slug: rancho.slug,
           descricao: rancho.descricao || '',
+          descricao_en: rancho.descricao_en,
           localizacao: rancho.localizacao,
+          localizacao_en: rancho.localizacao_en,
           capacidade: rancho.capacidade,
           preco: Number(rancho.preco),
           rating: Number(rancho.rating),
@@ -403,9 +409,12 @@ export const useRanchoBySlug = (slug: string | undefined) => {
         return {
           id: data.id,
           nome: data.nome,
+          nome_en: data.nome_en,
           slug: data.slug,
           descricao: data.descricao || '',
+          descricao_en: data.descricao_en,
           localizacao: data.localizacao,
+          localizacao_en: data.localizacao_en,
           capacidade: data.capacidade,
           preco: Number(data.preco),
           rating: Number(data.rating),
