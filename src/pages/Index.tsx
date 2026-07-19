@@ -10,7 +10,22 @@ import { Skeleton } from '@/components/ui/skeleton';
 import LazySection from '@/components/LazySection';
 
 import { lazyWithRetry } from '@/utils/lazyWithRetry';
-import SectionErrorBoundary from '@/components/SectionErrorBoundary';
+
+class SectionErrorBoundary extends React.Component<{ children: React.ReactNode; fallback?: React.ReactNode }, { hasError: boolean }> {
+  state = { hasError: false };
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch(error: any, errorInfo: any) {
+    console.error('SectionErrorBoundary caught an isolated error:', error, errorInfo);
+  }
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback || null;
+    }
+    return this.props.children;
+  }
+}
 
 // Lazy load all below-the-fold sections with auto-retry
 const AnunciosSection = lazyWithRetry(() => import('@/components/AnunciosSection').then(m => ({ default: m.AnunciosSection })));
