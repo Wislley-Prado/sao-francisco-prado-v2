@@ -95,32 +95,6 @@ const mapNewApiDataToDamData = (apiData: NewApiResponseItem[]): DamData => {
   };
 };
 
-// Buscar da API da Cemig diretamente com trava anti-cache móbile
-const fetchCemigDirectly = async (): Promise<DamData> => {
-  if (import.meta.env.DEV) console.log('🔄 [FETCH] Buscando dados diretamente da API Cemig...');
-  const timestamp = Date.now();
-  const formData = new URLSearchParams();
-  formData.append('action', 'buscar_dados_usina');
-  formData.append('usina_id', 'UHE_TRES_MARIAS');
-  formData.append('_t', timestamp.toString());
-
-  const response = await fetch(`https://www.cemig.com.br/wp-json/api-busca-usinas/v1/send-form?_t=${timestamp}`, {
-    method: 'POST',
-    cache: 'no-cache',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-      'Cache-Control': 'no-cache, no-store, must-revalidate',
-      'Pragma': 'no-cache'
-    },
-    body: formData.toString(),
-  });
-
-  if (!response.ok) {
-    throw new Error(`Erro HTTP Cemig: ${response.status}`);
-  }
-
-  const raw = await response.json();
-
 // Processar dados brutos do JSON da Cemig (usado pelo fetch direto e pelo banco)
 const processCemigRawData = (raw: any): DamData => {
   const getLast = <T>(arr: T[] | undefined): T | null => (Array.isArray(arr) && arr.length > 0 ? arr[arr.length - 1] : null);
@@ -307,4 +281,3 @@ export const useDamData = () => {
     retryDelay: 3000,
   });
 };
-
