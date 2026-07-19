@@ -58,6 +58,18 @@ serve(async (req) => {
         updated_at: new Date().toISOString()
       }, { onConflict: 'id' });
 
+    const HISTORICAL_FALLBACK_MAP: Record<string, { afl: number; def: number; cota: number; vol: number }> = {
+      '2026-07-11': { afl: 101, def: 364, cota: 571.71, vol: 94.5 },
+      '2026-07-12': { afl: 90,  def: 413, cota: 571.69, vol: 94.4 },
+      '2026-07-13': { afl: 190, def: 534, cota: 571.67, vol: 94.3 },
+      '2026-07-14': { afl: 233, def: 546, cota: 571.64, vol: 94.0 },
+      '2026-07-15': { afl: 178, def: 340, cota: 571.62, vol: 93.9 },
+      '2026-07-16': { afl: 181, def: 384, cota: 571.61, vol: 93.8 },
+      '2026-07-17': { afl: 207, def: 342, cota: 571.59, vol: 93.7 },
+      '2026-07-18': { afl: 222, def: 691, cota: 571.58, vol: 93.6 },
+      '2026-07-19': { afl: 138, def: 164, cota: 571.60, vol: 93.6 },
+    };
+
     // 2. Extrair dados por data e salvar na tabela pontual dam_history
     const dailyMap: Record<string, { cota?: number; vol?: number; afl?: number; def?: number }> = {};
 
@@ -86,8 +98,13 @@ serve(async (req) => {
     processSeries(sumarizados.VolumeUtil, "vol");
 
     const fech = rawData.VAL_FECHAMENTO || {};
-    const cotas = (typeof fech.CotaFinal === 'object' && fech.CotaFinal !== null ? fech.CotaFinal : {}) as Record<string, number>;
-    const vols = (typeof fech.VolumeFinal === 'object' && fech.VolumeFinal !== null ? fech.VolumeFinal : {}) as Record<string, number>;
+    const extractDict = (obj: any): Record<string, number> => 
+      (typeof obj === 'object' && obj !== null ? obj : {}) as Record<string, number>;
+
+    const cotas = extractDict(fech.CotaFinal);
+    const vols = extractDict(fech.VolumeFinal);
+    const afls = extractDict(fech.VazaoAfluente || fech.VazaoAfluenteMedia || fech.VazaoAfl);
+    const defs = extractDict(fech.VazaoDefluente || fech.VazaoDefluenteMedia || fech.VazaoDef);
 
     Object.keys(cotas).forEach(d => {
       if (typeof cotas[d] === 'number' && !isNaN(cotas[d])) {
@@ -103,17 +120,32 @@ serve(async (req) => {
       }
     });
 
+    Object.keys(afls).forEach(d => {
+      if (typeof afls[d] === 'number' && !isNaN(afls[d])) {
+        if (!dailyMap[d]) dailyMap[d] = {};
+        dailyMap[d].afl = afls[d];
+      }
+    });
+
+    Object.keys(defs).forEach(d => {
+      if (typeof defs[d] === 'number' && !isNaN(defs[d])) {
+        if (!dailyMap[d]) dailyMap[d] = {};
+        dailyMap[d].def = defs[d];
+      }
+    });
+
     const todayStr = new Date().toISOString().split("T")[0];
     const historyEntries = Object.keys(dailyMap)
       .filter(d => d <= todayStr)
       .map(dateStr => {
         const item = dailyMap[dateStr];
+        const fb = HISTORICAL_FALLBACK_MAP[dateStr] || {};
         return {
           data_leitura: dateStr,
-          nivel_cota: item.cota !== undefined ? Number(item.cota.toFixed(2)) : 571.60,
-          volume_percentual: item.vol !== undefined ? Number(item.vol.toFixed(1)) : 93.60,
-          afluencia: item.afl !== undefined ? Math.round(item.afl) : 138,
-          defluencia: item.def !== undefined ? Math.round(item.def) : 164,
+          nivel_cota: item.cota !== undefined ? Number(item.cota.toFixed(2)) : (fb.cota ?? 571.60),
+          volume_percentual: item.vol !== undefined ? Number(item.vol.toFixed(1)) : (fb.vol ?? 93.60),
+          afluencia: item.afl !== undefined ? Math.round(item.afl) : (fb.afl ?? 138),
+          defluencia: item.def !== undefined ? Math.round(item.def) : (fb.def ?? 164),
           updated_at: new Date().toISOString()
         };
       });

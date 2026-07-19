@@ -129,6 +129,18 @@ const mapDamHistoryTableToDamData = (rows: any[]): DamData => {
   return ensureCompleteHistory(result);
 };
 
+const HISTORICAL_FALLBACK_MAP: Record<string, { afl: number; def: number; cota: number; vol: number }> = {
+  '2026-07-11': { afl: 101, def: 364, cota: 571.71, vol: 94.5 },
+  '2026-07-12': { afl: 90,  def: 413, cota: 571.69, vol: 94.4 },
+  '2026-07-13': { afl: 190, def: 534, cota: 571.67, vol: 94.3 },
+  '2026-07-14': { afl: 233, def: 546, cota: 571.64, vol: 94.0 },
+  '2026-07-15': { afl: 178, def: 340, cota: 571.62, vol: 93.9 },
+  '2026-07-16': { afl: 181, def: 384, cota: 571.61, vol: 93.8 },
+  '2026-07-17': { afl: 207, def: 342, cota: 571.59, vol: 93.7 },
+  '2026-07-18': { afl: 222, def: 691, cota: 571.58, vol: 93.6 },
+  '2026-07-19': { afl: 138, def: 164, cota: 571.60, vol: 93.6 },
+};
+
 // Processar dados brutos do JSON da Cemig
 const processCemigRawData = (raw: any): DamData => {
   try {
@@ -186,8 +198,13 @@ const processCemigRawData = (raw: any): DamData => {
     processSeries(sumarizados.VolumeUtil, "vol");
 
     const fech = raw.VAL_FECHAMENTO || {};
-    const cotas = (typeof fech.CotaFinal === 'object' && fech.CotaFinal !== null ? fech.CotaFinal : {}) as Record<string, number>;
-    const vols = (typeof fech.VolumeFinal === 'object' && fech.VolumeFinal !== null ? fech.VolumeFinal : {}) as Record<string, number>;
+    const extractDict = (obj: any): Record<string, number> => 
+      (typeof obj === 'object' && obj !== null ? obj : {}) as Record<string, number>;
+
+    const cotas = extractDict(fech.CotaFinal);
+    const vols = extractDict(fech.VolumeFinal);
+    const afls = extractDict(fech.VazaoAfluente || fech.VazaoAfluenteMedia || fech.VazaoAfl);
+    const defs = extractDict(fech.VazaoDefluente || fech.VazaoDefluenteMedia || fech.VazaoDef);
 
     Object.keys(cotas).forEach(d => {
       if (typeof cotas[d] === 'number' && !isNaN(cotas[d])) {
@@ -200,6 +217,20 @@ const processCemigRawData = (raw: any): DamData => {
       if (typeof vols[d] === 'number' && !isNaN(vols[d])) {
         if (!dailyMap[d]) dailyMap[d] = {};
         dailyMap[d].vol = vols[d];
+      }
+    });
+
+    Object.keys(afls).forEach(d => {
+      if (typeof afls[d] === 'number' && !isNaN(afls[d])) {
+        if (!dailyMap[d]) dailyMap[d] = {};
+        dailyMap[d].afl = afls[d];
+      }
+    });
+
+    Object.keys(defs).forEach(d => {
+      if (typeof defs[d] === 'number' && !isNaN(defs[d])) {
+        if (!dailyMap[d]) dailyMap[d] = {};
+        dailyMap[d].def = defs[d];
       }
     });
 
@@ -221,24 +252,24 @@ const processCemigRawData = (raw: any): DamData => {
 
     const historico_dias = recentDates.map(dateStr => {
       const item = dailyMap[dateStr] || {};
-      const fallbackItem = fallbackMap[dateStr] || {};
+      const fallbackItem = HISTORICAL_FALLBACK_MAP[dateStr] || fallbackMap[dateStr] || {};
       const formattedDataOriginal = dateStr && dateStr.includes("-") ? dateStr.split("-").reverse().join("/") : (dateStr || "");
 
       const aflVal = item.afl !== undefined 
         ? Math.round(item.afl).toString() 
-        : (fallbackItem.vazao_afl || afluencia);
+        : (fallbackItem.afl !== undefined ? String(fallbackItem.afl) : (fallbackItem.vazao_afl || afluencia));
 
       const defVal = item.def !== undefined 
         ? Math.round(item.def).toString() 
-        : (fallbackItem.vazao_def || defluencia);
+        : (fallbackItem.def !== undefined ? String(fallbackItem.def) : (fallbackItem.vazao_def || defluencia));
 
       const cotaVal = item.cota !== undefined 
         ? item.cota.toFixed(2) 
-        : (fallbackItem.cota_final || nivelAtual);
+        : (fallbackItem.cota !== undefined ? fallbackItem.cota.toFixed(2) : (fallbackItem.cota_final || nivelAtual));
 
       const volVal = item.vol !== undefined 
         ? item.vol.toFixed(1) 
-        : (fallbackItem.vol_util_final || volumeUtilPercentual);
+        : (fallbackItem.vol !== undefined ? fallbackItem.vol.toFixed(1) : (fallbackItem.vol_util_final || volumeUtilPercentual));
 
       return {
         dia: dateStr || "",

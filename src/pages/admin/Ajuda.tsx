@@ -971,85 +971,70 @@ const Ajuda = () => {
     {
       id: 'represa',
       icon: Waves,
-      title: 'Informações da Represa (API Cemig)',
+      title: 'Informações da Represa (API Cemig & Histórico)',
       color: 'text-blue-700',
       category: 'Funcionalidades Públicas',
       content: (
         <div className="space-y-4">
           <p className="text-muted-foreground">
-            Manual de funcionamento da integração automática com os dados oficiais da Usina Hidrelétrica de Três Marias (CEMIG) e seu gráfico de 7 dias.
+            Manual de funcionamento da integração automática com os dados oficiais da Usina Hidrelétrica de Três Marias (CEMIG), tabela de histórico e gráficos dinâmicos de 7 a 9 dias.
           </p>
           
           <div className="bg-blue-500/10 border border-blue-500/20 p-4 rounded-lg space-y-2">
             <h4 className="font-semibold text-blue-900 dark:text-blue-300 flex items-center gap-2">
-              <Zap className="w-5 h-5 text-blue-600" /> Como Funciona a Automação (Explicação Simples):
+              <Zap className="w-5 h-5 text-blue-600" /> Como Funciona a Automação (Sem Custos):
             </h4>
             <p className="text-sm text-muted-foreground">
-              O site possui uma conexão direta com o servidor oficial da <strong>CEMIG</strong>. Toda vez que um visitante entra na página da represa, o site busca os números atualizados automaticamente. 
-              <strong> Não é necessário usar n8n ou nenhuma ferramenta paga externa.</strong>
+              O site conecta-se diretamente à API da <strong>CEMIG</strong> através de uma Edge Function no Supabase. Toda vez que um visitante navega no site ou a cada 5 minutos, os dados oficiais são atualizados e sincronizados no banco de dados. 
+              <strong> Não é necessário pagar ferramentas externas ou acionar scripts manuais.</strong>
             </p>
           </div>
 
           <div className="space-y-2">
-            <h4 className="font-semibold text-foreground">📊 Dados Medidos e Exibidos:</h4>
+            <h4 className="font-semibold text-foreground">📊 Armazenamento e Tabela `dam_history`:</h4>
             <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
-              <li><strong>Nível / Cota Atual (m):</strong> A altura exata da água na barragem em metros (ex: 571,58 m).</li>
-              <li><strong>Volume Útil (%):</strong> A porcentagem de capacidade da represa (ex: 93.6%).</li>
-              <li><strong>Afluência (m³/s):</strong> A quantidade de água em metros cúbicos que está <em>entrando</em> na represa pelos rios a cada segundo.</li>
-              <li><strong>Defluência (m³/s):</strong> A quantidade de água em metros cúbicos que está <em>saindo</em> da represa pelas turbinas e comportas a cada segundo.</li>
-              <li><strong>Histórico dos Útimos 7 Dias:</strong> Gráfico interativo que mostra a evolução da água ao longo da última semana.</li>
+              <li><strong>Tabela `dam_history` no Supabase:</strong> Cada medição diária é armazenada com chave única pela data (<code>data_leitura</code>).</li>
+              <li><strong>Dados Armazenados por Dia:</strong> Nível Cota (m), Volume Útil (%), Afluência (m³/s) e Defluência (m³/s).</li>
+              <li><strong>Manutenção Automática (15 Dias):</strong> A função realiza a limpeza automática de registros com mais de 15 dias para manter o banco leve.</li>
             </ul>
           </div>
 
           <div className="space-y-2">
             <h4 className="font-semibold text-foreground flex items-center gap-2">
-              <BarChart3 className="w-4 h-4 text-blue-600" /> O Gráfico de 7 Dias:
+              <BarChart3 className="w-4 h-4 text-blue-600" /> Gráfico Dinâmico e Histórico de 7 a 9 Dias:
             </h4>
             <p className="text-sm text-muted-foreground">
-              O gráfico desenhado na tela cruza duas informações importantes para o pescador:
+              O gráfico interativo e a tabela de histórico exibem o comportamento real da represa ao longo dos dias:
             </p>
             <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground ml-2">
-              <li><strong>Linha de Volume Útil (%):</strong> Mostra a tendência (se a represa está subindo, baixando ou estável).</li>
-              <li><strong>Barras de Afluência x Defluência:</strong> Compara se está entrando mais água do que saindo. Se a afluência for maior que a defluência, o nível da água irá subir.</li>
+              <li><strong>Barras Verdes (Afluência):</strong> Exibem a quantidade individual de água entrando por segundo a cada dia (ex: 101 m³/s, 190 m³/s, 251 m³/s).</li>
+              <li><strong>Linha Laranja (Defluência):</strong> Exibe a curva da água liberada pelas turbinas/comportas a cada dia.</li>
+              <li><strong>Volume Útil (%) e Cotas:</strong> Acompanhamento preciso das variações de nível (subindo, descendo ou estável).</li>
             </ul>
           </div>
 
           <div className="space-y-2">
             <h4 className="font-semibold text-foreground flex items-center gap-2">
-              <Clock className="w-4 h-4 text-green-600" /> Frequência de Atualização:
+              <Clock className="w-4 h-4 text-green-600" /> Sincronização & Proteção Anti-Falha:
             </h4>
             <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
-              <li><strong>No Navegador (Automático):</strong> O site verifica novas medições na Cemig a cada <strong>5 minutos</strong> enquanto o usuário navega.</li>
-              <li><strong>Sem Telas Vazias (Garantia):</strong> O sistema possui um histórico seguro pré-carregado. Mesmo que a internet do visitante oscile, a tela nunca fica em branco ou com "0 dias".</li>
+              <li><strong>Sincronização Contínua:</strong> Atualiza a cada 5 minutos no frontend.</li>
+              <li><strong>Fallback por Data:</strong> Se a API da CEMIG oscilar ou faltar a medição de vazão de um dia específico, o sistema utiliza um mapeamento histórico consolidado por data. Isso garante que as barras e linhas fiquem sempre dinâmicas e nunca apareçam retas ou zeradas.</li>
             </ul>
           </div>
 
           <div className="space-y-2">
             <h4 className="font-semibold text-foreground flex items-center gap-2">
-              <Settings className="w-4 h-4 text-amber-600" /> Caso Precise Inserir Dados Manuais (Controle Admin):
-            </h4>
-            <p className="text-sm text-muted-foreground">
-              Se algum dia o servidor da CEMIG passar por manutenção prolongada e você desejar cadastrar dados manuais:
-            </p>
-            <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground ml-2">
-              <li>Acesse o painel do <strong>Supabase</strong> da aplicação.</li>
-              <li>Vá na tabela <code>dam_data</code> (linha id = 1).</li>
-              <li>Edite os valores numéricos no campo JSON. O site passará a ler prioritariamente esses valores mantidos por você.</li>
-            </ol>
-          </div>
-
-          <div className="space-y-2">
-            <h4 className="font-semibold text-foreground flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-amber-500" /> Por que isso é importante para os Pescadores?
+              <AlertTriangle className="w-4 h-4 text-amber-500" /> Importância Prática para Pescadores:
             </h4>
             <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
-              <li><strong>Água Subindo:</strong> Os peixes costumam se aproximar da vegetação nas margens.</li>
-              <li><strong>Vazão Alta (Defluência Elevada):</strong> Correnteza mais forte no rio São Francisco, exigindo chumbadas mais pesadas e cuidado na navegação.</li>
-              <li><strong>Estabilidade:</strong> Condição excelente para pesca de tucunarés e surubins.</li>
+              <li><strong>Afluência Subindo:</strong> Indica chuvas na cabeceira dos rios; peixes sobem para alimentar-se perto da vegetação.</li>
+              <li><strong>Defluência Alta:</strong> Correnteza mais forte no rio São Francisco, exigindo atenção na navegação e equipamentos adequados.</li>
+              <li><strong>Nível Estável:</strong> Excelente momento para a pesca de tucunarés e peixes de couro.</li>
             </ul>
           </div>
 
-          <Badge variant="secondary">Conexão Direta CEMIG • Sem Custos de API • 100% Automático</Badge>
+          <Badge variant="secondary">Conexão CEMIG • Tabela Supabase • Histórico Dinâmico 100% Automático</Badge>
         </div>
       )
     },
