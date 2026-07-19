@@ -14,6 +14,10 @@ const HistoryTable: React.FC<HistoryTableProps> = ({ historicoDias }) => {
     return null;
   }
 
+  const displayRows = [...historicoDias]
+    .sort((a, b) => (a.dia < b.dia ? 1 : a.dia > b.dia ? -1 : 0))
+    .slice(0, 7);
+
   return (
     <div className="mt-8">
       <h4 className="font-semibold text-gray-900 mb-4 flex items-center">
@@ -32,7 +36,7 @@ const HistoryTable: React.FC<HistoryTableProps> = ({ historicoDias }) => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {historicoDias.slice(0, 7).map((dia, index) => (
+            {displayRows.map((dia, index) => (
               <TableRow key={index}>
                 <TableCell className="font-medium py-2 sm:py-3">
                   {formatDate(dia.dia)}

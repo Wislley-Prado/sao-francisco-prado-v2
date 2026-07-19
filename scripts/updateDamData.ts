@@ -89,9 +89,7 @@ async function fetchCemigData() {
   });
 
   const allDates = Object.keys(dailyMap).filter(d => dailyMap[d].cota !== undefined || dailyMap[d].afl !== undefined).sort();
-  const todayStr = new Date().toISOString().split('T')[0];
-  const historicalDates = allDates.filter(d => d < todayStr);
-  const recentDates = historicalDates.length >= 7 ? historicalDates.slice(-7) : allDates.slice(-7);
+  const recentDates = allDates.slice(-7);
 
   const historico_dias = recentDates.map(dateStr => {
     const item = dailyMap[dateStr];
