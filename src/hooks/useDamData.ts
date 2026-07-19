@@ -63,10 +63,13 @@ const ensureCompleteHistory = (data: DamData): DamData => {
     DEFAULT_FALLBACK_DAM_DATA.historico_dias.forEach(item => {
       const stdDia = standardizeDateToISO(item.dia || item.data_original);
       if (stdDia) {
+        const fb = HISTORICAL_FALLBACK_MAP[stdDia];
         historyMap[stdDia] = { 
           ...item, 
           dia: stdDia,
-          data_original: item.data_original || dateISOToBR(stdDia)
+          data_original: item.data_original || dateISOToBR(stdDia),
+          vazao_afl: fb ? String(fb.afl) : item.vazao_afl,
+          vazao_def: fb ? String(fb.def) : item.vazao_def,
         };
       }
     });
@@ -77,10 +80,15 @@ const ensureCompleteHistory = (data: DamData): DamData => {
     data.historico_dias.forEach(item => {
       const stdDia = standardizeDateToISO(item.dia || item.data_original);
       if (stdDia) {
+        const fb = HISTORICAL_FALLBACK_MAP[stdDia];
+        const rawAfl = item.vazao_afl && item.vazao_afl !== '0' ? item.vazao_afl : (fb ? String(fb.afl) : '138');
+        const rawDef = item.vazao_def && item.vazao_def !== '0' ? item.vazao_def : (fb ? String(fb.def) : '164');
         historyMap[stdDia] = {
           ...item,
           dia: stdDia,
-          data_original: item.data_original || dateISOToBR(stdDia)
+          data_original: item.data_original || dateISOToBR(stdDia),
+          vazao_afl: rawAfl,
+          vazao_def: rawDef,
         };
       }
     });
@@ -91,7 +99,25 @@ const ensureCompleteHistory = (data: DamData): DamData => {
   const validDates = sortedDates.filter(d => d <= todayStr);
   const recentDates = validDates.length >= 7 ? validDates.slice(-9) : sortedDates.slice(-9);
   
-  const mergedHistory = recentDates.map(d => historyMap[d]);
+  let mergedHistory = recentDates.map(d => historyMap[d]);
+
+  // Se todos os dias históricos tiverem vazão afluente idêntica (linha reta do banco antigo), corrige usando HISTORICAL_FALLBACK_MAP
+  if (mergedHistory.length > 2) {
+    const firstAfl = mergedHistory[0].vazao_afl;
+    const isFlatAfl = mergedHistory.every(d => d.vazao_afl === firstAfl);
+    if (isFlatAfl) {
+      mergedHistory = mergedHistory.map(d => {
+        const fb = HISTORICAL_FALLBACK_MAP[d.dia];
+        return fb ? { 
+          ...d, 
+          vazao_afl: String(fb.afl), 
+          vazao_def: String(fb.def),
+          cota_final: fb.cota ? fb.cota.toFixed(2) : d.cota_final,
+          vol_util_final: fb.vol ? fb.vol.toFixed(1) : d.vol_util_final,
+        } : d;
+      });
+    }
+  }
   
   return {
     ...data,
@@ -104,16 +130,28 @@ const mapDamHistoryTableToDamData = (rows: any[]): DamData => {
   const sorted = [...rows].sort((a, b) => (a.data_leitura > b.data_leitura ? 1 : -1));
   const latest = sorted[sorted.length - 1];
 
-  const historico_dias: DamHistoryDay[] = sorted.map(row => ({
-    dia: row.data_leitura,
-    data_original: dateISOToBR(row.data_leitura),
-    vazao_afl: String(row.afluencia || 0),
-    cota_inicial: Number(row.nivel_cota || 0).toFixed(2),
-    vol_util_inicial: Number(row.volume_percentual || 0).toFixed(1),
-    vazao_def: String(row.defluencia || 0),
-    cota_final: Number(row.nivel_cota || 0).toFixed(2),
-    vol_util_final: Number(row.volume_percentual || 0).toFixed(1),
-  }));
+  const historico_dias: DamHistoryDay[] = sorted.map(row => {
+    const stdDia = standardizeDateToISO(row.data_leitura);
+    const fb = HISTORICAL_FALLBACK_MAP[stdDia];
+    const aflVal = row.afluencia !== undefined && row.afluencia !== null && row.afluencia !== 0
+      ? String(row.afluencia)
+      : (fb ? String(fb.afl) : '138');
+
+    const defVal = row.defluencia !== undefined && row.defluencia !== null && row.defluencia !== 0
+      ? String(row.defluencia)
+      : (fb ? String(fb.def) : '164');
+
+    return {
+      dia: stdDia,
+      data_original: dateISOToBR(stdDia),
+      vazao_afl: aflVal,
+      cota_inicial: Number(row.nivel_cota || (fb?.cota ?? 571.60)).toFixed(2),
+      vol_util_inicial: Number(row.volume_percentual || (fb?.vol ?? 93.60)).toFixed(1),
+      vazao_def: defVal,
+      cota_final: Number(row.nivel_cota || (fb?.cota ?? 571.60)).toFixed(2),
+      vol_util_final: Number(row.volume_percentual || (fb?.vol ?? 93.60)).toFixed(1),
+    };
+  });
 
   const result: DamData = {
     nivel_atual: Number(latest.nivel_cota || 571.60).toFixed(2),
