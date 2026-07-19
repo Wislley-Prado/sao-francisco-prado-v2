@@ -6,8 +6,10 @@ import { Droplets } from 'lucide-react';
 import { DamData } from '@/types/damData';
 import { getStatusFromLevel } from '@/utils/damStatus';
 
-// Lazy load recharts to avoid 224KB eager load
-const LazyChart = React.lazy(() => import('./DamLevelChart'));
+import { lazyWithRetry } from '@/utils/lazyWithRetry';
+
+// Lazy load recharts with auto-retry
+const LazyChart = lazyWithRetry(() => import('./DamLevelChart'));
 
 interface DamLevelCardProps {
   damData: DamData | undefined;

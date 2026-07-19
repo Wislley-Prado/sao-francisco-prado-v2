@@ -4,8 +4,10 @@ import { Badge } from '@/components/ui/badge';
 import { TrendingUp, TrendingDown, Minus, BarChart3 } from 'lucide-react';
 import { DamData } from '@/types/damData';
 
-// Lazy load the actual chart component with recharts
-const LazyHistoryCharts = React.lazy(() => import('./DamHistoryCharts'));
+import { lazyWithRetry } from '@/utils/lazyWithRetry';
+
+// Lazy load the actual chart component with recharts and auto-retry
+const LazyHistoryCharts = lazyWithRetry(() => import('./DamHistoryCharts'));
 
 interface DamHistoryChartProps {
   damData: DamData | undefined;

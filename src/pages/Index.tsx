@@ -9,17 +9,20 @@ import Footer from '@/components/Footer';
 import { Skeleton } from '@/components/ui/skeleton';
 import LazySection from '@/components/LazySection';
 
-// Lazy load all below-the-fold sections
-const AnunciosSection = React.lazy(() => import('@/components/AnunciosSection').then(m => ({ default: m.AnunciosSection })));
-const DamInfo = React.lazy(() => import('@/components/DamInfo'));
-const LunarCalendar = React.lazy(() => import('@/components/LunarCalendar'));
-const WeatherDashboard = React.lazy(() => import('@/components/WeatherDashboard'));
-const RanchosSection = React.lazy(() => import('@/components/RanchosSection'));
-const PropriedadesVendaSection = React.lazy(() => import('@/components/PropriedadesVendaSection'));
-const PackagesSection = React.lazy(() => import('@/components/PackagesSection'));
-const BlogSection = React.lazy(() => import('@/components/BlogSection'));
-const TestimonialsSection = React.lazy(() => import('@/components/TestimonialsSection').then(m => ({ default: m.TestimonialsSection })));
-const FAQSection = React.lazy(() => import('@/components/FAQSection').then(m => ({ default: m.FAQSection })));
+import { lazyWithRetry } from '@/utils/lazyWithRetry';
+import SectionErrorBoundary from '@/components/SectionErrorBoundary';
+
+// Lazy load all below-the-fold sections with auto-retry
+const AnunciosSection = lazyWithRetry(() => import('@/components/AnunciosSection').then(m => ({ default: m.AnunciosSection })));
+const DamInfo = lazyWithRetry(() => import('@/components/DamInfo'));
+const LunarCalendar = lazyWithRetry(() => import('@/components/LunarCalendar'));
+const WeatherDashboard = lazyWithRetry(() => import('@/components/WeatherDashboard'));
+const RanchosSection = lazyWithRetry(() => import('@/components/RanchosSection'));
+const PropriedadesVendaSection = lazyWithRetry(() => import('@/components/PropriedadesVendaSection'));
+const PackagesSection = lazyWithRetry(() => import('@/components/PackagesSection'));
+const BlogSection = lazyWithRetry(() => import('@/components/BlogSection'));
+const TestimonialsSection = lazyWithRetry(() => import('@/components/TestimonialsSection').then(m => ({ default: m.TestimonialsSection })));
+const FAQSection = lazyWithRetry(() => import('@/components/FAQSection').then(m => ({ default: m.FAQSection })));
 
 const SectionSkeleton = () => (
   <div className="py-16 container mx-auto px-4">
@@ -58,80 +61,104 @@ const Index = () => {
       <Header />
       <HeroSection />
 
-      {/* Anúncios topo - lazy render quando próximo */}
+      {/* Anúncios topo */}
       <LazySection fallback={null} rootMargin="100px">
-        <Suspense fallback={null}>
-          <AnunciosSection posicao="topo" />
-        </Suspense>
+        <SectionErrorBoundary fallback={null}>
+          <Suspense fallback={null}>
+            <AnunciosSection posicao="topo" />
+          </Suspense>
+        </SectionErrorBoundary>
       </LazySection>
 
-      {/* Dados em tempo real - defer until near viewport */}
+      {/* Dados em tempo real */}
       <LazySection fallback={<SectionSkeleton />} rootMargin="300px" id="represa">
-        <Suspense fallback={<SectionSkeleton />}>
-          <DamInfo />
-        </Suspense>
+        <SectionErrorBoundary fallback={null}>
+          <Suspense fallback={<SectionSkeleton />}>
+            <DamInfo />
+          </Suspense>
+        </SectionErrorBoundary>
       </LazySection>
 
       <LazySection fallback={<SectionSkeleton />} rootMargin="200px" id="calendario-lunar">
-        <Suspense fallback={<SectionSkeleton />}>
-          <LunarCalendar />
-        </Suspense>
+        <SectionErrorBoundary fallback={null}>
+          <Suspense fallback={<SectionSkeleton />}>
+            <LunarCalendar />
+          </Suspense>
+        </SectionErrorBoundary>
       </LazySection>
 
       <LazySection fallback={<SectionSkeleton />} rootMargin="200px">
-        <Suspense fallback={<SectionSkeleton />}>
-          <WeatherDashboard />
-        </Suspense>
+        <SectionErrorBoundary fallback={null}>
+          <Suspense fallback={<SectionSkeleton />}>
+            <WeatherDashboard />
+          </Suspense>
+        </SectionErrorBoundary>
       </LazySection>
 
       <LazySection fallback={null} rootMargin="200px">
-        <Suspense fallback={null}>
-          <AnunciosSection posicao="meio" />
-        </Suspense>
+        <SectionErrorBoundary fallback={null}>
+          <Suspense fallback={null}>
+            <AnunciosSection posicao="meio" />
+          </Suspense>
+        </SectionErrorBoundary>
       </LazySection>
 
-      {/* Conteúdo principal - defer */}
+      {/* Conteúdo principal */}
       <LazySection fallback={<SectionSkeleton />} rootMargin="300px" id="ranchos">
-        <Suspense fallback={<SectionSkeleton />}>
-          <RanchosSection />
-        </Suspense>
+        <SectionErrorBoundary fallback={null}>
+          <Suspense fallback={<SectionSkeleton />}>
+            <RanchosSection />
+          </Suspense>
+        </SectionErrorBoundary>
       </LazySection>
 
       <LazySection fallback={<SectionSkeleton />} rootMargin="300px" id="venda">
-        <Suspense fallback={<SectionSkeleton />}>
-          <PropriedadesVendaSection />
-        </Suspense>
+        <SectionErrorBoundary fallback={null}>
+          <Suspense fallback={<SectionSkeleton />}>
+            <PropriedadesVendaSection />
+          </Suspense>
+        </SectionErrorBoundary>
       </LazySection>
 
       <LazySection fallback={<SectionSkeleton />} rootMargin="200px">
-        <Suspense fallback={<SectionSkeleton />}>
-          <PackagesSection />
-        </Suspense>
+        <SectionErrorBoundary fallback={null}>
+          <Suspense fallback={<SectionSkeleton />}>
+            <PackagesSection />
+          </Suspense>
+        </SectionErrorBoundary>
       </LazySection>
 
       <LazySection fallback={<SectionSkeleton />} rootMargin="200px">
-        <Suspense fallback={<SectionSkeleton />}>
-          <BlogSection />
-        </Suspense>
+        <SectionErrorBoundary fallback={null}>
+          <Suspense fallback={<SectionSkeleton />}>
+            <BlogSection />
+          </Suspense>
+        </SectionErrorBoundary>
       </LazySection>
 
       {/* Seções de suporte */}
       <LazySection fallback={null} rootMargin="200px">
-        <Suspense fallback={null}>
-          <TestimonialsSection />
-        </Suspense>
+        <SectionErrorBoundary fallback={null}>
+          <Suspense fallback={null}>
+            <TestimonialsSection />
+          </Suspense>
+        </SectionErrorBoundary>
       </LazySection>
 
       <LazySection fallback={null} rootMargin="200px">
-        <Suspense fallback={null}>
-          <FAQSection />
-        </Suspense>
+        <SectionErrorBoundary fallback={null}>
+          <Suspense fallback={null}>
+            <FAQSection />
+          </Suspense>
+        </SectionErrorBoundary>
       </LazySection>
 
       <LazySection fallback={null} rootMargin="200px">
-        <Suspense fallback={null}>
-          <AnunciosSection posicao="rodape" />
-        </Suspense>
+        <SectionErrorBoundary fallback={null}>
+          <Suspense fallback={null}>
+            <AnunciosSection posicao="rodape" />
+          </Suspense>
+        </SectionErrorBoundary>
       </LazySection>
 
       <WhatsAppButton />
