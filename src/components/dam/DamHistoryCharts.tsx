@@ -62,7 +62,6 @@ const DamHistoryCharts: React.FC<DamHistoryChartsProps> = ({ chartData }) => {
         </div>
       </div>
     </>
-    </>
   );
 };
 
