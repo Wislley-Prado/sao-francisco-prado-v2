@@ -36,10 +36,8 @@ const DamLevelCard: React.FC<DamLevelCardProps> = ({
     const last7Days = sortedData.slice(-7);
 
     return last7Days.map((dia) => {
-      const dataFormatada = new Date(dia.dia).toLocaleDateString('pt-BR', { 
-        day: '2-digit', 
-        month: '2-digit' 
-      });
+      const parts = dia.dia ? dia.dia.split('-') : [];
+      const dataFormatada = parts.length === 3 ? `${parts[2]}/${parts[1]}` : (dia.data_original ? dia.data_original.slice(0, 5) : dia.dia);
       
       return {
         time: dataFormatada,

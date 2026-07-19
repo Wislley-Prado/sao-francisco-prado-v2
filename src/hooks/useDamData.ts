@@ -179,16 +179,17 @@ const fetchCemigDirectly = async (): Promise<DamData> => {
   const recentDates = historicalDates.length >= 7 ? historicalDates.slice(-7) : allDates.slice(-7);
 
   const historico_dias = recentDates.map(dateStr => {
-    const item = dailyMap[dateStr];
+    const item = dailyMap[dateStr] || {};
+    const formattedDataOriginal = dateStr && dateStr.includes("-") ? dateStr.split("-").reverse().join("/") : (dateStr || "");
     return {
-      dia: dateStr,
-      data_original: dateStr.split("-").reverse().join("/"),
+      dia: dateStr || "",
+      data_original: formattedDataOriginal,
       vazao_afl: item.afl !== undefined ? Math.round(item.afl).toString() : afluencia,
-      cota_inicial: item.cota ? item.cota.toFixed(2) : nivelAtual,
-      vol_util_inicial: item.vol ? item.vol.toFixed(1) : volumeUtilPercentual,
+      cota_inicial: item.cota !== undefined ? item.cota.toFixed(2) : nivelAtual,
+      vol_util_inicial: item.vol !== undefined ? item.vol.toFixed(1) : volumeUtilPercentual,
       vazao_def: item.def !== undefined ? Math.round(item.def).toString() : defluencia,
-      cota_final: item.cota ? item.cota.toFixed(2) : nivelAtual,
-      vol_util_final: item.vol ? item.vol.toFixed(1) : volumeUtilPercentual,
+      cota_final: item.cota !== undefined ? item.cota.toFixed(2) : nivelAtual,
+      vol_util_final: item.vol !== undefined ? item.vol.toFixed(1) : volumeUtilPercentual,
     };
   });
 

@@ -30,8 +30,14 @@ export const getStatusText = (status: string): string => {
 
 export const formatDate = (dateString: string): string => {
   if (!dateString) return '--';
+  if (dateString.includes('/')) return dateString;
   try {
+    const parts = dateString.split('-');
+    if (parts.length === 3) {
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
     const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString;
     return date.toLocaleDateString('pt-BR');
   } catch {
     return dateString;

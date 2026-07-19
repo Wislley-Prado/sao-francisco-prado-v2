@@ -22,14 +22,18 @@ const DamHistoryChart: React.FC<DamHistoryChartProps> = ({ damData }) => {
       .sort((a, b) => new Date(a.dia).getTime() - new Date(b.dia).getTime())
       .slice(-7);
 
-    return sortedData.map(dia => ({
-      data: new Date(dia.dia).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
-      dataCompleta: dia.dia,
-      nivel: parseFloat(dia.vol_util_final) || 0,
-      cota: parseFloat(dia.cota_final) || 0,
-      afluencia: parseFloat(dia.vazao_afl) || 0,
-      defluencia: parseFloat(dia.vazao_def) || 0,
-    }));
+    return sortedData.map(dia => {
+      const parts = dia.dia ? dia.dia.split('-') : [];
+      const formattedDate = parts.length === 3 ? `${parts[2]}/${parts[1]}` : (dia.data_original ? dia.data_original.slice(0, 5) : dia.dia);
+      return {
+        data: formattedDate,
+        dataCompleta: dia.dia,
+        nivel: parseFloat(dia.vol_util_final) || 0,
+        cota: parseFloat(dia.cota_final) || 0,
+        afluencia: parseFloat(dia.vazao_afl) || 0,
+        defluencia: parseFloat(dia.vazao_def) || 0,
+      };
+    });
   }, [damData?.historico_dias]);
 
   const nivelVariacao = useMemo(() => {
