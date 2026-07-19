@@ -95,17 +95,22 @@ const mapNewApiDataToDamData = (apiData: NewApiResponseItem[]): DamData => {
   };
 };
 
-// Buscar da API da Cemig diretamente se o banco estiver vazio ou desatualizado
+// Buscar da API da Cemig diretamente com trava anti-cache móbile
 const fetchCemigDirectly = async (): Promise<DamData> => {
   if (import.meta.env.DEV) console.log('🔄 [FETCH] Buscando dados diretamente da API Cemig...');
+  const timestamp = Date.now();
   const formData = new URLSearchParams();
   formData.append('action', 'buscar_dados_usina');
   formData.append('usina_id', 'UHE_TRES_MARIAS');
+  formData.append('_t', timestamp.toString());
 
-  const response = await fetch('https://www.cemig.com.br/wp-json/api-busca-usinas/v1/send-form', {
+  const response = await fetch(`https://www.cemig.com.br/wp-json/api-busca-usinas/v1/send-form?_t=${timestamp}`, {
     method: 'POST',
+    cache: 'no-cache',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache'
     },
     body: formData.toString(),
   });
