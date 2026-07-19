@@ -210,39 +210,20 @@ const fetchCemigDirectly = async (): Promise<DamData> => {
   return processCemigRawData(raw);
 };
 
-// Buscar dados com suporte total a CORS, modo anônimo e Edge Function
+// Buscar dados com prioridade no Supabase e suporte resiliente a API Cemig
 const fetchDamDataFromDB = async (): Promise<DamData> => {
-  // 1. Tentar busca direta no navegador
-  try {
-    if (import.meta.env.DEV) console.log('⚡ [FETCH] Carregando dados oficiais diretamente da API da Cemig...');
-    const cemigData = await fetchCemigDirectly();
-    if (cemigData && Array.isArray(cemigData.historico_dias) && cemigData.historico_dias.length > 0) {
-      return cemigData;
-    }
-  } catch (cemigErr) {
-    if (import.meta.env.DEV) console.warn('⚠️ [FETCH] Bloqueio CORS ou rede no fetch direto. Tentando Edge Function:', cemigErr);
-  }
-
-  // 2. Tentar via Edge Function no Supabase (Proxy servidor 100% sem CORS)
-  try {
-    const { data: edgeData, error: edgeErr } = await supabase.functions.invoke('dam-data-proxy');
-    if (!edgeErr && edgeData?.raw_cemig) {
-      return processCemigRawData(edgeData.raw_cemig);
-    }
-  } catch (edgeErr) {
-    if (import.meta.env.DEV) console.warn('⚠️ [FETCH] Erro na Edge Function:', edgeErr);
-  }
-
-  // 3. Se a busca direta e o proxy falharem, lê do banco de dados Supabase
+  // 1. Verificar se existe registro atualizado no banco de dados Supabase (row 1)
   try {
     const { data, error } = await supabase
       .from('dam_data')
-      .select('data')
+      .select('data, updated_at')
       .eq('id', 1)
       .single();
 
     if (!error && data?.data) {
       const responseData = data.data as any;
+      if (import.meta.env.DEV) console.log('✅ [FETCH] Dados encontrados no Supabase:', data.updated_at);
+      
       if (responseData?.raw_cemig) {
         return processCemigRawData(responseData.raw_cemig);
       }
@@ -251,7 +232,28 @@ const fetchDamDataFromDB = async (): Promise<DamData> => {
       }
     }
   } catch (err) {
-    if (import.meta.env.DEV) console.warn('⚠️ [FETCH] Erro na leitura do Supabase:', err);
+    if (import.meta.env.DEV) console.warn('⚠️ [FETCH] Erro ao ler dados do Supabase:', err);
+  }
+
+  // 2. Se o banco estiver vazio, tenta a busca direta na API oficial da Cemig
+  try {
+    if (import.meta.env.DEV) console.log('⚡ [FETCH] Banco sem dados. Carregando direto da Cemig...');
+    const cemigData = await fetchCemigDirectly();
+    if (cemigData && Array.isArray(cemigData.historico_dias) && cemigData.historico_dias.length > 0) {
+      return cemigData;
+    }
+  } catch (cemigErr) {
+    if (import.meta.env.DEV) console.warn('⚠️ [FETCH] Erro no fetch direto da Cemig:', cemigErr);
+  }
+
+  // 3. Tentar via Edge Function no Supabase (Proxy servidor 100% sem CORS)
+  try {
+    const { data: edgeData, error: edgeErr } = await supabase.functions.invoke('dam-data-proxy');
+    if (!edgeErr && edgeData?.raw_cemig) {
+      return processCemigRawData(edgeData.raw_cemig);
+    }
+  } catch (edgeErr) {
+    if (import.meta.env.DEV) console.warn('⚠️ [FETCH] Erro na Edge Function:', edgeErr);
   }
 
   // 4. Fallback de segurança contendo a medição mais recente (19/07/2026)
@@ -282,7 +284,7 @@ export const DEFAULT_FALLBACK_DAM_DATA: DamData = {
 
 export const useDamData = () => {
   return useQuery({
-    queryKey: ['damData', 'cached'],
+    queryKey: ['damData'],
     queryFn: fetchDamDataFromDB,
     placeholderData: DEFAULT_FALLBACK_DAM_DATA,
     refetchInterval: 5 * 60 * 1000, // Verifica a cada 5 min
