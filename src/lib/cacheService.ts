@@ -32,9 +32,24 @@ interface CacheStats {
   supabaseCalls: number;
 }
 
-// Storage key prefix
-const CACHE_PREFIX = 'prado_cache_';
+// Storage key prefix (versão 3 com invalidação automática de cache antigo)
+const CACHE_VERSION = 'v3';
+const CACHE_PREFIX = `prado_cache_${CACHE_VERSION}_`;
 const STATS_KEY = 'prado_cache_stats';
+
+// Limpar caches antigos ou de versões anteriores do localStorage no carregamento do módulo
+if (typeof window !== 'undefined' && window.localStorage) {
+  try {
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('prado_cache_') && !key.startsWith(CACHE_PREFIX) && key !== STATS_KEY) {
+        localStorage.removeItem(key);
+      }
+    }
+  } catch {
+    // Ignora erros de localStorage
+  }
+}
 
 // In-memory cache for faster access
 const memoryCache = new Map<string, CacheEntry<unknown>>();

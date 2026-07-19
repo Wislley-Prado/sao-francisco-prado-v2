@@ -17,6 +17,7 @@ import { PrivateRoute } from "@/components/admin/PrivateRoute";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 import { lazyWithRetry } from "@/utils/lazyWithRetry";
 
@@ -105,73 +106,75 @@ const App = () => {
             <PageViewTracker />
             <AuthProvider>
               <TrackingScripts />
-              <Suspense fallback={<PageFallback />}>
-              <Routes>
-                {/* Public Routes */}
-                <Route path="/" element={<Index />} />
-                <Route path="/live" element={<LiveStream />} />
-                <Route path="/rancho/:slug" element={<RanchoDetalhes />} />
-                <Route path="/pacotes" element={<PackagesIndexDynamic />} />
-                <Route path="/ranchos" element={<RanchosIndex />} />
-                <Route path="/pacote/:slug" element={<PacoteDetalhes />} />
-                <Route path="/pacotes-estaticos" element={<PackagesIndex />} />
-                <Route path="/pacote/vip" element={<PackageVip />} />
-                <Route path="/pacote/luxo" element={<PackageLuxo />} />
-                <Route path="/pacote/diamante" element={<PackageDiamante />} />
-                <Route path="/politica-privacidade" element={<PrivacyPolicy />} />
-                <Route path="/blog" element={<Blog />} />
-                <Route path="/blog/:slug" element={<BlogPost />} />
-                <Route path="/vendas" element={<VendasIndex />} />
-                <Route path="/venda/:slug" element={<PropriedadeDetalhes />} />
-                <Route path="/pacote-vip" element={<PackageVip />} />
-                
-                {/* Admin Routes */}
-                <Route path="/admin/login" element={<AdminLogin />} />
-                <Route 
-                  path="/admin" 
-                  element={
-                    <PrivateRoute>
-                      <AdminLayout />
-                    </PrivateRoute>
-                  }
-                >
-                  <Route index element={<AdminDashboard />} />
-                  <Route path="ranchos" element={<AdminRanchos />} />
-                  <Route path="ranchos/novo" element={<RanchoNovo />} />
-                  <Route path="ranchos/editar/:id" element={<RanchoEditar />} />
-                  <Route path="vendas" element={<AdminPropriedadesVenda />} />
-                  <Route path="vendas/nova" element={<PropriedadeVendaNova />} />
-                  <Route path="vendas/editar/:id" element={<PropriedadeVendaEditar />} />
-                  <Route path="pacotes" element={<AdminPacotes />} />
-                  <Route path="pacotes/novo" element={<PacoteNovo />} />
-                  <Route path="pacotes/:id/editar" element={<PacoteEditar />} />
-                  <Route path="pacotes/analytics" element={<PacoteAnalytics />} />
-                  <Route path="avaliacoes" element={<AdminAvaliacoes />} />
-                  <Route path="estatisticas-avaliacoes" element={<EstatisticasAvaliacoes />} />
-                  <Route path="analytics" element={<AdminAnalytics />} />
-                  <Route path="blog" element={<AdminBlog />} />
-                  <Route path="blog/novo" element={<BlogNovo />} />
-                  <Route path="blog/editar/:id" element={<BlogEditar />} />
-                  <Route path="blog/analytics" element={<BlogAnalytics />} />
-                  <Route path="faqs" element={<FAQs />} />
-                  <Route path="faqs/novo" element={<FAQNovo />} />
-                  <Route path="faqs/editar/:id" element={<FAQEditar />} />
-                  <Route path="depoimentos" element={<Depoimentos />} />
-                  <Route path="depoimentos/novo" element={<DepoimentoNovo />} />
-                  <Route path="depoimentos/editar/:id" element={<DepoimentoEditar />} />
-                  <Route path="anuncios" element={<Anuncios />} />
-                  <Route path="anuncios/novo" element={<AnuncioNovo />} />
-                  <Route path="anuncios/editar/:id" element={<AnuncioEditar />} />
-                  <Route path="configuracoes" element={<AdminConfiguracoes />} />
-                  <Route path="whatsapp-config" element={<WhatsAppConfig />} />
-                  <Route path="whatsapp-analytics" element={<WhatsAppAnalytics />} />
-                  <Route path="videos" element={<ConfiguracoesVideos />} />
-                  <Route path="ajuda" element={<Ajuda />} />
-                </Route>
-                
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-              </Suspense>
+              <ErrorBoundary>
+                <Suspense fallback={<PageFallback />}>
+                  <Routes>
+                    {/* Public Routes */}
+                    <Route path="/" element={<Index />} />
+                    <Route path="/live" element={<LiveStream />} />
+                    <Route path="/rancho/:slug" element={<RanchoDetalhes />} />
+                    <Route path="/pacotes" element={<PackagesIndexDynamic />} />
+                    <Route path="/ranchos" element={<RanchosIndex />} />
+                    <Route path="/pacote/:slug" element={<PacoteDetalhes />} />
+                    <Route path="/pacotes-estaticos" element={<PackagesIndex />} />
+                    <Route path="/pacote/vip" element={<PackageVip />} />
+                    <Route path="/pacote/luxo" element={<PackageLuxo />} />
+                    <Route path="/pacote/diamante" element={<PackageDiamante />} />
+                    <Route path="/politica-privacidade" element={<PrivacyPolicy />} />
+                    <Route path="/blog" element={<Blog />} />
+                    <Route path="/blog/:slug" element={<BlogPost />} />
+                    <Route path="/vendas" element={<VendasIndex />} />
+                    <Route path="/venda/:slug" element={<PropriedadeDetalhes />} />
+                    <Route path="/pacote-vip" element={<PackageVip />} />
+                    
+                    {/* Admin Routes */}
+                    <Route path="/admin/login" element={<AdminLogin />} />
+                    <Route 
+                      path="/admin" 
+                      element={
+                        <PrivateRoute>
+                          <AdminLayout />
+                        </PrivateRoute>
+                      }
+                    >
+                      <Route index element={<AdminDashboard />} />
+                      <Route path="ranchos" element={<AdminRanchos />} />
+                      <Route path="ranchos/novo" element={<RanchoNovo />} />
+                      <Route path="ranchos/editar/:id" element={<RanchoEditar />} />
+                      <Route path="vendas" element={<AdminPropriedadesVenda />} />
+                      <Route path="vendas/nova" element={<PropriedadeVendaNova />} />
+                      <Route path="vendas/editar/:id" element={<PropriedadeVendaEditar />} />
+                      <Route path="pacotes" element={<AdminPacotes />} />
+                      <Route path="pacotes/novo" element={<PacoteNovo />} />
+                      <Route path="pacotes/:id/editar" element={<PacoteEditar />} />
+                      <Route path="pacotes/analytics" element={<PacoteAnalytics />} />
+                      <Route path="avaliacoes" element={<AdminAvaliacoes />} />
+                      <Route path="estatisticas-avaliacoes" element={<EstatisticasAvaliacoes />} />
+                      <Route path="analytics" element={<AdminAnalytics />} />
+                      <Route path="blog" element={<AdminBlog />} />
+                      <Route path="blog/novo" element={<BlogNovo />} />
+                      <Route path="blog/editar/:id" element={<BlogEditar />} />
+                      <Route path="blog/analytics" element={<BlogAnalytics />} />
+                      <Route path="faqs" element={<FAQs />} />
+                      <Route path="faqs/novo" element={<FAQNovo />} />
+                      <Route path="faqs/editar/:id" element={<FAQEditar />} />
+                      <Route path="depoimentos" element={<Depoimentos />} />
+                      <Route path="depoimentos/novo" element={<DepoimentoNovo />} />
+                      <Route path="depoimentos/editar/:id" element={<DepoimentoEditar />} />
+                      <Route path="anuncios" element={<Anuncios />} />
+                      <Route path="anuncios/novo" element={<AnuncioNovo />} />
+                      <Route path="anuncios/editar/:id" element={<AnuncioEditar />} />
+                      <Route path="configuracoes" element={<AdminConfiguracoes />} />
+                      <Route path="whatsapp-config" element={<WhatsAppConfig />} />
+                      <Route path="whatsapp-analytics" element={<WhatsAppAnalytics />} />
+                      <Route path="videos" element={<ConfiguracoesVideos />} />
+                      <Route path="ajuda" element={<Ajuda />} />
+                    </Route>
+                    
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </Suspense>
+              </ErrorBoundary>
               <CookieConsent />
             </AuthProvider>
           </BrowserRouter>

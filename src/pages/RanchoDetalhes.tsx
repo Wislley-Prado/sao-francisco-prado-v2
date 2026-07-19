@@ -63,36 +63,37 @@ const RanchoDetalhes = () => {
   // Transform to expected format
   const rancho = React.useMemo(() => {
     if (!ranchoData) return null;
+    const rawImagens = Array.isArray(ranchoData?.imagens) ? ranchoData.imagens : [];
     return {
       id: ranchoData.id,
-      nome: ranchoData.nome,
-      nome_en: ranchoData.nome_en,
-      descricao: ranchoData.descricao,
-      descricao_en: ranchoData.descricao_en,
-      localizacao: ranchoData.localizacao,
-      localizacao_en: ranchoData.localizacao_en,
-      capacidade: ranchoData.capacidade,
-      preco: ranchoData.preco,
-      rating: ranchoData.rating,
-      quartos: ranchoData.quartos,
-      banheiros: ranchoData.banheiros,
+      nome: ranchoData.nome || '',
+      nome_en: ranchoData.nome_en || null,
+      descricao: ranchoData.descricao || '',
+      descricao_en: ranchoData.descricao_en || null,
+      localizacao: ranchoData.localizacao || '',
+      localizacao_en: ranchoData.localizacao_en || null,
+      capacidade: Number(ranchoData.capacidade || 0),
+      preco: Number(ranchoData.preco || 0),
+      rating: Number(ranchoData.rating || 5),
+      quartos: Number(ranchoData.quartos || 0),
+      banheiros: Number(ranchoData.banheiros || 0),
       area: ranchoData.area || 0,
-      comodidades: ranchoData.comodidades,
-      disponivel: ranchoData.disponivel,
-      telefone_whatsapp: ranchoData.telefone_whatsapp,
-      mensagem_whatsapp: ranchoData.mensagem_whatsapp,
-      typebot_url: ranchoData.typebot_url,
-      texto_botao_whatsapp: ranchoData.texto_botao_whatsapp,
-      video_youtube: ranchoData.video_youtube,
-      google_calendar_url: ranchoData.google_calendar_url,
-      tracking_code: ranchoData.tracking_code,
+      comodidades: Array.isArray(ranchoData.comodidades) ? ranchoData.comodidades : [],
+      disponivel: Boolean(ranchoData.disponivel),
+      telefone_whatsapp: ranchoData.telefone_whatsapp || '',
+      mensagem_whatsapp: ranchoData.mensagem_whatsapp || '',
+      typebot_url: ranchoData.typebot_url || '',
+      texto_botao_whatsapp: ranchoData.texto_botao_whatsapp || '',
+      video_youtube: ranchoData.video_youtube || '',
+      google_calendar_url: ranchoData.google_calendar_url || '',
+      tracking_code: ranchoData.tracking_code || '',
       latitude: ranchoData.latitude,
       longitude: ranchoData.longitude,
-      endereco_completo: ranchoData.endereco_completo,
-      imagens: ranchoData.imagens.map(img => ({
-        url: img.url,
-        alt_text: img.alt_text || '',
-        principal: img.principal,
+      endereco_completo: ranchoData.endereco_completo || '',
+      imagens: rawImagens.map(img => ({
+        url: typeof img === 'string' ? img : img?.url || '',
+        alt_text: (typeof img === 'object' && img?.alt_text) || '',
+        principal: (typeof img === 'object' && img?.principal) || false,
       })),
     };
   }, [ranchoData]);
@@ -106,39 +107,43 @@ const RanchoDetalhes = () => {
 
   // Transform and filter out current rancho
   const suggestedRanchos = React.useMemo(() => {
-    if (!allRanchosData || !rancho) return [];
+    if (!allRanchosData || !Array.isArray(allRanchosData) || !rancho) return [];
     
     // Filter out current rancho
-    const filtered = allRanchosData.filter(r => r.id !== rancho.id);
+    const filtered = allRanchosData.filter(r => r && r.id !== rancho.id);
 
     // Map to the format RanchCard expects
-    return filtered.slice(0, 3).map(ranchoItem => ({
-      id: ranchoItem.id,
-      name: ranchoItem.nome,
-      name_en: ranchoItem.nome_en,
-      slug: ranchoItem.slug,
-      description: ranchoItem.descricao || '',
-      description_en: ranchoItem.descricao_en,
-      location: ranchoItem.localizacao,
-      location_en: ranchoItem.localizacao_en,
-      capacity: ranchoItem.capacidade,
-      price: ranchoItem.preco,
-      rating: ranchoItem.rating,
-      images: [...ranchoItem.imagens]
-        .sort((a, b) => {
-          if (a.principal && !b.principal) return -1;
-          if (!a.principal && b.principal) return 1;
-          return a.ordem - b.ordem;
-        })
-        .map(img => img.url),
-      amenities: ranchoItem.comodidades,
-      available: ranchoItem.disponivel,
-      features: {
-        bedrooms: ranchoItem.quartos,
-        bathrooms: ranchoItem.banheiros,
-        area: ranchoItem.area ? `${ranchoItem.area}m²` : '0m²'
-      }
-    }));
+    return filtered.slice(0, 3).map(ranchoItem => {
+      const itemImagens = Array.isArray(ranchoItem?.imagens) ? ranchoItem.imagens : [];
+      return {
+        id: ranchoItem.id,
+        name: ranchoItem.nome || '',
+        name_en: ranchoItem.nome_en || null,
+        slug: ranchoItem.slug || '',
+        description: ranchoItem.descricao || '',
+        description_en: ranchoItem.descricao_en || null,
+        location: ranchoItem.localizacao || '',
+        location_en: ranchoItem.localizacao_en || null,
+        capacity: Number(ranchoItem.capacidade || 0),
+        price: Number(ranchoItem.preco || 0),
+        rating: Number(ranchoItem.rating || 5),
+        images: [...itemImagens]
+          .sort((a, b) => {
+            if (a?.principal && !b?.principal) return -1;
+            if (!a?.principal && b?.principal) return 1;
+            return (a?.ordem || 0) - (b?.ordem || 0);
+          })
+          .map(img => (typeof img === 'string' ? img : img?.url || ''))
+          .filter(Boolean),
+        amenities: Array.isArray(ranchoItem.comodidades) ? ranchoItem.comodidades : [],
+        available: Boolean(ranchoItem.disponivel),
+        features: {
+          bedrooms: Number(ranchoItem.quartos || 0),
+          bathrooms: Number(ranchoItem.banheiros || 0),
+          area: ranchoItem.area ? `${ranchoItem.area}m²` : '0m²'
+        }
+      };
+    });
   }, [allRanchosData, rancho]);
 
   const whatsappNumber = rancho?.telefone_whatsapp || "5531999999999";

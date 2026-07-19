@@ -36,6 +36,17 @@ export class ErrorBoundary extends Component<Props, State> {
         const keys = await caches.keys();
         await Promise.all(keys.map((key) => caches.delete(key)));
       }
+      if (typeof window !== 'undefined' && window.localStorage) {
+        for (let i = localStorage.length - 1; i >= 0; i--) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('prado_cache')) {
+            localStorage.removeItem(key);
+          }
+        }
+      }
+      if (typeof window !== 'undefined' && window.sessionStorage) {
+        sessionStorage.clear();
+      }
     } catch (e) {
       console.error('Erro ao limpar cache durante reload:', e);
     }

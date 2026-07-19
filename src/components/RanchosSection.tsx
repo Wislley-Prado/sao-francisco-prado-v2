@@ -36,36 +36,42 @@ const RanchosSection = () => {
     }
   }, [heroData]);
 
-  // Transform data to expected format
+  // Transform data to expected format com validação defensiva total
   const ranchos = React.useMemo(() => {
-    if (!ranchosData) return [];
-    return ranchosData.map(rancho => ({
-      id: rancho.id,
-      name: rancho.nome,
-      name_en: rancho.nome_en,
-      slug: rancho.slug,
-      description: rancho.descricao,
-      description_en: rancho.descricao_en,
-      location: rancho.localizacao,
-      location_en: rancho.localizacao_en,
-      capacity: rancho.capacidade,
-      price: rancho.preco,
-      rating: rancho.rating,
-      images: [...rancho.imagens]
+    if (!ranchosData || !Array.isArray(ranchosData)) return [];
+    return ranchosData.map(rancho => {
+      const rawImagens = Array.isArray(rancho?.imagens) ? rancho.imagens : [];
+      const images = [...rawImagens]
         .sort((a, b) => {
-          if (a.principal && !b.principal) return -1;
-          if (!a.principal && b.principal) return 1;
-          return a.ordem - b.ordem;
+          if (a?.principal && !b?.principal) return -1;
+          if (!a?.principal && b?.principal) return 1;
+          return (a?.ordem || 0) - (b?.ordem || 0);
         })
-        .map(img => img.url),
-      amenities: rancho.comodidades,
-      available: rancho.disponivel,
-      features: {
-        bedrooms: rancho.quartos,
-        bathrooms: rancho.banheiros,
-        area: rancho.area ? `${rancho.area}m²` : '0m²'
-      }
-    }));
+        .map(img => (typeof img === 'string' ? img : img?.url || ''))
+        .filter(Boolean);
+
+      return {
+        id: rancho?.id || String(Math.random()),
+        name: rancho?.nome || 'Rancho',
+        name_en: rancho?.nome_en || null,
+        slug: rancho?.slug || '',
+        description: rancho?.descricao || '',
+        description_en: rancho?.descricao_en || null,
+        location: rancho?.localizacao || '',
+        location_en: rancho?.localizacao_en || null,
+        capacity: Number(rancho?.capacidade || 0),
+        price: Number(rancho?.preco || 0),
+        rating: Number(rancho?.rating || 5),
+        images,
+        amenities: Array.isArray(rancho?.comodidades) ? rancho.comodidades : [],
+        available: Boolean(rancho?.disponivel),
+        features: {
+          bedrooms: Number(rancho?.quartos || 0),
+          bathrooms: Number(rancho?.banheiros || 0),
+          area: rancho?.area ? `${rancho.area}m²` : '0m²'
+        }
+      };
+    });
   }, [ranchosData]);
 
   return (
