@@ -13,12 +13,14 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'prompt',
+      registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'icons/*.png', 'robots.txt'],
       manifest: false, // Use external manifest.json
-      injectRegister: null,
+      injectRegister: 'auto',
       strategies: 'generateSW',
       workbox: {
+        skipWaiting: true,
+        clientsClaim: true,
         globPatterns: ['**/*.{js,css,html,ico,png,jpg,jpeg,svg,woff,woff2}'],
         cleanupOutdatedCaches: true,
         maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 10 MB
@@ -47,11 +49,8 @@ export default defineConfig(({ mode }) => ({
             }
           }
         ]
-        // Offline page disabled for now
-        // navigateFallback: '/offline.html',
-        // navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/]
       },
-    devOptions: {
+      devOptions: {
         enabled: false
       }
     }),
