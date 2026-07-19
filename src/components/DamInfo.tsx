@@ -63,8 +63,8 @@ const DamInfo = () => {
   const errorForComponents = error instanceof Error ? error : new Error('Unknown error occurred');
 
   return (
-    <section id="represa" className="py-20 bg-gradient-to-br from-blue-50 to-green-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="represa" className="py-10 sm:py-16 bg-gradient-to-br from-blue-50 to-green-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
         <DamHeader 
           damData={damData}
           isLoading={isLoading}
@@ -81,59 +81,9 @@ const DamInfo = () => {
           onRefresh={handleRefetch}
         />
 
-        <div className="mb-8">
-          <DamHistoryChart damData={damData} />
-        </div>
+        <DamHistoryChart damData={damData} />
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
-            <Card className="shadow-xl">
-              <CardHeader className="bg-rio-blue text-white">
-                <CardTitle className="text-2xl flex items-center justify-between">
-                  <div className="flex items-center">
-                    <Droplets className="mr-3 h-6 w-6" />
-                    Status Atual da Represa
-                  </div>
-                  <button 
-                    onClick={handleRefetch} 
-                    className="p-2 hover:bg-blue-600 rounded-full transition-colors"
-                    disabled={isLoading}
-                  >
-                    <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-                  </button>
-                </CardTitle>
-                <p className="text-blue-100">
-                  {damData ? 'Dados em tempo real' : 'Últimos dados disponíveis'}
-                </p>
-              </CardHeader>
-              <CardContent className="p-6">
-                <div className="mb-8">
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-2xl font-bold text-gray-900">
-                      Nível: {nivelAtualMetros.toFixed(1)}m
-                    </h3>
-                    <Badge className={`${levelStatus.color} text-white`}>
-                      {levelStatus.text}
-                    </Badge>
-                  </div>
-                  <Progress value={volumePercentual} className="h-4 mb-2" />
-                  <div className="flex justify-between text-sm text-gray-600">
-                    <span>Mínimo (40%)</span>
-                    <span>Atual: {volumePercentual.toFixed(1)}%</span>
-                    <span>Máximo (100%)</span>
-                  </div>
-                </div>
-
-                <ConditionsGrid conditions={conditions} defluencia={defluencia} />
-
-                <HistoryTable historicoDias={damData?.historico_dias || []} />
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="space-y-6">
-          </div>
-        </div>
+        <HistoryTable historicoDias={damData?.historico_dias || []} />
       </div>
     </section>
   );

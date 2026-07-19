@@ -86,18 +86,6 @@ const DamLevelCard: React.FC<DamLevelCardProps> = ({
               <span>100%</span>
             </div>
           </div>
-          
-          {trendData.length > 0 && (
-            <Suspense fallback={<div className="h-24 sm:h-32 flex items-center justify-center text-sm text-muted-foreground">Carregando gráfico...</div>}>
-              <LazyChart trendData={trendData} dataUpdatedAt={dataUpdatedAt} renderCount={renderCount} />
-            </Suspense>
-          )}
-
-          {trendData.length === 0 && (
-            <div className="mt-6 text-center">
-              <p className="text-sm text-gray-500">Aguardando dados históricos...</p>
-            </div>
-          )}
         </div>
       </CardContent>
     </Card>

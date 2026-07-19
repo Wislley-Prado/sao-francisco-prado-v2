@@ -36,18 +36,16 @@ const DamMetricsCards: React.FC<DamMetricsCardsProps> = ({ damData }) => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="grid grid-cols-3 lg:grid-cols-1 gap-3">
       {/* Tendência da Represa */}
-      <Card className="border-0 shadow-md">
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              {getTendenciaIcon()}
-              <span className="text-sm font-medium text-gray-700">Tendência</span>
-            </div>
+      <Card className="border-0 shadow-sm bg-gray-50/50">
+        <CardContent className="p-3 text-center lg:text-left">
+          <div className="flex items-center justify-center lg:justify-between space-x-1 sm:space-x-2">
+            {getTendenciaIcon()}
+            <span className="text-xs font-medium text-gray-700">Tendência</span>
           </div>
-          <div className="mt-2">
-            <Badge className={`${getTendenciaColor()} border px-2 py-1 text-sm capitalize`}>
+          <div className="mt-2 flex justify-center lg:justify-start">
+            <Badge className={`${getTendenciaColor()} border px-2 py-0.5 text-xs capitalize`}>
               {tendencia}
             </Badge>
           </div>
@@ -55,30 +53,26 @@ const DamMetricsCards: React.FC<DamMetricsCardsProps> = ({ damData }) => {
       </Card>
 
       {/* Afluência */}
-      <Card className="border-0 shadow-md">
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Activity className="h-4 w-4 text-blue-500" />
-              <span className="text-sm font-medium text-gray-700">Afluência</span>
-            </div>
-            <div className="text-xs text-gray-500">m³/s</div>
+      <Card className="border-0 shadow-sm bg-gray-50/50">
+        <CardContent className="p-3 text-center lg:text-left">
+          <div className="flex items-center justify-center lg:justify-between space-x-1 sm:space-x-2">
+            <Activity className="h-3.5 w-3.5 text-blue-500 hidden sm:inline-block" />
+            <span className="text-xs font-medium text-gray-700">Afluência</span>
+            <span className="text-[10px] text-gray-500 hidden sm:inline-block">m³/s</span>
           </div>
-          <div className="text-xl sm:text-2xl font-bold text-gray-900 mt-2">{afluencia}</div>
+          <div className="text-base sm:text-2xl font-bold text-gray-900 mt-1">{afluencia} <span className="text-[10px] text-gray-500 sm:hidden">m³/s</span></div>
         </CardContent>
       </Card>
 
       {/* Defluência */}
-      <Card className="border-0 shadow-md">
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Activity className="h-4 w-4 text-orange-500" />
-              <span className="text-sm font-medium text-gray-700">Defluência</span>
-            </div>
-            <div className="text-xs text-gray-500">m³/s</div>
+      <Card className="border-0 shadow-sm bg-gray-50/50">
+        <CardContent className="p-3 text-center lg:text-left">
+          <div className="flex items-center justify-center lg:justify-between space-x-1 sm:space-x-2">
+            <Activity className="h-3.5 w-3.5 text-orange-500 hidden sm:inline-block" />
+            <span className="text-xs font-medium text-gray-700">Defluência</span>
+            <span className="text-[10px] text-gray-500 hidden sm:inline-block">m³/s</span>
           </div>
-          <div className="text-xl sm:text-2xl font-bold text-gray-900 mt-2">{defluencia}</div>
+          <div className="text-base sm:text-2xl font-bold text-gray-900 mt-1">{defluencia} <span className="text-[10px] text-gray-500 sm:hidden">m³/s</span></div>
         </CardContent>
       </Card>
     </div>
