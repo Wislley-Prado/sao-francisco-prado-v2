@@ -99,7 +99,37 @@ const ensureCompleteHistory = (data: DamData): DamData => {
   };
 };
 
-// Processar dados brutos do JSON da Cemig com ultra-resiliência contra erros
+// Converter linhas da tabela dam_history do Supabase em um objeto DamData completo
+const mapDamHistoryTableToDamData = (rows: any[]): DamData => {
+  const sorted = [...rows].sort((a, b) => (a.data_leitura > b.data_leitura ? 1 : -1));
+  const latest = sorted[sorted.length - 1];
+
+  const historico_dias: DamHistoryDay[] = sorted.map(row => ({
+    dia: row.data_leitura,
+    data_original: dateISOToBR(row.data_leitura),
+    vazao_afl: String(row.afluencia || 0),
+    cota_inicial: Number(row.nivel_cota || 0).toFixed(2),
+    vol_util_inicial: Number(row.volume_percentual || 0).toFixed(1),
+    vazao_def: String(row.defluencia || 0),
+    cota_final: Number(row.nivel_cota || 0).toFixed(2),
+    vol_util_final: Number(row.volume_percentual || 0).toFixed(1),
+  }));
+
+  const result: DamData = {
+    nivel_atual: Number(latest.nivel_cota || 571.60).toFixed(2),
+    volume_util_percentual: Number(latest.volume_percentual || 93.60).toFixed(1),
+    afluencia: String(latest.afluencia || 138),
+    defluencia: String(latest.defluencia || 164),
+    data_atualizacao: dateISOToBR(latest.data_leitura),
+    hora_atualizacao: new Date(latest.updated_at || Date.now()).toLocaleTimeString("pt-BR"),
+    historico_dias: historico_dias,
+    usando_dados_historicos: false
+  };
+
+  return ensureCompleteHistory(result);
+};
+
+// Processar dados brutos do JSON da Cemig
 const processCemigRawData = (raw: any): DamData => {
   try {
     if (!raw || typeof raw !== 'object') {
@@ -173,7 +203,6 @@ const processCemigRawData = (raw: any): DamData => {
       }
     });
 
-    // Mapear dados históricos consolidados de fallback para preenchimento de lacunas
     const fallbackMap: Record<string, any> = {};
     if (DEFAULT_FALLBACK_DAM_DATA?.historico_dias) {
       DEFAULT_FALLBACK_DAM_DATA.historico_dias.forEach(fb => {
@@ -181,7 +210,6 @@ const processCemigRawData = (raw: any): DamData => {
       });
     }
 
-    // Garantir que as datas recentes de fallback estejam no dailyMap
     Object.keys(fallbackMap).forEach(d => {
       if (!dailyMap[d]) dailyMap[d] = {};
     });
@@ -242,38 +270,26 @@ const processCemigRawData = (raw: any): DamData => {
   }
 };
 
-// Buscar da API da Cemig diretamente com trava anti-cache móbile
-const fetchCemigDirectly = async (): Promise<DamData> => {
-  if (import.meta.env.DEV) console.log('🔄 [FETCH] Buscando dados diretamente da API Cemig...');
-  const timestamp = Date.now();
-  const formData = new URLSearchParams();
-  formData.append('action', 'buscar_dados_usina');
-  formData.append('usina_id', 'UHE_TRES_MARIAS');
-  formData.append('_t', timestamp.toString());
-
-  const response = await fetch(`https://www.cemig.com.br/wp-json/api-busca-usinas/v1/send-form?_t=${timestamp}`, {
-    method: 'POST',
-    cache: 'no-cache',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-      'Cache-Control': 'no-cache, no-store, must-revalidate',
-      'Pragma': 'no-cache'
-    },
-    body: formData.toString(),
-  });
-
-  if (!response.ok) {
-    throw new Error(`Erro HTTP Cemig: ${response.status}`);
-  }
-
-  const raw = await response.json();
-  return processCemigRawData(raw);
-};
-
-// Buscar dados com prioridade no Supabase e suporte resiliente a API Cemig
+// Buscar dados com prioridade total na tabela estruturada dam_history do Supabase
 const fetchDamDataFromDB = async (): Promise<DamData> => {
   try {
-    // 1. Verificar se existe registro atualizado no banco de dados Supabase (row 1)
+    // 1. Prioridade 1: Buscar diretamente da tabela pontual dam_history do Supabase
+    try {
+      const { data: historyRows, error: historyErr } = await supabase
+        .from('dam_history')
+        .select('*')
+        .order('data_leitura', { ascending: true })
+        .limit(15);
+
+      if (!historyErr && Array.isArray(historyRows) && historyRows.length > 0) {
+        if (import.meta.env.DEV) console.log(`✅ [FETCH] ${historyRows.length} dias lidos da tabela dam_history no Supabase`);
+        return mapDamHistoryTableToDamData(historyRows);
+      }
+    } catch (err) {
+      if (import.meta.env.DEV) console.warn('⚠️ [FETCH] Tabela dam_history ainda não disponível:', err);
+    }
+
+    // 2. Prioridade 2: Verificar se existe registro em dam_data (row 1)
     try {
       const { data, error } = await supabase
         .from('dam_data')
@@ -283,8 +299,6 @@ const fetchDamDataFromDB = async (): Promise<DamData> => {
 
       if (!error && data?.data) {
         const responseData = data.data as any;
-        if (import.meta.env.DEV) console.log('✅ [FETCH] Dados encontrados no Supabase:', data.updated_at);
-        
         if (responseData?.raw_cemig) {
           const processed = processCemigRawData(responseData.raw_cemig);
           if (processed && processed.nivel_atual) return ensureCompleteHistory(processed);
@@ -297,7 +311,7 @@ const fetchDamDataFromDB = async (): Promise<DamData> => {
       if (import.meta.env.DEV) console.warn('⚠️ [FETCH] Erro ao ler dados do Supabase:', err);
     }
 
-    // 2. Se o banco estiver sem dados atualizados, tenta via Edge Function no Supabase (Proxy servidor 100% sem CORS)
+    // 3. Prioridade 3: Invocar Edge Function no Supabase (preenche dam_history e faz limpeza automática de 15 dias)
     try {
       const { data: edgeData, error: edgeErr } = await supabase.functions.invoke('dam-data-proxy');
       if (!edgeErr && edgeData?.raw_cemig) {
@@ -308,22 +322,11 @@ const fetchDamDataFromDB = async (): Promise<DamData> => {
       if (import.meta.env.DEV) console.warn('⚠️ [FETCH] Erro na Edge Function:', edgeErr);
     }
 
-    // 3. Tentar busca direta (pode falhar no navegador por CORS do servidor da Cemig)
-    try {
-      if (import.meta.env.DEV) console.log('⚡ [FETCH] Tentando busca direta na Cemig...');
-      const cemigData = await fetchCemigDirectly();
-      if (cemigData && Array.isArray(cemigData.historico_dias) && cemigData.historico_dias.length > 0) {
-        return ensureCompleteHistory(cemigData);
-      }
-    } catch (cemigErr) {
-      if (import.meta.env.DEV) console.warn('⚠️ [FETCH] Erro ou bloqueio CORS no fetch direto da Cemig:', cemigErr);
-    }
-
-    // 4. Fallback de segurança contendo a medição mais recente (19/07/2026)
+    // 4. Fallback final de segurança
     return ensureCompleteHistory(DEFAULT_FALLBACK_DAM_DATA);
   } catch (globalErr) {
     if (import.meta.env.DEV) console.error('❌ [FETCH] Erro global na busca de dados da represa:', globalErr);
-    return DEFAULT_FALLBACK_DAM_DATA;
+    return ensureCompleteHistory(DEFAULT_FALLBACK_DAM_DATA);
   }
 };
 
