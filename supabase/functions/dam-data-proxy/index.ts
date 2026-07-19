@@ -7,99 +7,65 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const DEFAULT_WEBHOOK_URL = 'https://webhook.v1.vendopro.com.br/webhook/v1.represa.online';
-
 serve(async (req) => {
-  // Handle CORS preflight requests
+  // Tratar requisições preflight CORS
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
-  console.log('🚀 [PROXY] Iniciando requisição para webhook da represa...');
+  console.log('🚀 [PROXY] Buscando dados oficiais diretamente da API da CEMIG...');
 
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Buscar configurações do site (webhook URL e flag de pausa)
-    const { data: settings, error: settingsError } = await supabase
-      .from('site_settings')
-      .select('dam_webhook_url, dam_webhook_pausado')
-      .limit(1)
-      .single();
+    const timestamp = Date.now();
+    const formData = new URLSearchParams();
+    formData.append('action', 'buscar_dados_usina');
+    formData.append('usina_id', 'UHE_TRES_MARIAS');
+    formData.append('_t', timestamp.toString());
 
-    if (settingsError) {
-      console.warn('⚠️ [PROXY] Erro ao buscar configurações:', settingsError.message);
-    }
-
-    // Verificar se o webhook está pausado
-    if (settings?.dam_webhook_pausado === true) {
-      console.log('⏸️ [PROXY] Webhook PAUSADO pelo admin. Dados manuais preservados.');
-      return new Response(JSON.stringify({
-        pausado: true,
-        message: 'Webhook pausado pelo admin. Dados manuais estão protegidos.',
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    let webhookUrl = DEFAULT_WEBHOOK_URL;
-    if (settings?.dam_webhook_url) {
-      webhookUrl = settings.dam_webhook_url;
-      console.log('📌 [PROXY] URL do webhook carregada do banco:', webhookUrl);
-    } else {
-      console.log('📌 [PROXY] Usando URL padrão do webhook');
-    }
-
-    // Chamar o webhook do n8n
-    const response = await fetch(webhookUrl, {
+    const cemigRes = await fetch(`https://www.cemig.com.br/wp-json/api-busca-usinas/v1/send-form?_t=${timestamp}`, {
       method: 'POST',
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)'
       },
-      body: JSON.stringify({}),
+      body: formData.toString(),
     });
 
-    console.log(`📡 [PROXY] Status da resposta: ${response.status}`);
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`❌ [PROXY] Erro do webhook: ${errorText}`);
-      return new Response(
-        JSON.stringify({ 
-          error: `Webhook error: ${response.status}`, 
-          details: errorText,
-          hint: 'Verifique se o workflow no n8n está ativo e a URL está correta nas configurações do admin.'
-        }),
-        { 
-          status: response.status, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
+    if (!cemigRes.ok) {
+      throw new Error(`Erro HTTP da Cemig: ${cemigRes.status}`);
     }
 
-    const data = await response.json();
-    console.log(`✅ [PROXY] Dados recebidos:`, JSON.stringify(data).substring(0, 200));
+    const rawData = await cemigRes.json();
+    console.log(`✅ [PROXY] Dados recebidos da CEMIG com sucesso!`);
 
-    // Salvar dados na tabela dam_data
+    const dbPayload = {
+      sucesso: true,
+      origem: 'cemig_direto',
+      raw_cemig: rawData,
+      atualizado_em: new Date().toISOString()
+    };
+
     const { error: upsertError } = await supabase
       .from('dam_data')
       .upsert({
         id: 1,
-        data: data,
+        data: dbPayload,
         updated_at: new Date().toISOString()
       }, { onConflict: 'id' });
 
     if (upsertError) {
       console.error('❌ [PROXY] Erro ao salvar dados no banco:', upsertError.message);
     } else {
-      console.log('💾 [PROXY] Dados salvos no banco com sucesso!');
+      console.log('💾 [PROXY] Dados salvos no banco Supabase com sucesso!');
     }
 
     return new Response(JSON.stringify({ 
-      ...data, 
+      sucesso: true,
+      raw_cemig: rawData,
       saved_to_db: !upsertError,
       updated_at: new Date().toISOString()
     }), {
@@ -107,11 +73,10 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('❌ [PROXY] Erro na requisição:', error);
+    console.error('❌ [PROXY] Erro ao conectar com a CEMIG:', error);
     return new Response(
       JSON.stringify({ 
-        error: error.message,
-        hint: 'Verifique a URL do webhook nas configurações do admin.'
+        error: (error as Error).message || 'Erro ao conectar com a CEMIG'
       }),
       { 
         status: 500, 

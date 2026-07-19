@@ -210,9 +210,9 @@ const fetchCemigDirectly = async (): Promise<DamData> => {
   return processCemigRawData(raw);
 };
 
-// Buscar dados com suporte total ao modo anônimo/privado
+// Buscar dados com suporte total a CORS, modo anônimo e Edge Function
 const fetchDamDataFromDB = async (): Promise<DamData> => {
-  // 1. Tentar busca direta na API oficial da Cemig
+  // 1. Tentar busca direta no navegador
   try {
     if (import.meta.env.DEV) console.log('⚡ [FETCH] Carregando dados oficiais diretamente da API da Cemig...');
     const cemigData = await fetchCemigDirectly();
@@ -220,10 +220,20 @@ const fetchDamDataFromDB = async (): Promise<DamData> => {
       return cemigData;
     }
   } catch (cemigErr) {
-    if (import.meta.env.DEV) console.warn('⚠️ [FETCH] Erro de rede ou modo privado no fetch da Cemig:', cemigErr);
+    if (import.meta.env.DEV) console.warn('⚠️ [FETCH] Bloqueio CORS ou rede no fetch direto. Tentando Edge Function:', cemigErr);
   }
 
-  // 2. Se a busca direta na Cemig for bloqueada pelo modo anônimo, usa o Supabase
+  // 2. Tentar via Edge Function no Supabase (Proxy servidor 100% sem CORS)
+  try {
+    const { data: edgeData, error: edgeErr } = await supabase.functions.invoke('dam-data-proxy');
+    if (!edgeErr && edgeData?.raw_cemig) {
+      return processCemigRawData(edgeData.raw_cemig);
+    }
+  } catch (edgeErr) {
+    if (import.meta.env.DEV) console.warn('⚠️ [FETCH] Erro na Edge Function:', edgeErr);
+  }
+
+  // 3. Se a busca direta e o proxy falharem, lê do banco de dados Supabase
   try {
     const { data, error } = await supabase
       .from('dam_data')
@@ -244,7 +254,7 @@ const fetchDamDataFromDB = async (): Promise<DamData> => {
     if (import.meta.env.DEV) console.warn('⚠️ [FETCH] Erro na leitura do Supabase:', err);
   }
 
-  // 3. Fallback de segurança contendo a medição mais recente (19/07/2026)
+  // 4. Fallback de segurança contendo a medição mais recente (19/07/2026)
   return DEFAULT_FALLBACK_DAM_DATA;
 };
 

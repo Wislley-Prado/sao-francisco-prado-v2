@@ -231,45 +231,11 @@ const Configuracoes = () => {
   const handleRefreshDamData = async () => {
     setRefreshing(true);
     try {
-      // 1. Consultar diretamente a API oficial da Cemig
-      const timestamp = Date.now();
-      const formData = new URLSearchParams();
-      formData.append('action', 'buscar_dados_usina');
-      formData.append('usina_id', 'UHE_TRES_MARIAS');
-      formData.append('_t', timestamp.toString());
+      // 1. Invocar a Edge Function no Supabase (100% livre de bloqueios CORS no navegador)
+      const { data, error } = await supabase.functions.invoke('dam-data-proxy');
 
-      const response = await fetch(`https://www.cemig.com.br/wp-json/api-busca-usinas/v1/send-form?_t=${timestamp}`, {
-        method: 'POST',
-        cache: 'no-cache',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-        },
-        body: formData.toString(),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Erro HTTP Cemig: ${response.status}`);
-      }
-
-      const raw = await response.json();
-
-      // Salvar os dados atualizados no Supabase (id: 1)
-      const { error: dbError } = await supabase
-        .from('dam_data')
-        .upsert({ 
-          id: 1, 
-          data: {
-            sucesso: true,
-            origem: 'cemig_direto',
-            atualizado_em: new Date().toISOString(),
-            raw_cemig: raw
-          }, 
-          updated_at: new Date().toISOString() 
-        });
-
-      if (dbError) {
-        console.warn('Aviso ao salvar no banco:', dbError);
+      if (error) {
+        throw error;
       }
 
       toast.success('Dados da represa atualizados com sucesso diretamente da CEMIG!');
