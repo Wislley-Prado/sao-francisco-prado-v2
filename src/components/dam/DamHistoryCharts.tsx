@@ -50,57 +50,18 @@ const DamHistoryCharts: React.FC<DamHistoryChartsProps> = ({ chartData }) => {
         </div>
       </div>
 
-      {/* Gráfico de Afluência e Defluência */}
-      <div>
-        <h4 className="text-xs sm:text-sm font-medium text-gray-700 mb-2 flex items-center gap-3 flex-wrap">
-          <span className="flex items-center gap-1.5">
-            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500"></div>
-            Afluência
-          </span>
-          <span className="flex items-center gap-1.5">
-            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-orange-500"></div>
-            Defluência
-          </span>
-          <span className="text-[10px] sm:text-xs text-muted-foreground">(m³/s)</span>
-        </h4>
-        <div className="h-44 sm:h-56 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-              <XAxis dataKey="data" fontSize={10} stroke="#6b7280" tickMargin={6} />
-              <YAxis fontSize={10} stroke="#6b7280" tickFormatter={(value) => `${value}`} />
-              <Tooltip 
-                contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', fontSize: '12px' }}
-                formatter={(value: number, name: string) => [`${value} m³/s`, name === 'afluencia' ? 'Afluência' : 'Defluência']}
-                labelFormatter={(label) => `Data: ${label}`}
-              />
-              <Legend formatter={(value) => value === 'afluencia' ? 'Afluência' : 'Defluência'} wrapperStyle={{ fontSize: '11px' }} />
-              <Bar dataKey="afluencia" fill="#22c55e" radius={[4, 4, 0, 0]} opacity={0.8} />
-              <Line type="monotone" dataKey="defluencia" stroke="#f97316" strokeWidth={2} dot={{ fill: '#f97316', strokeWidth: 2, r: 3 }} />
-            </ComposedChart>
-          </ResponsiveContainer>
+      {/* Resumo estatístico simples de nível */}
+      <div className="grid grid-cols-2 gap-2 sm:gap-4 pt-4 border-t max-w-md mx-auto">
+        <div className="text-center p-3 rounded-xl bg-blue-50/50 border border-blue-100">
+          <p className="text-xs text-muted-foreground font-medium">Nível Mínimo no Período</p>
+          <p className="text-base sm:text-xl font-bold text-blue-600">{Math.min(...chartData.map(d => d.nivel)).toFixed(1)}%</p>
+        </div>
+        <div className="text-center p-3 rounded-xl bg-blue-50/50 border border-blue-100">
+          <p className="text-xs text-muted-foreground font-medium">Nível Máximo no Período</p>
+          <p className="text-base sm:text-xl font-bold text-blue-600">{Math.max(...chartData.map(d => d.nivel)).toFixed(1)}%</p>
         </div>
       </div>
-
-      {/* Resumo estatístico */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 pt-4 border-t">
-        <div className="text-center p-2 rounded-lg bg-gray-50/50">
-          <p className="text-[10px] sm:text-xs text-muted-foreground">Nível Mín</p>
-          <p className="text-sm sm:text-lg font-semibold text-blue-600">{Math.min(...chartData.map(d => d.nivel)).toFixed(1)}%</p>
-        </div>
-        <div className="text-center p-2 rounded-lg bg-gray-50/50">
-          <p className="text-[10px] sm:text-xs text-muted-foreground">Nível Máx</p>
-          <p className="text-sm sm:text-lg font-semibold text-blue-600">{Math.max(...chartData.map(d => d.nivel)).toFixed(1)}%</p>
-        </div>
-        <div className="text-center p-2 rounded-lg bg-gray-50/50">
-          <p className="text-[10px] sm:text-xs text-muted-foreground">Média Afluência</p>
-          <p className="text-sm sm:text-lg font-semibold text-green-600">{(chartData.reduce((acc, d) => acc + d.afluencia, 0) / chartData.length).toFixed(0)} m³/s</p>
-        </div>
-        <div className="text-center p-2 rounded-lg bg-gray-50/50">
-          <p className="text-[10px] sm:text-xs text-muted-foreground">Média Defluência</p>
-          <p className="text-sm sm:text-lg font-semibold text-orange-600">{(chartData.reduce((acc, d) => acc + d.defluencia, 0) / chartData.length).toFixed(0)} m³/s</p>
-        </div>
-      </div>
+    </>
     </>
   );
 };

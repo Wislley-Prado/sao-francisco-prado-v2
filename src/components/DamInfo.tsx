@@ -46,8 +46,6 @@ const DamInfo = () => {
         />
 
         <DamHistoryChart damData={damData} />
-
-        <HistoryTable historicoDias={damData?.historico_dias || []} />
       </div>
     </section>
   );
