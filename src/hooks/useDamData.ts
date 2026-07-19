@@ -173,8 +173,10 @@ const fetchCemigDirectly = async (): Promise<DamData> => {
   });
 
   const allDates = Object.keys(dailyMap).filter(d => dailyMap[d].cota !== undefined || dailyMap[d].afl !== undefined).sort();
-  // Pegar os últimos 7 dias registrados na Cemig
-  const recentDates = allDates.slice(-7);
+  // Pegar os últimos 7 dias históricos consolidados (excluindo o dia de hoje que está em andamento)
+  const todayStr = new Date().toISOString().split("T")[0];
+  const historicalDates = allDates.filter(d => d < todayStr);
+  const recentDates = historicalDates.length >= 7 ? historicalDates.slice(-7) : allDates.slice(-7);
 
   const historico_dias = recentDates.map(dateStr => {
     const item = dailyMap[dateStr] || {};
