@@ -29,17 +29,19 @@ RewriteRule ^ index.html [L]
   AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/x-javascript application/json application/xml image/svg+xml image/x-icon font/ttf font/otf font/woff font/woff2
 </IfModule>
 
-# --- BROWSER CACHING FOR HOSTINGER PERFORMANCE (Score 100) ---
+# --- BROWSER CACHING FOR HOSTINGER & SPA ANTI-WHITE-SCREEN ---
 <IfModule mod_headers.c>
   # Manter conexao HTTP ativa para diminuir latencia do documento
   Header set Connection keep-alive
 
-  # HTML e manifest: Cache de 2 minutos (120s) com revalidação obrigatoria
+  # NUNCA fazer cache do index.html, sw.js, manifest.json para que navegacoes e deploys funcionem sem precisar limpar cache
   <FilesMatch "^(index\.html|sw\.js|registerSW\.js|manifest\.json|bot\.php)$">
-    Header set Cache-Control "public, max-age=120, must-revalidate"
+    Header set Cache-Control "no-cache, no-store, must-revalidate, max-age=0"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
   </FilesMatch>
   
-  # Assets compilados em JS/CSS, imagens e fontes: Cache de 1 ano (31536000s) imutavel
+  # Assets compilados em JS/CSS, imagens e fontes possuem hash no nome e sao cacheados por 1 ano com seguranca
   <FilesMatch "\.(js|css|png|jpg|jpeg|gif|ico|svg|webp|avif|woff|woff2|ttf|eot|json)$">
     Header set Cache-Control "public, max-age=31536000, immutable"
   </FilesMatch>
@@ -48,8 +50,8 @@ RewriteRule ^ index.html [L]
 <IfModule mod_expires.c>
   ExpiresActive On
   ExpiresDefault "access plus 1 year"
-  ExpiresByType text/html "access plus 2 minutes"
-  ExpiresByType application/json "access plus 1 year"
+  ExpiresByType text/html "access plus 0 seconds"
+  ExpiresByType application/json "access plus 0 seconds"
   ExpiresByType image/x-icon "access plus 1 year"
   ExpiresByType image/gif "access plus 1 year"
   ExpiresByType image/png "access plus 1 year"
