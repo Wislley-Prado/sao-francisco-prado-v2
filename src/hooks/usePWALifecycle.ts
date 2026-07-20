@@ -60,8 +60,8 @@ export const usePWALifecycle = () => {
     });
 
     // Check if app is already installed
-    const isInstalled = window.matchMedia('(display-mode: standalone)').matches ||
-      (window.navigator as NavigatorWithVendor).standalone === true;
+    const isInstalled = (typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(display-mode: standalone)').matches : false) ||
+      (typeof navigator !== 'undefined' && (window.navigator as NavigatorWithVendor).standalone === true);
 
     console.log('📦 Installation Status:', { isInstalled });
     setState(prev => ({ ...prev, isInstalled }));
