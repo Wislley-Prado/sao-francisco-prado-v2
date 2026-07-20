@@ -235,11 +235,11 @@ export const usePropriedadesVenda = (onlyActive = true) => {
       }
     ),
     {
-      staleTime: TTL.LISTS,
-      cacheTime: TTL.STATIC,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      refetchOnMount: false,
+      staleTime: 0,
+      cacheTime: 5 * 60 * 1000,
+      refetchOnWindowFocus: true,
+      refetchOnReconnect: true,
+      refetchOnMount: true,
       retry: 1,
     }
   );
@@ -281,11 +281,11 @@ export const usePropriedadeVendaBySlug = (slug: string | undefined) => {
     ),
     {
       enabled: !!slug,
-      staleTime: TTL.LISTS,
-      cacheTime: TTL.STATIC,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      refetchOnMount: false,
+      staleTime: 0,
+      cacheTime: 5 * 60 * 1000,
+      refetchOnWindowFocus: true,
+      refetchOnReconnect: true,
+      refetchOnMount: true,
       retry: 1,
     }
   );
@@ -366,9 +366,9 @@ export const useRanchos = (onlyAvailable = true) => {
       }
     ),
     {
-      staleTime: 30 * 1000,
-      cacheTime: 10 * 60 * 1000,
-      refetchOnWindowFocus: false,
+      staleTime: 0,
+      cacheTime: 5 * 60 * 1000,
+      refetchOnWindowFocus: true,
       refetchOnReconnect: true,
       refetchOnMount: true,
       retry: 1,
@@ -454,9 +454,9 @@ export const useRanchoBySlug = (slug: string | undefined) => {
     ),
     {
       enabled: !!slug,
-      staleTime: 30 * 1000,
-      cacheTime: 10 * 60 * 1000,
-      refetchOnWindowFocus: false,
+      staleTime: 0,
+      cacheTime: 5 * 60 * 1000,
+      refetchOnWindowFocus: true,
       refetchOnReconnect: true,
       refetchOnMount: true,
       retry: 1,
@@ -535,11 +535,11 @@ export const usePacotes = (onlyActive = true) => {
       }
     ),
     {
-      staleTime: TTL.LISTS,
-      cacheTime: TTL.STATIC,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      refetchOnMount: false,
+      staleTime: 0,
+      cacheTime: 5 * 60 * 1000,
+      refetchOnWindowFocus: true,
+      refetchOnReconnect: true,
+      refetchOnMount: true,
       retry: 1,
     }
   );
@@ -620,11 +620,11 @@ export const usePacoteBySlug = (slug: string | undefined) => {
     ),
     {
       enabled: !!slug,
-      staleTime: TTL.LISTS,
-      cacheTime: TTL.STATIC,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      refetchOnMount: false,
+      staleTime: 0,
+      cacheTime: 5 * 60 * 1000,
+      refetchOnWindowFocus: true,
+      refetchOnReconnect: true,
+      refetchOnMount: true,
       retry: 1,
     }
   );
@@ -654,11 +654,11 @@ export const useAllAnuncios = () => {
       }
     ),
     {
-      staleTime: TTL.SEMI_DYNAMIC,
-      cacheTime: TTL.LISTS,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      refetchOnMount: false,
+      staleTime: 0,
+      cacheTime: 5 * 60 * 1000,
+      refetchOnWindowFocus: true,
+      refetchOnReconnect: true,
+      refetchOnMount: true,
       retry: 1,
     }
   );
@@ -707,11 +707,11 @@ export const useBlogPosts = (limit?: number) => {
       }
     ),
     {
-      staleTime: TTL.LISTS,
-      cacheTime: TTL.STATIC,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      refetchOnMount: false,
+      staleTime: 0,
+      cacheTime: 5 * 60 * 1000,
+      refetchOnWindowFocus: true,
+      refetchOnReconnect: true,
+      refetchOnMount: true,
       retry: 1,
     }
   );
@@ -737,11 +737,11 @@ export const useBlogPostBySlug = (slug: string | undefined) => {
     ),
     {
       enabled: !!slug,
-      staleTime: TTL.LISTS,
-      cacheTime: TTL.STATIC,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      refetchOnMount: false,
+      staleTime: 0,
+      cacheTime: 5 * 60 * 1000,
+      refetchOnWindowFocus: true,
+      refetchOnReconnect: true,
+      refetchOnMount: true,
       retry: 1,
     }
   );
@@ -776,11 +776,11 @@ export const useDepoimentos = () => {
       }
     ),
     {
-      staleTime: TTL.LISTS,
-      cacheTime: TTL.LISTS,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      refetchOnMount: true, // Permitir refetch ao montar
+      staleTime: 0,
+      cacheTime: 5 * 60 * 1000,
+      refetchOnWindowFocus: true,
+      refetchOnReconnect: true,
+      refetchOnMount: true,
       retry: 2,
     }
   );
@@ -817,11 +817,11 @@ export const useFAQs = (pacoteId?: string, ranchoId?: string) => {
       }
     ),
     {
-      staleTime: TTL.STATIC,
-      cacheTime: TTL.STATIC,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      refetchOnMount: false,
+      staleTime: 0,
+      cacheTime: 5 * 60 * 1000,
+      refetchOnWindowFocus: true,
+      refetchOnReconnect: true,
+      refetchOnMount: true,
       retry: 1,
     }
   );
@@ -910,11 +910,11 @@ export const useFAQEstatisticas = () => {
       }
     ),
     {
-      staleTime: TTL.ADMIN_STATS,
-      cacheTime: TTL.STATIC,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      refetchOnMount: false,
+      staleTime: 0,
+      cacheTime: 5 * 60 * 1000,
+      refetchOnWindowFocus: true,
+      refetchOnReconnect: true,
+      refetchOnMount: true,
       retry: 1,
     }
   );
@@ -935,11 +935,11 @@ export const useRanchoEstatisticas = () => {
       }
     ),
     {
-      staleTime: TTL.ADMIN_STATS,
-      cacheTime: TTL.STATIC,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      refetchOnMount: false,
+      staleTime: 0,
+      cacheTime: 5 * 60 * 1000,
+      refetchOnWindowFocus: true,
+      refetchOnReconnect: true,
+      refetchOnMount: true,
       retry: 1,
     }
   );
@@ -975,11 +975,11 @@ export const useAdminDepoimentos = () => {
       }
     ),
     {
-      staleTime: TTL.ADMIN_STATS,
-      cacheTime: TTL.STATIC,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      refetchOnMount: false,
+      staleTime: 0,
+      cacheTime: 5 * 60 * 1000,
+      refetchOnWindowFocus: true,
+      refetchOnReconnect: true,
+      refetchOnMount: true,
       retry: 1,
     }
   );
@@ -1005,11 +1005,11 @@ export const useAdminBlogPosts = () => {
       }
     ),
     {
-      staleTime: TTL.ADMIN_STATS,
-      cacheTime: TTL.STATIC,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      refetchOnMount: false,
+      staleTime: 0,
+      cacheTime: 5 * 60 * 1000,
+      refetchOnWindowFocus: true,
+      refetchOnReconnect: true,
+      refetchOnMount: true,
       retry: 1,
     }
   );
@@ -1056,11 +1056,11 @@ export const useAdminPacotes = () => {
       }
     ),
     {
-      staleTime: TTL.ADMIN_STATS,
-      cacheTime: TTL.STATIC,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      refetchOnMount: false,
+      staleTime: 0,
+      cacheTime: 5 * 60 * 1000,
+      refetchOnWindowFocus: true,
+      refetchOnReconnect: true,
+      refetchOnMount: true,
       retry: 1,
     }
   );
@@ -1111,11 +1111,12 @@ export const useDashboardStats = () => {
       }
     ),
     {
-      staleTime: TTL.ADMIN_STATS,
-      cacheTime: TTL.STATIC,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      refetchOnMount: false,
+      staleTime: 0,
+      cacheTime: 5 * 60 * 1000,
+      refetchOnWindowFocus: true,
+      refetchOnReconnect: true,
+      refetchOnMount: true,
+      retry: 1,
     }
   );
 };
@@ -1129,54 +1130,54 @@ export const useInvalidateCache = () => {
     invalidateRanchos: () => {
       invalidateCacheByPrefix('ranchos');
       invalidateCacheByPrefix('rancho_');
-      queryClient.invalidateQueries(['ranchos']);
-      queryClient.invalidateQueries(['rancho']);
+      queryClient.invalidateQueries({ queryKey: ['ranchos'] });
+      queryClient.invalidateQueries({ queryKey: ['rancho'] });
     },
     invalidatePacotes: () => {
       invalidateCacheByPrefix('pacotes');
       invalidateCacheByPrefix('pacote_');
-      queryClient.invalidateQueries(['pacotes']);
-      queryClient.invalidateQueries(['pacote']);
+      queryClient.invalidateQueries({ queryKey: ['pacotes'] });
+      queryClient.invalidateQueries({ queryKey: ['pacote'] });
     },
     invalidateBlog: () => {
       invalidateCacheByPrefix('blog');
-      queryClient.invalidateQueries(['blog-posts']);
-      queryClient.invalidateQueries(['blog-post']);
+      queryClient.invalidateQueries({ queryKey: ['blog-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['blog-post'] });
     },
     invalidateAnuncios: () => {
       invalidateCacheByPrefix('anuncios');
-      queryClient.invalidateQueries(['anuncios']);
+      queryClient.invalidateQueries({ queryKey: ['anuncios'] });
     },
     invalidateAdminStats: () => {
       invalidateCacheByPrefix('faq_estatisticas');
       invalidateCacheByPrefix('rancho_estatisticas');
-      queryClient.invalidateQueries(['faq-estatisticas']);
-      queryClient.invalidateQueries(['rancho-estatisticas']);
+      queryClient.invalidateQueries({ queryKey: ['faq-estatisticas'] });
+      queryClient.invalidateQueries({ queryKey: ['rancho-estatisticas'] });
     },
     invalidateDepoimentos: () => {
       invalidateCacheByPrefix('admin_depoimentos');
-      queryClient.invalidateQueries(['admin-depoimentos']);
+      queryClient.invalidateQueries({ queryKey: ['admin-depoimentos'] });
     },
     invalidateAdminBlog: () => {
       invalidateCacheByPrefix('admin_blog_posts');
-      queryClient.invalidateQueries(['admin-blog-posts-cached']);
+      queryClient.invalidateQueries({ queryKey: ['admin-blog-posts-cached'] });
     },
     invalidateAdminPacotes: () => {
       invalidateCacheByPrefix('admin_pacotes');
-      queryClient.invalidateQueries(['admin-pacotes-cached']);
+      queryClient.invalidateQueries({ queryKey: ['admin-pacotes-cached'] });
     },
     invalidateDashboard: () => {
       invalidateCacheByPrefix('dashboard_stats');
-      queryClient.invalidateQueries(['dashboard-stats']);
+      queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
     },
     invalidatePropriedadesVenda: () => {
       invalidateCacheByPrefix('propriedades_venda');
       invalidateCacheByPrefix('propriedade_venda_');
-      queryClient.invalidateQueries(['propriedades_venda']);
-      queryClient.invalidateQueries(['propriedade_venda']);
-      queryClient.invalidateQueries(['admin-propriedades-venda']);
-      queryClient.invalidateQueries(['admin-propriedade-venda']);
-      queryClient.invalidateQueries(['dashboard-stats']);
+      queryClient.invalidateQueries({ queryKey: ['propriedades_venda'] });
+      queryClient.invalidateQueries({ queryKey: ['propriedade_venda'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-propriedades-venda'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-propriedade-venda'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
     },
     invalidateAll: () => {
       invalidateCacheByPrefix('');

@@ -234,6 +234,13 @@ export const invalidateCacheByPrefix = (prefix: string): void => {
 };
 
 /**
+ * Invalidate cache by tag/entity (e.g. 'ranchos', 'pacotes', 'auth', 'user_role')
+ */
+export const invalidateByTag = (tag: string): void => {
+  invalidateCacheByPrefix(tag);
+};
+
+/**
  * Clear old cache entries when storage is full
  */
 const clearOldCacheEntries = (): void => {

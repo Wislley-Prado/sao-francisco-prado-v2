@@ -13,10 +13,14 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     VitePWA({
-      selfDestroying: true, // Auto-destrói qualquer Service Worker antigo no navegador do usuário
       registerType: 'autoUpdate',
-      injectRegister: null, // Impede injeção automática de registro de SW
-      manifest: false,
+      injectRegister: 'auto',
+      workbox: {
+        skipWaiting: true,
+        clientsClaim: true,
+        cleanupOutdatedCaches: true,
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,webp}'],
+      },
       devOptions: {
         enabled: false
       }

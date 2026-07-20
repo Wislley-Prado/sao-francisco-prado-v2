@@ -3,6 +3,7 @@ import { User, Session, AuthError } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { clearAllCache } from '@/lib/cacheService';
 
 interface AuthContextType {
   user: User | null;
@@ -82,6 +83,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signIn = async (email: string, password: string) => {
     try {
+      clearAllCache();
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -147,6 +149,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signOut = async () => {
     try {
+      clearAllCache();
       await supabase.auth.signOut();
       setIsAdmin(false);
       toast.success('Logout realizado com sucesso!');

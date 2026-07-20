@@ -20,6 +20,12 @@ import NotFound from "./pages/NotFound";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
 import { lazyWithRetry } from "@/utils/lazyWithRetry";
+import { useSupabaseRealtime } from "@/hooks/useSupabaseRealtime";
+
+const RealtimeSubscriber = () => {
+  useSupabaseRealtime();
+  return null;
+};
 
 // Lazy load - public secondary pages
 const LiveStream = lazyWithRetry(() => import("./pages/LiveStream"));
@@ -95,6 +101,7 @@ const App = () => {
   return (
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
+        <RealtimeSubscriber />
         <ThemeProvider>
           <TooltipProvider>
             <Toaster />
