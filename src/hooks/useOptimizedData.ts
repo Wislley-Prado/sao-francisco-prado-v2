@@ -210,7 +210,7 @@ export const usePropriedadesVenda = (onlyActive = true) => {
     async () => {
       let query = supabase
         .from('propriedades_venda')
-        .select('id, titulo, titulo_en, slug, descricao, descricao_en, tipo, preco, area, quartos, banheiros, vagas_garagem, localizacao, localizacao_en, endereco_completo, latitude, longitude, ativo, destaque, ordem, imagens, caracteristicas, telefone_whatsapp, mensagem_whatsapp, created_at, updated_at')
+        .select('id, titulo, titulo_en, slug, descricao, descricao_en, tipo, localizacao, localizacao_en, preco, area, unidade_area, latitude, longitude, imagens, caracteristicas, telefone_contato, whatsapp_contato, ativo, destaque, ordem, texto_botao_whatsapp, mensagem_whatsapp, video_youtube, created_at, updated_at')
         .order('destaque', { ascending: false })
         .order('ordem', { ascending: true })
         .order('created_at', { ascending: false });
@@ -256,7 +256,7 @@ export const usePropriedadeVendaBySlug = (slug: string | undefined) => {
       // Fetch individually if not in list
       const { data, error } = await supabase
         .from('propriedades_venda')
-        .select('id, titulo, titulo_en, slug, descricao, descricao_en, tipo, preco, area, quartos, banheiros, vagas_garagem, localizacao, localizacao_en, endereco_completo, latitude, longitude, ativo, destaque, ordem, imagens, caracteristicas, telefone_whatsapp, mensagem_whatsapp, created_at, updated_at')
+        .select('id, titulo, titulo_en, slug, descricao, descricao_en, tipo, localizacao, localizacao_en, preco, area, unidade_area, latitude, longitude, imagens, caracteristicas, telefone_contato, whatsapp_contato, ativo, destaque, ordem, texto_botao_whatsapp, mensagem_whatsapp, video_youtube, created_at, updated_at')
         .eq('slug', slug)
         .maybeSingle();
 

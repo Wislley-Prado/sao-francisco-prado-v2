@@ -16,7 +16,7 @@ const PropriedadeVendaEditar = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('propriedades_venda')
-        .select('id, titulo, titulo_en, slug, descricao, descricao_en, tipo, preco, area, quartos, banheiros, vagas_garagem, localizacao, localizacao_en, endereco_completo, latitude, longitude, ativo, destaque, ordem, imagens, caracteristicas, telefone_whatsapp, mensagem_whatsapp, created_at, updated_at')
+        .select('id, titulo, titulo_en, slug, descricao, descricao_en, tipo, localizacao, localizacao_en, preco, area, unidade_area, latitude, longitude, imagens, caracteristicas, telefone_contato, whatsapp_contato, ativo, destaque, ordem, texto_botao_whatsapp, mensagem_whatsapp, video_youtube, created_at, updated_at')
         .eq('id', id)
         .single();
 
