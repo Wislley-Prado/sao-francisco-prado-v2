@@ -653,7 +653,7 @@ export const useBlogPosts = (limit?: number) => {
     async () => {
       let query = supabase
         .from('blog_posts')
-        .select('id, titulo, titulo_en, slug, resumo, resumo_en, conteudo, conteudo_en, categoria, categoria_en, tags, imagem_destaque, publicado, data_publicacao, visualizacoes, tempo_leitura, redes_sociais, banner_midia_paga, created_at, updated_at')
+        .select('id, titulo, titulo_en, slug, resumo, resumo_en, conteudo, conteudo_en, categoria, categoria_en, tags, imagem_destaque, publicado, data_publicacao, visualizacoes, redes_sociais, banner_midia_paga, created_at, updated_at')
         .eq('publicado', true)
         .order('data_publicacao', { ascending: false });
 
@@ -682,7 +682,7 @@ export const useBlogPostBySlug = (slug: string | undefined) => {
     async () => {
       const { data, error } = await supabase
         .from('blog_posts')
-        .select('id, titulo, titulo_en, slug, resumo, resumo_en, conteudo, conteudo_en, categoria, categoria_en, tags, imagem_destaque, publicado, data_publicacao, visualizacoes, tempo_leitura, redes_sociais, banner_midia_paga, created_at, updated_at')
+        .select('id, titulo, titulo_en, slug, resumo, resumo_en, conteudo, conteudo_en, categoria, categoria_en, tags, imagem_destaque, publicado, data_publicacao, visualizacoes, redes_sociais, banner_midia_paga, created_at, updated_at')
         .eq('slug', slug)
         .eq('publicado', true)
         .maybeSingle();
@@ -928,7 +928,7 @@ export const useAdminBlogPosts = () => {
     async () => {
       const { data, error } = await supabase
         .from('blog_posts')
-        .select('id, titulo, titulo_en, slug, resumo, resumo_en, conteudo, conteudo_en, categoria, categoria_en, tags, imagem_destaque, publicado, data_publicacao, visualizacoes, tempo_leitura, redes_sociais, banner_midia_paga, created_at, updated_at')
+        .select('id, titulo, titulo_en, slug, resumo, resumo_en, conteudo, conteudo_en, categoria, categoria_en, tags, imagem_destaque, publicado, data_publicacao, visualizacoes, redes_sociais, banner_midia_paga, created_at, updated_at')
         .order('created_at', { ascending: false });
       if (error) throw error;
       return data || [];

@@ -53,7 +53,7 @@ const Blog = () => {
     queryFn: async () => {
       let query = supabase
         .from('blog_posts')
-        .select('id, titulo, titulo_en, slug, resumo, resumo_en, categoria, categoria_en, tags, imagem_destaque, publicado, data_publicacao, visualizacoes, tempo_leitura, redes_sociais, banner_midia_paga, created_at, updated_at')
+        .select('id, titulo, titulo_en, slug, resumo, resumo_en, categoria, categoria_en, tags, imagem_destaque, publicado, data_publicacao, visualizacoes, redes_sociais, banner_midia_paga, created_at, updated_at')
         .eq('publicado', true)
         .order('data_publicacao', { ascending: false });
 
