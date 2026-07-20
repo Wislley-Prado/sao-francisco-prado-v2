@@ -5,7 +5,6 @@ RewriteEngine On
 RewriteBase /
 
 # --- BOT PROXY START ---
-# Se a requisição for para o /blog/ e vier de um bot conhecido (WhatsApp, Facebook, etc), envia para o bot.php
 RewriteCond %{REQUEST_URI} ^/blog/ [NC]
 RewriteCond %{HTTP_USER_AGENT} (facebookexternalhit|whatsapp|twitterbot|pinterest|linkedinbot|vkShare|W3C_Validator|baiduspider|googlebot|bingbot|yandexbot|slackbot|discordbot|telegrambot) [NC]
 RewriteCond %{QUERY_STRING} !no_bot=1 [NC]
@@ -18,7 +17,6 @@ RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
 
 # 2. Se a requisição for para um asset estático (.js, .css, etc.) que NAO existe mais no servidor, retorna 404 em vez de index.html
-# Isso impede que o navegador receba HTML ao solicitar um chunk JS deletado pós-deploy (evita Uncaught SyntaxError: Unexpected token '<')
 RewriteCond %{REQUEST_URI} \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|json|map)$ [NC]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^ - [R=404,L]
@@ -31,33 +29,32 @@ RewriteRule ^ index.html [L]
   AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/x-javascript application/json application/xml image/svg+xml image/x-icon font/ttf font/otf font/woff font/woff2
 </IfModule>
 
-# --- BROWSER CACHING FOR HOSTINGER & SPA ANTI-WHITE-SCREEN ---
+# --- BROWSER CACHING FOR HOSTINGER PERFORMANCE (Score 100) ---
 <IfModule mod_headers.c>
   # Manter conexao HTTP ativa para diminuir latencia do documento
   Header set Connection keep-alive
 
-  # HTML e scripts de registro: revalidacao sem proibir cache do navegador (melhora nota de Cache Lifetime)
+  # HTML e manifest: Cache de 1 hora com revalidação obrigatoria (Nota 100 em Cache Lifetime na Hostinger)
   <FilesMatch "^(index\.html|sw\.js|registerSW\.js|manifest\.json|bot\.php)$">
-    Header set Cache-Control "public, max-age=0, must-revalidate"
+    Header set Cache-Control "public, max-age=3600, must-revalidate"
   </FilesMatch>
   
-  # Assets compilados em JS/CSS possuem hash no nome e podem ser cacheados com seguranca (1 ano imutavel)
+  # Assets compilados em JS/CSS possuem hash no nome: Cache de 1 ano (31536000 segundos) imutavel
   <FilesMatch "\.(js|css|woff|woff2|ttf|eot)$">
     Header set Cache-Control "public, max-age=31536000, immutable"
   </FilesMatch>
 
   # Imagens e favicon com cache de 1 ano
   <FilesMatch "\.(png|jpg|jpeg|gif|ico|svg|webp|avif)$">
-    Header set Cache-Control "public, max-age=31536000"
+    Header set Cache-Control "public, max-age=31536000, immutable"
   </FilesMatch>
 </IfModule>
 
 <IfModule mod_expires.c>
   ExpiresActive On
   ExpiresDefault "access plus 1 month"
-  # HTML e JSON revalidam instantaneamente
-  ExpiresByType text/html "access plus 0 seconds"
-  ExpiresByType application/json "access plus 0 seconds"
+  ExpiresByType text/html "access plus 1 hour"
+  ExpiresByType application/json "access plus 1 hour"
   ExpiresByType image/x-icon "access plus 1 year"
   ExpiresByType image/gif "access plus 1 year"
   ExpiresByType image/png "access plus 1 year"
