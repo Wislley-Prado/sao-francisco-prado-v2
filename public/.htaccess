@@ -12,12 +12,18 @@ RewriteCond %{QUERY_STRING} !no_bot=1 [NC]
 RewriteRule ^ bot.php [L]
 # --- BOT PROXY END ---
 
-# If the request is for an existing file or directory, serve it directly
+# 1. Se o arquivo ou diretório existe fisicamente, serve diretamente
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
 
-# Otherwise, rewrite everything to index.html
+# 2. Se a requisição for para um asset estático (.js, .css, etc.) que NAO existe mais no servidor, retorna 404 em vez de index.html
+# Isso impede que o navegador receba HTML ao solicitar um chunk JS deletado pós-deploy (evita Uncaught SyntaxError: Unexpected token '<')
+RewriteCond %{REQUEST_URI} \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|json|map)$ [NC]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ - [R=404,L]
+
+# 3. Para qualquer outra rota virtual de página SPA, reescreve para index.html
 RewriteRule ^ index.html [L]
 
 # --- GZIP COMPRESSION FOR HOSTINGER ---

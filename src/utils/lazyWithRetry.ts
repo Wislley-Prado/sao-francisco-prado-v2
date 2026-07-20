@@ -47,8 +47,12 @@ export function lazyWithRetry<T extends ComponentType<any>>(
 
         // Recarregar do servidor
         window.location.reload();
+        // Retornar promise pendente para manter a UI atual enquanto a página recarrega, evitando tela branca instantânea
+        return new Promise<{ default: T }>(() => {});
       }
 
+      // Se já havia sido recarregado antes, reseta a flag para não travar navegações futuras
+      window.sessionStorage.removeItem('retry-lazy-refreshed');
       throw error;
     }
   });
