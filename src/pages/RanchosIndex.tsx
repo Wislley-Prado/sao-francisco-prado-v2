@@ -22,7 +22,7 @@ const RanchosIndex = () => {
         return null;
       }
     },
-    staleTime: 30 * 60 * 1000,
+    staleTime: 0,
   });
 
   const ogImage = (settings as { og_image_url?: string })?.og_image_url || '/og-image.png';

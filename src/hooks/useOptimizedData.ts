@@ -207,33 +207,29 @@ export interface PropriedadeVenda {
 export const usePropriedadesVenda = (onlyActive = true) => {
   return useQuery(
     ['propriedades_venda', onlyActive ? 'active' : 'all'],
-    () => cachedQuery<PropriedadeVenda[]>(
-      `propriedades_venda_${onlyActive ? 'active' : 'all'}`,
-      TTL.LISTS,
-      async () => {
-        let query = supabase
-          .from('propriedades_venda')
-          .select('*')
-          .order('destaque', { ascending: false })
-          .order('ordem', { ascending: true })
-          .order('created_at', { ascending: false });
+    async () => {
+      let query = supabase
+        .from('propriedades_venda')
+        .select('*')
+        .order('destaque', { ascending: false })
+        .order('ordem', { ascending: true })
+        .order('created_at', { ascending: false });
 
-        if (onlyActive) {
-          query = query.eq('ativo', true);
-        }
-
-        const { data, error } = await query;
-        if (error) throw error;
-
-        return (data || []).map(p => ({
-          ...p,
-          preco: Number(p.preco),
-          area: p.area ? Number(p.area) : null,
-          imagens: p.imagens || [],
-          caracteristicas: p.caracteristicas || []
-        }));
+      if (onlyActive) {
+        query = query.eq('ativo', true);
       }
-    ),
+
+      const { data, error } = await query;
+      if (error) throw error;
+
+      return (data || []).map(p => ({
+        ...p,
+        preco: Number(p.preco),
+        area: p.area ? Number(p.area) : null,
+        imagens: p.imagens || [],
+        caracteristicas: p.caracteristicas || []
+      }));
+    },
     {
       staleTime: 0,
       cacheTime: 5 * 60 * 1000,
@@ -250,35 +246,31 @@ export const usePropriedadeVendaBySlug = (slug: string | undefined) => {
 
   return useQuery(
     ['propriedade_venda', slug],
-    () => cachedQuery<PropriedadeVenda | null>(
-      `propriedade_venda_${slug}`,
-      TTL.LISTS,
-      async () => {
-        // First check if we already have it from the list
-        if (propriedades) {
-          const found = propriedades.find(p => p.slug === slug);
-          if (found) return found;
-        }
-
-        // Fetch individually if not in list
-        const { data, error } = await supabase
-          .from('propriedades_venda')
-          .select('*')
-          .eq('slug', slug)
-          .maybeSingle();
-
-        if (error) throw error;
-        if (!data) return null;
-
-        return {
-          ...data,
-          preco: Number(data.preco),
-          area: data.area ? Number(data.area) : null,
-          imagens: data.imagens || [],
-          caracteristicas: data.caracteristicas || []
-        };
+    async () => {
+      // First check if we already have it from the list
+      if (propriedades) {
+        const found = propriedades.find(p => p.slug === slug);
+        if (found) return found;
       }
-    ),
+
+      // Fetch individually if not in list
+      const { data, error } = await supabase
+        .from('propriedades_venda')
+        .select('*')
+        .eq('slug', slug)
+        .maybeSingle();
+
+      if (error) throw error;
+      if (!data) return null;
+
+      return {
+        ...data,
+        preco: Number(data.preco),
+        area: data.area ? Number(data.area) : null,
+        imagens: data.imagens || [],
+        caracteristicas: data.caracteristicas || []
+      };
+    },
     {
       enabled: !!slug,
       staleTime: 0,
@@ -293,78 +285,71 @@ export const usePropriedadeVendaBySlug = (slug: string | undefined) => {
 
 // ============= RANCHOS =============
 
-
 export const useRanchos = (onlyAvailable = true) => {
   return useQuery(
     ['ranchos', onlyAvailable ? 'available' : 'all'],
-    () => cachedQuery<RanchoWithImages[]>(
-      `ranchos_${onlyAvailable ? 'available' : 'all'}`,
-      TTL.LISTS,
-      async () => {
-        let query = supabase
-          .from('ranchos')
-          .select(`
-            *,
-            rancho_imagens!rancho_imagens_rancho_id_fkey (
-              id, url, alt_text, principal, ordem
-            )
-          `)
-          .order('destaque', { ascending: false })
-          .order('created_at', { ascending: false });
+    async () => {
+      let query = supabase
+        .from('ranchos')
+        .select(`
+          *,
+          rancho_imagens!rancho_imagens_rancho_id_fkey (
+            id, url, alt_text, principal, ordem
+          )
+        `)
+        .order('destaque', { ascending: false })
+        .order('created_at', { ascending: false });
 
-        if (onlyAvailable) {
-          query = query.eq('disponivel', true);
-        }
-
-        const { data, error } = await query;
-        if (error) throw error;
-
-        return (data || []).map(rancho => ({
-          id: rancho.id,
-          nome: rancho.nome,
-          nome_en: rancho.nome_en,
-          slug: rancho.slug,
-          descricao: rancho.descricao || '',
-          descricao_en: rancho.descricao_en,
-          localizacao: rancho.localizacao,
-          localizacao_en: rancho.localizacao_en,
-          capacidade: rancho.capacidade,
-          preco: Number(rancho.preco),
-          rating: Number(rancho.rating),
-          quartos: rancho.quartos,
-          banheiros: rancho.banheiros,
-          area: rancho.area,
-          comodidades: rancho.comodidades || [],
-          disponivel: rancho.disponivel,
-          destaque: rancho.destaque,
-          telefone_whatsapp: rancho.telefone_whatsapp,
-          mensagem_whatsapp: rancho.mensagem_whatsapp,
-          typebot_url: rancho.typebot_url,
-          texto_botao_whatsapp: rancho.texto_botao_whatsapp,
-          video_youtube: rancho.video_youtube,
-          google_calendar_url: rancho.google_calendar_url,
-          tracking_code: rancho.tracking_code,
-          latitude: rancho.latitude,
-          longitude: rancho.longitude,
-          endereco_completo: rancho.endereco_completo,
-          imagens: (rancho.rancho_imagens || [])
-            .sort((a: { ordem: number; principal: boolean }, b: { ordem: number; principal: boolean }) => {
-              // Principal image always comes first
-              if (a.principal && !b.principal) return -1;
-              if (!a.principal && b.principal) return 1;
-              // Then sort by ordem
-              return a.ordem - b.ordem;
-            })
-            .map((img: { id: string; url: string; alt_text?: string; principal: boolean; ordem: number }) => ({
-              id: img.id,
-              url: img.url,
-              alt_text: img.alt_text,
-              principal: img.principal,
-              ordem: img.ordem,
-            })),
-        }));
+      if (onlyAvailable) {
+        query = query.eq('disponivel', true);
       }
-    ),
+
+      const { data, error } = await query;
+      if (error) throw error;
+
+      return (data || []).map(rancho => ({
+        id: rancho.id,
+        nome: rancho.nome,
+        nome_en: rancho.nome_en,
+        slug: rancho.slug,
+        descricao: rancho.descricao || '',
+        descricao_en: rancho.descricao_en,
+        localizacao: rancho.localizacao,
+        localizacao_en: rancho.localizacao_en,
+        capacidade: rancho.capacidade,
+        preco: Number(rancho.preco),
+        rating: Number(rancho.rating),
+        quartos: rancho.quartos,
+        banheiros: rancho.banheiros,
+        area: rancho.area,
+        comodidades: rancho.comodidades || [],
+        disponivel: rancho.disponivel,
+        destaque: rancho.destaque,
+        telefone_whatsapp: rancho.telefone_whatsapp,
+        mensagem_whatsapp: rancho.mensagem_whatsapp,
+        typebot_url: rancho.typebot_url,
+        texto_botao_whatsapp: rancho.texto_botao_whatsapp,
+        video_youtube: rancho.video_youtube,
+        google_calendar_url: rancho.google_calendar_url,
+        tracking_code: rancho.tracking_code,
+        latitude: rancho.latitude,
+        longitude: rancho.longitude,
+        endereco_completo: rancho.endereco_completo,
+        imagens: (rancho.rancho_imagens || [])
+          .sort((a: { ordem: number; principal: boolean }, b: { ordem: number; principal: boolean }) => {
+            if (a.principal && !b.principal) return -1;
+            if (!a.principal && b.principal) return 1;
+            return a.ordem - b.ordem;
+          })
+          .map((img: { id: string; url: string; alt_text?: string; principal: boolean; ordem: number }) => ({
+            id: img.id,
+            url: img.url,
+            alt_text: img.alt_text,
+            principal: img.principal,
+            ordem: img.ordem,
+          })),
+      }));
+    },
     {
       staleTime: 0,
       cacheTime: 5 * 60 * 1000,
@@ -381,77 +366,71 @@ export const useRanchoBySlug = (slug: string | undefined) => {
 
   return useQuery(
     ['rancho', slug],
-    () => cachedQuery<RanchoWithImages | null>(
-      `rancho_${slug}`,
-      TTL.LISTS,
-      async () => {
-        // First check if we already have it from the list
-        if (ranchos) {
-          const found = ranchos.find(r => r.slug === slug);
-          if (found) return found;
-        }
-
-        // Fetch individually if not in list
-        const { data, error } = await supabase
-          .from('ranchos')
-          .select(`
-            *,
-            rancho_imagens!rancho_imagens_rancho_id_fkey (
-              id, url, alt_text, principal, ordem
-            )
-          `)
-          .eq('slug', slug)
-          .maybeSingle();
-
-        if (error) throw error;
-        if (!data) return null;
-
-        return {
-          id: data.id,
-          nome: data.nome,
-          nome_en: data.nome_en,
-          slug: data.slug,
-          descricao: data.descricao || '',
-          descricao_en: data.descricao_en,
-          localizacao: data.localizacao,
-          localizacao_en: data.localizacao_en,
-          capacidade: data.capacidade,
-          preco: Number(data.preco),
-          rating: Number(data.rating),
-          quartos: data.quartos,
-          banheiros: data.banheiros,
-          area: data.area,
-          comodidades: data.comodidades || [],
-          disponivel: data.disponivel,
-          destaque: data.destaque,
-          telefone_whatsapp: data.telefone_whatsapp,
-          mensagem_whatsapp: data.mensagem_whatsapp,
-          typebot_url: data.typebot_url,
-          texto_botao_whatsapp: data.texto_botao_whatsapp,
-          video_youtube: data.video_youtube,
-          google_calendar_url: data.google_calendar_url,
-          tracking_code: data.tracking_code,
-          latitude: data.latitude,
-          longitude: data.longitude,
-          endereco_completo: data.endereco_completo,
-          imagens: (data.rancho_imagens || [])
-            .sort((a: { ordem: number; principal: boolean }, b: { ordem: number; principal: boolean }) => {
-              // Principal image always comes first
-              if (a.principal && !b.principal) return -1;
-              if (!a.principal && b.principal) return 1;
-              // Then sort by ordem
-              return a.ordem - b.ordem;
-            })
-            .map((img: { id: string; url: string; alt_text?: string; principal: boolean; ordem: number }) => ({
-              id: img.id,
-              url: img.url,
-              alt_text: img.alt_text,
-              principal: img.principal,
-              ordem: img.ordem,
-            })),
-        };
+    async () => {
+      // First check if we already have it from the list
+      if (ranchos) {
+        const found = ranchos.find(r => r.slug === slug);
+        if (found) return found;
       }
-    ),
+
+      // Fetch individually if not in list
+      const { data, error } = await supabase
+        .from('ranchos')
+        .select(`
+          *,
+          rancho_imagens!rancho_imagens_rancho_id_fkey (
+            id, url, alt_text, principal, ordem
+          )
+        `)
+        .eq('slug', slug)
+        .maybeSingle();
+
+      if (error) throw error;
+      if (!data) return null;
+
+      return {
+        id: data.id,
+        nome: data.nome,
+        nome_en: data.nome_en,
+        slug: data.slug,
+        descricao: data.descricao || '',
+        descricao_en: data.descricao_en,
+        localizacao: data.localizacao,
+        localizacao_en: data.localizacao_en,
+        capacidade: data.capacidade,
+        preco: Number(data.preco),
+        rating: Number(data.rating),
+        quartos: data.quartos,
+        banheiros: data.banheiros,
+        area: data.area,
+        comodidades: data.comodidades || [],
+        disponivel: data.disponivel,
+        destaque: data.destaque,
+        telefone_whatsapp: data.telefone_whatsapp,
+        mensagem_whatsapp: data.mensagem_whatsapp,
+        typebot_url: data.typebot_url,
+        texto_botao_whatsapp: data.texto_botao_whatsapp,
+        video_youtube: data.video_youtube,
+        google_calendar_url: data.google_calendar_url,
+        tracking_code: data.tracking_code,
+        latitude: data.latitude,
+        longitude: data.longitude,
+        endereco_completo: data.endereco_completo,
+        imagens: (data.rancho_imagens || [])
+          .sort((a: { ordem: number; principal: boolean }, b: { ordem: number; principal: boolean }) => {
+            if (a.principal && !b.principal) return -1;
+            if (!a.principal && b.principal) return 1;
+            return a.ordem - b.ordem;
+          })
+          .map((img: { id: string; url: string; alt_text?: string; principal: boolean; ordem: number }) => ({
+            id: img.id,
+            url: img.url,
+            alt_text: img.alt_text,
+            principal: img.principal,
+            ordem: img.ordem,
+          })),
+      };
+    },
     {
       enabled: !!slug,
       staleTime: 0,
@@ -469,71 +448,65 @@ export const useRanchoBySlug = (slug: string | undefined) => {
 export const usePacotes = (onlyActive = true) => {
   return useQuery(
     ['pacotes', onlyActive ? 'active' : 'all'],
-    () => cachedQuery<PacoteWithImages[]>(
-      `pacotes_${onlyActive ? 'active' : 'all'}`,
-      TTL.LISTS,
-      async () => {
-        let query = supabase
-          .from('pacotes')
-          .select(`
-            *,
-            pacote_imagens (
-              id, url, alt_text, principal, ordem
-            )
-          `)
-          .order('popular', { ascending: false })
-          .order('preco', { ascending: true });
+    async () => {
+      let query = supabase
+        .from('pacotes')
+        .select(`
+          *,
+          pacote_imagens (
+            id, url, alt_text, principal, ordem
+          )
+        `)
+        .order('popular', { ascending: false })
+        .order('preco', { ascending: true });
 
-        if (onlyActive) {
-          query = query.eq('ativo', true);
-        }
-
-        const { data, error } = await query;
-        if (error) throw error;
-
-        return (data || []).map(pacote => ({
-          id: pacote.id,
-          nome: pacote.nome,
-          slug: pacote.slug,
-          descricao: pacote.descricao || '',
-          preco: Number(pacote.preco),
-          duracao: pacote.duracao,
-          pessoas: pacote.pessoas,
-          rating: Number(pacote.rating),
-          tipo: pacote.tipo,
-          caracteristicas: pacote.caracteristicas || [],
-          inclusos: pacote.inclusos || [],
-          ativo: pacote.ativo,
-          popular: pacote.popular,
-          destaque: pacote.destaque,
-          parcelas_quantidade: pacote.parcelas_quantidade,
-          parcela_valor: pacote.parcela_valor ? Number(pacote.parcela_valor) : undefined,
-          desconto_avista: pacote.desconto_avista ? Number(pacote.desconto_avista) : undefined,
-          vagas_disponiveis: pacote.vagas_disponiveis,
-          video_youtube: pacote.video_youtube,
-          tracking_code: pacote.tracking_code,
-          telefone_whatsapp: pacote.telefone_whatsapp,
-          endereco_completo: pacote.endereco_completo,
-          latitude: pacote.latitude,
-          longitude: pacote.longitude,
-          imagens: (pacote.pacote_imagens || [])
-            .sort((a: { ordem: number; principal: boolean }, b: { ordem: number; principal: boolean }) => {
-              // Principal image always comes first
-              if (a.principal && !b.principal) return -1;
-              if (!a.principal && b.principal) return 1;
-              // Then sort by ordem
-              return a.ordem - b.ordem;
-            })
-            .map((img: { id: string; url: string; alt_text?: string; principal: boolean; ordem: number }) => ({
-              id: img.id,
-              url: img.url,
-              alt_text: img.alt_text,
-              principal: img.principal,
-              ordem: img.ordem,
-            })),
-        }));
+      if (onlyActive) {
+        query = query.eq('ativo', true);
       }
-    ),
+
+      const { data, error } = await query;
+      if (error) throw error;
+
+      return (data || []).map(pacote => ({
+        id: pacote.id,
+        nome: pacote.nome,
+        slug: pacote.slug,
+        descricao: pacote.descricao || '',
+        preco: Number(pacote.preco),
+        duracao: pacote.duracao,
+        pessoas: pacote.pessoas,
+        rating: Number(pacote.rating),
+        tipo: pacote.tipo,
+        caracteristicas: pacote.caracteristicas || [],
+        inclusos: pacote.inclusos || [],
+        ativo: pacote.ativo,
+        popular: pacote.popular,
+        destaque: pacote.destaque,
+        parcelas_quantidade: pacote.parcelas_quantidade,
+        parcela_valor: pacote.parcela_valor ? Number(pacote.parcela_valor) : undefined,
+        desconto_avista: pacote.desconto_avista ? Number(pacote.desconto_avista) : undefined,
+        vagas_disponiveis: pacote.vagas_disponiveis,
+        video_youtube: pacote.video_youtube,
+        tracking_code: pacote.tracking_code,
+        telefone_whatsapp: pacote.telefone_whatsapp,
+        endereco_completo: pacote.endereco_completo,
+        latitude: pacote.latitude,
+        longitude: pacote.longitude,
+        imagens: (pacote.pacote_imagens || [])
+          .sort((a: { ordem: number; principal: boolean }, b: { ordem: number; principal: boolean }) => {
+            if (a.principal && !b.principal) return -1;
+            if (!a.principal && b.principal) return 1;
+            return a.ordem - b.ordem;
+          })
+          .map((img: { id: string; url: string; alt_text?: string; principal: boolean; ordem: number }) => ({
+            id: img.id,
+            url: img.url,
+            alt_text: img.alt_text,
+            principal: img.principal,
+            ordem: img.ordem,
+          })),
+      }));
+    },
     {
       staleTime: 0,
       cacheTime: 5 * 60 * 1000,
@@ -550,74 +523,68 @@ export const usePacoteBySlug = (slug: string | undefined) => {
 
   return useQuery(
     ['pacote', slug],
-    () => cachedQuery<PacoteWithImages | null>(
-      `pacote_${slug}`,
-      TTL.LISTS,
-      async () => {
-        // First check if we already have it from the list
-        if (pacotes) {
-          const found = pacotes.find(p => p.slug === slug);
-          if (found) return found;
-        }
-
-        // Fetch individually if not in list
-        const { data, error } = await supabase
-          .from('pacotes')
-          .select(`
-            *,
-            pacote_imagens (
-              id, url, alt_text, principal, ordem
-            )
-          `)
-          .eq('slug', slug)
-          .maybeSingle();
-
-        if (error) throw error;
-        if (!data) return null;
-
-        return {
-          id: data.id,
-          nome: data.nome,
-          slug: data.slug,
-          descricao: data.descricao || '',
-          preco: Number(data.preco),
-          duracao: data.duracao,
-          pessoas: data.pessoas,
-          rating: Number(data.rating),
-          tipo: data.tipo,
-          caracteristicas: data.caracteristicas || [],
-          inclusos: data.inclusos || [],
-          ativo: data.ativo,
-          popular: data.popular,
-          destaque: data.destaque,
-          parcelas_quantidade: data.parcelas_quantidade,
-          parcela_valor: data.parcela_valor ? Number(data.parcela_valor) : undefined,
-          desconto_avista: data.desconto_avista ? Number(data.desconto_avista) : undefined,
-          vagas_disponiveis: data.vagas_disponiveis,
-          video_youtube: data.video_youtube,
-          tracking_code: data.tracking_code,
-          telefone_whatsapp: data.telefone_whatsapp,
-          endereco_completo: data.endereco_completo,
-          latitude: data.latitude,
-          longitude: data.longitude,
-          imagens: (data.pacote_imagens || [])
-            .sort((a: { ordem: number; principal: boolean }, b: { ordem: number; principal: boolean }) => {
-              // Principal image always comes first
-              if (a.principal && !b.principal) return -1;
-              if (!a.principal && b.principal) return 1;
-              // Then sort by ordem
-              return a.ordem - b.ordem;
-            })
-            .map((img: { id: string; url: string; alt_text?: string; principal: boolean; ordem: number }) => ({
-              id: img.id,
-              url: img.url,
-              alt_text: img.alt_text,
-              principal: img.principal,
-              ordem: img.ordem,
-            })),
-        };
+    async () => {
+      // First check if we already have it from the list
+      if (pacotes) {
+        const found = pacotes.find(p => p.slug === slug);
+        if (found) return found;
       }
-    ),
+
+      // Fetch individually if not in list
+      const { data, error } = await supabase
+        .from('pacotes')
+        .select(`
+          *,
+          pacote_imagens (
+            id, url, alt_text, principal, ordem
+          )
+        `)
+        .eq('slug', slug)
+        .maybeSingle();
+
+      if (error) throw error;
+      if (!data) return null;
+
+      return {
+        id: data.id,
+        nome: data.nome,
+        slug: data.slug,
+        descricao: data.descricao || '',
+        preco: Number(data.preco),
+        duracao: data.duracao,
+        pessoas: data.pessoas,
+        rating: Number(data.rating),
+        tipo: data.tipo,
+        caracteristicas: data.caracteristicas || [],
+        inclusos: data.inclusos || [],
+        ativo: data.ativo,
+        popular: data.popular,
+        destaque: data.destaque,
+        parcelas_quantidade: data.parcelas_quantidade,
+        parcela_valor: data.parcela_valor ? Number(data.parcela_valor) : undefined,
+        desconto_avista: data.desconto_avista ? Number(data.desconto_avista) : undefined,
+        vagas_disponiveis: data.vagas_disponiveis,
+        video_youtube: data.video_youtube,
+        tracking_code: data.tracking_code,
+        telefone_whatsapp: data.telefone_whatsapp,
+        endereco_completo: data.endereco_completo,
+        latitude: data.latitude,
+        longitude: data.longitude,
+        imagens: (data.pacote_imagens || [])
+          .sort((a: { ordem: number; principal: boolean }, b: { ordem: number; principal: boolean }) => {
+            if (a.principal && !b.principal) return -1;
+            if (!a.principal && b.principal) return 1;
+            return a.ordem - b.ordem;
+          })
+          .map((img: { id: string; url: string; alt_text?: string; principal: boolean; ordem: number }) => ({
+            id: img.id,
+            url: img.url,
+            alt_text: img.alt_text,
+            principal: img.principal,
+            ordem: img.ordem,
+          })),
+      };
+    },
     {
       enabled: !!slug,
       staleTime: 0,
@@ -639,20 +606,16 @@ export const usePacoteBySlug = (slug: string | undefined) => {
 export const useAllAnuncios = () => {
   return useQuery(
     ['anuncios', 'all'],
-    () => cachedQuery<Anuncio[]>(
-      'anuncios_all',
-      TTL.SEMI_DYNAMIC,
-      async () => {
-        const { data, error } = await supabase
-          .from('anuncios')
-          .select('*')
-          .eq('ativo', true)
-          .order('ordem', { ascending: true });
+    async () => {
+      const { data, error } = await supabase
+        .from('anuncios')
+        .select('*')
+        .eq('ativo', true)
+        .order('ordem', { ascending: true });
 
-        if (error) throw error;
-        return data || [];
-      }
-    ),
+      if (error) throw error;
+      return data || [];
+    },
     {
       staleTime: 0,
       cacheTime: 5 * 60 * 1000,
@@ -687,25 +650,21 @@ export const useAnuncios = (posicao: string) => {
 export const useBlogPosts = (limit?: number) => {
   return useQuery(
     ['blog-posts', limit || 'all'],
-    () => cachedQuery<BlogPost[]>(
-      `blog_posts_${limit || 'all'}`,
-      TTL.LISTS,
-      async () => {
-        let query = supabase
-          .from('blog_posts')
-          .select('*')
-          .eq('publicado', true)
-          .order('data_publicacao', { ascending: false });
+    async () => {
+      let query = supabase
+        .from('blog_posts')
+        .select('*')
+        .eq('publicado', true)
+        .order('data_publicacao', { ascending: false });
 
-        if (limit) {
-          query = query.limit(limit);
-        }
-
-        const { data, error } = await query;
-        if (error) throw error;
-        return data || [];
+      if (limit) {
+        query = query.limit(limit);
       }
-    ),
+
+      const { data, error } = await query;
+      if (error) throw error;
+      return data || [];
+    },
     {
       staleTime: 0,
       cacheTime: 5 * 60 * 1000,
@@ -720,21 +679,17 @@ export const useBlogPosts = (limit?: number) => {
 export const useBlogPostBySlug = (slug: string | undefined) => {
   return useQuery(
     ['blog-post', slug],
-    () => cachedQuery<BlogPost | null>(
-      `blog_post_${slug}`,
-      TTL.LISTS,
-      async () => {
-        const { data, error } = await supabase
-          .from('blog_posts')
-          .select('*')
-          .eq('slug', slug)
-          .eq('publicado', true)
-          .maybeSingle();
+    async () => {
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .select('*')
+        .eq('slug', slug)
+        .eq('publicado', true)
+        .maybeSingle();
 
-        if (error) throw error;
-        return data;
-      }
-    ),
+      if (error) throw error;
+      return data;
+    },
     {
       enabled: !!slug,
       staleTime: 0,
@@ -752,29 +707,25 @@ export const useBlogPostBySlug = (slug: string | undefined) => {
 export const useDepoimentos = () => {
   return useQuery(
     ['depoimentos'],
-    () => cachedQuery<Depoimento[]>(
-      'depoimentos_active',
-      TTL.LISTS,
-      async () => {
-        const { data, error } = await supabase
-          .from('depoimentos')
-          .select('id, nome, cargo, foto_url, depoimento, rating, ativo, ordem')
-          .eq('ativo', true)
-          .order('ordem', { ascending: true });
+    async () => {
+      const { data, error } = await supabase
+        .from('depoimentos')
+        .select('id, nome, cargo, foto_url, depoimento, rating, ativo, ordem')
+        .eq('ativo', true)
+        .order('ordem', { ascending: true });
 
-        if (error) throw error;
-        return (data || []).map(d => ({
-          id: d.id,
-          nome: d.nome,
-          cargo: d.cargo,
-          foto_url: d.foto_url,
-          depoimento: d.depoimento,
-          rating: d.rating,
-          ativo: d.ativo,
-          ordem: d.ordem,
-        }));
-      }
-    ),
+      if (error) throw error;
+      return (data || []).map(d => ({
+        id: d.id,
+        nome: d.nome,
+        cargo: d.cargo,
+        foto_url: d.foto_url,
+        depoimento: d.depoimento,
+        rating: d.rating,
+        ativo: d.ativo,
+        ordem: d.ordem,
+      }));
+    },
     {
       staleTime: 0,
       cacheTime: 5 * 60 * 1000,
@@ -793,29 +744,25 @@ export const useFAQs = (pacoteId?: string, ranchoId?: string) => {
 
   return useQuery(
     ['faqs', key],
-    () => cachedQuery<FAQ[]>(
-      `faqs_${key}`,
-      TTL.STATIC,
-      async () => {
-        let query = supabase
-          .from('faqs')
-          .select('*')
-          .eq('ativo', true)
-          .order('ordem', { ascending: true });
+    async () => {
+      let query = supabase
+        .from('faqs')
+        .select('*')
+        .eq('ativo', true)
+        .order('ordem', { ascending: true });
 
-        if (pacoteId) {
-          query = query.eq('pacote_id', pacoteId);
-        } else if (ranchoId) {
-          query = query.eq('rancho_id', ranchoId);
-        } else {
-          query = query.is('pacote_id', null).is('rancho_id', null);
-        }
-
-        const { data, error } = await query;
-        if (error) throw error;
-        return data || [];
+      if (pacoteId) {
+        query = query.eq('pacote_id', pacoteId);
+      } else if (ranchoId) {
+        query = query.eq('rancho_id', ranchoId);
+      } else {
+        query = query.is('pacote_id', null).is('rancho_id', null);
       }
-    ),
+
+      const { data, error } = await query;
+      if (error) throw error;
+      return data || [];
+    },
     {
       staleTime: 0,
       cacheTime: 5 * 60 * 1000,
@@ -834,10 +781,8 @@ export const useSiteSettings = (isAdmin = false) => {
     ['site-settings', isAdmin],
     () => cachedQuery<SiteSettings | null>(
       isAdmin ? 'site_settings_admin' : 'site_settings',
-      isAdmin ? 1000 : TTL.SETTINGS, // TTL muito curto para admin para garantir dados frescos
+      isAdmin ? 0 : TTL.SETTINGS,
       async () => {
-        // Para admin, usamos a tabela base para garantir dados atualizados e acesso total
-        // Para público, usamos a view pública que protege dados sensíveis
         if (isAdmin) {
           const { data, error } = await supabase
             .from('site_settings')
@@ -857,10 +802,10 @@ export const useSiteSettings = (isAdmin = false) => {
 
     ),
     {
-      staleTime: isAdmin ? 0 : TTL.SETTINGS,
-      cacheTime: isAdmin ? 0 : TTL.STATIC,
-      refetchOnWindowFocus: isAdmin,
-      refetchOnReconnect: isAdmin,
+      staleTime: 0,
+      cacheTime: 5 * 60 * 1000,
+      refetchOnWindowFocus: true,
+      refetchOnReconnect: true,
       refetchOnMount: true,
       retry: 1,
     }
@@ -868,7 +813,7 @@ export const useSiteSettings = (isAdmin = false) => {
 };
 
 
-// ============= ADMIN STATISTICS (1 hora de cache) =============
+// ============= ADMIN STATISTICS =============
 
 export interface FAQEstatistica {
   id: string;
@@ -898,17 +843,13 @@ export interface RanchoEstatistica {
 export const useFAQEstatisticas = () => {
   return useQuery(
     ['faq-estatisticas'],
-    () => cachedQuery<FAQEstatistica[]>(
-      'faq_estatisticas',
-      TTL.ADMIN_STATS,
-      async () => {
-        const { data, error } = await supabase
-          .from('faq_estatisticas')
-          .select('*');
-        if (error) throw error;
-        return data || [];
-      }
-    ),
+    async () => {
+      const { data, error } = await supabase
+        .from('faq_estatisticas')
+        .select('*');
+      if (error) throw error;
+      return data || [];
+    },
     {
       staleTime: 0,
       cacheTime: 5 * 60 * 1000,
@@ -923,17 +864,13 @@ export const useFAQEstatisticas = () => {
 export const useRanchoEstatisticas = () => {
   return useQuery(
     ['rancho-estatisticas'],
-    () => cachedQuery<RanchoEstatistica[]>(
-      'rancho_estatisticas',
-      TTL.ADMIN_STATS,
-      async () => {
-        const { data, error } = await supabase
-          .from('rancho_estatisticas')
-          .select('*');
-        if (error) throw error;
-        return data || [];
-      }
-    ),
+    async () => {
+      const { data, error } = await supabase
+        .from('rancho_estatisticas')
+        .select('*');
+      if (error) throw error;
+      return data || [];
+    },
     {
       staleTime: 0,
       cacheTime: 5 * 60 * 1000,
@@ -945,7 +882,7 @@ export const useRanchoEstatisticas = () => {
   );
 };
 
-// ============= ADMIN HOOKS (1-HOUR CACHE) =============
+// ============= ADMIN HOOKS =============
 
 export interface AdminDepoimento {
   id: string;
@@ -962,18 +899,14 @@ export interface AdminDepoimento {
 export const useAdminDepoimentos = () => {
   return useQuery(
     ['admin-depoimentos'],
-    () => cachedQuery<AdminDepoimento[]>(
-      'admin_depoimentos',
-      TTL.ADMIN_STATS,
-      async () => {
-        const { data, error } = await supabase
-          .from('depoimentos')
-          .select('*')
-          .order('ordem', { ascending: true });
-        if (error) throw error;
-        return data || [];
-      }
-    ),
+    async () => {
+      const { data, error } = await supabase
+        .from('depoimentos')
+        .select('*')
+        .order('ordem', { ascending: true });
+      if (error) throw error;
+      return data || [];
+    },
     {
       staleTime: 0,
       cacheTime: 5 * 60 * 1000,
@@ -992,18 +925,14 @@ export type AdminBlogPost = Tables<'blog_posts'>;
 export const useAdminBlogPosts = () => {
   return useQuery(
     ['admin-blog-posts-cached'],
-    () => cachedQuery<AdminBlogPost[]>(
-      'admin_blog_posts',
-      TTL.ADMIN_STATS,
-      async () => {
-        const { data, error } = await supabase
-          .from('blog_posts')
-          .select('*')
-          .order('created_at', { ascending: false });
-        if (error) throw error;
-        return data || [];
-      }
-    ),
+    async () => {
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    },
     {
       staleTime: 0,
       cacheTime: 5 * 60 * 1000,
@@ -1043,18 +972,14 @@ export interface AdminPacote {
 export const useAdminPacotes = () => {
   return useQuery(
     ['admin-pacotes-cached'],
-    () => cachedQuery<AdminPacote[]>(
-      'admin_pacotes',
-      TTL.ADMIN_STATS,
-      async () => {
-        const { data, error } = await supabase
-          .from('pacotes')
-          .select('*, pacote_imagens(*)')
-          .order('nome', { ascending: true });
-        if (error) throw error;
-        return data || [];
-      }
-    ),
+    async () => {
+      const { data, error } = await supabase
+        .from('pacotes')
+        .select('*, pacote_imagens(*)')
+        .order('nome', { ascending: true });
+      if (error) throw error;
+      return data || [];
+    },
     {
       staleTime: 0,
       cacheTime: 5 * 60 * 1000,
@@ -1084,32 +1009,28 @@ export interface DashboardStats {
 export const useDashboardStats = () => {
   return useQuery(
     ['dashboard-stats'],
-    () => cachedQuery<DashboardStats>(
-      'dashboard_stats',
-      TTL.ADMIN_STATS,
-      async () => {
-        const [ranchos, pacotes, blog, depoimentos, vendas] = await Promise.all([
-          supabase.from('ranchos').select('disponivel'),
-          supabase.from('pacotes').select('ativo'),
-          supabase.from('blog_posts').select('publicado'),
-          supabase.from('depoimentos').select('ativo'),
-          supabase.from('propriedades_venda').select('ativo'),
-        ]);
+    async () => {
+      const [ranchos, pacotes, blog, depoimentos, vendas] = await Promise.all([
+        supabase.from('ranchos').select('disponivel'),
+        supabase.from('pacotes').select('ativo'),
+        supabase.from('blog_posts').select('publicado'),
+        supabase.from('depoimentos').select('ativo'),
+        supabase.from('propriedades_venda').select('ativo'),
+      ]);
 
-        return {
-          totalRanchos: ranchos.data?.length || 0,
-          ranchosDisponiveis: ranchos.data?.filter(r => r.disponivel).length || 0,
-          totalPacotes: pacotes.data?.length || 0,
-          pacotesAtivos: pacotes.data?.filter(p => p.ativo).length || 0,
-          totalBlogPosts: blog.data?.length || 0,
-          postsPublicados: blog.data?.filter(b => b.publicado).length || 0,
-          totalDepoimentos: depoimentos.data?.length || 0,
-          depoimentosAtivos: depoimentos.data?.filter(d => d.ativo).length || 0,
-          totalVendas: vendas.data?.length || 0,
-          vendasAtivas: vendas.data?.filter(v => v.ativo).length || 0,
-        };
-      }
-    ),
+      return {
+        totalRanchos: ranchos.data?.length || 0,
+        ranchosDisponiveis: ranchos.data?.filter(r => r.disponivel).length || 0,
+        totalPacotes: pacotes.data?.length || 0,
+        pacotesAtivos: pacotes.data?.filter(p => p.ativo).length || 0,
+        totalBlogPosts: blog.data?.length || 0,
+        postsPublicados: blog.data?.filter(b => b.publicado).length || 0,
+        totalDepoimentos: depoimentos.data?.length || 0,
+        depoimentosAtivos: depoimentos.data?.filter(d => d.ativo).length || 0,
+        totalVendas: vendas.data?.length || 0,
+        vendasAtivas: vendas.data?.filter(v => v.ativo).length || 0,
+      };
+    },
     {
       staleTime: 0,
       cacheTime: 5 * 60 * 1000,

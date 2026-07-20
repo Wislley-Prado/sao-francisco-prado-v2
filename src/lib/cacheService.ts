@@ -1,22 +1,26 @@
 /**
  * CacheService - Sistema de cache persistente com localStorage
- * Reduz Supabase Cached Egress em 60-70%
+ * USADO APENAS PARA: configurações, tema, preferências, menus e imagens estáticas.
+ * NUNCA PARA DADOS DO BANCO (Ranchos, Blog, Pacotes, Agenda, Reservas, Usuários, Financeiro, etc.).
  */
 
 // TTL configs em milliseconds (0 = sempre tempo real do banco de dados)
 export const TTL = {
-  // Dados estáticos - 24 horas
+  // Dados estáticos, imagens e assets - 24 horas
   STATIC: 24 * 60 * 60 * 1000,
-  // Dados semi-dinâmicos - 0 segundos (tempo real)
-  SEMI_DYNAMIC: 0,
-  // Dados dinâmicos - 0 segundos (tempo real)
-  DYNAMIC: 0,
+  // Tema do sistema - 24 horas
+  THEME: 24 * 60 * 60 * 1000,
+  // Preferências do usuário - 24 horas
+  PREFERENCES: 24 * 60 * 60 * 1000,
+  // Menus e navegação - 24 horas
+  MENUS: 24 * 60 * 60 * 1000,
   // Configurações do site - 0 segundos (tempo real)
   SETTINGS: 0,
-  // Listas principais - 0 segundos (tempo real, garante que reservas e edições reflitam na hora)
+  // Dados do banco: SEMPRE 0 segundos (nunca cacheados em localStorage/cacheService)
+  SEMI_DYNAMIC: 0,
+  DYNAMIC: 0,
   LISTS: 0,
-  // Estatísticas admin - 5 minutos
-  ADMIN_STATS: 5 * 60 * 1000,
+  ADMIN_STATS: 0,
 } as const;
 
 interface CacheEntry<T> {
@@ -32,16 +36,17 @@ interface CacheStats {
   supabaseCalls: number;
 }
 
-// Storage key prefix (versão 5 com invalidação total de caches anteriores)
-const CACHE_VERSION = 'v5';
+// Storage key prefix (versão 6 com invalidação total de caches anteriores de dados do banco)
+const CACHE_VERSION = 'v6';
 const CACHE_PREFIX = `prado_cache_${CACHE_VERSION}_`;
 const STATS_KEY = 'prado_cache_stats';
 
-// Limpar caches antigos ou de versões anteriores do localStorage no carregamento do módulo
+// Limpar qualquer cache no localStorage no carregamento do módulo
 if (typeof window !== 'undefined' && window.localStorage) {
   try {
     for (let i = localStorage.length - 1; i >= 0; i--) {
       const key = localStorage.key(i);
+      // Remove todos os caches antigos do prado_cache (inclusive versões antigas com dados do banco)
       if (key && key.startsWith('prado_cache_') && !key.startsWith(CACHE_PREFIX) && key !== STATS_KEY) {
         localStorage.removeItem(key);
       }
@@ -88,6 +93,41 @@ const saveStats = (): void => {
 stats = loadStats();
 
 /**
+ * Padrões de chaves de banco de dados que NUNCA devem ser salvas em cacheService
+ */
+const DB_DATA_PATTERNS = [
+  'ranchos',
+  'rancho',
+  'blog',
+  'pacotes',
+  'pacote',
+  'agenda',
+  'reservas',
+  'reserva',
+  'usuarios',
+  'usuario',
+  'users',
+  'user',
+  'financeiro',
+  'vendas',
+  'propriedades',
+  'anuncios',
+  'anuncio',
+  'depoimentos',
+  'depoimento',
+  'faqs',
+  'faq',
+  'stats',
+  'dashboard',
+  'analytics'
+];
+
+const isDatabaseDataKey = (key: string): boolean => {
+  const lowerKey = key.toLowerCase();
+  return DB_DATA_PATTERNS.some((pattern) => lowerKey.includes(pattern));
+};
+
+/**
  * Log cache event with emoji indicators
  */
 export const logCacheEvent = (
@@ -103,8 +143,13 @@ export const logCacheEvent = (
 
 /**
  * Get item from cache (memory first, then localStorage)
+ * Retorna null para qualquer chave de dados do banco de dados.
  */
 export const getFromCache = <T>(key: string): T | null => {
+  if (isDatabaseDataKey(key)) {
+    return null;
+  }
+
   const fullKey = CACHE_PREFIX + key;
   
   // Try memory cache first (faster)
@@ -155,8 +200,13 @@ export const getFromCache = <T>(key: string): T | null => {
 
 /**
  * Set item in cache (both memory and localStorage)
+ * Bloqueado para dados do banco de dados.
  */
 export const setInCache = <T>(key: string, data: T, ttl: number): void => {
+  if (isDatabaseDataKey(key) || ttl <= 0) {
+    return;
+  }
+
   const fullKey = CACHE_PREFIX + key;
   const entry: CacheEntry<T> = {
     data,
@@ -172,7 +222,7 @@ export const setInCache = <T>(key: string, data: T, ttl: number): void => {
   try {
     localStorage.setItem(fullKey, JSON.stringify(entry));
     logCacheEvent('SET', key, `TTL: ${Math.round(ttl / 1000 / 60)}min`);
-  } catch (e) {
+  } catch {
     // localStorage might be full - clear old entries
     clearOldCacheEntries();
     try {
@@ -234,7 +284,7 @@ export const invalidateCacheByPrefix = (prefix: string): void => {
 };
 
 /**
- * Invalidate cache by tag/entity (e.g. 'ranchos', 'pacotes', 'auth', 'user_role')
+ * Invalidate cache by tag/entity (e.g. 'auth', 'user_role', 'theme', 'settings')
  */
 export const invalidateByTag = (tag: string): void => {
   invalidateCacheByPrefix(tag);
@@ -314,16 +364,17 @@ export const clearAllCache = (): void => {
 };
 
 /**
- * Wrapper function for cached Supabase queries
- * Use this in useQuery to automatically handle caching
+ * Wrapper function for cached queries (APENAS PARA CONFIGURAÇÕES, TEMAS, MENUS E IMAGENS ESTÁTICAS)
+ * Se a chave pertencer a dados do banco de dados (Ranchos, Blog, Pacotes, Agenda, Reservas, etc.),
+ * a busca é feita diretamente no Supabase sem armazenamento no cacheService.
  */
 export const cachedQuery = async <T>(
   key: string,
   ttl: number,
   fetchFn: () => Promise<T>
 ): Promise<T> => {
-  // If TTL is 0 or less, bypass cache for real-time fresh data
-  if (ttl <= 0) {
+  // Dados do banco de dados ou TTL <= 0: nunca guardar em cacheService, buscar direto do banco
+  if (ttl <= 0 || isDatabaseDataKey(key)) {
     recordSupabaseCall(key);
     return await fetchFn();
   }
@@ -352,5 +403,6 @@ if (typeof window !== 'undefined') {
     clear: clearAllCache,
     invalidate: invalidateCache,
   };
-  if (import.meta.env.DEV) console.log('[Cache 🚀] Cache system initialized. Use window.pradoCache for debugging.');
+  if (import.meta.env.DEV) console.log('[Cache 🚀] Cache system initialized. Direct DB queries bypass custom cache.');
 }
+

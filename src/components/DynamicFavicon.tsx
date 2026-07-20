@@ -33,7 +33,7 @@ export const DynamicFavicon = () => {
         .single();
       return data;
     },
-    staleTime: 30 * 60 * 1000,
+    staleTime: 0,
   });
 
   useEffect(() => {
