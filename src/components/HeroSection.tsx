@@ -44,7 +44,7 @@ const HeroSection = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-          <div className="text-white space-y-6 sm:space-y-8 animate-fade-in order-2 lg:order-1">
+          <div className="text-white space-y-6 sm:space-y-8 order-2 lg:order-1">
             <div className="space-y-4">
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
                 {t('hero.titlePart1', 'Sua Experiência de Pesca no ')}
@@ -59,7 +59,7 @@ const HeroSection = () => {
 
           </div>
 
-          <div className="animate-fade-in order-1 lg:order-2">
+          <div className="order-1 lg:order-2">
             <Card id="live-video-card" className="bg-white bg-opacity-10 backdrop-blur-md border-white border-opacity-20">
               <CardContent className="p-4 sm:p-6">
                 <div className="space-y-4">
