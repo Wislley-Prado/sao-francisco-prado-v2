@@ -34,27 +34,22 @@ RewriteRule ^ index.html [L]
   # Manter conexao HTTP ativa para diminuir latencia do documento
   Header set Connection keep-alive
 
-  # HTML e manifest: Cache de 1 hora com revalidação obrigatoria (Nota 100 em Cache Lifetime na Hostinger)
+  # HTML e manifest: Cache de 2 minutos (120s) com revalidação obrigatoria
   <FilesMatch "^(index\.html|sw\.js|registerSW\.js|manifest\.json|bot\.php)$">
-    Header set Cache-Control "public, max-age=3600, must-revalidate"
+    Header set Cache-Control "public, max-age=120, must-revalidate"
   </FilesMatch>
   
-  # Assets compilados em JS/CSS possuem hash no nome: Cache de 1 ano (31536000 segundos) imutavel
-  <FilesMatch "\.(js|css|woff|woff2|ttf|eot)$">
-    Header set Cache-Control "public, max-age=31536000, immutable"
-  </FilesMatch>
-
-  # Imagens e favicon com cache de 1 ano
-  <FilesMatch "\.(png|jpg|jpeg|gif|ico|svg|webp|avif)$">
+  # Assets compilados em JS/CSS, imagens e fontes: Cache de 1 ano (31536000s) imutavel
+  <FilesMatch "\.(js|css|png|jpg|jpeg|gif|ico|svg|webp|avif|woff|woff2|ttf|eot|json)$">
     Header set Cache-Control "public, max-age=31536000, immutable"
   </FilesMatch>
 </IfModule>
 
 <IfModule mod_expires.c>
   ExpiresActive On
-  ExpiresDefault "access plus 1 month"
-  ExpiresByType text/html "access plus 1 hour"
-  ExpiresByType application/json "access plus 1 hour"
+  ExpiresDefault "access plus 1 year"
+  ExpiresByType text/html "access plus 2 minutes"
+  ExpiresByType application/json "access plus 1 year"
   ExpiresByType image/x-icon "access plus 1 year"
   ExpiresByType image/gif "access plus 1 year"
   ExpiresByType image/png "access plus 1 year"
