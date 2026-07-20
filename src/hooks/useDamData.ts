@@ -376,10 +376,63 @@ const processCemigRawData = (raw: any): DamData => {
   }
 };
 
-// Buscar dados com prioridade total na tabela estruturada dam_history do Supabase
+// Busca dados em tempo real diretamente da API pública da CEMIG
+const fetchCemigDirectly = async (): Promise<DamData | null> => {
+  try {
+    const timestamp = Date.now();
+    const formData = new URLSearchParams();
+    formData.append('action', 'buscar_dados_usina');
+    formData.append('usina_id', 'UHE_TRES_MARIAS');
+    formData.append('_t', timestamp.toString());
+
+    const res = await fetch(`https://www.cemig.com.br/wp-json/api-busca-usinas/v1/send-form?_t=${timestamp}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+      },
+      body: formData.toString(),
+    });
+
+    if (res.ok) {
+      const raw = await res.json();
+      if (raw && (raw.VAL_NIVEL || raw.VAL_VOLUTIL || raw.VAL_VAZAOAFLU || raw.VAL_VAZAODEFLU)) {
+        const processed = processCemigRawData(raw);
+        if (processed && processed.nivel_atual) {
+          // Gravar leitura atual na tabela dam_history para manter o banco atualizado
+          try {
+            const todayStr = new Date().toISOString().split('T')[0];
+            await supabase.from('dam_history').upsert({
+              data_leitura: todayStr,
+              nivel_cota: Number(processed.nivel_atual),
+              volume_percentual: Number(processed.volume_util_percentual),
+              afluencia: Number(processed.afluencia),
+              defluencia: Number(processed.defluencia),
+              updated_at: new Date().toISOString(),
+            }, { onConflict: 'data_leitura' });
+          } catch {
+            // Ignorar erro silenciosamente se gravação falhar
+          }
+          return processed;
+        }
+      }
+    }
+  } catch (err) {
+    if (import.meta.env.DEV) console.warn('⚠️ [CEMIG DIRECT] Não foi possível buscar diretamente da CEMIG:', err);
+  }
+  return null;
+};
+
+// Buscar dados da represa (CEMIG em tempo real -> Supabase DB -> Fallback)
 const fetchDamDataFromDB = async (): Promise<DamData> => {
   try {
-    // 1. Prioridade 1: Buscar diretamente da tabela pontual dam_history do Supabase
+    // 1. Prioridade 1: Tentar busca em tempo real diretamente da API da CEMIG
+    const directData = await fetchCemigDirectly();
+    if (directData) {
+      if (import.meta.env.DEV) console.log('✅ [FETCH] Dados lidos com sucesso em tempo real direto da API da CEMIG!');
+      return directData;
+    }
+
+    // 2. Prioridade 2: Buscar da tabela pontual dam_history do Supabase
     try {
       const { data: historyRows, error: historyErr } = await supabase
         .from('dam_history')
@@ -395,7 +448,7 @@ const fetchDamDataFromDB = async (): Promise<DamData> => {
       if (import.meta.env.DEV) console.warn('⚠️ [FETCH] Tabela dam_history ainda não disponível:', err);
     }
 
-    // 2. Prioridade 2: Verificar se existe registro em dam_data (row 1)
+    // 3. Prioridade 3: Verificar se existe registro em dam_data (row 1)
     try {
       const { data, error } = await supabase
         .from('dam_data')
@@ -417,7 +470,7 @@ const fetchDamDataFromDB = async (): Promise<DamData> => {
       if (import.meta.env.DEV) console.warn('⚠️ [FETCH] Erro ao ler dados do Supabase:', err);
     }
 
-    // 3. Prioridade 3: Invocar Edge Function no Supabase (preenche dam_history e faz limpeza automática de 15 dias)
+    // 4. Prioridade 4: Invocar Edge Function no Supabase (se disponível)
     try {
       const { data: edgeData, error: edgeErr } = await supabase.functions.invoke('dam-data-proxy');
       if (!edgeErr && edgeData?.raw_cemig) {
@@ -428,7 +481,7 @@ const fetchDamDataFromDB = async (): Promise<DamData> => {
       if (import.meta.env.DEV) console.warn('⚠️ [FETCH] Erro na Edge Function:', edgeErr);
     }
 
-    // 4. Fallback final de segurança
+    // 5. Fallback final de segurança
     return ensureCompleteHistory(DEFAULT_FALLBACK_DAM_DATA);
   } catch (globalErr) {
     if (import.meta.env.DEV) console.error('❌ [FETCH] Erro global na busca de dados da represa:', globalErr);
