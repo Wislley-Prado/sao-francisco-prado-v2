@@ -64,7 +64,7 @@
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
 
-    <!-- Script de desregistro automatico de Service Worker e limpeza de CacheStorage -->
+    <!-- Script de desregistro automatico de Service Worker antigo se existir -->
     <script>
       (function() {
         if ('serviceWorker' in navigator) {
@@ -74,52 +74,6 @@
             }
           });
         }
-        setTimeout(function() {
-          try { sessionStorage.removeItem('app_auto_reloaded_on_error'); } catch(e){}
-        }, 5000);
-        
-        window.addEventListener('error', function(e) {
-          var currentHasReloaded = sessionStorage.getItem('app_auto_reloaded_on_error');
-          var target = e.target || e.srcElement;
-          var isScriptError = target && (target.tagName === 'SCRIPT' || target.tagName === 'LINK');
-          var isSyntaxError = e.message && (e.message.indexOf('Unexpected token') > -1 || e.message.indexOf('Failed to fetch dynamically imported module') > -1 || e.message.indexOf('importing a module script failed') > -1);
-          
-          if ((isScriptError || isSyntaxError) && !currentHasReloaded) {
-            sessionStorage.setItem('app_auto_reloaded_on_error', 'true');
-            if ('serviceWorker' in navigator) {
-              navigator.serviceWorker.getRegistrations().then(function(registrations) {
-                registrations.forEach(function(r) { r.unregister(); });
-              });
-            }
-            if ('caches' in window) {
-              caches.keys().then(function(names) {
-                names.forEach(function(name) { caches.delete(name); });
-              });
-            }
-            setTimeout(function() {
-              window.location.reload(true);
-            }, 100);
-          }
-        }, true);
-
-        window.addEventListener('DOMContentLoaded', function() {
-          setTimeout(function() {
-            var rootNode = document.getElementById('root');
-            if (rootNode && rootNode.children.length === 0) {
-              console.warn('Aplicação falhou ao renderizar. Exibindo interface de emergência para reset de cache.');
-              rootNode.innerHTML = `
-                <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#f9fafb;font-family:system-ui,-apple-system,sans-serif;padding:20px;text-align:center;">
-                  <div style="max-width:400px;background:#fff;padding:32px;border-radius:16px;box-shadow:0 10px 25px -5px rgba(0,0,0,0.1);border:1px solid #e5e7eb;">
-                    <div style="width:48px;height:48px;background:#fef3c7;color:#d97706;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px auto;font-size:24px;font-weight:bold;">!</div>
-                    <h2 style="font-size:18px;font-weight:700;color:#111827;margin:0 0 8px 0;">Atualização Necessária</h2>
-                    <p style="font-size:14px;color:#4b5563;margin:0 0 20px 0;line-height:1.5;">Uma nova versão do site está disponível. Clique abaixo para atualizar e limpar o cache desatualizado do seu navegador.</p>
-                    <button onclick="localStorage.clear();sessionStorage.clear();if('caches' in window){caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k);});});}if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister();});});}setTimeout(function(){window.location.reload(true);},200);" style="width:100%;background:#0284c7;color:#fff;border:none;padding:12px 16px;border-radius:8px;font-weight:600;font-size:14px;cursor:pointer;">Limpar Cache e Atualizar</button>
-                  </div>
-                </div>
-              `;
-            }
-          }, 5000);
-        });
       })();
     </script>
   </body>

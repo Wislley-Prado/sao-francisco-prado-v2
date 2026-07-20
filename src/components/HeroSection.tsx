@@ -47,12 +47,12 @@ const HeroSection = () => {
           <div className="text-white space-y-6 sm:space-y-8 animate-fade-in order-2 lg:order-1">
             <div className="space-y-4">
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
-                {t('hero.titlePart1')}
-                <span className="text-sand-beige">{t('hero.titlePart2')}</span>
-                {t('hero.titlePart3')}
+                {t('hero.titlePart1', 'Sua Experiência de Pesca no ')}
+                <span className="text-sand-beige">{t('hero.titlePart2', 'Rio São Francisco')}</span>
+                {t('hero.titlePart3', ' Começa Aqui')}
               </h1>
               <p className="text-lg sm:text-xl text-blue-100 leading-relaxed">
-                {t('hero.subtitle')}
+                {t('hero.subtitle', 'Ranchos exclusivos, pacotes de pesca completos e informações em tempo real da Represa de Três Marias/MG.')}
               </p>
             </div>
 
