@@ -34,8 +34,8 @@ RewriteRule ^ index.html [L]
   # Manter conexao HTTP ativa para diminuir latencia do documento
   Header set Connection keep-alive
 
-  # NUNCA fazer cache do index.html, sw.js, manifest.json para que navegacoes e deploys funcionem sem precisar limpar cache
-  <FilesMatch "^(index\.html|sw\.js|registerSW\.js|manifest\.json|bot\.php)$">
+  # NUNCA fazer cache de documentos HTML (index.html, *.html, sw.js, manifest.json, bot.php)
+  <FilesMatch "\.(html|htm|php)$|^(index\.html|sw\.js|registerSW\.js|manifest\.json|bot\.php)$">
     Header set Cache-Control "no-cache, no-store, must-revalidate, max-age=0"
     Header set Pragma "no-cache"
     Header set Expires "0"
