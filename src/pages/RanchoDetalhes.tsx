@@ -17,7 +17,7 @@ import {
   Wifi, Car, Waves, Utensils, Wind, Tv,
   ArrowLeft, MessageCircle, Loader2, CheckCircle,
   Calendar, Play, CalendarDays, Navigation, Compass, ExternalLink, Copy,
-  ArrowRight
+  ArrowRight, HelpCircle
 } from 'lucide-react';
 import { ReviewsList } from "@/components/reviews/ReviewsList";
 import { ReviewForm } from "@/components/reviews/ReviewForm";
@@ -599,6 +599,28 @@ const RanchoDetalhes = () => {
               </TabsContent>
             </Tabs>
           </div>
+
+          {/* Seção de Perguntas Frequentes (FAQs) */}
+          {rancho && (
+            <div className="mt-12">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-3 rounded-xl bg-gradient-to-br from-rio-blue to-blue-700 shadow-lg shadow-rio-blue/20">
+                  <HelpCircle className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-2xl md:text-3xl font-bold text-foreground">{t('labels.faq')}</h2>
+                  <p className="text-sm text-muted-foreground">
+                    {isEn ? "Frequently asked questions about this ranch" : "Tire suas dúvidas mais comuns sobre este rancho"}
+                  </p>
+                </div>
+              </div>
+              <Card className="border border-gray-100 shadow-md">
+                <CardContent className="p-6">
+                  <RanchoFAQs ranchoId={rancho.id} />
+                </CardContent>
+              </Card>
+            </div>
+          )}
         </div>
       </main>
 
@@ -709,20 +731,6 @@ const RanchoDetalhes = () => {
               url={pageUrl}
               descricao={isEn ? `Ranch in ${localizacao} for up to ${rancho.capacidade} guests` : `Rancho em ${localizacao} para ${rancho.capacidade} pessoas`}
             />
-          </div>
-        </section>
-      )}
-
-      {/* Seção de FAQs */}
-      {rancho && (
-        <section className="py-16 bg-muted/50">
-          <div className="container mx-auto px-4">
-            <Card>
-              <CardContent className="p-6">
-                <h2 className="text-2xl font-bold mb-6">{t('labels.faq')}</h2>
-                <RanchoFAQs ranchoId={rancho.id} />
-              </CardContent>
-            </Card>
           </div>
         </section>
       )}
