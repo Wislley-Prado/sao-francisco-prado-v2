@@ -40,7 +40,10 @@ const DamHistoryCharts: React.FC<DamHistoryChartsProps> = ({ chartData }) => {
               <YAxis fontSize={10} stroke="#6b7280" domain={['dataMin - 2', 'dataMax + 2']} tickFormatter={(value) => `${value}%`} />
               <Tooltip 
                 contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', fontSize: '12px' }}
-                formatter={(value: number) => [`${value.toFixed(1)}%`, 'Volume Útil']}
+                formatter={(value: any) => [
+                  `${typeof value === 'number' && !isNaN(value) ? value.toFixed(1) : (parseFloat(value) || 0).toFixed(1)}%`, 
+                  'Volume Útil'
+                ]}
                 labelFormatter={(label) => `Data: ${label}`}
               />
               <Area type="monotone" dataKey="nivel" stroke="#3b82f6" fill="url(#nivelGradient)" strokeWidth={2} />
@@ -54,11 +57,21 @@ const DamHistoryCharts: React.FC<DamHistoryChartsProps> = ({ chartData }) => {
       <div className="grid grid-cols-2 gap-2 sm:gap-4 pt-4 border-t max-w-md mx-auto">
         <div className="text-center p-3 rounded-xl bg-blue-50/50 border border-blue-100">
           <p className="text-xs text-muted-foreground font-medium">Nível Mínimo no Período</p>
-          <p className="text-base sm:text-xl font-bold text-blue-600">{Math.min(...chartData.map(d => d.nivel)).toFixed(1)}%</p>
+          <p className="text-base sm:text-xl font-bold text-blue-600">
+            {(() => {
+              const valid = chartData.map(d => d.nivel).filter(v => typeof v === 'number' && !isNaN(v));
+              return valid.length > 0 ? Math.min(...valid).toFixed(1) : '0.0';
+            })()}%
+          </p>
         </div>
         <div className="text-center p-3 rounded-xl bg-blue-50/50 border border-blue-100">
           <p className="text-xs text-muted-foreground font-medium">Nível Máximo no Período</p>
-          <p className="text-base sm:text-xl font-bold text-blue-600">{Math.max(...chartData.map(d => d.nivel)).toFixed(1)}%</p>
+          <p className="text-base sm:text-xl font-bold text-blue-600">
+            {(() => {
+              const valid = chartData.map(d => d.nivel).filter(v => typeof v === 'number' && !isNaN(v));
+              return valid.length > 0 ? Math.max(...valid).toFixed(1) : '0.0';
+            })()}%
+          </p>
         </div>
       </div>
     </>

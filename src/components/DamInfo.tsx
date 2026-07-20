@@ -11,6 +11,7 @@ import DamHeader from './dam/DamHeader';
 import HistoryTable from './dam/HistoryTable';
 import DamDashboard from './dam/DamDashboard';
 import DamHistoryChart from './dam/DamHistoryChart';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 const DamInfo = () => {
   const { data: damDataRaw, isLoading, error, refetch, dataUpdatedAt } = useDamData();
@@ -36,16 +37,20 @@ const DamInfo = () => {
           refetch={handleRefetch}
         />
 
-        <DamDashboard
-          damData={damData}
-          isLoading={isLoading}
-          error={errorForComponents}
-          dataUpdatedAt={dataUpdatedAt}
-          renderCount={renderCount.current}
-          onRefresh={handleRefetch}
-        />
+        <ErrorBoundary>
+          <DamDashboard
+            damData={damData}
+            isLoading={isLoading}
+            error={errorForComponents}
+            dataUpdatedAt={dataUpdatedAt}
+            renderCount={renderCount.current}
+            onRefresh={handleRefetch}
+          />
+        </ErrorBoundary>
 
-        <DamHistoryChart damData={damData} />
+        <ErrorBoundary>
+          <DamHistoryChart damData={damData} />
+        </ErrorBoundary>
       </div>
     </section>
   );

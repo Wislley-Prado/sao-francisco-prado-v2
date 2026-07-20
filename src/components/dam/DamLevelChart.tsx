@@ -31,8 +31,8 @@ const DamLevelChart: React.FC<DamLevelChartProps> = ({ trendData, dataUpdatedAt,
             <YAxis fontSize={10} stroke="#6b7280" domain={['dataMin - 1', 'dataMax + 1']} />
             <Tooltip 
               contentStyle={{ backgroundColor: '#1f2937', border: 'none', borderRadius: '8px', color: 'white' }}
-              formatter={(value, name) => [
-                `${value}${name === 'nivel' ? '%' : ' m³/s'}`,
+              formatter={(value: any, name: any) => [
+                `${typeof value === 'number' && !isNaN(value) ? value : (parseFloat(value) || 0)}${name === 'nivel' ? '%' : ' m³/s'}`,
                 name === 'nivel' ? 'Nível' : name === 'afluencia' ? 'Afluência' : 'Defluência'
               ]}
             />

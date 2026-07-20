@@ -102,7 +102,7 @@ const StreamInfo = () => {
           <div className="flex justify-between items-center">
             <span className="text-xs sm:text-sm text-gray-600">Melhor Horário</span>
             <span className="font-medium text-sunset-orange text-sm sm:text-base">
-              {weatherData ? 
+              {weatherData && weatherData.current?.sunrise && !isNaN(weatherData.current.sunrise) ? 
                 `${new Date(weatherData.current.sunrise * 1000).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}-${new Date(weatherData.current.sunrise * 1000 + 2 * 3600000).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}` :
                 '05:00-07:00'
               }
