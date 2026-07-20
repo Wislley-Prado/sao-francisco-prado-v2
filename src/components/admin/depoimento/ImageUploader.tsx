@@ -33,7 +33,7 @@ export const ImageUploader = ({ value, onChange, onUploadStart, onUploadEnd }: I
 
       const { error: uploadError, data } = await supabase.storage
         .from("configuracoes")
-        .upload(filePath, file);
+        .upload(filePath, file, { cacheControl: "31536000", upsert: true });
 
       if (uploadError) throw uploadError;
 

@@ -94,7 +94,7 @@ export const BlogImageUploader = ({ value, onChange }: BlogImageUploaderProps) =
 
       const { error: uploadError } = await supabase.storage
         .from('blog')
-        .upload(filePath, compressedFile);
+        .upload(filePath, compressedFile, { cacheControl: '31536000', upsert: true });
 
       if (uploadError) throw uploadError;
 

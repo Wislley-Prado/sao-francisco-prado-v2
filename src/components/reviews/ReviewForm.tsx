@@ -111,7 +111,7 @@ export const ReviewForm = ({ ranchoId, onSuccess }: ReviewFormProps) => {
 
       const { error } = await supabase.storage
         .from("avaliacoes")
-        .upload(filePath, file);
+        .upload(filePath, file, { cacheControl: "31536000", upsert: true });
 
       if (error) {
         console.error("Erro ao fazer upload:", error);

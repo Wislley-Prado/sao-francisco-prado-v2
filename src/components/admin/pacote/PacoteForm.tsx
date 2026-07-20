@@ -260,7 +260,7 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
       const fileName = `${pacoteId}/${Date.now()}-${sanitizedName}`;
       const { error: uploadError } = await supabase.storage
         .from('pacotes')
-        .upload(fileName, image.file!);
+        .upload(fileName, image.file!, { cacheControl: '31536000', upsert: true });
       if (uploadError) throw uploadError;
 
       const { data: { publicUrl } } = supabase.storage

@@ -378,7 +378,7 @@ export const RanchoForm = ({ rancho, onSuccess }: RanchoFormProps) => {
 
         const { error: uploadError } = await supabase.storage
           .from('ranchos')
-          .upload(filePath, image.file!);
+          .upload(filePath, image.file!, { cacheControl: '31536000', upsert: true });
 
         if (uploadError) throw uploadError;
 

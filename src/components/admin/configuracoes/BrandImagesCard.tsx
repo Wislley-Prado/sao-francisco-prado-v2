@@ -55,7 +55,7 @@ export const ImageUploader = ({ label, description, currentUrl, bucket, path, fi
 
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from(bucket)
-        .upload(fileName, compressed, { upsert: true, cacheControl: '3600' });
+        .upload(fileName, compressed, { upsert: true, cacheControl: '31536000' });
 
       if (uploadError) {
         console.error('Erro no upload storage:', uploadError);

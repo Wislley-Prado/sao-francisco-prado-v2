@@ -160,7 +160,7 @@ export const PropriedadeVendaForm = ({ propriedade, onSuccess }: PropriedadeVend
 
         const { error: uploadError } = await supabase.storage
           .from('propriedades-venda')
-          .upload(filePath, file);
+          .upload(filePath, file, { cacheControl: '31536000', upsert: true });
 
         if (uploadError) throw uploadError;
 
