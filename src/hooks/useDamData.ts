@@ -147,8 +147,29 @@ const ensureCompleteHistory = (data: DamData): DamData => {
     });
   }
   
+  const now = new Date();
+  const todayStr = now.toISOString().split('T')[0];
+  const todayBR = now.toLocaleDateString('pt-BR');
+  const nowTimeStr = now.toLocaleTimeString('pt-BR');
+
+  // Garantir que a data de hoje sempre exista no histórico
+  if (!historyMap[todayStr]) {
+    const sortedExisting = Object.keys(historyMap).sort();
+    const lastDate = sortedExisting.pop();
+    const lastItem = lastDate ? historyMap[lastDate] : null;
+    historyMap[todayStr] = {
+      dia: todayStr,
+      data_original: todayBR,
+      vazao_afl: lastItem?.vazao_afl || '138',
+      cota_inicial: lastItem?.cota_final || '571.60',
+      vol_util_inicial: lastItem?.vol_util_final || '93.6',
+      vazao_def: lastItem?.vazao_def || '164',
+      cota_final: lastItem?.cota_final || '571.60',
+      vol_util_final: lastItem?.vol_util_final || '93.6'
+    };
+  }
+
   const sortedDates = Object.keys(historyMap).sort();
-  const todayStr = new Date().toISOString().split('T')[0];
   const validDates = sortedDates.filter(d => d <= todayStr);
   const recentDates = validDates.length >= 7 ? validDates.slice(-9) : sortedDates.slice(-9);
   
@@ -175,8 +196,16 @@ const ensureCompleteHistory = (data: DamData): DamData => {
     }
   }
   
+  const latestDay = mergedHistory.length > 0 ? mergedHistory[mergedHistory.length - 1] : null;
+
   return {
     ...data,
+    data_atualizacao: (data.data_atualizacao && data.data_atualizacao.includes(todayBR.slice(0, 5))) ? data.data_atualizacao : todayBR,
+    hora_atualizacao: data.hora_atualizacao || nowTimeStr,
+    nivel_atual: latestDay?.cota_final || data.nivel_atual,
+    volume_util_percentual: latestDay?.vol_util_final || data.volume_util_percentual,
+    afluencia: latestDay?.vazao_afl || data.afluencia,
+    defluencia: latestDay?.vazao_def || data.defluencia,
     historico_dias: mergedHistory.length > 0 ? mergedHistory : DEFAULT_FALLBACK_DAM_DATA.historico_dias
   };
 };
