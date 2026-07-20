@@ -491,6 +491,7 @@ const RanchoDetalhes = () => {
                                 params.set('wkst', '1');
                                 params.set('bgcolor', '#ffffff');
                                 params.set('ctz', 'America/Sao_Paulo');
+                                params.set('_t', String(Date.now()));
 
                                 if (!url.pathname.includes('/embed')) {
                                   const cid = params.get('cid');

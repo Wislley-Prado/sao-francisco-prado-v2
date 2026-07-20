@@ -3,20 +3,20 @@
  * Reduz Supabase Cached Egress em 60-70%
  */
 
-// TTL configs em milliseconds
+// TTL configs em milliseconds (0 = sempre tempo real do banco de dados)
 export const TTL = {
   // Dados estáticos - 24 horas
   STATIC: 24 * 60 * 60 * 1000,
-  // Dados semi-dinâmicos - 10 minutos
-  SEMI_DYNAMIC: 10 * 60 * 1000,
-  // Dados dinâmicos - 60 segundos
-  DYNAMIC: 60 * 1000,
-  // Configurações do site - 1 hora
-  SETTINGS: 60 * 60 * 1000,
-  // Listas principais - 3 minutos (antes era 15, reduzido para atualizar mais rápido)
-  LISTS: 3 * 60 * 1000,
-  // Estatísticas admin - 1 hora (economia máxima)
-  ADMIN_STATS: 60 * 60 * 1000,
+  // Dados semi-dinâmicos - 0 segundos (tempo real)
+  SEMI_DYNAMIC: 0,
+  // Dados dinâmicos - 0 segundos (tempo real)
+  DYNAMIC: 0,
+  // Configurações do site - 0 segundos (tempo real)
+  SETTINGS: 0,
+  // Listas principais - 0 segundos (tempo real, garante que reservas e edições reflitam na hora)
+  LISTS: 0,
+  // Estatísticas admin - 5 minutos
+  ADMIN_STATS: 5 * 60 * 1000,
 } as const;
 
 interface CacheEntry<T> {
@@ -32,8 +32,8 @@ interface CacheStats {
   supabaseCalls: number;
 }
 
-// Storage key prefix (versão 3 com invalidação automática de cache antigo)
-const CACHE_VERSION = 'v3';
+// Storage key prefix (versão 5 com invalidação total de caches anteriores)
+const CACHE_VERSION = 'v5';
 const CACHE_PREFIX = `prado_cache_${CACHE_VERSION}_`;
 const STATS_KEY = 'prado_cache_stats';
 
@@ -315,6 +315,12 @@ export const cachedQuery = async <T>(
   ttl: number,
   fetchFn: () => Promise<T>
 ): Promise<T> => {
+  // If TTL is 0 or less, bypass cache for real-time fresh data
+  if (ttl <= 0) {
+    recordSupabaseCall(key);
+    return await fetchFn();
+  }
+
   // Check cache first
   const cached = getFromCache<T>(key);
   if (cached !== null) {
