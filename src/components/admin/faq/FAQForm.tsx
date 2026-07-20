@@ -51,7 +51,6 @@ export const FAQForm = ({ initialData }: FAQFormProps) => {
     const { data } = await supabase
       .from("pacotes")
       .select("id, nome")
-      .eq("ativo", true)
       .order("nome");
     setPacotes(data || []);
   };
@@ -60,7 +59,6 @@ export const FAQForm = ({ initialData }: FAQFormProps) => {
     const { data } = await supabase
       .from("ranchos")
       .select("id, nome")
-      .eq("disponivel", true)
       .order("nome");
     setRanchos(data || []);
   };
@@ -86,6 +84,20 @@ export const FAQForm = ({ initialData }: FAQFormProps) => {
       rancho_id: null,
     },
   });
+
+  useEffect(() => {
+    if (initialData) {
+      form.reset({
+        pergunta: initialData.pergunta || "",
+        resposta: initialData.resposta || "",
+        ordem: initialData.ordem ?? 0,
+        ativo: initialData.ativo ?? true,
+        tipo: getTipo(),
+        pacote_id: initialData.pacote_id || null,
+        rancho_id: initialData.rancho_id || null,
+      });
+    }
+  }, [initialData]);
 
   const onSubmit = async (data: FormData) => {
     try {
