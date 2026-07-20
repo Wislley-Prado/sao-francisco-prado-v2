@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,6 +29,7 @@ export const DeletePacoteDialog = ({
   onSuccess,
 }: DeletePacoteDialogProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
+  const queryClient = useQueryClient();
   const { invalidatePacotes, invalidateAdminPacotes } = useInvalidateCache();
 
   const handleDelete = async () => {
@@ -75,6 +77,7 @@ export const DeletePacoteDialog = ({
       // Invalida cache para refletir as mudanças imediatamente
       invalidatePacotes();
       invalidateAdminPacotes();
+      queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
 
       toast.success('Pacote excluído com sucesso!');
       onSuccess();

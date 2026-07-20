@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,6 +30,7 @@ export const DeleteBlogDialog = ({
   onDelete
 }: DeleteBlogDialogProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
+  const queryClient = useQueryClient();
 
   const handleDelete = async () => {
     if (!post) return;
@@ -41,6 +43,11 @@ export const DeleteBlogDialog = ({
         .eq('id', post.id);
 
       if (error) throw error;
+
+      queryClient.invalidateQueries({ queryKey: ['blog-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['blog-post'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-blog-posts-cached'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
 
       toast.success('Post excluído com sucesso!');
       onDelete();

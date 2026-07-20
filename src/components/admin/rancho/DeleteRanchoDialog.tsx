@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,22 +12,20 @@ import {
 } from '@/components/ui/alert-dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { useState } from 'react';
 
 interface RanchoImage {
-  url: string;
-}
-
-interface Rancho {
   id: string;
-  nome: string;
-  rancho_imagens: RanchoImage[];
+  url: string;
 }
 
 interface DeleteRanchoDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  rancho: Rancho;
+  rancho: {
+    id: string;
+    nome: string;
+    rancho_imagens?: RanchoImage[];
+  };
   onSuccess: () => void;
 }
 
@@ -36,6 +36,7 @@ export const DeleteRanchoDialog = ({
   onSuccess,
 }: DeleteRanchoDialogProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
+  const queryClient = useQueryClient();
 
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -63,6 +64,10 @@ export const DeleteRanchoDialog = ({
         .eq('id', rancho.id);
 
       if (deleteError) throw deleteError;
+
+      queryClient.invalidateQueries({ queryKey: ['ranchos'] });
+      queryClient.invalidateQueries({ queryKey: ['rancho'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
 
       toast.success('Rancho excluído com sucesso!');
       onSuccess();

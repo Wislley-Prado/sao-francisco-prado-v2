@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { BlogForm, BlogFormData } from '@/components/admin/blog/BlogForm';
 import { supabase } from '@/integrations/supabase/client';
@@ -9,6 +9,7 @@ import { useState } from 'react';
 const BlogEditar = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { data: post, isLoading } = useQuery({
@@ -54,6 +55,10 @@ const BlogEditar = () => {
         .eq('id', id);
 
       if (error) throw error;
+
+      queryClient.invalidateQueries({ queryKey: ['blog-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['blog-post'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-blog-posts-cached'] });
 
       toast.success('Post atualizado com sucesso!');
       navigate('/admin/blog');
