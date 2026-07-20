@@ -46,7 +46,7 @@ const DamHistoryCharts: React.FC<DamHistoryChartsProps> = ({ chartData }) => {
                 ]}
                 labelFormatter={(label) => `Data: ${label}`}
               />
-              <Area type="monotone" dataKey="nivel" stroke="#3b82f6" fill="url(#nivelGradient)" strokeWidth={2} />
+              <Area type="monotone" dataKey="nivel" stroke="#3b82f6" fill="url(#nivelGradient)" strokeWidth={2} tooltipType="none" />
               <Line type="monotone" dataKey="nivel" stroke="#3b82f6" strokeWidth={2} dot={{ fill: '#3b82f6', strokeWidth: 2, r: 3 }} activeDot={{ r: 5, fill: '#2563eb' }} />
             </ComposedChart>
           </ResponsiveContainer>
