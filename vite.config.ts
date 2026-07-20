@@ -13,57 +13,10 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     VitePWA({
+      selfDestroying: true, // Auto-destrói qualquer Service Worker antigo no navegador do usuário
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'icons/*.png', 'robots.txt'],
-      manifest: false, // Use external manifest.json
-      injectRegister: 'auto',
-      strategies: 'generateSW',
-      workbox: {
-        skipWaiting: true,
-        clientsClaim: true,
-        globPatterns: ['**/*.{js,css,ico,png,jpg,jpeg,svg,woff,woff2}'], // Removido 'html' para nao congelar index.html antigo no cache do SW
-        cleanupOutdatedCaches: true,
-        maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 10 MB
-        navigateFallback: '/index.html',
-        navigateFallbackDenylist: [/^\/api/, /^\/bot\.php/],
-        runtimeCaching: [
-          {
-            urlPattern: ({ request }) => request.mode === 'navigate',
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'pages-cache',
-              networkTimeoutSeconds: 3,
-              expiration: {
-                maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 // 24 horas
-              }
-            }
-          },
-          {
-            urlPattern: /^https:\/\/api\./,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'api-cache',
-              expiration: {
-                maxEntries: 100,
-                maxAgeSeconds: 60 * 60 * 24 // 24 hours
-              },
-              networkTimeoutSeconds: 3
-            }
-          },
-          {
-            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'images-cache',
-              expiration: {
-                maxEntries: 100,
-                maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
-              }
-            }
-          }
-        ]
-      },
+      injectRegister: null, // Impede injeção automática de registro de SW
+      manifest: false,
       devOptions: {
         enabled: false
       }
