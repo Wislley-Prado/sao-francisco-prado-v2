@@ -15,15 +15,17 @@ export default defineConfig(({ mode }) => ({
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: 'auto',
+      selfDestroying: mode !== 'production', // Desabilita e destrói o Service Worker em desenvolvimento
+      devOptions: {
+        enabled: false,
+        suppressWarnings: true,
+      },
       workbox: {
         skipWaiting: true,
         clientsClaim: true,
         cleanupOutdatedCaches: true,
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webp}'],
       },
-      devOptions: {
-        enabled: false
-      }
     }),
     ViteImageOptimizer({
       png: {
