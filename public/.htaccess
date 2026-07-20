@@ -24,7 +24,11 @@ RewriteRule ^ - [R=404,L]
 # 3. Para qualquer outra rota virtual de página SPA, reescreve para index.html
 RewriteRule ^ index.html [L]
 
-# --- GZIP COMPRESSION FOR HOSTINGER ---
+# --- BROTLI & GZIP COMPRESSION FOR HOSTINGER / APACHE ---
+<IfModule mod_brotli.c>
+  AddOutputFilterByType BROTLI_COMPRESS text/html text/plain text/xml text/css text/javascript application/javascript application/x-javascript application/json application/xml image/svg+xml image/x-icon font/ttf font/otf font/woff font/woff2
+</IfModule>
+
 <IfModule mod_deflate.c>
   AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/x-javascript application/json application/xml image/svg+xml image/x-icon font/ttf font/otf font/woff font/woff2
 </IfModule>
