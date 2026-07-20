@@ -51,6 +51,7 @@ const PackageCard = ({ pkg }: PackageCardProps) => {
             alt={pkg.title}
             className="w-full h-full object-cover"
             loading="lazy"
+            decoding="async"
             width={400}
             height={192}
             onError={(e) => {
