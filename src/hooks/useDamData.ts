@@ -383,7 +383,7 @@ const fetchDamDataFromDB = async (): Promise<DamData> => {
     try {
       const { data: historyRows, error: historyErr } = await supabase
         .from('dam_history')
-        .select('*')
+        .select('id, data_leitura, cota, vazao_defluente, vazao_afluente, volume_util, created_at')
         .order('data_leitura', { ascending: true })
         .limit(15);
 

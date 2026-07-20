@@ -17,7 +17,7 @@ const BlogEditar = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('blog_posts')
-        .select('*')
+        .select('id, titulo, titulo_en, slug, resumo, resumo_en, conteudo, conteudo_en, categoria, categoria_en, tags, imagem_destaque, publicado, data_publicacao, visualizacoes, tempo_leitura, redes_sociais, banner_midia_paga, created_at, updated_at')
         .eq('id', id!)
         .single();
 

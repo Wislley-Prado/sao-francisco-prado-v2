@@ -210,7 +210,7 @@ export const usePropriedadesVenda = (onlyActive = true) => {
     async () => {
       let query = supabase
         .from('propriedades_venda')
-        .select('*')
+        .select('id, titulo, titulo_en, slug, descricao, descricao_en, tipo, preco, area, quartos, banheiros, vagas_garagem, localizacao, localizacao_en, endereco_completo, latitude, longitude, ativo, destaque, ordem, imagens, caracteristicas, telefone_whatsapp, mensagem_whatsapp, created_at, updated_at')
         .order('destaque', { ascending: false })
         .order('ordem', { ascending: true })
         .order('created_at', { ascending: false });
@@ -256,7 +256,7 @@ export const usePropriedadeVendaBySlug = (slug: string | undefined) => {
       // Fetch individually if not in list
       const { data, error } = await supabase
         .from('propriedades_venda')
-        .select('*')
+        .select('id, titulo, titulo_en, slug, descricao, descricao_en, tipo, preco, area, quartos, banheiros, vagas_garagem, localizacao, localizacao_en, endereco_completo, latitude, longitude, ativo, destaque, ordem, imagens, caracteristicas, telefone_whatsapp, mensagem_whatsapp, created_at, updated_at')
         .eq('slug', slug)
         .maybeSingle();
 
@@ -292,7 +292,7 @@ export const useRanchos = (onlyAvailable = true) => {
       let query = supabase
         .from('ranchos')
         .select(`
-          *,
+          id, nome, nome_en, slug, descricao, descricao_en, localizacao, localizacao_en, capacidade, preco, rating, quartos, banheiros, area, comodidades, disponivel, destaque, telefone_whatsapp, mensagem_whatsapp, typebot_url, texto_botao_whatsapp, video_youtube, google_calendar_url, tracking_code, latitude, longitude, endereco_completo, created_at,
           rancho_imagens!rancho_imagens_rancho_id_fkey (
             id, url, alt_text, principal, ordem
           )
@@ -377,7 +377,7 @@ export const useRanchoBySlug = (slug: string | undefined) => {
       const { data, error } = await supabase
         .from('ranchos')
         .select(`
-          *,
+          id, nome, nome_en, slug, descricao, descricao_en, localizacao, localizacao_en, capacidade, preco, rating, quartos, banheiros, area, comodidades, disponivel, destaque, telefone_whatsapp, mensagem_whatsapp, typebot_url, texto_botao_whatsapp, video_youtube, google_calendar_url, tracking_code, latitude, longitude, endereco_completo, created_at,
           rancho_imagens!rancho_imagens_rancho_id_fkey (
             id, url, alt_text, principal, ordem
           )
@@ -452,7 +452,7 @@ export const usePacotes = (onlyActive = true) => {
       let query = supabase
         .from('pacotes')
         .select(`
-          *,
+          id, nome, slug, descricao, preco, duracao, pessoas, rating, tipo, caracteristicas, inclusos, ativo, popular, destaque, parcelas_quantidade, parcela_valor, desconto_avista, vagas_disponiveis, video_youtube, tracking_code, telefone_whatsapp, endereco_completo, latitude, longitude, created_at,
           pacote_imagens (
             id, url, alt_text, principal, ordem
           )
@@ -534,7 +534,7 @@ export const usePacoteBySlug = (slug: string | undefined) => {
       const { data, error } = await supabase
         .from('pacotes')
         .select(`
-          *,
+          id, nome, slug, descricao, preco, duracao, pessoas, rating, tipo, caracteristicas, inclusos, ativo, popular, destaque, parcelas_quantidade, parcela_valor, desconto_avista, vagas_disponiveis, video_youtube, tracking_code, telefone_whatsapp, endereco_completo, latitude, longitude, created_at,
           pacote_imagens (
             id, url, alt_text, principal, ordem
           )
@@ -609,7 +609,7 @@ export const useAllAnuncios = () => {
     async () => {
       const { data, error } = await supabase
         .from('anuncios')
-        .select('*')
+        .select('id, titulo, subtitulo, descricao, imagem_url, link_url, texto_botao, tipo, posicao, ativo, destaque, ordem, visualizacoes, cliques, duracao_exibicao, data_inicio, data_fim, created_at, updated_at')
         .eq('ativo', true)
         .order('ordem', { ascending: true });
 
@@ -653,7 +653,7 @@ export const useBlogPosts = (limit?: number) => {
     async () => {
       let query = supabase
         .from('blog_posts')
-        .select('*')
+        .select('id, titulo, titulo_en, slug, resumo, resumo_en, conteudo, conteudo_en, categoria, categoria_en, tags, imagem_destaque, publicado, data_publicacao, visualizacoes, tempo_leitura, redes_sociais, banner_midia_paga, created_at, updated_at')
         .eq('publicado', true)
         .order('data_publicacao', { ascending: false });
 
@@ -682,7 +682,7 @@ export const useBlogPostBySlug = (slug: string | undefined) => {
     async () => {
       const { data, error } = await supabase
         .from('blog_posts')
-        .select('*')
+        .select('id, titulo, titulo_en, slug, resumo, resumo_en, conteudo, conteudo_en, categoria, categoria_en, tags, imagem_destaque, publicado, data_publicacao, visualizacoes, tempo_leitura, redes_sociais, banner_midia_paga, created_at, updated_at')
         .eq('slug', slug)
         .eq('publicado', true)
         .maybeSingle();
@@ -710,7 +710,7 @@ export const useDepoimentos = () => {
     async () => {
       const { data, error } = await supabase
         .from('depoimentos')
-        .select('id, nome, cargo, foto_url, depoimento, rating, ativo, ordem')
+        .select('id, nome, cargo, foto_url, depoimento, rating, ativo, ordem, pacote_id, rancho_id, created_at')
         .eq('ativo', true)
         .order('ordem', { ascending: true });
 
@@ -747,7 +747,7 @@ export const useFAQs = (pacoteId?: string, ranchoId?: string) => {
     async () => {
       let query = supabase
         .from('faqs')
-        .select('*')
+        .select('id, pergunta, pergunta_en, resposta, resposta_en, categoria, ativo, ordem, pacote_id, rancho_id, votos_uteis, votos_nao_uteis, created_at')
         .eq('ativo', true)
         .order('ordem', { ascending: true });
 
@@ -786,14 +786,14 @@ export const useSiteSettings = (isAdmin = false) => {
         if (isAdmin) {
           const { data, error } = await supabase
             .from('site_settings')
-            .select('*')
+            .select('id, site_name, site_description, contact_phone, contact_email, whatsapp_number, address, hero_title, hero_subtitle, logo_url, favicon_url, pwa_icon_url, og_image_url, primary_color, secondary_color, header_scripts, body_scripts, video_title, video_url, video_enabled, reserva_button_text, created_at, updated_at')
             .maybeSingle();
           if (error) throw error;
           return data as unknown as SiteSettings | null;
         } else {
           const { data, error } = await supabase
             .from('site_settings_public')
-            .select('*')
+            .select('id, site_name, site_description, contact_phone, contact_email, whatsapp_number, address, hero_title, hero_subtitle, logo_url, favicon_url, pwa_icon_url, og_image_url, primary_color, secondary_color, header_scripts, body_scripts, video_title, video_url, video_enabled, reserva_button_text, created_at, updated_at')
             .maybeSingle();
           if (error) throw error;
           return data as unknown as SiteSettings | null;
@@ -846,7 +846,7 @@ export const useFAQEstatisticas = () => {
     async () => {
       const { data, error } = await supabase
         .from('faq_estatisticas')
-        .select('*');
+        .select('id, pergunta, ordem, ativo, pacote_id, rancho_id, total_votos, votos_uteis, votos_nao_uteis, taxa_utilidade');
       if (error) throw error;
       return data || [];
     },
@@ -867,7 +867,7 @@ export const useRanchoEstatisticas = () => {
     async () => {
       const { data, error } = await supabase
         .from('rancho_estatisticas')
-        .select('*');
+        .select('id, nome, slug, total_visualizacoes, total_cliques_whatsapp, total_cliques_reserva, taxa_conversao, visualizacoes_7_dias, visualizacoes_30_dias');
       if (error) throw error;
       return data || [];
     },
@@ -902,7 +902,7 @@ export const useAdminDepoimentos = () => {
     async () => {
       const { data, error } = await supabase
         .from('depoimentos')
-        .select('*')
+        .select('id, nome, cargo, foto_url, depoimento, rating, ordem, ativo, pacote_id, rancho_id, created_at')
         .order('ordem', { ascending: true });
       if (error) throw error;
       return data || [];
@@ -928,7 +928,7 @@ export const useAdminBlogPosts = () => {
     async () => {
       const { data, error } = await supabase
         .from('blog_posts')
-        .select('*')
+        .select('id, titulo, titulo_en, slug, resumo, resumo_en, conteudo, conteudo_en, categoria, categoria_en, tags, imagem_destaque, publicado, data_publicacao, visualizacoes, tempo_leitura, redes_sociais, banner_midia_paga, created_at, updated_at')
         .order('created_at', { ascending: false });
       if (error) throw error;
       return data || [];

@@ -40,7 +40,7 @@ const WhatsAppConfig = () => {
       setLoading(true);
       const { data, error } = await supabase
         .from("site_settings")
-        .select("*")
+        .select("id, site_name, site_description, contact_phone, contact_email, whatsapp_number, address, hero_title, hero_subtitle, logo_url, favicon_url, pwa_icon_url, og_image_url, primary_color, secondary_color, header_scripts, body_scripts, video_title, video_url, video_enabled, reserva_button_text, created_at, updated_at")
         .eq("id", SETTINGS_ID)
         .single();
 

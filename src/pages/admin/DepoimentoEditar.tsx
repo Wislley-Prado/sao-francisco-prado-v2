@@ -18,7 +18,7 @@ export default function DepoimentoEditar() {
     try {
       const { data, error } = await supabase
         .from("depoimentos")
-        .select("*")
+        .select("id, nome, cargo, foto_url, depoimento, rating, ordem, ativo, pacote_id, rancho_id, created_at")
         .eq("id", id)
         .single();
 

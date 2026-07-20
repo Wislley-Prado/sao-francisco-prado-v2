@@ -87,7 +87,7 @@ export const PackageTestimonials = ({
     queryFn: async () => {
       let query = supabase
         .from('depoimentos')
-        .select('*')
+        .select('id, nome, cargo, foto_url, depoimento, rating, ativo, ordem, pacote_id, rancho_id, created_at')
         .eq('ativo', true)
         .order('ordem', { ascending: true })
         .order('created_at', { ascending: false });

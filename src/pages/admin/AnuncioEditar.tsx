@@ -54,7 +54,7 @@ export default function AnuncioEditar() {
     try {
       const { data, error } = await supabase
         .from('anuncios')
-        .select('*')
+        .select('id, titulo, subtitulo, descricao, imagem_url, link_url, texto_botao, tipo, posicao, ativo, destaque, ordem, visualizacoes, cliques, duracao_exibicao, data_inicio, data_fim, created_at, updated_at')
         .eq('id', id)
         .single();
 
