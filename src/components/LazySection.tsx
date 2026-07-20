@@ -24,18 +24,27 @@ const LazySection: React.FC<LazySectionProps> = ({
     const el = ref.current;
     if (!el) return;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.disconnect();
-        }
-      },
-      { rootMargin }
-    );
+    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
+      setIsVisible(true);
+      return;
+    }
 
-    observer.observe(el);
-    return () => observer.disconnect();
+    try {
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+            observer.disconnect();
+          }
+        },
+        { rootMargin }
+      );
+
+      observer.observe(el);
+      return () => observer.disconnect();
+    } catch (e) {
+      setIsVisible(true);
+    }
   }, [rootMargin]);
 
   return (

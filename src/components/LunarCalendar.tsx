@@ -98,7 +98,9 @@ const LunarCalendar = () => {
     }
   };
 
-  const nextPhase = lunarData.phases[0];
+  const nextPhase = (lunarData.phases && lunarData.phases.length > 0) 
+    ? lunarData.phases[0] 
+    : { phase: 'Crescente', date: 'Em breve', illumination: 50, fishing: 'Boa', color: 'bg-blue-500', timestamp: Date.now() };
 
   return (
     <section id="calendario-lunar" className="py-8 md:py-16 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
