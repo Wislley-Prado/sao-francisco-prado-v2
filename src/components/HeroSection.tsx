@@ -20,7 +20,7 @@ const HeroSection = () => {
 
   const videoId = settings?.youtube_video_url 
     ? extractYouTubeId(settings.youtube_video_url)
-    : 'cN_BspPR2gg';
+    : 'vGVZlO0lrpQ';
   const isShorts = settings?.youtube_video_url?.includes('/shorts/') || false;
   
   const temperature = weatherData?.current.temperature || 24;
