@@ -6,26 +6,53 @@ import React, { ComponentType } from 'react';
  * fazendo o import() dinâmico falhar. Este utilitário captura a exceção, desregistra
  * o Service Worker, limpa o CacheStorage e recarrega a página 1 vez para buscar o novo index.html.
  */
+function getSessionItem(key: string): string | null {
+  try {
+    return typeof window !== 'undefined' && window.sessionStorage ? window.sessionStorage.getItem(key) : null;
+  } catch {
+    return null;
+  }
+}
+
+function setSessionItem(key: string, value: string): void {
+  try {
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      window.sessionStorage.setItem(key, value);
+    }
+  } catch {}
+}
+
+function removeSessionItem(key: string): void {
+  try {
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      window.sessionStorage.removeItem(key);
+    }
+  } catch {}
+}
+
 export function lazyWithRetry<T extends ComponentType<any>>(
   componentImport: () => Promise<{ default: T }>
 ): React.LazyExoticComponent<T> {
   return React.lazy(async () => {
-    const pageHasBeenRefreshed = JSON.parse(
-      window.sessionStorage.getItem('retry-lazy-refreshed') || 'false'
-    );
+    let pageHasBeenRefreshed = false;
+    try {
+      pageHasBeenRefreshed = JSON.parse(getSessionItem('retry-lazy-refreshed') || 'false');
+    } catch {
+      pageHasBeenRefreshed = false;
+    }
 
     try {
       const component = await componentImport();
-      window.sessionStorage.setItem('retry-lazy-refreshed', 'false');
+      setSessionItem('retry-lazy-refreshed', 'false');
       return component;
     } catch (error) {
       console.error('Erro ao carregar componente dinâmico (chunk 404):', error);
 
       if (!pageHasBeenRefreshed) {
-        window.sessionStorage.setItem('retry-lazy-refreshed', 'true');
+        setSessionItem('retry-lazy-refreshed', 'true');
 
         // Limpar Service Worker e Caches se disponíveis
-        if ('serviceWorker' in navigator) {
+        if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
           try {
             const registrations = await navigator.serviceWorker.getRegistrations();
             for (const registration of registrations) {
@@ -36,7 +63,7 @@ export function lazyWithRetry<T extends ComponentType<any>>(
           }
         }
 
-        if ('caches' in window) {
+        if (typeof window !== 'undefined' && 'caches' in window) {
           try {
             const keys = await caches.keys();
             await Promise.all(keys.map((key) => caches.delete(key)));
@@ -46,13 +73,13 @@ export function lazyWithRetry<T extends ComponentType<any>>(
         }
 
         // Recarregar do servidor
-        window.location.reload();
-        // Retornar promise pendente para manter a UI atual enquanto a página recarrega, evitando tela branca instantânea
+        if (typeof window !== 'undefined') {
+          window.location.reload();
+        }
         return new Promise<{ default: T }>(() => {});
       }
 
-      // Se já havia sido recarregado antes, reseta a flag para não travar navegações futuras
-      window.sessionStorage.removeItem('retry-lazy-refreshed');
+      removeSessionItem('retry-lazy-refreshed');
       throw error;
     }
   });

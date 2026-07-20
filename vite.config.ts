@@ -56,7 +56,7 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
-    target: "es2020",
+    target: ["es2015", "chrome64", "edge79", "firefox67", "safari12"],
     minify: "esbuild",
     cssMinify: true,
     cssCodeSplit: true,
