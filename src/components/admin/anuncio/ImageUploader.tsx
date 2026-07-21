@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { Upload, X, Loader2 } from 'lucide-react';
+import { compressImage } from '@/utils/imageCompression';
 
 interface ImageUploaderProps {
   value: string | null;
@@ -33,13 +34,20 @@ export function ImageUploader({ value, onChange }: ImageUploaderProps) {
     setIsUploading(true);
 
     try {
-      const fileExt = file.name.split('.').pop();
+      // Comprimir imagem para tamanho otimizado de banner
+      const compressedFile = await compressImage(file, {
+        maxWidth: 1400,
+        maxHeight: 800,
+        quality: 0.80,
+      });
+
+      const fileExt = compressedFile.name.split('.').pop();
       const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
       const filePath = `anuncios/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
         .from('configuracoes')
-        .upload(filePath, file, { cacheControl: '31536000', upsert: true });
+        .upload(filePath, compressedFile, { cacheControl: '31536000', upsert: true });
 
       if (uploadError) throw uploadError;
 

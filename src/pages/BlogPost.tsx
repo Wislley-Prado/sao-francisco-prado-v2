@@ -19,6 +19,7 @@ import { PaidMediaBannerDisplay } from '@/components/blog/PaidMediaBannerDisplay
 import RelatedPosts from '@/components/blog/RelatedPosts';
 import { SITE_CONFIG } from '@/lib/constants';
 import { useTranslation } from 'react-i18next';
+import { getOptimizedUrl } from '@/lib/imageUtils';
 
 const BlogPost = () => {
   const { t, i18n } = useTranslation();
@@ -168,9 +169,15 @@ const BlogPost = () => {
           {post.imagem_destaque && (
             <div className="aspect-video mb-8 rounded-lg overflow-hidden">
               <img
-                src={post.imagem_destaque}
+                src={getOptimizedUrl(post.imagem_destaque, 1200)}
                 alt={postTitle}
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  const original = post.imagem_destaque;
+                  if (e.currentTarget.src !== original) {
+                    e.currentTarget.src = original;
+                  }
+                }}
               />
             </div>
           )}

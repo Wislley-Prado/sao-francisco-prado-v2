@@ -9,6 +9,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { supabase } from '@/integrations/supabase/client';
 import { useTranslation } from 'react-i18next';
+import { getOptimizedUrl } from '@/lib/imageUtils';
 
 interface Pacote {
   id: string;
@@ -161,9 +162,15 @@ const PackagesIndexDynamic = () => {
                     {/* Imagem */}
                     <div className="relative h-64 overflow-hidden">
                       <img
-                        src={getMainImage(pacote)}
+                        src={getOptimizedUrl(getMainImage(pacote), 800)}
                         alt={nome}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                        onError={(e) => {
+                          const original = getMainImage(pacote);
+                          if (e.currentTarget.src !== original) {
+                            e.currentTarget.src = original;
+                          }
+                        }}
                       />
 
                       {/* Badges */}

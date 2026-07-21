@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Upload, X } from "lucide-react";
 import { toast } from "sonner";
+import { compressImage } from "@/utils/imageCompression";
 
 interface ImageUploaderProps {
   value?: string | null;
@@ -27,13 +28,20 @@ export const ImageUploader = ({ value, onChange, onUploadStart, onUploadEnd }: I
         return;
       }
 
-      const fileExt = file.name.split(".").pop();
+      // Comprimir avatar de depoimento para tamanho reduzido e leve
+      const compressedFile = await compressImage(file, {
+        maxWidth: 300,
+        maxHeight: 300,
+        quality: 0.75,
+      });
+
+      const fileExt = compressedFile.name.split(".").pop();
       const fileName = `${Math.random()}.${fileExt}`;
       const filePath = `depoimentos/${fileName}`;
 
       const { error: uploadError, data } = await supabase.storage
         .from("configuracoes")
-        .upload(filePath, file, { cacheControl: "31536000", upsert: true });
+        .upload(filePath, compressedFile, { cacheControl: "31536000", upsert: true });
 
       if (uploadError) throw uploadError;
 

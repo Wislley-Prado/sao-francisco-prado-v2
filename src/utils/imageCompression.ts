@@ -6,25 +6,32 @@ export interface CompressionOptions {
 }
 
 const DEFAULT_OPTIONS: CompressionOptions = {
-  maxWidth: 1920,
-  maxHeight: 1920,
-  quality: 0.85,
-  maxSizeMB: 1,
+  maxWidth: 1200,
+  maxHeight: 1200,
+  quality: 0.80,
+  maxSizeMB: 0.15, // 150KB
 };
 
 /**
- * Comprime uma imagem usando canvas
+ * Comprime uma imagem usando canvas e converte para WebP
  */
 export const compressImage = async (
   file: File,
   options: CompressionOptions = {}
 ): Promise<File> => {
+  // Ignorar SVG e GIF animados para não quebrar funcionalidade ou animação
+  if (file.type === 'image/svg+xml' || file.type === 'image/gif') {
+    console.log(`Skipping compression for SVG/GIF: ${file.name}`);
+    return file;
+  }
+
   const opts = { ...DEFAULT_OPTIONS, ...options };
 
-  // Se a imagem já é pequena o suficiente, retorna o arquivo original
+  // Se a imagem já é pequena o suficiente e já está em formato WebP, retorna o arquivo original
   const fileSizeMB = file.size / 1024 / 1024;
-  if (fileSizeMB < (opts.maxSizeMB || 1) * 0.8) {
-    console.log(`Image ${file.name} is already small enough (${fileSizeMB.toFixed(2)}MB)`);
+  const isWebP = file.type === 'image/webp';
+  if (isWebP && fileSizeMB < (opts.maxSizeMB || 0.15)) {
+    console.log(`Image ${file.name} is already small enough and in WebP format (${fileSizeMB.toFixed(2)}MB)`);
     return file;
   }
 
@@ -38,8 +45,8 @@ export const compressImage = async (
         try {
           // Calcular novas dimensões mantendo aspect ratio
           let { width, height } = img;
-          const maxWidth = opts.maxWidth || 1920;
-          const maxHeight = opts.maxHeight || 1920;
+          const maxWidth = opts.maxWidth || 1200;
+          const maxHeight = opts.maxHeight || 1200;
 
           if (width > maxWidth || height > maxHeight) {
             const aspectRatio = width / height;
@@ -67,7 +74,7 @@ export const compressImage = async (
           // Desenhar imagem no canvas
           ctx.drawImage(img, 0, 0, width, height);
 
-          // Converter para blob
+          // Converter para blob em formato WebP
           canvas.toBlob(
             (blob) => {
               if (!blob) {
@@ -77,19 +84,22 @@ export const compressImage = async (
 
               const compressedSizeMB = blob.size / 1024 / 1024;
               console.log(
-                `Compressed ${file.name}: ${fileSizeMB.toFixed(2)}MB → ${compressedSizeMB.toFixed(2)}MB (${((1 - compressedSizeMB / fileSizeMB) * 100).toFixed(1)}% reduction)`
+                `Compressed ${file.name} to WebP: ${fileSizeMB.toFixed(2)}MB → ${compressedSizeMB.toFixed(2)}MB (${((1 - compressedSizeMB / fileSizeMB) * 100).toFixed(1)}% reduction)`
               );
 
-              // Criar novo arquivo com o blob comprimido
-              const compressedFile = new File([blob], file.name, {
-                type: file.type,
+              // Gerar novo nome com extensão .webp
+              const webpName = file.name.replace(/\.[^/.]+$/, "") + ".webp";
+              
+              // Criar novo arquivo com o blob comprimido em WebP
+              const compressedFile = new File([blob], webpName, {
+                type: 'image/webp',
                 lastModified: Date.now(),
               });
 
               resolve(compressedFile);
             },
-            file.type,
-            opts.quality || 0.85
+            'image/webp',
+            opts.quality || 0.80
           );
         } catch (error) {
           reject(error);

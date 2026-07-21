@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
 import FeaturedPackagesCarousel from '@/components/FeaturedPackagesCarousel';
 import Footer from '@/components/Footer';
+import { getOptimizedUrl } from '@/lib/imageUtils';
 
 interface PacoteImage {
   id: string;
@@ -240,14 +241,19 @@ const PackagesIndex = () => {
                     <CardHeader className="p-0">
                       <div className="h-48 relative overflow-hidden">
                         <img
-                          src={pkg.image}
+                          src={getOptimizedUrl(pkg.image, 800)}
                           alt={pkg.title}
                           className="w-full h-full object-cover"
                           loading="lazy"
                           onError={(e) => {
                             console.log('Erro ao carregar imagem:', pkg.image);
-                            e.currentTarget.style.display = 'none';
-                            e.currentTarget.parentElement!.classList.add('bg-gradient-to-br', 'from-rio-blue', 'to-water-green');
+                            const original = pkg.image;
+                            if (e.currentTarget.src !== original) {
+                              e.currentTarget.src = original;
+                            } else {
+                              e.currentTarget.style.display = 'none';
+                              e.currentTarget.parentElement!.classList.add('bg-gradient-to-br', 'from-rio-blue', 'to-water-green');
+                            }
                           }}
                         />
                         <div className="absolute inset-0 bg-black bg-opacity-20"></div>
