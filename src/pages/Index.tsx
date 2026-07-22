@@ -1,4 +1,4 @@
-import React, { Suspense, useState, useEffect } from 'react';
+import React, { Suspense } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -46,29 +46,6 @@ const SectionSkeleton = () => (
 );
 
 const Index = () => {
-  const [debugInfo, setDebugInfo] = useState<string>("Carregando debug...");
-  useEffect(() => {
-    async function runDebug() {
-      try {
-        const res = await fetch('https://zeqloqlhnbdeivnyghkx.supabase.co/rest/v1/?apikey=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ewogICJyb2xlIjogInNlcnZpY2Vfcm9sZSIsCiAgImlzcyI6ICJzdXBhYmFzZSIsCiAgImlhdCI6IDE3MTUwNTA4MDAsCiAgImV4cCI6IDE4NzI4MTcyMDAKfQ.Yl30TXhhTdohurjkqf3tU76Ow-jWJhqvn7A1qmWAkdw');
-        const spec = await res.json();
-        const faqProps = Object.keys(spec.definitions?.faqs?.properties || {});
-        
-        const { data, error } = await supabase.from('faqs').select('*').limit(1);
-        const rowKeys = data && data.length > 0 ? Object.keys(data[0]) : [];
-        
-        setDebugInfo(JSON.stringify({
-          faqProps,
-          rowKeys,
-          error: error ? error.message : null
-        }));
-      } catch (err: any) {
-        setDebugInfo("Error: " + err.message);
-      }
-    }
-    runDebug();
-  }, []);
-
   const { data: settings } = useQuery({
     queryKey: ['site-settings-og'],
     queryFn: async () => {
@@ -86,9 +63,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen">
-      <div id="db-debug-output" style={{background: 'black', color: 'lime', padding: '20px', fontFamily: 'monospace', zIndex: 9999, position: 'relative'}}>
-        {debugInfo}
-      </div>
       <Helmet>
         <title>PradoAqui | Rio São Francisco ao Vivo - Pesca em Três Marias/MG</title>
         <meta name="description" content="Sua experiência de pesca no Rio São Francisco começa aqui! Ranchos exclusivos, pacotes personalizados e estrutura completa em Três Marias/MG." />
