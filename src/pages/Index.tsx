@@ -37,7 +37,7 @@ const PropriedadesVendaSection = lazyWithRetry(() => import('@/components/Propri
 const PackagesSection = lazyWithRetry(() => import('@/components/PackagesSection'));
 const BlogSection = lazyWithRetry(() => import('@/components/BlogSection'));
 const TestimonialsSection = lazyWithRetry(() => import('@/components/TestimonialsSection').then(m => ({ default: m.TestimonialsSection })));
-const FAQSection = lazyWithRetry(() => import('@/components/FAQSection').then(m => ({ default: m.FAQSection })));
+
 
 const SectionSkeleton = () => (
   <div className="py-16 container mx-auto px-4">
@@ -160,13 +160,7 @@ const Index = () => {
         </SectionErrorBoundary>
       </LazySection>
 
-      <LazySection fallback={null} rootMargin="200px">
-        <SectionErrorBoundary fallback={null}>
-          <Suspense fallback={null}>
-            <FAQSection />
-          </Suspense>
-        </SectionErrorBoundary>
-      </LazySection>
+
 
       <LazySection fallback={null} rootMargin="200px">
         <SectionErrorBoundary fallback={null}>
