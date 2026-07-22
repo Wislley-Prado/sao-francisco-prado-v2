@@ -38,7 +38,7 @@ export const RanchoFAQs = ({ ranchoId }: RanchoFAQsProps) => {
     try {
       const { data, error } = await supabase
         .from("faqs")
-        .select("id, pergunta, pergunta_en, resposta, resposta_en, categoria, ativo, ordem, pacote_id, rancho_id, votos_uteis, votos_nao_uteis, created_at")
+        .select("id, pergunta, resposta, ativo, ordem, pacote_id, rancho_id, created_at")
         .eq("ativo", true)
         .or(`rancho_id.eq.${ranchoId},and(rancho_id.is.null,pacote_id.is.null)`)
         .order("ordem", { ascending: true });
