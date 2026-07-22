@@ -107,7 +107,7 @@ const Configuracoes = () => {
     try {
       const { data, error } = await supabase
         .from('site_settings')
-        .select('id, site_name, site_description, contact_phone, contact_email, whatsapp_number, address, hero_title, hero_subtitle, logo_url, favicon_url, pwa_icon_url, og_image_url, primary_color, secondary_color, header_scripts, body_scripts, video_title, video_url, video_enabled, reserva_button_text, dam_webhook_pausado, created_at, updated_at')
+        .select('id, favicon_url, og_image_url, pwa_icon_url, facebook_pixel, google_analytics, google_tag_manager, custom_head_scripts, dam_webhook_url, autor_avatar_url, facebook_url, instagram_url, youtube_url, tiktok_url, twitter_url, telefone_contato, email_contato, copyright_text, reserva_button_link, youtube_live_url, youtube_video_url, youtube_institucional_url, reserva_button_text, dam_webhook_pausado, created_at, updated_at')
         .eq('id', SETTINGS_ID)
         .single();
 
