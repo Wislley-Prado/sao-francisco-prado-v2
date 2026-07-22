@@ -14,9 +14,9 @@ export interface VideoSettings {
 /**
  * useVideoSettings - Reutiliza dados de useSiteSettings (elimina query duplicada)
  */
-export const useVideoSettings = () => {
+export const useVideoSettings = (isAdmin = false) => {
   const queryClient = useQueryClient();
-  const { data: siteSettings, isLoading } = useSiteSettings(true);
+  const { data: siteSettings, isLoading } = useSiteSettings(isAdmin);
 
   // Extrair video settings dos site settings já carregados
   const settings: VideoSettings | null = useMemo(() => {

@@ -786,14 +786,14 @@ export const useSiteSettings = (isAdmin = false) => {
         if (isAdmin) {
           const { data, error } = await supabase
             .from('site_settings')
-            .select('id, site_name, site_description, contact_phone, contact_email, whatsapp_number, address, hero_title, hero_subtitle, logo_url, favicon_url, pwa_icon_url, og_image_url, primary_color, secondary_color, header_scripts, body_scripts, video_title, video_url, video_enabled, reserva_button_text, created_at, updated_at')
+            .select('id, favicon_url, og_image_url, pwa_icon_url, facebook_pixel, google_analytics, google_tag_manager, custom_head_scripts, dam_webhook_url, autor_avatar_url, facebook_url, instagram_url, youtube_url, tiktok_url, twitter_url, telefone_contato, email_contato, copyright_text, reserva_button_link, youtube_live_url, youtube_video_url, youtube_institucional_url, reserva_button_text, dam_webhook_pausado, whatsapp_numero, whatsapp_titulo, whatsapp_mensagem_padrao, whatsapp_saudacao, whatsapp_instrucao, whatsapp_horario, whatsapp_opcoes, created_at, updated_at')
             .maybeSingle();
           if (error) throw error;
           return data as unknown as SiteSettings | null;
         } else {
           const { data, error } = await supabase
             .from('site_settings_public')
-            .select('id, site_name, site_description, contact_phone, contact_email, whatsapp_number, address, hero_title, hero_subtitle, logo_url, favicon_url, pwa_icon_url, og_image_url, primary_color, secondary_color, header_scripts, body_scripts, video_title, video_url, video_enabled, reserva_button_text, created_at, updated_at')
+            .select('id, facebook_pixel, google_analytics, google_tag_manager, custom_head_scripts, autor_avatar_url, facebook_url, instagram_url, youtube_url, tiktok_url, twitter_url, telefone_contato, email_contato, copyright_text, reserva_button_link, youtube_live_url, youtube_video_url, youtube_institucional_url, reserva_button_text, whatsapp_numero, whatsapp_titulo, whatsapp_mensagem_padrao, whatsapp_saudacao, whatsapp_instrucao, whatsapp_horario, whatsapp_opcoes, created_at, updated_at')
             .maybeSingle();
           if (error) throw error;
           return data as unknown as SiteSettings | null;

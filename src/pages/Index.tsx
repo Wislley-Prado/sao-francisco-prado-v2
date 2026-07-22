@@ -1,7 +1,5 @@
 import React, { Suspense } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
 import WhatsAppButton from '@/components/WhatsAppButton';
@@ -46,20 +44,7 @@ const SectionSkeleton = () => (
 );
 
 const Index = () => {
-  const { data: settings } = useQuery({
-    queryKey: ['site-settings-og'],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from('site_settings_public')
-        .select('og_image_url')
-        .limit(1)
-        .single();
-      return data;
-    },
-    staleTime: 0,
-  });
-
-  const ogImage = (settings as { og_image_url?: string })?.og_image_url || '/og-image.png';
+  const ogImage = '/og-image.png';
 
   return (
     <div className="min-h-screen">

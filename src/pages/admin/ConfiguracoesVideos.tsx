@@ -8,7 +8,7 @@ import { useVideoSettings, extractYouTubeId, isValidYouTubeUrl } from '@/hooks/u
 import { YouTubePreview } from '@/components/YouTubePlayer';
 
 const ConfiguracoesVideos = () => {
-  const { settings, isLoading, updateSettings, isUpdating } = useVideoSettings();
+  const { settings, isLoading, updateSettings, isUpdating } = useVideoSettings(true);
   const [liveUrl, setLiveUrl] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
   const [institucionalUrl, setInstitucionalUrl] = useState('');
