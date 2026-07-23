@@ -255,7 +255,7 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
           {renderAnuncioTag(anuncio)}
 
           <img
-            src={getOptimizedUrl(anuncio.imagem_url, 800)}
+            src={getOptimizedUrl(anuncio.imagem_url, 700, 70)}
             alt={anuncio.titulo}
             loading="lazy"
             decoding="async"
@@ -313,7 +313,7 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
               {renderAnuncioTag(anuncio, 'top-left')}
 
               <img
-                src={getOptimizedUrl(anuncio.imagem_url, 600)}
+                src={getOptimizedUrl(anuncio.imagem_url, 400, 70)}
                 alt={anuncio.titulo}
                 loading="lazy"
                 decoding="async"
@@ -401,7 +401,7 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
           {renderAnuncioTag(anuncio)}
 
           <img
-            src={getOptimizedUrl(anuncio.imagem_url, 800)}
+            src={getOptimizedUrl(anuncio.imagem_url, 700, 70)}
             alt={anuncio.titulo}
             loading="lazy"
             decoding="async"

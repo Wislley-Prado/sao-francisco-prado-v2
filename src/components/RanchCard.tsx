@@ -65,7 +65,7 @@ const RanchCard = ({ ranch }: RanchCardProps) => {
         <div className="relative">
           {images.length > 0 ? (
             <img 
-              src={getOptimizedUrl(images[0], 800)} 
+              src={getOptimizedUrl(images[0], 500, 70)} 
               alt={name}
               loading="lazy"
               decoding="async"

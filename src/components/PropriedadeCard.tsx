@@ -95,7 +95,7 @@ const PropriedadeCard = ({ propriedade }: PropriedadeCardProps) => {
           <Link to={`/venda/${propriedade.slug}`} className="block overflow-hidden">
             {propriedade.imagens && propriedade.imagens.length > 0 ? (
               <img 
-                src={getOptimizedUrl(propriedade.imagens[0], 800)} 
+                src={getOptimizedUrl(propriedade.imagens[0], 500, 70)} 
                 alt={titulo}
                 loading="lazy"
                 decoding="async"

@@ -23,7 +23,7 @@ const BlogCard = ({ post }: BlogCardProps) => {
     <Card className="h-full hover:shadow-lg transition-shadow duration-300 group cursor-pointer">
       <div className="aspect-video overflow-hidden rounded-t-lg">
         <img 
-          src={getOptimizedUrl(post.image, 800)} 
+          src={getOptimizedUrl(post.image, 500, 70)} 
           alt={post.title}
           loading="lazy"
           decoding="async"
