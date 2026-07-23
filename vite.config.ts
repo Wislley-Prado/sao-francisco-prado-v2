@@ -73,7 +73,7 @@ export default defineConfig(({ mode }) => ({
     nativeCompression(),
     VitePWA({
       registerType: 'autoUpdate',
-      injectRegister: 'auto',
+      injectRegister: 'inline',
       selfDestroying: mode !== 'production', // Desabilita e destrói o Service Worker em desenvolvimento
       devOptions: {
         enabled: false,

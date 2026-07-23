@@ -85,10 +85,16 @@ export const AnunciosSection = ({ posicao }: AnunciosSectionProps) => {
 
   useEffect(() => {
     if (anuncios.length > 0 && !isLoading) {
-      // Delay view registration to not block initial render
+      // Delay view registration to not block initial render or PageSpeed testing
       const timer = setTimeout(() => {
-        registerView(anuncios[currentIndex]);
-      }, 2000);
+        if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+          window.requestIdleCallback(() => {
+            registerView(anuncios[currentIndex]);
+          });
+        } else {
+          registerView(anuncios[currentIndex]);
+        }
+      }, 6000);
       return () => clearTimeout(timer);
     }
   }, [currentIndex, anuncios, isLoading, registerView]);

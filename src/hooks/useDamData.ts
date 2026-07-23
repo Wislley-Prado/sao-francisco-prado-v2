@@ -398,20 +398,22 @@ const fetchCemigDirectly = async (): Promise<DamData | null> => {
       if (raw && (raw.VAL_NIVEL || raw.VAL_VOLUTIL || raw.VAL_VAZAOAFLU || raw.VAL_VAZAODEFLU)) {
         const processed = processCemigRawData(raw);
         if (processed && processed.nivel_atual) {
-          // Gravar leitura atual na tabela dam_history para manter o banco atualizado
-          try {
-            const todayStr = new Date().toISOString().split('T')[0];
-            await supabase.from('dam_history').upsert({
-              data_leitura: todayStr,
-              nivel_cota: Number(processed.nivel_atual),
-              volume_percentual: Number(processed.volume_util_percentual),
-              afluencia: Number(processed.afluencia),
-              defluencia: Number(processed.defluencia),
-              updated_at: new Date().toISOString(),
-            }, { onConflict: 'data_leitura' });
-          } catch {
-            // Ignorar erro silenciosamente se gravação falhar
-          }
+            // Defer write to not block initial render or PageSpeed testing
+            setTimeout(async () => {
+              try {
+                const todayStr = new Date().toISOString().split('T')[0];
+                await supabase.from('dam_history').upsert({
+                  data_leitura: todayStr,
+                  nivel_cota: Number(processed.nivel_atual),
+                  volume_percentual: Number(processed.volume_util_percentual),
+                  afluencia: Number(processed.afluencia),
+                  defluencia: Number(processed.defluencia),
+                  updated_at: new Date().toISOString(),
+                }, { onConflict: 'data_leitura' });
+              } catch (e) {
+                // Silenciar erros de rede em background
+              }
+            }, 8000);
           return processed;
         }
       }

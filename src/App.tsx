@@ -7,7 +7,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { PWALifecycle } from "@/components/PWALifecycle";
-import { DynamicFavicon } from "@/components/DynamicFavicon";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import CookieConsent from "@/components/CookieConsent";
 import TrackingScripts from "@/components/TrackingScripts";
@@ -107,7 +106,6 @@ const App = () => {
             <Toaster />
             <Sonner />
             <PWALifecycle />
-            <DynamicFavicon />
             <BrowserRouter>
             <ScrollToTop />
             <PageViewTracker />
