@@ -25,7 +25,7 @@ import { RichTextEditor } from '@/components/admin/blog/RichTextEditor';
 import { CoordenadasHelper } from './CoordenadasHelper';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Loader2, Plus, X } from 'lucide-react';
+import { Loader2, Plus, X, Phone, MessageSquare, ExternalLink } from 'lucide-react';
 import { useInvalidateCache } from '@/hooks/useOptimizedData';
 import { isValidYouTubeUrl } from '@/hooks/useVideoSettings';
 
@@ -63,6 +63,7 @@ const pacoteSchema = z.object({
         message: 'Formato inválido. Use apenas números (DDD + número)',
       }
     ),
+  link_botao_acao: z.string().optional().or(z.literal('')),
   endereco_completo: z.string().optional(),
   latitude: z.number().optional().or(z.string().transform((val) => val ? parseFloat(val) : undefined)),
   longitude: z.number().optional().or(z.string().transform((val) => val ? parseFloat(val) : undefined)),
@@ -102,6 +103,7 @@ export interface PacoteData {
   vagas_disponiveis?: number;
   tracking_code?: string;
   telefone_whatsapp?: string;
+  link_botao_acao?: string | null;
   endereco_completo?: string;
   latitude?: number | string;
   longitude?: number | string;
@@ -165,6 +167,7 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
       vagas_disponiveis: pacote?.vagas_disponiveis || undefined,
       tracking_code: pacote?.tracking_code || '',
       telefone_whatsapp: pacote?.telefone_whatsapp || '',
+      link_botao_acao: pacote?.link_botao_acao || '',
       endereco_completo: pacote?.endereco_completo || '',
       latitude: pacote?.latitude ? Number(pacote.latitude) : undefined,
       longitude: pacote?.longitude ? Number(pacote.longitude) : undefined,
@@ -315,7 +318,8 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
         vagas_disponiveis: data.vagas_disponiveis || null,
         tracking_code: data.tracking_code || null,
         video_youtube: data.video_youtube || null,
-        telefone_whatsapp: data.telefone_whatsapp || null,
+        telefone_whatsapp: data.telefone_whatsapp ? data.telefone_whatsapp.replace(/\D/g, '') : null,
+        link_botao_acao: data.link_botao_acao && data.link_botao_acao.trim() !== '' ? data.link_botao_acao.trim() : null,
         endereco_completo: data.endereco_completo || null,
         latitude: data.latitude || null,
         longitude: data.longitude || null,
@@ -699,6 +703,70 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
               )}
             />
 
+            {/* Seção Contato e Ação */}
+            <div className="rounded-xl border p-5 bg-muted/30 space-y-4">
+              <div>
+                <h3 className="text-base font-semibold text-foreground flex items-center gap-2">
+                  <Phone className="w-4 h-4 text-primary" />
+                  Contato do Pacote & Botão de Ação
+                </h3>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Configure para onde o botão principal "Reservar Agora" e o botão do WhatsApp irão direcionar os clientes.
+                </p>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                {/* WhatsApp */}
+                <FormField
+                  control={form.control}
+                  name="telefone_whatsapp"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-1.5">
+                        <MessageSquare className="w-4 h-4 text-green-600" />
+                        WhatsApp para Contato (Opcional)
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="Ex: 55389988320108 (DDD + número)"
+                          maxLength={15}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        WhatsApp deste pacote. Deixe vazio para usar o padrão do site.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Link Botão de Ação */}
+                <FormField
+                  control={form.control}
+                  name="link_botao_acao"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-1.5">
+                        <ExternalLink className="w-4 h-4 text-blue-600" />
+                        URL / Link do Botão de Ação (Opcional)
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="Ex: https://checkout.exemplo.com/... ou link de reserva"
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Destino do botão "Reservar Agora". Se vazio, abrirá o WhatsApp do pacote automaticamente.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <FormField
                 control={form.control}
@@ -853,30 +921,6 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
                 <YouTubePreview videoUrl={form.watch('video_youtube')} />
               </div>
             )}
-
-            <Separator className="my-6" />
-
-            {/* WhatsApp */}
-            <FormField
-              control={form.control}
-              name="telefone_whatsapp"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>WhatsApp para Contato (Opcional)</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="5538999999999 (apenas números com DDD)"
-                      maxLength={13}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Número específico para este pacote. Se deixar vazio, será usado o WhatsApp padrão do site
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
 
             <Separator className="my-6" />
 

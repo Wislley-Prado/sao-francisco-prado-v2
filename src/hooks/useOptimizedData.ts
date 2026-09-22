@@ -71,6 +71,7 @@ export interface PacoteWithImages {
   video_youtube?: string;
   tracking_code?: string;
   telefone_whatsapp?: string;
+  link_botao_acao?: string;
   endereco_completo?: string;
   latitude?: number;
   longitude?: number;
@@ -454,7 +455,7 @@ export const usePacotes = (onlyActive = true) => {
       let query = supabase
         .from('pacotes')
         .select(`
-          id, nome, titulo_en, slug, descricao, descricao_en, preco, duracao, pessoas, rating, tipo, caracteristicas, inclusos, ativo, popular, destaque, parcelas_quantidade, parcela_valor, desconto_avista, vagas_disponiveis, video_youtube, tracking_code, telefone_whatsapp, endereco_completo, latitude, longitude, created_at,
+          id, nome, titulo_en, slug, descricao, descricao_en, preco, duracao, pessoas, rating, tipo, caracteristicas, inclusos, ativo, popular, destaque, parcelas_quantidade, parcela_valor, desconto_avista, vagas_disponiveis, video_youtube, tracking_code, telefone_whatsapp, link_botao_acao, endereco_completo, latitude, longitude, created_at,
           pacote_imagens (
             id, url, alt_text, principal, ordem
           )
@@ -493,6 +494,7 @@ export const usePacotes = (onlyActive = true) => {
         video_youtube: pacote.video_youtube,
         tracking_code: pacote.tracking_code,
         telefone_whatsapp: pacote.telefone_whatsapp,
+        link_botao_acao: pacote.link_botao_acao,
         endereco_completo: pacote.endereco_completo,
         latitude: pacote.latitude,
         longitude: pacote.longitude,
@@ -538,7 +540,7 @@ export const usePacoteBySlug = (slug: string | undefined) => {
       const { data, error } = await supabase
         .from('pacotes')
         .select(`
-          id, nome, titulo_en, slug, descricao, descricao_en, preco, duracao, pessoas, rating, tipo, caracteristicas, inclusos, ativo, popular, destaque, parcelas_quantidade, parcela_valor, desconto_avista, vagas_disponiveis, video_youtube, tracking_code, telefone_whatsapp, endereco_completo, latitude, longitude, created_at,
+          id, nome, titulo_en, slug, descricao, descricao_en, preco, duracao, pessoas, rating, tipo, caracteristicas, inclusos, ativo, popular, destaque, parcelas_quantidade, parcela_valor, desconto_avista, vagas_disponiveis, video_youtube, tracking_code, telefone_whatsapp, link_botao_acao, endereco_completo, latitude, longitude, created_at,
           pacote_imagens (
             id, url, alt_text, principal, ordem
           )
@@ -573,6 +575,7 @@ export const usePacoteBySlug = (slug: string | undefined) => {
         video_youtube: data.video_youtube,
         tracking_code: data.tracking_code,
         telefone_whatsapp: data.telefone_whatsapp,
+        link_botao_acao: data.link_botao_acao,
         endereco_completo: data.endereco_completo,
         latitude: data.latitude,
         longitude: data.longitude,

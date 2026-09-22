@@ -61,6 +61,7 @@ const PacoteDetalhes = () => {
       video_youtube: pacoteData.video_youtube,
       tracking_code: pacoteData.tracking_code,
       telefone_whatsapp: pacoteData.telefone_whatsapp,
+      link_botao_acao: pacoteData.link_botao_acao,
       endereco_completo: pacoteData.endereco_completo,
       latitude: pacoteData.latitude,
       longitude: pacoteData.longitude,
@@ -139,6 +140,16 @@ const PacoteDetalhes = () => {
         });
       }
     }
+
+    // Se tiver link/URL de ação próprio, redireciona diretamente
+    if (pacote?.link_botao_acao && pacote.link_botao_acao.trim() !== '') {
+      const url = pacote.link_botao_acao.trim();
+      const finalUrl = url.startsWith('http://') || url.startsWith('https://') ? url : `https://${url}`;
+      window.open(finalUrl, '_blank', 'noopener,noreferrer');
+      return;
+    }
+
+    // Fallback: abre conversa de WhatsApp do pacote
     handleWhatsAppClick();
   };
 

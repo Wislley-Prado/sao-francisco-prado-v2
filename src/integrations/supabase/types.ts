@@ -599,6 +599,7 @@ export type Database = {
           video_youtube: string | null
           titulo_en: string | null
           descricao_en: string | null
+          link_botao_acao: string | null
         }
         Insert: {
           ativo?: boolean
@@ -629,6 +630,7 @@ export type Database = {
           video_youtube?: string | null
           titulo_en?: string | null
           descricao_en?: string | null
+          link_botao_acao?: string | null
         }
         Update: {
           ativo?: boolean
@@ -659,6 +661,7 @@ export type Database = {
           video_youtube?: string | null
           titulo_en?: string | null
           descricao_en?: string | null
+          link_botao_acao?: string | null
         }
         Relationships: []
       }
