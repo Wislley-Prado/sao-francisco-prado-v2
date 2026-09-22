@@ -18,31 +18,33 @@ interface FAQ {
 }
 
 interface PacoteFAQsProps {
-  pacoteId: string;
+  pacoteId: string | null;
+  showTitle?: boolean;
+  className?: string;
 }
 
 const FAQItem = ({ faq, index, value }: { faq: FAQ; index: number; value: string }) => {
-  const { ref, isVisible } = useScrollReveal({ threshold: 0.3 });
+  const { ref, isVisible } = useScrollReveal({ threshold: 0.1 });
 
   return (
     <div
       ref={ref}
-      className={`transition-all duration-700 ${isVisible
+      className={`transition-all duration-500 ${isVisible
         ? 'opacity-100 translate-y-0'
-        : 'opacity-0 translate-y-6'
+        : 'opacity-0 translate-y-4'
         }`}
-      style={{ transitionDelay: `${index * 100}ms` }}
+      style={{ transitionDelay: `${index * 80}ms` }}
     >
       <AccordionItem value={value} className="border-b border-border/50 hover:border-primary/30 transition-colors">
-        <AccordionTrigger className="text-left font-semibold hover:text-primary transition-colors py-5">
+        <AccordionTrigger className="text-left font-semibold hover:text-primary transition-colors py-4">
           <div className="flex items-start gap-3">
-            <HelpCircle className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+            <HelpCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
             <span>{faq.pergunta}</span>
           </div>
         </AccordionTrigger>
-        <AccordionContent className="text-muted-foreground pb-6">
+        <AccordionContent className="text-muted-foreground pb-5">
           <div className="pl-8">
-            <p className="leading-relaxed mb-4">{faq.resposta}</p>
+            <p className="leading-relaxed mb-3">{faq.resposta}</p>
             <FAQVoteButtons faqId={faq.id} />
           </div>
         </AccordionContent>
@@ -51,10 +53,10 @@ const FAQItem = ({ faq, index, value }: { faq: FAQ; index: number; value: string
   );
 };
 
-export const PacoteFAQs = ({ pacoteId }: PacoteFAQsProps) => {
+export const PacoteFAQs = ({ pacoteId, showTitle = false, className = '' }: PacoteFAQsProps) => {
   const [faqs, setFaqs] = useState<FAQ[]>([]);
   const [loading, setLoading] = useState(true);
-  const { ref: titleRef, isVisible: titleVisible } = useScrollReveal({ threshold: 0.5 });
+  const { ref: titleRef, isVisible: titleVisible } = useScrollReveal({ threshold: 0.3 });
 
   useEffect(() => {
     fetchFaqs();
@@ -63,12 +65,19 @@ export const PacoteFAQs = ({ pacoteId }: PacoteFAQsProps) => {
 
   const fetchFaqs = async () => {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from("faqs")
         .select("id, pergunta, resposta, ativo, ordem, pacote_id, rancho_id, created_at")
         .eq("ativo", true)
-        .or(`pacote_id.eq.${pacoteId},and(rancho_id.is.null,pacote_id.is.null)`)
         .order("ordem", { ascending: true });
+
+      if (pacoteId) {
+        query = query.or(`pacote_id.eq.${pacoteId},and(rancho_id.is.null,pacote_id.is.null)`);
+      } else {
+        query = query.is("rancho_id", null).is("pacote_id", null);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       setFaqs(data || []);
@@ -81,28 +90,49 @@ export const PacoteFAQs = ({ pacoteId }: PacoteFAQsProps) => {
 
   if (loading) {
     return (
-      <div className="py-16 text-center">
-        <div className="animate-pulse text-muted-foreground">Carregando perguntas...</div>
+      <div className="py-6 text-center">
+        <div className="animate-pulse text-sm text-muted-foreground">Carregando perguntas frequentes...</div>
       </div>
     );
   }
 
   if (faqs.length === 0) {
     return (
-      <div className="text-center py-12 text-muted-foreground bg-muted/30 rounded-xl">
-        <HelpCircle className="w-12 h-12 mx-auto mb-4 text-muted-foreground/50" />
-        <p className="font-semibold mb-2">Nenhuma pergunta frequente disponível para este pacote.</p>
-        <p className="text-sm">Entre em contato pelo WhatsApp para tirar suas dúvidas!</p>
+      <div className="text-center py-6 text-muted-foreground bg-muted/20 rounded-xl">
+        <HelpCircle className="w-8 h-8 mx-auto mb-2 text-muted-foreground/50" />
+        <p className="font-medium text-sm mb-1">Nenhuma pergunta frequente cadastrada para este pacote.</p>
+        <p className="text-xs">Entre em contato pelo WhatsApp para tirar todas as suas dúvidas!</p>
+      </div>
+    );
+  }
+
+  const accordionContent = (
+    <Accordion type="single" collapsible className="w-full">
+      {faqs.map((faq, index) => (
+        <FAQItem
+          key={faq.id}
+          faq={faq}
+          index={index}
+          value={`item-${index}`}
+        />
+      ))}
+    </Accordion>
+  );
+
+  if (!showTitle) {
+    return (
+      <div className={`w-full ${className}`}>
+        {accordionContent}
       </div>
     );
   }
 
   return (
-    <section className="py-16">
+    <section className={`py-8 ${className}`}>
       <div className="container max-w-4xl mx-auto px-4">
         <div
           ref={titleRef}
-          className={`text-center mb-12 transition-all duration-700 ${titleVisible
+          className={`text-center mb-8 transition-all duration-700 ${titleVisible
             ? 'opacity-100 translate-y-0'
             : 'opacity-0 translate-y-4'
             }`}
@@ -114,17 +144,7 @@ export const PacoteFAQs = ({ pacoteId }: PacoteFAQsProps) => {
             Tire suas dúvidas sobre este pacote
           </p>
         </div>
-
-        <Accordion type="single" collapsible className="w-full">
-          {faqs.map((faq, index) => (
-            <FAQItem
-              key={faq.id}
-              faq={faq}
-              index={index}
-              value={`item-${index}`}
-            />
-          ))}
-        </Accordion>
+        {accordionContent}
       </div>
     </section>
   );

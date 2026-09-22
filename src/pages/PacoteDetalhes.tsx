@@ -581,10 +581,10 @@ const PacoteDetalhes = () => {
             {/* Dúvidas Frequentes (FAQ) */}
             <Card className="border shadow-sm">
               <CardContent className="p-6 sm:p-8">
-                <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-4">
                   {t('labels.faq', 'Dúvidas Frequentes')}
                 </h2>
-                <PacoteFAQs pacoteId={pacote.id} />
+                <PacoteFAQs pacoteId={pacote.id} showTitle={false} />
               </CardContent>
             </Card>
 
@@ -598,8 +598,8 @@ const PacoteDetalhes = () => {
             </div>
           </div>
 
-          {/* Coluna Lateral (Sticky) - Preço e Reserva */}
-          <div className="lg:col-span-1">
+          {/* Coluna Lateral (Sticky no Desktop, Primeira no Mobile) - Preço e Reserva */}
+          <div className="lg:col-span-1 order-first lg:order-last">
             <div className="sticky top-20 space-y-6">
               <PackagePricing
                 price={pacote.preco}
@@ -636,7 +636,41 @@ const PacoteDetalhes = () => {
         </div>
       </main>
 
-      <Footer />
+      {/* Barra Flutuante de Reserva Fixa no Rodapé (Exclusiva para Celular) */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-lg border-t border-border p-3 px-4 shadow-[0_-4px_20px_rgba(0,0,0,0.12)] flex items-center justify-between gap-3">
+        <div>
+          <div className="text-[11px] text-muted-foreground font-medium">
+            {pacote.desconto_avista && pacote.desconto_avista > 0 ? (
+              <span className="text-emerald-600 dark:text-emerald-400 font-bold">{pacote.desconto_avista}% OFF à vista</span>
+            ) : (
+              'A partir de'
+            )}
+          </div>
+          <div className="font-extrabold text-sm sm:text-base text-foreground leading-tight">
+            {pacote.parcela_valor || pacote.parcelas_quantidade ? (
+              <>
+                {(pacote.parcelas_quantidade || 10)}x de R$ {(pacote.parcela_valor || (pacote.preco / (pacote.parcelas_quantidade || 10))).toFixed(2).replace('.', ',')}
+              </>
+            ) : (
+              <>R$ {pacote.preco.toFixed(2).replace('.', ',')}</>
+            )}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            onClick={handleReservarClick}
+            className="font-bold text-xs sm:text-sm px-4 py-2 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white shadow-md shadow-green-600/20 rounded-xl"
+          >
+            Reservar Agora
+          </Button>
+        </div>
+      </div>
+
+      <div className="pb-16 lg:pb-0">
+        <Footer />
+      </div>
     </>
   );
 };
