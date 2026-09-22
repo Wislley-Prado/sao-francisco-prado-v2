@@ -131,8 +131,12 @@ export default async function handler(req: any, res: any) {
     });
 
     const sessionId = Math.random().toString(36).substring(2, 15);
-    // Notifica o endpoint para onde o Gemini deve enviar as chamadas POST
-    res.write(`event: endpoint\ndata: /api/mcp?sessionId=${sessionId}\n\n`);
+    const host = req.headers['x-forwarded-host'] || req.headers['host'] || 'sao-francisco-prado-v2.vercel.app';
+    const proto = req.headers['x-forwarded-proto'] || 'https';
+    const postUrl = `${proto}://${host}/api/mcp?sessionId=${sessionId}`;
+
+    // Notifica o endpoint para onde o Gemini deve enviar as chamadas POST (URL absoluta compatível)
+    res.write(`event: endpoint\ndata: ${postUrl}\n\n`);
 
     // Mantém a conexão aberta com ping
     const interval = setInterval(() => {
@@ -146,7 +150,18 @@ export default async function handler(req: any, res: any) {
     return;
   }
 
-  // 2. Visita pelo navegador (Página informativa com status)
+  // 2. Resposta JSON para clientes e validadores de API
+  if (req.method === 'GET' && (acceptHeader.includes('application/json') || req.query?.format === 'json')) {
+    return res.status(200).json({
+      name: 'PradoAqui Blog Agent',
+      version: '1.0.0',
+      protocolVersion: '2024-11-05',
+      capabilities: { tools: {} },
+      tools: TOOLS
+    });
+  }
+
+  // 3. Visita pelo navegador (Página informativa com status)
   if (req.method === 'GET') {
     return res.status(200).send(`
       <!DOCTYPE html>
