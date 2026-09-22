@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Switch } from '@/components/ui/switch';
 import {
   Table,
   TableBody,
@@ -14,6 +15,9 @@ import { Edit, Trash2, Star, Users, Calendar } from 'lucide-react';
 import { DeletePacoteDialog } from './DeletePacoteDialog';
 import { useState } from 'react';
 import { getOriginalUrl } from '@/lib/imageUtils';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { useInvalidateCache } from '@/hooks/useOptimizedData';
 
 interface PacoteImage {
   url: string;
@@ -43,6 +47,30 @@ interface PacoteTableProps {
 export const PacoteTable = ({ pacotes, isLoading, onUpdate }: PacoteTableProps) => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedPacote, setSelectedPacote] = useState<Pacote | null>(null);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const { invalidatePacotes, invalidateAdminPacotes } = useInvalidateCache();
+
+  const handleToggleAtivo = async (id: string, currentStatus: boolean) => {
+    setUpdatingId(id);
+    try {
+      const { error } = await supabase
+        .from('pacotes')
+        .update({ ativo: !currentStatus })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      invalidatePacotes();
+      invalidateAdminPacotes();
+      onUpdate();
+      toast.success(!currentStatus ? 'Pacote ativado com sucesso!' : 'Pacote desativado com sucesso!');
+    } catch (error: any) {
+      console.error('Erro ao alternar status do pacote:', error);
+      toast.error(error?.message || 'Erro ao alterar status');
+    } finally {
+      setUpdatingId(null);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -150,9 +178,16 @@ export const PacoteTable = ({ pacotes, isLoading, onUpdate }: PacoteTableProps) 
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge variant={pacote.ativo ? 'default' : 'secondary'}>
-                    {pacote.ativo ? 'Ativo' : 'Inativo'}
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      checked={pacote.ativo}
+                      disabled={updatingId === pacote.id}
+                      onCheckedChange={() => handleToggleAtivo(pacote.id, pacote.ativo)}
+                    />
+                    <Badge variant={pacote.ativo ? 'default' : 'secondary'} className="text-xs">
+                      {pacote.ativo ? 'Ativo' : 'Inativo'}
+                    </Badge>
+                  </div>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center justify-end gap-2">

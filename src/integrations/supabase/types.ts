@@ -597,7 +597,7 @@ export type Database = {
           updated_at: string
           vagas_disponiveis: number | null
           video_youtube: string | null
-          nome_en: string | null
+          titulo_en: string | null
           descricao_en: string | null
         }
         Insert: {
@@ -627,7 +627,7 @@ export type Database = {
           updated_at?: string
           vagas_disponiveis?: number | null
           video_youtube?: string | null
-          nome_en?: string | null
+          titulo_en?: string | null
           descricao_en?: string | null
         }
         Update: {
@@ -657,7 +657,7 @@ export type Database = {
           updated_at?: string
           vagas_disponiveis?: number | null
           video_youtube?: string | null
-          nome_en?: string | null
+          titulo_en?: string | null
           descricao_en?: string | null
         }
         Relationships: []

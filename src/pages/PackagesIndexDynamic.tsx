@@ -11,34 +11,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { useTranslation } from 'react-i18next';
 import { getOptimizedUrl } from '@/lib/imageUtils';
 
-interface Pacote {
-  id: string;
-  nome: string;
-  nome_en?: string | null;
-  slug: string;
-  descricao: string;
-  descricao_en?: string | null;
-  preco: number;
-  duracao: string;
-  pessoas: number;
-  rating: number;
-  tipo: string;
-  ativo: boolean;
-  popular: boolean;
-  destaque: boolean;
-  caracteristicas: string[];
-  inclusos: string[];
-  imagens: {
-    url: string;
-    principal: boolean;
-  }[];
-}
+import { usePacotes, PacoteWithImages } from '@/hooks/useOptimizedData';
 
 const PackagesIndexDynamic = () => {
   const { t, i18n } = useTranslation();
   const isEn = i18n.language.startsWith('en');
-  const [pacotes, setPacotes] = useState<Pacote[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: pacotes = [], isLoading: loading } = usePacotes(true);
   const [heroImage, setHeroImage] = useState('');
 
   useEffect(() => {
@@ -63,37 +41,11 @@ const PackagesIndexDynamic = () => {
       }
     };
     fetchSettings();
-    
-    const fetchPacotes = async () => {
-      try {
-        const { data: pacotesData, error } = await supabase
-          .from('pacotes')
-          .select('*, pacote_imagens(url, principal)')
-          .eq('ativo', true)
-          .order('popular', { ascending: false })
-          .order('preco', { ascending: true });
-
-        if (error) throw error;
-
-        const pacotesFormatados = pacotesData?.map(p => ({
-          ...p,
-          imagens: p.pacote_imagens || []
-        })) || [];
-
-        setPacotes(pacotesFormatados);
-      } catch (error) {
-        console.error('Erro ao buscar pacotes:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPacotes();
   }, []);
 
-  const getMainImage = (pacote: Pacote) => {
-    const mainImg = pacote.imagens.find(img => img.principal);
-    return mainImg?.url || pacote.imagens[0]?.url || '/placeholder.svg';
+  const getMainImage = (pacote: PacoteWithImages) => {
+    const mainImg = pacote.imagens?.find(img => img.principal);
+    return mainImg?.url || pacote.imagens?.[0]?.url || '/placeholder.svg';
   };
 
   const getTipoIcon = (tipo: string) => {

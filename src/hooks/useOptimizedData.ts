@@ -50,8 +50,10 @@ export interface RanchoWithImages {
 export interface PacoteWithImages {
   id: string;
   nome: string;
+  nome_en?: string | null;
   slug: string;
   descricao: string;
+  descricao_en?: string | null;
   preco: number;
   duracao: string;
   pessoas: number;
@@ -452,7 +454,7 @@ export const usePacotes = (onlyActive = true) => {
       let query = supabase
         .from('pacotes')
         .select(`
-          id, nome, slug, descricao, preco, duracao, pessoas, rating, tipo, caracteristicas, inclusos, ativo, popular, destaque, parcelas_quantidade, parcela_valor, desconto_avista, vagas_disponiveis, video_youtube, tracking_code, telefone_whatsapp, endereco_completo, latitude, longitude, created_at,
+          id, nome, titulo_en, slug, descricao, descricao_en, preco, duracao, pessoas, rating, tipo, caracteristicas, inclusos, ativo, popular, destaque, parcelas_quantidade, parcela_valor, desconto_avista, vagas_disponiveis, video_youtube, tracking_code, telefone_whatsapp, endereco_completo, latitude, longitude, created_at,
           pacote_imagens (
             id, url, alt_text, principal, ordem
           )
@@ -470,8 +472,10 @@ export const usePacotes = (onlyActive = true) => {
       return (data || []).map(pacote => ({
         id: pacote.id,
         nome: pacote.nome,
+        nome_en: pacote.titulo_en || null,
         slug: pacote.slug,
         descricao: pacote.descricao || '',
+        descricao_en: pacote.descricao_en || null,
         preco: Number(pacote.preco),
         duracao: pacote.duracao,
         pessoas: pacote.pessoas,
@@ -534,7 +538,7 @@ export const usePacoteBySlug = (slug: string | undefined) => {
       const { data, error } = await supabase
         .from('pacotes')
         .select(`
-          id, nome, slug, descricao, preco, duracao, pessoas, rating, tipo, caracteristicas, inclusos, ativo, popular, destaque, parcelas_quantidade, parcela_valor, desconto_avista, vagas_disponiveis, video_youtube, tracking_code, telefone_whatsapp, endereco_completo, latitude, longitude, created_at,
+          id, nome, titulo_en, slug, descricao, descricao_en, preco, duracao, pessoas, rating, tipo, caracteristicas, inclusos, ativo, popular, destaque, parcelas_quantidade, parcela_valor, desconto_avista, vagas_disponiveis, video_youtube, tracking_code, telefone_whatsapp, endereco_completo, latitude, longitude, created_at,
           pacote_imagens (
             id, url, alt_text, principal, ordem
           )
@@ -548,8 +552,10 @@ export const usePacoteBySlug = (slug: string | undefined) => {
       return {
         id: data.id,
         nome: data.nome,
+        nome_en: data.titulo_en || null,
         slug: data.slug,
         descricao: data.descricao || '',
+        descricao_en: data.descricao_en || null,
         preco: Number(data.preco),
         duracao: data.duracao,
         pessoas: data.pessoas,
@@ -1057,8 +1063,10 @@ export const useInvalidateCache = () => {
     invalidatePacotes: () => {
       invalidateCacheByPrefix('pacotes');
       invalidateCacheByPrefix('pacote_');
+      invalidateCacheByPrefix('admin_pacotes');
       queryClient.invalidateQueries({ queryKey: ['pacotes'] });
       queryClient.invalidateQueries({ queryKey: ['pacote'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-pacotes-cached'] });
     },
     invalidateBlog: () => {
       invalidateCacheByPrefix('blog');

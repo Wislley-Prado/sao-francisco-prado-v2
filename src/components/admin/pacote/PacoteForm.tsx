@@ -84,6 +84,7 @@ export interface PacoteData {
   id: string;
   nome?: string;
   nome_en?: string | null;
+  titulo_en?: string | null;
   slug?: string;
   descricao?: string;
   descricao_en?: string | null;
@@ -146,7 +147,7 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
     reValidateMode: 'onChange',
     defaultValues: {
       nome: pacote?.nome || '',
-      nome_en: pacote?.nome_en || '',
+      nome_en: pacote?.titulo_en || pacote?.nome_en || '',
       slug: pacote?.slug || '',
       descricao: pacote?.descricao || '',
       descricao_en: pacote?.descricao_en || '',
@@ -296,7 +297,7 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
     try {
       const pacoteData = {
         nome: data.nome,
-        nome_en: data.nome_en || null,
+        titulo_en: data.nome_en || null,
         slug: data.slug,
         descricao: data.descricao || null,
         descricao_en: data.descricao_en || null,
@@ -350,10 +351,9 @@ export const PacoteForm = ({ pacote, onSuccess }: PacoteFormProps) => {
       invalidateAdminPacotes();
 
       onSuccess();
-    } catch (error) {
-      const isError = error instanceof Error;
+    } catch (error: any) {
       console.error('Error saving pacote:', error);
-      toast.error(isError ? error.message : 'Erro ao salvar pacote');
+      toast.error(error?.message || (error instanceof Error ? error.message : 'Erro ao salvar pacote'));
     } finally {
       setIsSubmitting(false);
     }

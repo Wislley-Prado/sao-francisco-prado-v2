@@ -23,7 +23,6 @@ import { toast } from 'sonner';
 import { usePacoteBySlug } from '@/hooks/useOptimizedData';
 import { ShareButtons } from '@/components/ShareButtons';
 import { SITE_CONFIG } from '@/lib/constants';
-import { invalidateCache } from '@/lib/cacheService';
 import { useTranslation } from 'react-i18next';
 
 const PacoteDetalhes = () => {
@@ -33,18 +32,7 @@ const PacoteDetalhes = () => {
   const navigate = useNavigate();
 
   // Use optimized hook with cache
-  const { data: pacoteData, isLoading: loading, refetch } = usePacoteBySlug(slug);
-
-  // Cache self-healing: if coordinates are missing but it's a known pacote, try clearing cache
-  useEffect(() => {
-    if (!loading && pacoteData && !pacoteData.latitude && slug) {
-      console.log(`[Cache] Dados de localização ausentes para ${slug}, invalidando cache...`);
-      invalidateCache(`pacote_${slug}`);
-      invalidateCache('pacotes_all');
-      invalidateCache('pacotes_available');
-      refetch();
-    }
-  }, [pacoteData, loading, slug, refetch]);
+  const { data: pacoteData, isLoading: loading } = usePacoteBySlug(slug);
 
   // Transform to expected format
   const pacote = useMemo(() => {
