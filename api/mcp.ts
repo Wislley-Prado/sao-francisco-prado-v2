@@ -150,20 +150,12 @@ export default async function handler(req: any, res: any) {
     return;
   }
 
-  // 2. Resposta JSON para clientes e validadores de API
-  if (req.method === 'GET' && (acceptHeader.includes('application/json') || req.query?.format === 'json')) {
-    return res.status(200).json({
-      name: 'PradoAqui Blog Agent',
-      version: '1.0.0',
-      protocolVersion: '2024-11-05',
-      capabilities: { tools: {} },
-      tools: TOOLS
-    });
-  }
-
-  // 3. Visita pelo navegador (Página informativa com status)
+  // 2. Resposta GET para clientes, validadores MCP e navegadores
   if (req.method === 'GET') {
-    return res.status(200).send(`
+    const isExplicitHtml = acceptHeader.includes('text/html') && !acceptHeader.includes('application/json') && req.query?.format !== 'json';
+
+    if (isExplicitHtml) {
+      return res.status(200).send(`
       <!DOCTYPE html>
       <html lang="pt-BR">
       <head>
@@ -184,10 +176,10 @@ export default async function handler(req: any, res: any) {
         <div class="card">
           <h3>Como conectar no Gemini Spark / Apps:</h3>
           <ol>
-            <li>Acesse <code>gemini.google.com/apps</code></li>
+            <li>Acesse <code>gemini.google.com/customize/connectors</code></li>
             <li>Cole a URL abaixo no campo de app personalizada:</li>
           </ol>
-          <pre>${req.headers.host ? `https://${req.headers.host}/api/mcp` : 'https://seu-dominio.vercel.app/api/mcp'}</pre>
+          <pre>${req.headers['host'] ? `https://${req.headers['host']}/api/mcp` : 'https://sao-francisco-prado-v2.vercel.app/api/mcp'}</pre>
         </div>
 
         <div class="card">
@@ -201,7 +193,19 @@ export default async function handler(req: any, res: any) {
         </div>
       </body>
       </html>
-    `);
+      `);
+    }
+
+    return res.status(200).json({
+      status: 'online',
+      name: 'PradoAqui Blog Agent',
+      version: '1.0.0',
+      protocolVersion: '2024-11-05',
+      capabilities: {
+        tools: { listChanged: false }
+      },
+      tools: TOOLS
+    });
   }
 
   // 3. Processamento de mensagens JSON-RPC (POST)
@@ -221,22 +225,25 @@ export default async function handler(req: any, res: any) {
     if (method === 'initialize') {
       return res.status(200).json({
         jsonrpc: '2.0',
-        id,
+        id: id ?? 1,
         result: {
-          protocolVersion: '2024-11-05',
+          protocolVersion: params?.protocolVersion || '2024-11-05',
           capabilities: {
-            tools: {}
+            tools: { listChanged: false }
           },
           serverInfo: {
-            name: 'PradoAqui Blog Agent',
+            name: 'pradoaqui-blog-agent',
             version: '1.0.0'
           }
         }
       });
     }
 
-    // Notificação: notifications/initialized
-    if (method === 'notifications/initialized') {
+    // Notificação: notifications/initialized ou initialized
+    if (method === 'notifications/initialized' || method === 'initialized') {
+      if (id !== undefined && id !== null) {
+        return res.status(200).json({ jsonrpc: '2.0', id, result: {} });
+      }
       return res.status(200).json({ jsonrpc: '2.0' });
     }
 
