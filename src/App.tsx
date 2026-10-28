@@ -13,9 +13,7 @@ import TrackingScripts from "@/components/TrackingScripts";
 import PageViewTracker from "@/components/PageViewTracker";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { PrivateRoute } from "@/components/admin/PrivateRoute";
-import { AdminLayout } from "@/components/admin/AdminLayout";
 import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
 import { lazyWithRetry } from "@/utils/lazyWithRetry";
@@ -76,6 +74,8 @@ const FAQEditar = lazyWithRetry(() => import("./pages/admin/FAQEditar"));
 const Depoimentos = lazyWithRetry(() => import("./pages/admin/Depoimentos"));
 const DepoimentoNovo = lazyWithRetry(() => import("./pages/admin/DepoimentoNovo"));
 const DepoimentoEditar = lazyWithRetry(() => import("./pages/admin/DepoimentoEditar"));
+const AdminLayout = lazyWithRetry(() => import("@/components/admin/AdminLayout").then(m => ({ default: m.AdminLayout })));
+const NotFound = lazyWithRetry(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
   defaultOptions: {

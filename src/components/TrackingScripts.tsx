@@ -12,7 +12,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import DOMPurify from 'dompurify';
 
 interface TrackingSettings {
   facebook_pixel: string;
@@ -142,17 +141,21 @@ const TrackingScripts = () => {
       document.body.insertBefore(gtmNoscript, document.body.firstChild);
     }
 
-    // Scripts personalizados (sanitizados)
+    // Scripts personalizados (sanitizados - carregado dinamicamente para não pesar o bundle inicial)
     if (scripts.custom_head_scripts) {
-      const customDiv = document.createElement('div');
-      const sanitizedHTML = DOMPurify.sanitize(scripts.custom_head_scripts, {
-        ADD_TAGS: ['script', 'style', 'link'],
-        ADD_ATTR: ['src', 'href', 'rel', 'type', 'async', 'defer'],
-        ALLOW_DATA_ATTR: false
-      });
-      customDiv.innerHTML = sanitizedHTML;
-      Array.from(customDiv.children).forEach((element) => {
-        document.head.appendChild(element.cloneNode(true));
+      import('dompurify').then(({ default: DOMPurify }) => {
+        const customDiv = document.createElement('div');
+        const sanitizedHTML = DOMPurify.sanitize(scripts.custom_head_scripts, {
+          ADD_TAGS: ['script', 'style', 'link'],
+          ADD_ATTR: ['src', 'href', 'rel', 'type', 'async', 'defer'],
+          ALLOW_DATA_ATTR: false
+        });
+        customDiv.innerHTML = sanitizedHTML;
+        Array.from(customDiv.children).forEach((element) => {
+          document.head.appendChild(element.cloneNode(true));
+        });
+      }).catch((err) => {
+        console.error('Erro ao carregar DOMPurify dinamicamente:', err);
       });
     }
   }, [scripts]);

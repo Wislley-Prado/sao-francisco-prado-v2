@@ -74,16 +74,10 @@ export default defineConfig(({ mode }) => ({
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: 'inline',
-      selfDestroying: mode !== 'production', // Desabilita e destrói o Service Worker em desenvolvimento
+      selfDestroying: true, // Desregistra Service Worker antigo sem precache invasivo de 5MB
       devOptions: {
         enabled: false,
         suppressWarnings: true,
-      },
-      workbox: {
-        skipWaiting: true,
-        clientsClaim: true,
-        cleanupOutdatedCaches: true,
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,webp}'],
       },
     }),
     ViteImageOptimizer({
@@ -107,7 +101,6 @@ export default defineConfig(({ mode }) => ({
             params: {
               overrides: {
                 cleanupNumericValues: false,
-                removeViewBox: false,
               },
             },
           },
@@ -130,20 +123,57 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks(id) {
           if (id.includes("node_modules")) {
-            if (id.includes("react-dom") || id.includes("react-router-dom") || (id.includes("react") && !id.includes("react-day-picker"))) {
-              return "vendor-core";
-            }
-            if (id.includes("recharts")) {
-              return "vendor-recharts";
-            }
-            if (id.includes("jspdf") || id.includes("html2canvas")) {
+            // 1. PDF generation (carregado apenas sob demanda para exportar relatório)
+            if (
+              id.includes("jspdf") ||
+              id.includes("html2canvas") ||
+              id.includes("canvg") ||
+              id.includes("fflate") ||
+              id.includes("brotli")
+            ) {
               return "vendor-pdf";
             }
-            if (id.includes("@tiptap")) {
+
+            // 2. Editor de texto rico Tiptap/ProseMirror (apenas para o painel admin)
+            if (id.includes("@tiptap") || id.includes("prosemirror")) {
               return "vendor-editor";
             }
+
+            // 3. Gráficos (Recharts e D3)
+            if (id.includes("recharts") || id.includes("d3-")) {
+              return "vendor-recharts";
+            }
+
+            // 4. Mapbox GL
             if (id.includes("mapbox-gl")) {
               return "vendor-mapbox";
+            }
+
+            // 5. Core React & Router
+            if (
+              id.includes("/node_modules/react/") ||
+              id.includes("/node_modules/react-dom/") ||
+              id.includes("/node_modules/react-router/") ||
+              id.includes("/node_modules/react-router-dom/") ||
+              id.includes("/node_modules/scheduler/")
+            ) {
+              return "vendor-core";
+            }
+
+            // 6. Componentes e utilitários de UI
+            if (
+              id.includes("clsx") ||
+              id.includes("tailwind-merge") ||
+              id.includes("class-variance-authority") ||
+              id.includes("@radix-ui") ||
+              id.includes("lucide-react")
+            ) {
+              return "vendor-ui";
+            }
+
+            // 7. Supabase & React Query
+            if (id.includes("@supabase") || id.includes("@tanstack")) {
+              return "vendor-query";
             }
           }
         },
